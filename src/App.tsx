@@ -3,7 +3,16 @@ import { observer } from 'mobx-react-lite'
 import { Provider as UrqlProvider } from 'urql'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 
-import './App.css'
+import Notifications from './components/Notifications'
+
+import materialTheme from './utils/materialTheme'
+import createGlobalStyle from './utils/createGlobalStyle'
+const GlobalStyle = createGlobalStyle()
+
+import { Provider as MobxProvider } from './storeContext'
+
+import initiateApp from './utils/initiateApp'
+import initiateDb from './utils/initiateDb'
 
 import logo from './logo.svg'
 

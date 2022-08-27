@@ -9005,6 +9005,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mst-persist@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "mst-persist@npm:0.1.3"
+  peerDependencies:
+    mobx-state-tree: ^3.2.1
+  checksum: 5accdea61e826d5d9b4dbfd8495e549ec7407ff942ac204caab8990d3aa88af3eae43c24c3be361acaa61074ca9199f099100702dd30627efabecc21b5416b60
+  languageName: node
+  linkType: hard
+
 "mute-stream@npm:0.0.8":
   version: 0.0.8
   resolution: "mute-stream@npm:0.0.8"
@@ -12435,6 +12444,7 @@ __metadata:
     mobx: 6.6.1
     mobx-react-lite: 3.4.0
     mobx-state-tree: 5.1.6
+    mst-persist: ^0.1.3
     prettier: 2.7.1
     prismjs: 1.29.0
     proj4: 2.8.0
