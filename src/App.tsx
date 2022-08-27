@@ -14,7 +14,7 @@ import { Provider as MobxProvider } from './storeContext'
 import initiateApp from './utils/initiateApp'
 import initiateDb from './utils/initiateDb'
 
-import logo from './logo.svg'
+import { dexie } from './dexieClient'
 
 // trying to persist indexedDB
 // https://dexie.org/docs/StorageManager#controlling-persistence
@@ -35,7 +35,6 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p className="header">
           🚀 Vite + React + Typescript 🤘 & <br />
           Eslint 🔥+ Prettier
