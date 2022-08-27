@@ -7,6 +7,19 @@ import './App.css'
 
 import logo from './logo.svg'
 
+// trying to persist indexedDB
+// https://dexie.org/docs/StorageManager#controlling-persistence
+// TODO: consider calling this only if user choose it in settings
+// or pop own window to explain as shown in above link
+// because it pops a request window
+async function persist() {
+  return (
+    (await navigator.storage) &&
+    navigator.storage.persist &&
+    navigator.storage.persist()
+  )
+}
+
 function App() {
   const [count, setCount] = useState(0)
 
