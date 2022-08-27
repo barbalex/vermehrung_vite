@@ -37,7 +37,6 @@
     "mobx": "6.6.1",
     "mobx-react-lite": "3.4.0",
     "mobx-state-tree": "5.1.6",
-    "prettier": "2.7.1",
     "prismjs": "1.29.0",
     "proj4": "2.8.0",
     "prop-types": "15.8.1",
@@ -82,6 +81,7 @@
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-react": "7.31.1",
     "eslint-plugin-react-hooks": "4.6.0",
+    "firebase-tools": "11.8.0",
     "prettier": "2.7.1",
     "tslint-config-prettier": "1.18.0",
     "typescript": "4.8.2",
@@ -90,5 +90,16 @@
   },
   "resolutions": {
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+  },
+  "dev-comments": {
+    "react-contextmenu": "using file copied from own build. When using v2.14.0 get Error in production: https://github.com/vkbansal/react-contextmenu/issues/284, https://github.com/gatsbyjs/gatsby/issues/19618. For better solution see: https://github.com/vkbansal/react-contextmenu/issues/284#issuecomment-670711499",
+    "graphql": "is needed by graphql_ws",
+    "react-is": "is needed by styled-components",
+    "prop-types": "is used by react-typography",
+    "jquery": "is peer",
+    "simplebar": "is peer",
+    "webpack": "is peer",
+    "core-js": "is peer",
+    "@babel/core": "is peer"
   }
 }
