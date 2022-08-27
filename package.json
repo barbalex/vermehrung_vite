@@ -1,6 +1,8 @@
 {
-  "name": "vite-reactts-eslint-prettier",
-  "version": "0.0.0",
+  "name": "vermehrung.ch",
+  "description": "breeding endangered plant species",
+  "version": "1.3.52",
+  "license": "ISC",
   "scripts": {
     "dev": "vite",
     "build_ts": "tsc && vite build",
@@ -14,20 +16,19 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/react": "18.0.14",
-    "@types/react-dom": "18.0.5",
-    "@typescript-eslint/eslint-plugin": "5.30.0",
-    "@typescript-eslint/parser": "5.30.0",
+    "@types/react": "18.0.17",
+    "@types/react-dom": "18.0.6",
+    "@typescript-eslint/eslint-plugin": "5.35.1",
+    "@typescript-eslint/parser": "5.35.1",
     "@vitejs/plugin-react": "^1.3.2",
-    "eslint": "8.18.0",
+    "eslint": "8.23.0",
     "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-react": "7.30.1",
+    "eslint-plugin-react": "7.31.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "prettier": "2.7.1",
     "tslint-config-prettier": "1.18.0",
-    "typescript": "4.7.4",
-    "vite": "2.9.13",
+    "typescript": "4.8.2",
+    "vite": "2.9.15",
     "vite-plugin-pwa": "^0.12.3"
-  },
-  "license": "MIT"
+  }
 }
