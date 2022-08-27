@@ -1,11 +1,14 @@
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Provider as UrqlProvider } from 'urql'
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 
-import React, { useState } from 'react';
+import './App.css'
 
-import logo from './logo.svg';
+import logo from './logo.svg'
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   return (
     <div className="App">
@@ -21,7 +24,10 @@ function App() {
             🪂 Click me : {count}
           </button>
 
-          <p> Don&apos;t forgot to install Eslint and Prettier in Your Vscode.</p>
+          <p>
+            {' '}
+            Don&apos;t forgot to install Eslint and Prettier in Your Vscode.
+          </p>
 
           <p>
             Mess up the code in <code>App.tsx </code> and save the file.
@@ -48,7 +54,7 @@ function App() {
         </div>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
