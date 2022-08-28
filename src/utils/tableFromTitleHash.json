@@ -1,0 +1,16 @@
+{
+  "Arten": "art",
+  "Events": "event",
+  "Gaerten": "garten",
+  "Kulturen": "kultur",
+  "Teilzaehlungen": "teilzaehlung",
+  "Teilkulturen": "teilkultur",
+  "Zaehlungen": "zaehlung",
+  "Aus-Lieferungen": "lieferung",
+  "An-Lieferungen": "lieferung",
+  "Lieferungen": "lieferung",
+  "Sammel-Lieferungen": "sammel_lieferung",
+  "Sammlungen": "sammlung",
+  "Herkuenfte": "herkunft",
+  "Personen": "person"
+}

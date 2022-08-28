@@ -1,5 +1,4 @@
 import localForage from 'localforage'
-import { navigate } from '@reach/router'
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import persist from 'mst-persist'
@@ -93,7 +92,7 @@ const recreatePersistedStore = async ({ store }) => {
     const visitedTopDomain = window.location.pathname === '/'
     if (!!user && visitedTopDomain) {
       setTimeout(() => {
-        navigate(`/Vermehrung/${store.tree.activeNodeArray.join('/')}`)
+        store.navigate(`/Vermehrung/${store.tree.activeNodeArray.join('/')}`)
       }, 200)
     }
     const nowOnline = await isOnline()

@@ -1,6 +1,5 @@
 import { types, getParent } from 'mobx-state-tree'
 import isEqual from 'lodash/isEqual'
-import { navigate } from '@reach/router'
 
 export default types
   .model('Tree', {
@@ -26,12 +25,8 @@ export default types
     setWidthInPercentOfScreen(val) {
       self.widthInPercentOfScreen = val
     },
-    setActiveNodeArray(val, nonavigate) {
+    setActiveNodeArray(val) {
       self.activeNodeArray = val
-      if (!nonavigate) {
-        navigate(`/Vermehrung/${val.join('/')}`)
-        self.addOpenNode(val)
-      }
     },
     setOpenNodes(val) {
       // need set to ensure contained arrays are unique
@@ -49,7 +44,7 @@ export default types
     },
     addOpenNode(url) {
       // add all parent nodes
-      let addedOpenNodes = []
+      const addedOpenNodes = []
       for (let i = 1; i <= url.length; i++) {
         addedOpenNodes.push(url.slice(0, i))
       }

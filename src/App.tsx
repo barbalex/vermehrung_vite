@@ -13,11 +13,12 @@ import { Provider as MobxProvider } from './storeContext'
 
 import initiateApp from './utils/initiateApp'
 import initiateDb from './utils/initiateDb'
+import NavigationSyncController from './components/NavigationSyncController'
 
 import { dexie } from './dexieClient'
 
 // trying to persist indexedDB
-// https://dexie.org/docs/StorageManager#controlling-persistence
+// https://dexie.org/docs/StorageManager#controlling-persistence 
 // TODO: consider calling this only if user choose it in settings
 // or pop own window to explain as shown in above link
 // because it pops a request window
@@ -29,53 +30,49 @@ async function persist() {
   )
 }
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = ({ element }) => {
+  const [store, setStore] = useState(null)
+  const [database, setDatabase] = useState(null)
+
+  useEffect(() => {
+    let isActive = true
+    let unregister
+    initiateApp().then(
+      ({ store: storeReturned, unregister: unregisterReturned }) => {
+        if (!isActive) return
+
+        setStore(storeReturned)
+        unregister = unregisterReturned
+        // const db = initiateDb(store)
+        // setDatabase(db)
+        // storeReturned.setDb(db)
+      },
+    )
+
+    return () => {
+      isActive = false
+      unregister()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // without store bad things happen
+  if (!store) return null
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p className="header">
-          🚀 Vite + React + Typescript 🤘 & <br />
-          Eslint 🔥+ Prettier
-        </p>
-
-        <div className="body">
-          <button onClick={() => setCount((count) => count + 1)}>
-            🪂 Click me : {count}
-          </button>
-
-          <p>
-            {' '}
-            Don&apos;t forgot to install Eslint and Prettier in Your Vscode.
-          </p>
-
-          <p>
-            Mess up the code in <code>App.tsx </code> and save the file.
-          </p>
-          <p>
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-            </a>
-            {' | '}
-            <a
-              className="App-link"
-              href="https://vitejs.dev/guide/features.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Vite Docs
-            </a>
-          </p>
-        </div>
-      </header>
-    </div>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={materialTheme}>
+        <MobxProvider value={store}>
+          <UrqlProvider value={store.gqlClient}>
+            <GlobalStyle />
+            <NavigationSyncController />
+            {element}
+            <Notifications />
+          </UrqlProvider>
+        </MobxProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   )
 }
 
-export default App
+export default observer(App)
