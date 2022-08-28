@@ -1,13 +1,16 @@
 import React, { useCallback } from 'react'
 import Typography from '@mui/material/Typography'
-import { navigate } from 'gatsby'
 import styled from 'styled-components'
 import { StaticImage } from 'gatsby-plugin-image'
 import Button from '@mui/material/Button'
+import { useNavigate } from 'react-router-dom'
 
 import Layout from '../components/Layout'
 import ErrorBoundary from '../components/shared/ErrorBoundary'
 import constants from '../utils/constants'
+import image from '../images/puls_vulg.jpg'
+import placeholderSrc from '../images/puls_vulg.jpg' // TODO: build small placeholder
+import ProgressiveImg from '../components/shared/ProgressiveImg' 
 
 const Container = styled.div`
   min-height: calc(100vh - ${constants.appBarHeight}px);
@@ -46,38 +49,32 @@ const bgImageStyle = {
 }
 
 const Index = () => {
+  const navigate = useNavigate()
   const onClickBack = useCallback(() => navigate('/'), [])
 
   return (
     <ErrorBoundary>
       <Container>
-        <Layout>
-          <StaticImage
-            src="../images/puls_vulg.jpg"
-            style={bgImageStyle}
-            alt="Pulsatilla vulgaris"
-            layout="fullWidth"
-          />
-          <TextContainer>
-            <PageTitle align="center" variant="h6">
-              Oh je
-            </PageTitle>
-          </TextContainer>
-          <TextContainer>
-            <Text align="center" variant="h6">
-              Diese Seite ist nicht verfügbar.
-            </Text>
-          </TextContainer>
-          <TextContainer>
-            <StyledButton
-              variant="outlined"
-              onClick={onClickBack}
-              color="inherit"
-            >
-              Zurück zur Startseite
-            </StyledButton>
-          </TextContainer>
-        </Layout>
+        <ProgressiveImg src={image} placeholderSrc={placeholderSrc} />
+        <TextContainer>
+          <PageTitle align="center" variant="h6">
+            Oh je
+          </PageTitle>
+        </TextContainer>
+        <TextContainer>
+          <Text align="center" variant="h6">
+            Diese Seite ist nicht verfügbar.
+          </Text>
+        </TextContainer>
+        <TextContainer>
+          <StyledButton
+            variant="outlined"
+            onClick={onClickBack}
+            color="inherit"
+          >
+            Zurück zur Startseite
+          </StyledButton>
+        </TextContainer>
       </Container>
     </ErrorBoundary>
   )

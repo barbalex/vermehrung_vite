@@ -2,23 +2,54 @@ import React from 'react'
 import Typography from '@mui/material/Typography'
 import MaterialCard from '@mui/material/Card'
 import styled from 'styled-components'
-import { StaticImage } from 'gatsby-plugin-image'
 
 import Layout from '../components/Layout'
 import ErrorBoundary from '../components/shared/ErrorBoundary'
 import constants from '../utils/constants'
+import image from '../images/puls_vulg.jpg'
+import placeholderSrc from '../images/puls_vulg.jpg' // TODO: build small placeholder
+import ProgressiveImg from '../components/shared/ProgressiveImg' 
 
-const ScrollContainer = styled.div`
-  height: calc(100vh - ${constants.appBarHeight}px);
+
+const OuterContainer = styled.div`
+  height: calc(100% - ${constants.appBarHeight}px);
   position: relative;
+  overflow: hidden;
+`
+// const ScrollContainer = styled.div`
+//   height: calc(100vh - ${constants.appBarHeight}px);
+//   position: relative;
+//   overflow-y: auto;
+//   /* prevent layout shift when scrollbar appears */
+//   scrollbar-gutter: stable;
+// `
+const ScrollContainer = styled.div`
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
   overflow-y: auto;
   /* prevent layout shift when scrollbar appears */
   scrollbar-gutter: stable;
 `
+// const Container = styled.div`
+//   padding: 15px;
+//   position: relative;
+//   min-height: 100%;
+//   @media (min-width: 700px) {
+//     padding: 20px;
+//   }
+//   @media (min-width: 1200px) {
+//     padding: 25px;
+//   }
+//   @media (min-width: 1700px) {
+//     padding: 30px;
+//   }
+// `
 const Container = styled.div`
+  height: 100%;
+  box-sizing: border-box;
   padding: 15px;
-  position: relative;
-  min-height: 100%;
   @media (min-width: 700px) {
     padding: 20px;
   }
@@ -102,15 +133,10 @@ const bgImageStyle = {
 
 const Index = () => (
   <ErrorBoundary>
-    <Layout>
+    <OuterContainer>
+      <ProgressiveImg src={image} placeholderSrc={placeholderSrc} />
       <ScrollContainer>
         <Container>
-          <StaticImage
-            src="../images/puls_vulg.jpg"
-            style={bgImageStyle}
-            alt="Pulsatilla vulgaris"
-            layout="fullWidth"
-          />
           <PageTitle align="center" variant="h6" color="inherit">
             Bedrohte Pflanzen vermehren
           </PageTitle>
@@ -212,7 +238,7 @@ const Index = () => (
           </CardContainer>
         </Container>
       </ScrollContainer>
-    </Layout>
+    </OuterContainer>
   </ErrorBoundary>
 )
 

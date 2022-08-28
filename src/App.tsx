@@ -18,6 +18,10 @@ import NavigationSyncController from './components/NavigationSyncController'
 
 import { dexie } from './dexieClient'
 import Layout from './components/Layout'
+import Home from './routes/index.js'
+import Vermehrung from './routes/Vermehrung'
+import Dokumentation from './routes/Dokumentation'
+import FourOhFour from './routes/404'
 
 // trying to persist indexedDB
 // https://dexie.org/docs/StorageManager#controlling-persistence 
@@ -73,10 +77,12 @@ const App = ({ element }) => {
               <GlobalStyle />
               <NavigationSyncController />
               <Layout>
-                <>
-                  {element}
-                  <p>hi</p>
-                </>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="Dokumentation/*" element={<Dokumentation />} />
+                  <Route path="/*" element={Vermehrungen}/>
+                  <Route path="*" element={<FourOhFour />} />
+                </Routes>
               </Layout>
             </UrqlProvider>
           </MobxProvider>
