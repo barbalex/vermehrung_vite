@@ -17,6 +17,7 @@ import initiateDb from './utils/initiateDb'
 import NavigationSyncController from './components/NavigationSyncController'
 
 import { dexie } from './dexieClient'
+import Layout from './components/Layout'
 
 // trying to persist indexedDB
 // https://dexie.org/docs/StorageManager#controlling-persistence 
@@ -58,8 +59,6 @@ const App = ({ element }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log('App rendering, store:',store)
-
   // without store bad things happen
   if (!store) return null
 
@@ -73,30 +72,18 @@ const App = ({ element }) => {
             <UrqlProvider value={store.gqlClient}>
               <GlobalStyle />
               <NavigationSyncController />
-              {element}
-              <p>hi</p>
+              <Layout>
+                <>
+                  {element}
+                  <p>hi</p>
+                </>
+              </Layout>
             </UrqlProvider>
           </MobxProvider>
         </ThemeProvider>
       </StyledEngineProvider>
     </BrowserRouter>
   )
-
-  // return (
-  //   <StyledEngineProvider injectFirst>
-  //     <ThemeProvider theme={materialTheme}>
-  //       <MobxProvider value={store}>
-  //         <UrqlProvider value={store.gqlClient}>
-  //           <GlobalStyle />
-  //           <NavigationSyncController />
-  //           {element}
-  //           <p>hi</p>
-  //           <Notifications />
-  //         </UrqlProvider>
-  //       </MobxProvider>
-  //     </ThemeProvider>
-  //   </StyledEngineProvider>
-  // )
 }
 
 export default observer(App)
