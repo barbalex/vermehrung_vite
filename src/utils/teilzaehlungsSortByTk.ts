@@ -1,4 +1,4 @@
-import { first as first$ } from 'rxjs/operators'
+// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const tzsSortByTk = async (tzs) => {
@@ -6,7 +6,8 @@ const tzsSortByTk = async (tzs) => {
     tzs.map(async (tz) => {
       let label = ''
       try {
-        label = await tz.label?.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
+        // await tz.label?.pipe(first$()).toPromise()
       } catch {}
 
       return {

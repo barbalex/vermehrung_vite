@@ -1,4 +1,4 @@
-import { Q } from '@nozbe/watermelondb'
+// import { Q } from '@nozbe/watermelondb'
 import isEqual from 'lodash/isEqual'
 
 import parseComplexFieldsForWm from './parseComplexFieldsForWm'
@@ -28,17 +28,19 @@ const processSubscriptionResult = async ({
 
   let objectsOfToUpdate = []
   try {
-    objectsOfToUpdate = await db
-      .get(table)
-      .query(Q.where('id', Q.oneOf(incomingIds)))
-      .fetch()
+    objectsOfToUpdate = [] // TODO: dexie
+    // await db
+    //   .get(table)
+    //   .query(Q.where('id', Q.oneOf(incomingIds)))
+    //   .fetch()
   } catch {}
   let objectsOfIncoming = []
   try {
-    objectsOfIncoming = await db
-      .get(table)
-      .query(Q.where('id', Q.oneOf(incomingIds)))
-      .fetch()
+    objectsOfIncoming = [] // TODO: dexie
+    // await db
+    //   .get(table)
+    //   .query(Q.where('id', Q.oneOf(incomingIds)))
+    //   .fetch()
   } catch {}
   const existingIds = objectsOfIncoming.map((d) => d.id)
   const missingIds = incomingIds.filter((d) => !existingIds.includes(d))

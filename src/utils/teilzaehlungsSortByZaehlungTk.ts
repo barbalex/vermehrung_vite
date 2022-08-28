@@ -1,4 +1,4 @@
-import { first as first$ } from 'rxjs/operators'
+// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const teilzaehlungsSortByZaehlungTk = async (tzs) => {
@@ -6,12 +6,14 @@ const teilzaehlungsSortByZaehlungTk = async (tzs) => {
     tzs.map(async (tz) => {
       let zaehlung
       try {
-        zaehlung = await tz.zaehlung.observe().pipe(first$()).toPromise()
+        zaehlung = 'TODO: dexie'
+        // await tz.zaehlung.observe().pipe(first$()).toPromise()
       } catch {}
       const zaehlungDatum = zaehlung?.datum ?? ''
       let label
       try {
-        label = await tz.label?.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
+        // await tz.label?.pipe(first$()).toPromise()
       } catch {}
 
       return {

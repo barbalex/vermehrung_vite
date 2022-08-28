@@ -1,4 +1,4 @@
-import { first as first$ } from 'rxjs/operators'
+// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const gvsSortByGarten = async (gvs) => {
@@ -6,7 +6,8 @@ const gvsSortByGarten = async (gvs) => {
     gvs.map(async (gv) => {
       let label = ''
       try {
-        label = await gv.gartenLabel.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
+        // await gv.gartenLabel.pipe(first$()).toPromise()
       } catch {}
 
       return {

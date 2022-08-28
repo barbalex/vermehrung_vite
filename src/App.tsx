@@ -13,7 +13,7 @@ const GlobalStyle = createGlobalStyle()
 import { Provider as MobxProvider } from './storeContext'
 
 import initiateApp from './utils/initiateApp'
-import initiateDb from './utils/initiateDb'
+// import initiateDb from './utils/initiateDb'
 import NavigationSyncController from './components/NavigationSyncController'
 
 import { dexie } from './dexieClient'
