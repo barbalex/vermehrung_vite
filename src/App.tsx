@@ -41,6 +41,7 @@ const App = ({ element }) => {
       ({ store: storeReturned, unregister: unregisterReturned }) => {
         if (!isActive) return
 
+        // console.log('App, effect, storeReturned:',storeReturned)
         setStore(storeReturned)
         unregister = unregisterReturned
         // const db = initiateDb(store)
@@ -56,8 +57,12 @@ const App = ({ element }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  console.log('App rendering, store:',store)
+
   // without store bad things happen
   if (!store) return null
+
+  // return <p>hi</p>
 
   return (
     <StyledEngineProvider injectFirst>
@@ -67,12 +72,28 @@ const App = ({ element }) => {
             <GlobalStyle />
             <NavigationSyncController />
             {element}
-            <Notifications />
+            <p>hi</p>
           </UrqlProvider>
         </MobxProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   )
+
+  // return (
+  //   <StyledEngineProvider injectFirst>
+  //     <ThemeProvider theme={materialTheme}>
+  //       <MobxProvider value={store}>
+  //         <UrqlProvider value={store.gqlClient}>
+  //           <GlobalStyle />
+  //           <NavigationSyncController />
+  //           {element}
+  //           <p>hi</p>
+  //           <Notifications />
+  //         </UrqlProvider>
+  //       </MobxProvider>
+  //     </ThemeProvider>
+  //   </StyledEngineProvider>
+  // )
 }
 
 export default observer(App)

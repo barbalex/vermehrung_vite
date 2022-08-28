@@ -112,6 +112,7 @@ const initiateApp = async () => {
     gqlWsClient.dispose()
   }
 
+  // console.log('initiateApp, store:', store)
   return { store, unregister }
 }
 
