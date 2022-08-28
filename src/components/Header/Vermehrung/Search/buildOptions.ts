@@ -1,6 +1,6 @@
 import Fuse from 'fuse.js'
 import { DateTime } from 'luxon'
-import { first as first$ } from 'rxjs/operators'
+// import { first as first$ } from 'rxjs/operators'
 
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import lieferungLabelFromLieferung from '../../../../utils/lieferungLabelFromLieferung'
@@ -112,7 +112,8 @@ const buildOptions = async ({ store, cb, val }) => {
     artsSorted.map(async (a) => {
       let label = ''
       try {
-        label = await a.label.pipe(first$()).toPromise()
+        // label = await a.label.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
       } catch {}
 
       return {
@@ -138,7 +139,8 @@ const buildOptions = async ({ store, cb, val }) => {
     gartensSorted.map(async (g) => {
       let label
       try {
-        label = await g.label.pipe(first$()).toPromise()
+        // label = await g.label.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
       } catch {}
       let person
       try {
@@ -210,7 +212,8 @@ const buildOptions = async ({ store, cb, val }) => {
     kultursSorted.map(async (k) => {
       let label
       try {
-        label = await k.label.pipe(first$()).toPromise()
+        // label = await k.label.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
       } catch {}
       let garten
       try {
@@ -257,7 +260,8 @@ const buildOptions = async ({ store, cb, val }) => {
   const searchEventSuggestions = eventsSorted.map(async (e) => {
     let label
     try {
-      label = await e.label.pipe(first$()).toPromise()
+      // label = await e.label.pipe(first$()).toPromise()
+      label = 'TODO: dexie'
     } catch {}
     let kultur
     try {
@@ -269,7 +273,8 @@ const buildOptions = async ({ store, cb, val }) => {
     } catch {}
     let artname = ''
     try {
-      artname = await art?.label?.pipe(first$()).toPromise()
+      // artname = await art?.label?.pipe(first$()).toPromise()
+      artname = 'TODO: dexie'
     } catch {}
     let garten
     try {
@@ -351,7 +356,8 @@ const buildOptions = async ({ store, cb, val }) => {
       } catch {}
       let artname
       try {
-        artname = (await art?.label?.pipe(first$()).toPromise()) ?? ''
+        // artname = (await art?.label?.pipe(first$()).toPromise()) ?? ''
+        artname = 'TODO: dexie'
       } catch {}
 
       return {
@@ -444,7 +450,8 @@ const buildOptions = async ({ store, cb, val }) => {
     sammlungsSorted.map(async (s) => {
       let label
       try {
-        label = await s.label.pipe(first$()).toPromise()
+        // label = await s.label.pipe(first$()).toPromise()
+        label = 'TODO: dexie'
       } catch {}
       let herkunft
       try {

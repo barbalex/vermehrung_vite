@@ -1,7 +1,7 @@
 import * as ExcelJs from 'exceljs/dist/exceljs.min.js'
 import { DateTime } from 'luxon'
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
+// import { Q } from '@nozbe/watermelondb'
+// import { first as first$ } from 'rxjs/operators'
 
 import addWorksheetToExceljsWorkbook from '../../../../../utils/addWorksheetToExceljsWorkbook'
 import herkunftLabelFromHerkunft from '../../../../../utils/herkunftLabelFromHerkunft'
@@ -15,10 +15,11 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
 
   let lieferungs = []
   try {
-    lieferungs = await db
-      .get('lieferung')
-      .query(Q.where('_deleted', false), Q.where('datum', Q.notEq(null)))
-      .fetch()
+    lieferungs = [] // TODO: dexie
+    // await db
+    //   .get('lieferung')
+    //   .query(Q.where('_deleted', false), Q.where('datum', Q.notEq(null)))
+    //   .fetch()
   } catch {}
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
@@ -39,7 +40,8 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let von_sammlung_label
         try {
-          von_sammlung_label = vonSammlung?.label.pipe(first$()).toPromise()
+          // von_sammlung_label = vonSammlung?.label.pipe(first$()).toPromise()
+          von_sammlung_label = 'TODO: dexie'
         } catch {}
         let vonSammlungPerson
         try {
@@ -51,11 +53,13 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let vonKultur
         try {
-          vonKultur = await l.von_kultur.pipe(first$()).toPromise()
+          // vonKultur = await l.von_kultur.pipe(first$()).toPromise()
+          vonKultur = 'TODO: dexie'
         } catch {}
         let von_kultur_label
         try {
-          von_kultur_label = await vonKultur?.label.pipe(first$()).toPromise()
+          // von_kultur_label = await vonKultur?.label.pipe(first$()).toPromise()
+          von_kultur_label = 'TODO: dexie'
         } catch {}
         let vonKulturGarten
         try {
@@ -63,9 +67,10 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let von_kultur_garten_label
         try {
-          von_kultur_garten_label = await vonKulturGarten?.label
-            .pipe(first$())
-            .toPromise()
+          von_kultur_garten_label = 'TODO: dexie'
+          // await vonKulturGarten?.label
+          //   .pipe(first$())
+          //   .toPromise()
         } catch {}
         let vonKulturHerkunft
         try {
@@ -73,11 +78,13 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let nachKultur
         try {
-          nachKultur = await l.nach_kultur.pipe(first$()).toPromise()
+          // nachKultur = await l.nach_kultur.pipe(first$()).toPromise()
+          nachKultur = 'TODO: dexie'
         } catch {}
         let nach_kultur_label
         try {
-          nach_kultur_label = nachKultur?.label.pipe(first$()).toPromise()
+          // nach_kultur_label = nachKultur?.label.pipe(first$()).toPromise()
+          nach_kultur_label = 'TODO: dexie'
         } catch {}
         let nachKulturGarten
         try {
@@ -85,9 +92,10 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let nach_kultur_garten_label
         try {
-          nach_kultur_garten_label = nachKulturGarten?.label
-            .pipe(first$())
-            .toPromise()
+          nach_kultur_garten_label = 'TODO: dexie'
+          // nachKulturGarten?.label
+          //   .pipe(first$())
+          //   .toPromise()
         } catch {}
         let nachKulturHerkunft
         try {
@@ -99,7 +107,8 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let art_label
         try {
-          art_label = await art?.label.pipe(first$()).toPromise()
+          // art_label = await art?.label.pipe(first$()).toPromise()
+          art_label = 'TODO: dexie'
         } catch {}
 
         return {

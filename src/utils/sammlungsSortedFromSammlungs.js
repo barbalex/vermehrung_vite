@@ -1,5 +1,5 @@
 import sortBy from 'lodash/sortBy'
-import { first as first$ } from 'rxjs/operators'
+// import { first as first$ } from 'rxjs/operators'
 
 import personFullname from './personFullname'
 
@@ -25,7 +25,8 @@ const sammlungsSortedFromSammlungs = async (sammlungs) => {
       } catch {}
       let artLabel = ''
       try {
-        artLabel = await art?.label?.pipe(first$()).toPromise()
+        // artLabel = await art?.label?.pipe(first$()).toPromise()
+        artLabel = 'TODO: dexie'
       } catch {}
       const sort = [
         datum,

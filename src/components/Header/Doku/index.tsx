@@ -5,7 +5,7 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import { FaHome } from 'react-icons/fa'
 import styled from 'styled-components'
-import { Link } from 'gatsby'
+import { Link } from 'react-router-dom'
 import { withResizeDetector } from 'react-resize-detector'
 
 import ErrorBoundary from '../../shared/ErrorBoundary'

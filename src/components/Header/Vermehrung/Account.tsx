@@ -11,8 +11,8 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { FaUserCircle as UserIcon, FaExclamationCircle } from 'react-icons/fa'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
-import { of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+// import { of as $of } from 'rxjs'
+// import { Q } from '@nozbe/watermelondb'
 import { sendPasswordResetEmail } from 'firebase/auth'
 
 import StoreContext from '../../../storeContext'
@@ -38,19 +38,19 @@ const Account = () => {
   const { user, online, db, queuedQueries, firebaseAuth } = store
 
   const [userPerson, setUserPerson] = useState(undefined)
-  useEffect(() => {
-    const userPersonObservable = user.uid
-      ? db
-          .get('person')
-          .query(Q.where('account_id', user.uid))
-          .observeWithColumns(['vorname', 'name'])
-      : $of({})
-    const subscription = userPersonObservable.subscribe(([userPerson]) =>
-      setUserPerson(userPerson),
-    )
+  // useEffect(() => {
+  //   const userPersonObservable = user.uid
+  //     ? db
+  //         .get('person')
+  //         .query(Q.where('account_id', user.uid))
+  //         .observeWithColumns(['vorname', 'name'])
+  //     : $of({})
+  //   const subscription = userPersonObservable.subscribe(([userPerson]) =>
+  //     setUserPerson(userPerson),
+  //   )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user])
+  //   return () => subscription?.unsubscribe?.()
+  // }, [db, user])
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [resetTitle, setResetTitle] = useState('Passwort zurücksetzen')
