@@ -248,7 +248,7 @@ const myTypes = types
     )
     return {
       setNavigate(val) {
-        return (self.navigate = val)
+        return (self.navigate = val) 
       },
       incrementWsReconnectCount() {
         self.wsReconnectCount = self.wsReconnectCount + 1

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Provider as UrqlProvider } from 'urql'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import Notifications from './components/Notifications'
 
@@ -65,18 +66,20 @@ const App = ({ element }) => {
   // return <p>hi</p>
 
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={materialTheme}>
-        <MobxProvider value={store}>
-          <UrqlProvider value={store.gqlClient}>
-            <GlobalStyle />
-            <NavigationSyncController />
-            {element}
-            <p>hi</p>
-          </UrqlProvider>
-        </MobxProvider>
-      </ThemeProvider>
-    </StyledEngineProvider>
+    <BrowserRouter>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={materialTheme}>
+          <MobxProvider value={store}>
+            <UrqlProvider value={store.gqlClient}>
+              <GlobalStyle />
+              <NavigationSyncController />
+              {element}
+              <p>hi</p>
+            </UrqlProvider>
+          </MobxProvider>
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </BrowserRouter>
   )
 
   // return (

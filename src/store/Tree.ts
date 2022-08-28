@@ -28,6 +28,20 @@ export default types
     setActiveNodeArray(val) {
       self.activeNodeArray = val
     },
+    addNode(url) {
+      // add all parent nodes
+      const addedOpenNodes = []
+      for (let i = 1; i <= url.length; i++) {
+        addedOpenNodes.push(url.slice(0, i))
+      }
+      self.addNodes(addedOpenNodes)
+    },
+    addNodes(nodes) {
+      // need set to ensure contained arrays are unique
+      const set = new Set([...self.openNodes, ...nodes].map(JSON.stringify))
+      const newOpenNodes = Array.from(set).map(JSON.parse)
+      self.openNodes = newOpenNodes
+    },
     setOpenNodes(val) {
       // need set to ensure contained arrays are unique
       const set = new Set(val.map(JSON.stringify))

@@ -19,11 +19,13 @@ const NavigationSyncController = () => {
   }, [])
 
   const store = useContext(storeContext)
-  const { setActiveNodeArray, setNavigate, addNode } = store
+  console.log('NavigationSyncController, store:',store)
+  const {  setNavigate } = store
+  const { setActiveNodeArray, addNode } = store.tree
 
   // need to update activeNodeArray on every navigation
   useEffect(() => {
-    console.log('NavigationSyncController, effect running')
+    console.log('NavigationSyncController, effect running',{store, setActiveNodeArray})
     const activeNodeArray = getActiveNodeArrayFromUrl(pathname)
 
     if (!isEqual(activeNodeArray, store.activeNodeArray?.slice())) {
