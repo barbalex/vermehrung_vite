@@ -80,7 +80,7 @@ const App = ({ element }) => {
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="Dokumentation/*" element={<Dokumentation />} />
-                  <Route path="/*" element={Vermehrungen}/>
+                  {/* <Route path="Vermehrung/*" element={<Vermehrung />}/> */}
                   <Route path="*" element={<FourOhFour />} />
                 </Routes>
               </Layout>

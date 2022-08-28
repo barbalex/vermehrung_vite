@@ -131,6 +131,8 @@ const bgImageStyle = {
   zIndex: -1,
 }
 
+// const Index = ()=> <p>HOME</p>
+
 const Index = () => (
   <ErrorBoundary>
     <OuterContainer>
