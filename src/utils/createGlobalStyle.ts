@@ -5,6 +5,10 @@ const createGlobalStyleModule = () => createGlobalStyle`
     overflow: hidden !important;
   }
 
+  body {
+    font-family: Roboto, sans-serif, system-ui;
+  }
+
   #___gatsby{
   /* works in firefox, not yet in chrome. https://caniuse.com/?search=scrollbar-color */
   scrollbar-color: #4a148c rgba(0, 0, 0, 0.4);}

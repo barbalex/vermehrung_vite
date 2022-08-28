@@ -6,6 +6,7 @@ const theme = createTheme({
     primary: { main: purple[900] },
     secondary: { main: orange[900] },
   },
+  typography: { fontFamily: ['Roboto'] },
 })
 
 export default theme

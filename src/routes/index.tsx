@@ -16,15 +16,8 @@ const OuterContainer = styled.div`
   position: relative;
   overflow: hidden;
 `
-// const ScrollContainer = styled.div`
-//   height: calc(100vh - ${constants.appBarHeight}px);
-//   position: relative;
-//   overflow-y: auto;
-//   /* prevent layout shift when scrollbar appears */
-//   scrollbar-gutter: stable;
-// `
 const ScrollContainer = styled.div`
-  height: 100%;
+  height: calc(100vh - ${constants.appBarHeight}px);
   width: 100%;
   position: absolute;
   top: 0;
@@ -32,20 +25,6 @@ const ScrollContainer = styled.div`
   /* prevent layout shift when scrollbar appears */
   scrollbar-gutter: stable;
 `
-// const Container = styled.div`
-//   padding: 15px;
-//   position: relative;
-//   min-height: 100%;
-//   @media (min-width: 700px) {
-//     padding: 20px;
-//   }
-//   @media (min-width: 1200px) {
-//     padding: 25px;
-//   }
-//   @media (min-width: 1700px) {
-//     padding: 30px;
-//   }
-// `
 const Container = styled.div`
   height: 100%;
   box-sizing: border-box;
@@ -121,17 +100,6 @@ const PageTitle = styled(Typography)`
 const CardTitle = styled.h3`
   font-weight: 700;
 `
-
-const bgImageStyle = {
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  width: '100%',
-  height: '100%',
-  zIndex: -1,
-}
-
-// const Index = ()=> <p>HOME</p>
 
 const Index = () => (
   <ErrorBoundary>
