@@ -39,6 +39,7 @@ const Container = styled.div`
   }
 `
 const CardContainer = styled.div`
+  color: inherit !important;
   display: grid;
   grid-template-columns: 1fr;
   grid-column-gap: 15px;
@@ -79,6 +80,7 @@ const Card = styled(MaterialCard)`
   li {
     font-weight: 500;
   }
+  h3 {margin-top: 0;}
 `
 const PageTitle = styled(Typography)`
   font-size: 2em !important;

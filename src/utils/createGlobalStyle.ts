@@ -12,9 +12,11 @@ const createGlobalStyleModule = () => createGlobalStyle`
     height: 100%;
   }
 
-  #root{
-  /* works in firefox, not yet in chrome. https://caniuse.com/?search=scrollbar-color */
-  scrollbar-color: #4a148c rgba(0, 0, 0, 0.4);}
+  #root {
+    /* works in firefox, not yet in chrome. https://caniuse.com/?search=scrollbar-color */
+    scrollbar-color: #4a148c rgba(0, 0, 0, 0.4);
+    height: 100%;
+  }
 
   /*
    * on mobile titles are invisible
