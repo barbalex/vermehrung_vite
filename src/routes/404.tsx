@@ -12,8 +12,19 @@ import image from '../images/puls_vulg.jpg'
 import placeholderSrc from '../images/puls_vulg.jpg' // TODO: build small placeholder
 import ProgressiveImg from '../components/shared/ProgressiveImg' 
 
-const Container = styled.div`
-  min-height: calc(100vh - ${constants.appBarHeight}px);
+const OuterContainer = styled.div`
+  height: calc(100% - ${constants.appBarHeight}px);
+  position: relative;
+  overflow: hidden;
+`
+const ScrollContainer = styled.div`
+  height: calc(100vh - ${constants.appBarHeight}px);
+  width: 100%;
+  position: absolute;
+  top: 0;
+  overflow-y: auto;
+  /* prevent layout shift when scrollbar appears */
+  scrollbar-gutter: stable;
 `
 const TextContainer = styled.div`
   display: flex;
@@ -54,28 +65,30 @@ const Index = () => {
 
   return (
     <ErrorBoundary>
-      <Container>
+      <OuterContainer>
         <ProgressiveImg src={image} placeholderSrc={placeholderSrc} />
-        <TextContainer>
-          <PageTitle align="center" variant="h6">
-            Oh je
-          </PageTitle>
-        </TextContainer>
-        <TextContainer>
-          <Text align="center" variant="h6">
-            Diese Seite ist nicht verfügbar.
-          </Text>
-        </TextContainer>
-        <TextContainer>
-          <StyledButton
-            variant="outlined"
-            onClick={onClickBack}
-            color="inherit"
-          >
-            Zurück zur Startseite
-          </StyledButton>
-        </TextContainer>
-      </Container>
+        <ScrollContainer>
+          <TextContainer>
+            <PageTitle align="center" variant="h6">
+              Oh je
+            </PageTitle>
+          </TextContainer>
+          <TextContainer>
+            <Text align="center" variant="h6">
+              Diese Seite ist nicht verfügbar.
+            </Text>
+          </TextContainer>
+          <TextContainer>
+            <StyledButton
+              variant="outlined"
+              onClick={onClickBack}
+              color="inherit"
+            >
+              Zurück zur Startseite
+            </StyledButton>
+          </TextContainer>
+        </ScrollContainer>
+      </OuterContainer>
     </ErrorBoundary>
   )
 }

@@ -64,7 +64,7 @@ const CardContainer = styled.div`
   }
   p:last-of-type {
     margin-bottom: 0 !important;
-    margin-top: 10px !important;
+    margin-top: 10px !important; 
   }
 `
 const Card = styled(MaterialCard)`
@@ -80,7 +80,9 @@ const Card = styled(MaterialCard)`
   li {
     font-weight: 500;
   }
-  h3 {margin-top: 0;}
+  h3 {
+    margin-top: 0;
+  }
 `
 const PageTitle = styled(Typography)`
   font-size: 2em !important;
