@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography'
 import MaterialCard from '@mui/material/Card'
 import styled from 'styled-components'
 
-import Layout from '../components/Layout'
 import ErrorBoundary from '../components/shared/ErrorBoundary'
 import constants from '../utils/constants'
 import image from '../images/puls_vulg.jpg'

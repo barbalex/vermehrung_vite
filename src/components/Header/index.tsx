@@ -2,14 +2,14 @@ import React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import styled from 'styled-components'
-import { Location } from '@reach/router'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import ErrorBoundary from '../shared/ErrorBoundary'
 import constants from '../../utils/constants'
 
 import Home from './Home'
 import Doku from './Doku'
-import Vermehrung from './Vermehrung'
+import Vermehrung from './Vermehrung' 
 
 const StyledAppBar = styled(AppBar)`
   min-height: ${constants.appBarHeight}px !important;
@@ -24,25 +24,27 @@ const StyledAppBar = styled(AppBar)`
 `
 
 const Header = () => {
-      const  pathname  = window.location.pathname
-      const isHome = pathname === '/'
-      const isVermehrung = pathname.startsWith('/Vermehrung')
+  const location = useLocation()
+  const  pathname  = location.pathname
+  const isHome = pathname === '/'
+  const isVermehrung = pathname.startsWith('/Vermehrung')
 
-      return (
-        <ErrorBoundary>
-          <StyledAppBar position="static">
-            <Toolbar>
-              {isHome ? (
-                <Home location={location} />
-              ) : isVermehrung ? (
-                <Vermehrung />
-              ) : (
-                <Doku />
-              )}
-            </Toolbar>
-          </StyledAppBar>
-        </ErrorBoundary>
-      )}
+  return (
+    <ErrorBoundary>
+      <StyledAppBar position="static">
+        <Toolbar>
+          {isHome ? (
+            <Home location={location} />
+          ) : isVermehrung ? (
+            <Vermehrung />
+          ) : (
+            <Doku />
+          )}
+        </Toolbar>
+      </StyledAppBar>
+    </ErrorBoundary>
+  )
+}
 
 
 export default Header
