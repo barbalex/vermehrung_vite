@@ -1,7 +1,7 @@
-// import { Q } from '@nozbe/watermelondb'
 import isEqual from 'lodash/isEqual'
 
-import parseComplexFieldsForWm from './parseComplexFieldsForWm'
+import parseComplexFieldsForWm from './parseComplexFieldsForWm'  
+import { dexie } from '../../dexieClient'
 
 const stripTypename = (object) => {
   // eslint-disable-next-line no-unused-vars

@@ -1,4 +1,4 @@
-import processSubscriptionResult from './processSubscriptionResult'
+import processTable from './processTable'
 
 const initializeSubscriptions = ({ store }) => {
   console.log('initializing subscriptions')
@@ -51,7 +51,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.ae_art,
           table: 'ae_art',
           store,
@@ -92,7 +92,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.art,
           table: 'art',
           store,
@@ -123,7 +123,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.art_file,
           table: 'art_file',
           store,
@@ -159,7 +159,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.art_qk,
           table: 'art_qk',
           store,
@@ -193,7 +193,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.av,
           table: 'av',
           store,
@@ -231,7 +231,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.event,
           table: 'event',
           store,
@@ -275,7 +275,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.garten,
           table: 'garten',
           store,
@@ -306,7 +306,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.garten_file,
           table: 'garten_file',
           store,
@@ -340,7 +340,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.gv,
           table: 'gv',
           store,
@@ -383,7 +383,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.herkunft,
           table: 'herkunft',
           store,
@@ -414,7 +414,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.herkunft_file,
           table: 'herkunft_file',
           store,
@@ -454,7 +454,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.kultur,
           table: 'kultur',
           store,
@@ -485,7 +485,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.kultur_file,
           table: 'kultur_file',
           store,
@@ -526,7 +526,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.kultur_option,
           table: 'kultur_option',
           store,
@@ -562,7 +562,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.kultur_qk,
           table: 'kultur_qk',
           store,
@@ -609,7 +609,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.lieferung,
           table: 'lieferung',
           store,
@@ -640,7 +640,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.lieferung_file,
           table: 'lieferung_file',
           store,
@@ -690,7 +690,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.person,
           table: 'person',
           store,
@@ -721,7 +721,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.person_file,
           table: 'person_file',
           store,
@@ -776,7 +776,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.person_option,
           table: 'person_option',
           store,
@@ -820,7 +820,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.sammel_lieferung,
           table: 'sammel_lieferung',
           store,
@@ -869,7 +869,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.sammlung,
           table: 'sammlung',
           store,
@@ -900,7 +900,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.sammlung_file,
           table: 'sammlung_file',
           store,
@@ -938,7 +938,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.teilkultur,
           table: 'teilkultur',
           store,
@@ -978,7 +978,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.teilzaehlung,
           table: 'teilzaehlung',
           store,
@@ -1007,7 +1007,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.user_role,
           table: 'user_role',
           store,
@@ -1043,7 +1043,7 @@ const initializeSubscriptions = ({ store }) => {
     },
     {
       next: (data) => {
-        processSubscriptionResult({
+        processTable({
           data: data.data.zaehlung,
           table: 'zaehlung',
           store,

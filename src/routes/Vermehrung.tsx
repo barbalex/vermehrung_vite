@@ -8,7 +8,7 @@ import StoreContext from '../storeContext'
 import Layout from '../components/Layout'
 import activeNodeArrayFromPathname from '../utils/activeNodeArrayFromPathname'
 import openNodesFromActiveNodeArray from '../utils/openNodesFromActiveNodeArray'
-import initializeSubscriptions from '../utils/initializeSubscriptions'
+import fetchFromServer from '../utils/fetchFromServer'
 import Tree from '../components/Tree'
 import Data from '../components/Data'
 import Filter from '../components/Filter'
@@ -126,7 +126,7 @@ const Vermehrung = ({ location }) => {
     if (existsUser && !authorizing) {
       // TODO:
       // need to fetch user to get role
-      // then pass role to initializeSubscriptions to skip fields
+      // then pass role to fetchFromServer to skip fields
       // this user has no access to
       // would be much nicer if hasura simply passed null values
       // https://github.com/hasura/graphql-engine/issues/6541
@@ -135,7 +135,7 @@ const Vermehrung = ({ location }) => {
       // if no data exists yet
       // set initial data queried false
       // then true on first data event
-      unsubscribe = initializeSubscriptions({ store })
+      unsubscribe = fetchFromServer({ store })
     }
     return function cleanup() {
       if (unsubscribe && Object.values(unsubscribe)) {
@@ -143,7 +143,7 @@ const Vermehrung = ({ location }) => {
       }
     }
     // wsReconnectCount is made so a subscription can provoke re-subscription on error
-    // see initializeSubscriptions, unsubscribe.ae_art
+    // see fetchFromServer, unsubscribe.ae_art
   }, [existsUser, store, wsReconnectCount, authorizing])
 
   //if (gettingAuthUser || isIOS) {
