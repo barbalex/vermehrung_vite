@@ -31,1370 +31,1370 @@ import {
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
 
-// if (typeof window !== 'undefined') {
-//   window.Dexie = Dexie
-// }
-
-// export interface IHerkunft {
-//   id: string
-//   nr?: string
-//   lokalname?: string
-//   gemeinde?: string
-//   kanton?: string
-//   land?: string
-//   geom_point?: string
-//   wgs84_lat?: number
-//   wgs84_long?: number
-//   lv95_x?: number
-//   lv95_y?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Herkunft implements IHerkunft {
-//   id: string
-//   nr?: string
-//   lokalname?: string
-//   gemeinde?: string
-//   kanton?: string
-//   land?: string
-//   geom_point?: string
-//   wgs84_lat?: number
-//   wgs84_long?: number
-//   lv95_x?: number
-//   lv95_y?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id?: string,
-//     nr?: string,
-//     lokalname?: string,
-//     gemeinde?: string,
-//     kanton?: string,
-//     land?: string,
-//     geom_point?: string,
-//     wgs84_lat?: number,
-//     wgs84_long?: number,
-//     lv95_x?: number,
-//     lv95_y?: number,
-//     bemerkungen?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.nr = nr ?? null
-//     this.lokalname = lokalname ?? null
-//     this.gemeinde = gemeinde ?? null
-//     this.kanton = kanton ?? null
-//     this.land = land ?? null
-//     this.geom_point = geom_point ?? null
-//     this.wgs84_lat = wgs84_lat ?? null
-//     this.wgs84_long = wgs84_long ?? null
-//     this.lv95_x = lv95_x ?? null
-//     this.lv95_y = lv95_y ?? null
-//     this.bemerkungen = bemerkungen ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`herkunft.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       herkunft_id: this.id,
-//       nr: field === 'nr' ? toStringIfPossible(value) : this.nr,
-//       lokalname:
-//         field === 'lokalname' ? toStringIfPossible(value) : this.lokalname,
-//       gemeinde:
-//         field === 'gemeinde' ? toStringIfPossible(value) : this.gemeinde,
-//       kanton: field === 'kanton' ? toStringIfPossible(value) : this.kanton,
-//       land: field === 'land' ? toStringIfPossible(value) : this.land,
-//       geom_point: field === 'geom_point' ? value : this.geom_point,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_herkunft_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'herkunft_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'herkunft',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['_deleted'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.herkunfts.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
-
-// export interface ISammlung {
-//   id: string
-//   art_id?: string
-//   person_id?: string
-//   herkunft_id?: string
-//   nr?: string
-//   datum?: Date
-//   von_anzahl_individuen?: number
-//   anzahl_pflanzen?: number
-//   gramm_samen?: number
-//   andere_menge?: string
-//   geom_point?: string
-//   wgs84_lat?: number
-//   wgs84_long?: number
-//   lv95_x?: number
-//   lv95_y?: number
-//   geplant?: boolean
-//   geplant_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Sammlung implements ISammlung {
-//   id: string
-//   art_id?: string
-//   person_id?: string
-//   herkunft_id?: string
-//   nr?: string
-//   datum?: Date
-//   von_anzahl_individuen?: number
-//   anzahl_pflanzen?: number
-//   gramm_samen?: number
-//   andere_menge?: string
-//   geom_point?: string
-//   wgs84_lat?: number
-//   wgs84_long?: number
-//   lv95_x?: number
-//   lv95_y?: number
-//   geplant?: boolean
-//   geplant_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     art_id?: string,
-//     person_id?: string,
-//     herkunft_id?: string,
-//     nr?: string,
-//     datum?: Date,
-//     von_anzahl_individuen?: number,
-//     anzahl_pflanzen?: number,
-//     gramm_samen?: number,
-//     andere_menge?: string,
-//     geom_point?: string,
-//     wgs84_lat?: number,
-//     wgs84_long?: number,
-//     lv95_x?: number,
-//     lv95_y?: number,
-//     geplant?: boolean,
-//     geplant_indexable?: number,
-//     bemerkungen?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.art_id = art_id ?? null
-//     this.person_id = person_id ?? null
-//     this.herkunft_id = herkunft_id ?? null
-//     this.nr = nr ?? null
-//     this.datum = datum ?? null
-//     this.von_anzahl_individuen = von_anzahl_individuen ?? null
-//     this.anzahl_pflanzen = anzahl_pflanzen ?? null
-//     this.gramm_samen = gramm_samen ?? null
-//     this.andere_menge = andere_menge ?? null
-//     this.geom_point = geom_point ?? null
-//     this.wgs84_lat = wgs84_lat ?? null
-//     this.wgs84_long = wgs84_long ?? null
-//     this.lv95_x = lv95_x ?? null
-//     this.lv95_y = lv95_y ?? null
-//     this.geplant = geplant ?? false
-//     this.geplant_indexable = geplant ? 1 : 0
-//     this.bemerkungen = bemerkungen ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   async label() {
-//     const herkunft = this.herkunft_id
-//       ? await dexie.herkunfts.get(this.herkunft_id)
-//       : undefined
-//     const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-//     const ae_art = art ? await dexie.ae_arts.get(art.ae_art_id) : undefined
-//     const person = this.person_id
-//       ? await dexie.persons.get(this.person_id)
-//       : undefined
-
-//     return sammlungLabelFromSammlung({
-//       sammlung: this,
-//       art,
-//       ae_art,
-//       person,
-//       herkunft,
-//     })
-//   }
-
-//   async labelUnderHerkunft() {
-//     const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-//     const ae_art = art ? await dexie.ae_arts.get(art.ae_art_id) : undefined
-//     const person = this.person_id
-//       ? await dexie.persons.get(this.person_id)
-//       : undefined
-
-//     return sammlungLabelFromSammlungUnderHerkunft({
-//       sammlung: this,
-//       art,
-//       ae_art,
-//       person,
-//     })
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`sammlung.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       sammlung_id: this.id,
-//       art_id: field === 'art_id' ? value : this.art_id,
-//       person_id: field === 'person_id' ? value : this.person_id,
-//       herkunft_id: field === 'herkunft_id' ? value : this.herkunft_id,
-//       nr: field === 'nr' ? toStringIfPossible(value) : this.nr,
-//       geom_point: field === 'geom_point' ? value : this.geom_point,
-//       datum: field === 'datum' ? value : this.datum,
-//       von_anzahl_individuen:
-//         field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
-//       anzahl_pflanzen:
-//         field === 'anzahl_pflanzen' ? value : this.anzahl_pflanzen,
-//       gramm_samen: field === 'gramm_samen' ? value : this.gramm_samen,
-//       andere_menge:
-//         field === 'andere_menge'
-//           ? toStringIfPossible(value)
-//           : this.andere_menge,
-//       geplant: field === 'geplant' ? value : this.geplant,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_sammlung_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'sammlung_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'sammlung',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['geplant', '_deleted'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.sammlungs.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
-
-// export interface ILieferung {
-//   id: string
-//   sammel_lieferung_id?: string
-//   art_id?: string
-//   person_id?: string
-//   von_sammlung_id?: string
-//   von_kultur_id?: string
-//   datum?: Date
-//   nach_kultur_id?: string
-//   nach_ausgepflanzt?: boolean
-//   nach_ausgepflanzt_indexable?: number
-//   von_anzahl_individuen?: number
-//   anzahl_pflanzen?: number
-//   anzahl_auspflanzbereit?: number
-//   gramm_samen?: number
-//   andere_menge?: string
-//   geplant?: boolean
-//   geplant_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Lieferung {
-//   id: string
-//   sammel_lieferung_id?: string
-//   art_id?: string
-//   person_id?: string
-//   von_sammlung_id?: string
-//   von_kultur_id?: string
-//   datum?: Date
-//   nach_kultur_id?: string
-//   nach_ausgepflanzt?: boolean
-//   nach_ausgepflanzt_indexable?: number
-//   von_anzahl_individuen?: number
-//   anzahl_pflanzen?: number
-//   anzahl_auspflanzbereit?: number
-//   gramm_samen?: number
-//   andere_menge?: string
-//   geplant?: boolean
-//   geplant_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     sammel_lieferung_id?: string,
-//     art_id?: string,
-//     person_id?: string,
-//     von_sammlung_id?: string,
-//     von_kultur_id?: string,
-//     datum?: Date,
-//     nach_kultur_id?: string,
-//     nach_ausgepflanzt?: boolean,
-//     nach_ausgepflanzt_indexable?: number,
-//     von_anzahl_individuen?: number,
-//     anzahl_pflanzen?: number,
-//     anzahl_auspflanzbereit?: number,
-//     gramm_samen?: number,
-//     andere_menge?: string,
-//     geplant?: boolean,
-//     geplant_indexable?: number,
-//     bemerkungen?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.sammel_lieferung_id = sammel_lieferung_id ?? null
-//     this.art_id = art_id ?? null
-//     this.person_id = person_id ?? null
-//     this.von_sammlung_id = von_sammlung_id ?? null
-//     this.von_kultur_id = von_kultur_id ?? null
-//     this.datum = datum ?? null
-//     this.nach_kultur_id = nach_kultur_id ?? null
-//     this.nach_ausgepflanzt = nach_ausgepflanzt ?? false
-//     this.nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
-//     this.von_anzahl_individuen = von_anzahl_individuen ?? null
-//     this.anzahl_pflanzen = anzahl_pflanzen ?? null
-//     this.anzahl_auspflanzbereit = anzahl_auspflanzbereit ?? null
-//     this.gramm_samen = gramm_samen ?? null
-//     this.andere_menge = andere_menge ?? null
-//     this.geplant = geplant ?? false
-//     this.geplant_indexable = geplant ? 1 : 0
-//     this.bemerkungen = bemerkungen ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   async von_kultur() {
-//     return await dexie.kulturs.get(this.von_kultur_id)
-//   }
-
-//   async nach_kultur() {
-//     return await dexie.kulturs.get(this.nach_kultur_id)
-//   }
-
-//   label() {
-//     return lieferungLabelFromLieferung({ lieferung: this })
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`lieferung.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       lieferung_id: this.id,
-//       sammel_lieferung_id:
-//         field === 'sammel_lieferung_id' ? value : this.sammel_lieferung_id,
-//       art_id: field === 'art_id' ? value : this.art_id,
-//       person_id: field === 'person_id' ? value : this.person_id,
-//       von_sammlung_id:
-//         field === 'von_sammlung_id' ? value : this.von_sammlung_id,
-//       von_kultur_id: field === 'von_kultur_id' ? value : this.von_kultur_id,
-//       datum: field === 'datum' ? value : this.datum,
-//       nach_kultur_id: field === 'nach_kultur_id' ? value : this.nach_kultur_id,
-//       nach_ausgepflanzt:
-//         field === 'nach_ausgepflanzt' ? value : this.nach_ausgepflanzt,
-//       von_anzahl_individuen:
-//         field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
-//       anzahl_pflanzen:
-//         field === 'anzahl_pflanzen' ? value : this.anzahl_pflanzen,
-//       anzahl_auspflanzbereit:
-//         field === 'anzahl_auspflanzbereit'
-//           ? value
-//           : this.anzahl_auspflanzbereit,
-//       gramm_samen: field === 'gramm_samen' ? value : this.gramm_samen,
-//       andere_menge:
-//         field === 'andere_menge'
-//           ? toStringIfPossible(value)
-//           : this.andere_menge,
-//       geplant: field === 'geplant' ? value : this.geplant,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_lieferung_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'lieferung_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'lieferung',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['_deleted', 'nach_ausgepflanzt', 'geplant'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.lieferungs.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
-
-// export interface IArt {
-//   id: string
-//   ae_id?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Art implements IArt {
-//   id: string
-//   ae_id?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     ae_id?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.ae_id = ae_id ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   async label() {
-//     const ae_art = this.ae_id ? await dexie.ae_arts.get(this.ae_id) : undefined
-//     return artLabelFromAeArt({ ae_art })
-//   }
-
-//   async herkunfts() {
-//     const sammlungs = await dexie.sammlungs.where({ art_id: this.id }).toArray()
-//     const herkunftIds = sammlungs
-//       .filter((s) => !!s.herkunft_id)
-//       .map((s) => s.herkunft_id)
-//     return await dexie.herkunfts.bulkGet(herkunftIds)
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`art.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       art_id: this.id,
-//       ae_id: field === 'ae_id' ? value : this.ae_id,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_art_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'art_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'art',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['_deleted'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.arts.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// } // 3
-
-// export interface IAeArt {
-//   id: string
-//   name?: string
-//   changed?: Date
-// }
-
-// export class AeArt implements IAeArt {
-//   id: string
-//   name?: string
-//   changed?: Date
-// }
-
-// export interface IGarten {
-//   id: string
-//   name?: string
-//   person_id?: string
-//   strasse?: string
-//   plz?: number
-//   ort?: string
-//   geom_point?: string
-//   wgs84_lat?: string
-//   wgs84_long?: string
-//   lv95_x?: string
-//   lv95_y?: string
-//   aktiv?: boolean
-//   aktiv_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Garten implements IGarten {
-//   id: string
-//   name?: string
-//   person_id?: string
-//   strasse?: string
-//   plz?: number
-//   ort?: string
-//   geom_point?: string
-//   wgs84_lat?: string
-//   wgs84_long?: string
-//   lv95_x?: string
-//   lv95_y?: string
-//   aktiv?: boolean
-//   aktiv_indexable?: number
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     name?: string,
-//     person_id?: string,
-//     strasse?: string,
-//     plz?: number,
-//     ort?: string,
-//     geom_point?: string,
-//     wgs84_lat?: string,
-//     wgs84_long?: string,
-//     lv95_x?: string,
-//     lv95_y?: string,
-//     aktiv?: boolean,
-//     aktiv_indexable?: number,
-//     bemerkungen?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.name = name ?? null
-//     this.person_id = person_id ?? null
-//     this.strasse = strasse ?? null
-//     this.plz = plz ?? null
-//     this.ort = ort ?? null
-//     this.geom_point = geom_point ?? null
-//     this.wgs84_lat = wgs84_lat ?? null
-//     this.wgs84_long = wgs84_long ?? null
-//     this.lv95_x = lv95_x ?? null
-//     this.lv95_y = lv95_y ?? null
-//     this.aktiv = aktiv ?? true
-//     this.aktiv_indexable = aktiv === false ? 0 : 1
-//     this.bemerkungen = bemerkungen ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   async label() {
-//     const person = this.person_id
-//       ? dexie.persons.get(this.person_id)
-//       : undefined
-
-//     return gartenLabelFromGarten({
-//       garten: this,
-//       person,
-//     })
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`garten.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       garten_id: this.id,
-//       name: field === 'name' ? toStringIfPossible(value) : this.name,
-//       person_id: field === 'person_id' ? value : this.person_id,
-//       strasse: field === 'strasse' ? toStringIfPossible(value) : this.strasse,
-//       plz: field === 'plz' ? value : this.plz,
-//       ort: field === 'ort' ? toStringIfPossible(value) : this.ort,
-//       geom_point: field === 'geom_point' ? value : this.geom_point,
-//       aktiv: field === 'aktiv' ? value : this.aktiv,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_garten_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'garten_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'garten',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['_deleted', 'aktiv'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.gartens.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
-
-// export interface IKultur {
-//   id: string
-//   art_id?: string
-//   herkunft_id?: string
-//   garten_id?: string
-//   zwischenlager?: boolean
-//   zwischenlager_indexable?: number
-//   erhaltungskultur?: boolean
-//   erhaltungskultur_indexable?: number
-//   von_anzahl_individuen?: number
-//   bemerkungen?: string
-//   aktiv?: boolean
-//   aktiv_indexable?: number
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Kultur implements IKultur {
-//   id: string
-//   art_id?: string
-//   herkunft_id?: string
-//   garten_id?: string
-//   zwischenlager?: boolean
-//   zwischenlager_indexable?: number
-//   erhaltungskultur?: boolean
-//   erhaltungskultur_indexable?: number
-//   von_anzahl_individuen?: number
-//   bemerkungen?: string
-//   aktiv?: boolean
-//   aktiv_indexable?: number
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     art_id?: string,
-//     herkunft_id?: string,
-//     garten_id?: string,
-//     zwischenlager?: boolean,
-//     zwischenlager_indexable?: number,
-//     erhaltungskultur?: boolean,
-//     erhaltungskultur_indexable?: number,
-//     von_anzahl_individuen?: number,
-//     bemerkungen?: string,
-//     aktiv?: boolean,
-//     aktiv_indexable?: number,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.art_id = art_id ?? null
-//     this.herkunft_id = herkunft_id ?? null
-//     this.garten_id = garten_id ?? null
-//     this.zwischenlager = zwischenlager ?? false
-//     this.zwischenlager_indexable = zwischenlager ? 1 : 0
-//     this.erhaltungskultur = erhaltungskultur ?? false
-//     this.erhaltungskultur_indexable = erhaltungskultur ? 1 : 0
-//     this.von_anzahl_individuen = von_anzahl_individuen ?? null
-//     this.bemerkungen = bemerkungen ?? null
-//     this.aktiv = aktiv ?? true
-//     this.aktiv_indexable = aktiv === false ? 0 : 1
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   async anlieferungs() {
-//     return await dexie.lieferungs.where({ nach_kultur_id: this.id }).toArray()
-//   }
-//   async auslieferungs() {
-//     return await dexie.lieferungs.where({ von_kultur_id: this.id }).toArray()
-//   }
-
-//   async label() {
-//     const garten = this.garten_id
-//       ? await dexie.gartens.get(this.garten_id)
-//       : undefined
-//     const gartenPerson = garten?.person_id
-//       ? await dexie.persons.get(garten.person_id)
-//       : undefined
-//     const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-//     const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
-//     const herkunft = this.herkunft_id
-//       ? await dexie.herkunfts.get(this.herkunft_id)
-//       : undefined
-
-//     return kulturLabelFromKultur({
-//       kultur: this,
-//       garten,
-//       gartenPerson,
-//       art,
-//       aeArt,
-//       herkunft,
-//     })
-//   }
-
-//   async labelUnderArt() {
-//     const garten = this.garten_id
-//       ? await dexie.gartens.get(this.garten_id)
-//       : undefined
-//     const gartenPerson = garten?.person_id
-//       ? await dexie.persons.get(garten.person_id)
-//       : undefined
-//     const herkunft = this.herkunft_id
-//       ? await dexie.herkunfts.get(this.herkunft_id)
-//       : undefined
-
-//     return kulturLabelFromKulturUnderArt({
-//       kultur: this,
-//       garten,
-//       gartenPerson,
-//       herkunft,
-//     })
-//   }
-
-//   async labelUnderGarten() {
-//     const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-//     const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
-//     const herkunft = this.herkunft_id
-//       ? await dexie.herkunfts.get(this.herkunft_id)
-//       : undefined
-
-//     return kulturLabelFromKulturUnderGarten({
-//       kultur: this,
-//       art,
-//       aeArt,
-//       herkunft,
-//     })
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`kultur.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       kultur_id: this.id,
-//       art_id: field === 'art_id' ? value : this.art_id,
-//       herkunft_id: field === 'herkunft_id' ? value : this.herkunft_id,
-//       garten_id: field === 'garten_id' ? value : this.garten_id,
-//       zwischenlager: field === 'zwischenlager' ? value : this.zwischenlager,
-//       erhaltungskultur:
-//         field === 'erhaltungskultur' ? value : this.erhaltungskultur,
-//       von_anzahl_individuen:
-//         field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       aktiv: field === 'aktiv' ? value : this.aktiv,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_kultur_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'kultur_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'kultur',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (
-//       ['_deleted', 'aktiv', 'erhaltungskultur', 'zwischenlager'].includes(field)
-//     ) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.kulturs.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
-
-// export interface ITeilkultur {
-//   id: string
-//   kultur_id?: string
-//   name?: string
-//   ort1?: string
-//   ort2?: string
-//   ort3?: string
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-// }
-
-// export class Teilkultur implements ITeilkultur {
-//   id: string
-//   kultur_id?: string
-//   name?: string
-//   ort1?: string
-//   ort2?: string
-//   ort3?: string
-//   bemerkungen?: string
-//   changed?: Date
-//   changed_by?: string
-//   _rev?: string
-//   _parent_rev?: string
-//   _revisions?: string[]
-//   _depth?: number
-//   _deleted?: boolean
-//   _deleted_indexable?: number
-//   _conflicts?: string[]
-
-//   constructor(
-//     id: string,
-//     kultur_id?: string,
-//     name?: string,
-//     ort1?: string,
-//     ort2?: string,
-//     ort3?: string,
-//     bemerkungen?: string,
-//     changed?: Date,
-//     changed_by?: string,
-//     _rev?: string,
-//     _parent_rev?: string,
-//     _revisions?: string[],
-//     _depth?: number,
-//     _deleted?: boolean,
-//     _deleted_indexable?: number,
-//     _conflicts?: string[],
-//   ) {
-//     this.id = id ?? uuidv1()
-//     this.kultur_id = kultur_id ?? null
-//     this.name = name ?? null
-//     this.ort1 = ort1 ?? null
-//     this.ort2 = ort2 ?? null
-//     this.ort3 = ort3 ?? null
-//     this.bemerkungen = bemerkungen ?? null
-//     this.changed = changed ?? new window.Date().toISOString()
-//     this.changed_by = changed_by ?? null
-//     this._rev = _rev ?? null
-//     this._parent_rev = _parent_rev ?? null
-//     this._revisions = _revisions ?? null
-//     this._depth = _depth ?? 1
-//     this._deleted = _deleted ?? false
-//     this._deleted_indexable = _deleted ? 1 : 0
-//     this._conflicts = _conflicts ?? null
-//   }
-
-//   removeConflict(_rev: string) {
-//     this._conflicts = this._conflicts.filter((r) => r !== _rev)
-//   }
-
-//   async edit({ field, value, store }) {
-//     const { addQueuedQuery, user, unsetError } = store
-
-//     unsetError(`teilkultur.${field}`)
-//     // first build the part that will be revisioned
-//     const newDepth = this._depth + 1
-//     const newObject = {
-//       teilkultur_id: this.id,
-//       kultur_id: field === 'kultur_id' ? value : this.kultur_id,
-//       name: field === 'name' ? toStringIfPossible(value) : this.name,
-//       ort1: field === 'ort1' ? toStringIfPossible(value) : this.ort1,
-//       ort2: field === 'ort2' ? toStringIfPossible(value) : this.ort2,
-//       ort3: field === 'ort3' ? toStringIfPossible(value) : this.ort3,
-//       bemerkungen:
-//         field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
-//       _parent_rev: this._rev,
-//       _depth: newDepth,
-//       _deleted: field === '_deleted' ? value : this._deleted,
-//     }
-//     const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
-//     // DO NOT include id in rev - or revs with same data will conflict
-//     newObject.id = uuidv1()
-//     newObject._rev = rev
-//     // do not revision the following fields as this leads to unwanted conflicts
-//     newObject.changed = new window.Date().toISOString()
-//     newObject.changed_by = user.email
-//     // convert to string as hasura does not support arrays yet
-//     // https://github.com/hasura/graphql-engine/pull/2243
-//     newObject._revisions = this._revisions
-//       ? toPgArray([rev, ...this._revisions])
-//       : toPgArray([rev])
-//     addQueuedQuery({
-//       name: 'mutateInsert_teilkultur_rev_one',
-//       variables: JSON.stringify({
-//         object: newObject,
-//         on_conflict: {
-//           constraint: 'teilkultur_rev_pkey',
-//           update_columns: ['id'],
-//         },
-//       }),
-//       revertTable: 'teilkultur',
-//       revertId: this.id,
-//       revertField: field,
-//       revertValue: this[field],
-//       newValue: value,
-//     })
-//     // optimistically update store
-//     const storeUpdate = {
-//       [field]: value,
-//       _depth: newObject._depth,
-//       _rev: newObject._rev,
-//       _parent_rev: newObject._parent_rev,
-//       changed: newObject.changed,
-//       changed_by: newObject.changed_by,
-//       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
-//     }
-//     // set all indexable boolean fields
-//     if (['_deleted'].includes(field)) {
-//       storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-//         ? value
-//         : value
-//         ? 1
-//         : 0
-//     }
-//     dexie.teilkulturs.update(this.id, storeUpdate)
-//   }
-
-//   delete({ store }) {
-//     this.edit({ field: '_deleted', value: true, store })
-//   }
-// }
+if (typeof window !== 'undefined') {
+  window.Dexie = Dexie
+}
+
+export interface IHerkunft {
+  id: string
+  nr?: string
+  lokalname?: string
+  gemeinde?: string
+  kanton?: string
+  land?: string
+  geom_point?: string
+  wgs84_lat?: number
+  wgs84_long?: number
+  lv95_x?: number
+  lv95_y?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Herkunft implements IHerkunft {
+  id: string
+  nr?: string
+  lokalname?: string
+  gemeinde?: string
+  kanton?: string
+  land?: string
+  geom_point?: string
+  wgs84_lat?: number
+  wgs84_long?: number
+  lv95_x?: number
+  lv95_y?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id?: string,
+    nr?: string,
+    lokalname?: string,
+    gemeinde?: string,
+    kanton?: string,
+    land?: string,
+    geom_point?: string,
+    wgs84_lat?: number,
+    wgs84_long?: number,
+    lv95_x?: number,
+    lv95_y?: number,
+    bemerkungen?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.nr = nr ?? null
+    this.lokalname = lokalname ?? null
+    this.gemeinde = gemeinde ?? null
+    this.kanton = kanton ?? null
+    this.land = land ?? null
+    this.geom_point = geom_point ?? null
+    this.wgs84_lat = wgs84_lat ?? null
+    this.wgs84_long = wgs84_long ?? null
+    this.lv95_x = lv95_x ?? null
+    this.lv95_y = lv95_y ?? null
+    this.bemerkungen = bemerkungen ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`herkunft.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      herkunft_id: this.id,
+      nr: field === 'nr' ? toStringIfPossible(value) : this.nr,
+      lokalname:
+        field === 'lokalname' ? toStringIfPossible(value) : this.lokalname,
+      gemeinde:
+        field === 'gemeinde' ? toStringIfPossible(value) : this.gemeinde,
+      kanton: field === 'kanton' ? toStringIfPossible(value) : this.kanton,
+      land: field === 'land' ? toStringIfPossible(value) : this.land,
+      geom_point: field === 'geom_point' ? value : this.geom_point,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_herkunft_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'herkunft_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'herkunft',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['_deleted'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.herkunfts.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface ISammlung {
+  id: string
+  art_id?: string
+  person_id?: string
+  herkunft_id?: string
+  nr?: string
+  datum?: Date
+  von_anzahl_individuen?: number
+  anzahl_pflanzen?: number
+  gramm_samen?: number
+  andere_menge?: string
+  geom_point?: string
+  wgs84_lat?: number
+  wgs84_long?: number
+  lv95_x?: number
+  lv95_y?: number
+  geplant?: boolean
+  geplant_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Sammlung implements ISammlung {
+  id: string
+  art_id?: string
+  person_id?: string
+  herkunft_id?: string
+  nr?: string
+  datum?: Date
+  von_anzahl_individuen?: number
+  anzahl_pflanzen?: number
+  gramm_samen?: number
+  andere_menge?: string
+  geom_point?: string
+  wgs84_lat?: number
+  wgs84_long?: number
+  lv95_x?: number
+  lv95_y?: number
+  geplant?: boolean
+  geplant_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    art_id?: string,
+    person_id?: string,
+    herkunft_id?: string,
+    nr?: string,
+    datum?: Date,
+    von_anzahl_individuen?: number,
+    anzahl_pflanzen?: number,
+    gramm_samen?: number,
+    andere_menge?: string,
+    geom_point?: string,
+    wgs84_lat?: number,
+    wgs84_long?: number,
+    lv95_x?: number,
+    lv95_y?: number,
+    geplant?: boolean,
+    geplant_indexable?: number,
+    bemerkungen?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.art_id = art_id ?? null
+    this.person_id = person_id ?? null
+    this.herkunft_id = herkunft_id ?? null
+    this.nr = nr ?? null
+    this.datum = datum ?? null
+    this.von_anzahl_individuen = von_anzahl_individuen ?? null
+    this.anzahl_pflanzen = anzahl_pflanzen ?? null
+    this.gramm_samen = gramm_samen ?? null
+    this.andere_menge = andere_menge ?? null
+    this.geom_point = geom_point ?? null
+    this.wgs84_lat = wgs84_lat ?? null
+    this.wgs84_long = wgs84_long ?? null
+    this.lv95_x = lv95_x ?? null
+    this.lv95_y = lv95_y ?? null
+    this.geplant = geplant ?? false
+    this.geplant_indexable = geplant ? 1 : 0
+    this.bemerkungen = bemerkungen ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  async label() {
+    const herkunft = this.herkunft_id
+      ? await dexie.herkunfts.get(this.herkunft_id)
+      : undefined
+    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
+    const ae_art = art ? await dexie.ae_arts.get(art.ae_art_id) : undefined
+    const person = this.person_id
+      ? await dexie.persons.get(this.person_id)
+      : undefined
+
+    return sammlungLabelFromSammlung({
+      sammlung: this,
+      art,
+      ae_art,
+      person,
+      herkunft,
+    })
+  }
+
+  async labelUnderHerkunft() {
+    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
+    const ae_art = art ? await dexie.ae_arts.get(art.ae_art_id) : undefined
+    const person = this.person_id
+      ? await dexie.persons.get(this.person_id)
+      : undefined
+
+    return sammlungLabelFromSammlungUnderHerkunft({
+      sammlung: this,
+      art,
+      ae_art,
+      person,
+    })
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`sammlung.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      sammlung_id: this.id,
+      art_id: field === 'art_id' ? value : this.art_id,
+      person_id: field === 'person_id' ? value : this.person_id,
+      herkunft_id: field === 'herkunft_id' ? value : this.herkunft_id,
+      nr: field === 'nr' ? toStringIfPossible(value) : this.nr,
+      geom_point: field === 'geom_point' ? value : this.geom_point,
+      datum: field === 'datum' ? value : this.datum,
+      von_anzahl_individuen:
+        field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
+      anzahl_pflanzen:
+        field === 'anzahl_pflanzen' ? value : this.anzahl_pflanzen,
+      gramm_samen: field === 'gramm_samen' ? value : this.gramm_samen,
+      andere_menge:
+        field === 'andere_menge'
+          ? toStringIfPossible(value)
+          : this.andere_menge,
+      geplant: field === 'geplant' ? value : this.geplant,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_sammlung_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'sammlung_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'sammlung',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['geplant', '_deleted'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.sammlungs.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface ILieferung {
+  id: string
+  sammel_lieferung_id?: string
+  art_id?: string
+  person_id?: string
+  von_sammlung_id?: string
+  von_kultur_id?: string
+  datum?: Date
+  nach_kultur_id?: string
+  nach_ausgepflanzt?: boolean
+  nach_ausgepflanzt_indexable?: number
+  von_anzahl_individuen?: number
+  anzahl_pflanzen?: number
+  anzahl_auspflanzbereit?: number
+  gramm_samen?: number
+  andere_menge?: string
+  geplant?: boolean
+  geplant_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Lieferung {
+  id: string
+  sammel_lieferung_id?: string
+  art_id?: string
+  person_id?: string
+  von_sammlung_id?: string
+  von_kultur_id?: string
+  datum?: Date
+  nach_kultur_id?: string
+  nach_ausgepflanzt?: boolean
+  nach_ausgepflanzt_indexable?: number
+  von_anzahl_individuen?: number
+  anzahl_pflanzen?: number
+  anzahl_auspflanzbereit?: number
+  gramm_samen?: number
+  andere_menge?: string
+  geplant?: boolean
+  geplant_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    sammel_lieferung_id?: string,
+    art_id?: string,
+    person_id?: string,
+    von_sammlung_id?: string,
+    von_kultur_id?: string,
+    datum?: Date,
+    nach_kultur_id?: string,
+    nach_ausgepflanzt?: boolean,
+    nach_ausgepflanzt_indexable?: number,
+    von_anzahl_individuen?: number,
+    anzahl_pflanzen?: number,
+    anzahl_auspflanzbereit?: number,
+    gramm_samen?: number,
+    andere_menge?: string,
+    geplant?: boolean,
+    geplant_indexable?: number,
+    bemerkungen?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.sammel_lieferung_id = sammel_lieferung_id ?? null
+    this.art_id = art_id ?? null
+    this.person_id = person_id ?? null
+    this.von_sammlung_id = von_sammlung_id ?? null
+    this.von_kultur_id = von_kultur_id ?? null
+    this.datum = datum ?? null
+    this.nach_kultur_id = nach_kultur_id ?? null
+    this.nach_ausgepflanzt = nach_ausgepflanzt ?? false
+    this.nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
+    this.von_anzahl_individuen = von_anzahl_individuen ?? null
+    this.anzahl_pflanzen = anzahl_pflanzen ?? null
+    this.anzahl_auspflanzbereit = anzahl_auspflanzbereit ?? null
+    this.gramm_samen = gramm_samen ?? null
+    this.andere_menge = andere_menge ?? null
+    this.geplant = geplant ?? false
+    this.geplant_indexable = geplant ? 1 : 0
+    this.bemerkungen = bemerkungen ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  async von_kultur() {
+    return await dexie.kulturs.get(this.von_kultur_id)
+  }
+
+  async nach_kultur() {
+    return await dexie.kulturs.get(this.nach_kultur_id)
+  }
+
+  label() {
+    return lieferungLabelFromLieferung({ lieferung: this })
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`lieferung.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      lieferung_id: this.id,
+      sammel_lieferung_id:
+        field === 'sammel_lieferung_id' ? value : this.sammel_lieferung_id,
+      art_id: field === 'art_id' ? value : this.art_id,
+      person_id: field === 'person_id' ? value : this.person_id,
+      von_sammlung_id:
+        field === 'von_sammlung_id' ? value : this.von_sammlung_id,
+      von_kultur_id: field === 'von_kultur_id' ? value : this.von_kultur_id,
+      datum: field === 'datum' ? value : this.datum,
+      nach_kultur_id: field === 'nach_kultur_id' ? value : this.nach_kultur_id,
+      nach_ausgepflanzt:
+        field === 'nach_ausgepflanzt' ? value : this.nach_ausgepflanzt,
+      von_anzahl_individuen:
+        field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
+      anzahl_pflanzen:
+        field === 'anzahl_pflanzen' ? value : this.anzahl_pflanzen,
+      anzahl_auspflanzbereit:
+        field === 'anzahl_auspflanzbereit'
+          ? value
+          : this.anzahl_auspflanzbereit,
+      gramm_samen: field === 'gramm_samen' ? value : this.gramm_samen,
+      andere_menge:
+        field === 'andere_menge'
+          ? toStringIfPossible(value)
+          : this.andere_menge,
+      geplant: field === 'geplant' ? value : this.geplant,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_lieferung_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'lieferung_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'lieferung',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['_deleted', 'nach_ausgepflanzt', 'geplant'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.lieferungs.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface IArt {
+  id: string
+  ae_id?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Art implements IArt {
+  id: string
+  ae_id?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    ae_id?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.ae_id = ae_id ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  async label() {
+    const ae_art = this.ae_id ? await dexie.ae_arts.get(this.ae_id) : undefined
+    return artLabelFromAeArt({ ae_art })
+  }
+
+  async herkunfts() {
+    const sammlungs = await dexie.sammlungs.where({ art_id: this.id }).toArray()
+    const herkunftIds = sammlungs
+      .filter((s) => !!s.herkunft_id)
+      .map((s) => s.herkunft_id)
+    return await dexie.herkunfts.bulkGet(herkunftIds)
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`art.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      art_id: this.id,
+      ae_id: field === 'ae_id' ? value : this.ae_id,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_art_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'art_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'art',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['_deleted'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.arts.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface IAeArt {
+  id: string
+  name?: string
+  changed?: Date
+}
+
+export class AeArt implements IAeArt {
+  id: string
+  name?: string
+  changed?: Date
+}
+
+export interface IGarten {
+  id: string
+  name?: string
+  person_id?: string
+  strasse?: string
+  plz?: number
+  ort?: string
+  geom_point?: string
+  wgs84_lat?: string
+  wgs84_long?: string
+  lv95_x?: string
+  lv95_y?: string
+  aktiv?: boolean
+  aktiv_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Garten implements IGarten {
+  id: string
+  name?: string
+  person_id?: string
+  strasse?: string
+  plz?: number
+  ort?: string
+  geom_point?: string
+  wgs84_lat?: string
+  wgs84_long?: string
+  lv95_x?: string
+  lv95_y?: string
+  aktiv?: boolean
+  aktiv_indexable?: number
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    name?: string,
+    person_id?: string,
+    strasse?: string,
+    plz?: number,
+    ort?: string,
+    geom_point?: string,
+    wgs84_lat?: string,
+    wgs84_long?: string,
+    lv95_x?: string,
+    lv95_y?: string,
+    aktiv?: boolean,
+    aktiv_indexable?: number,
+    bemerkungen?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.name = name ?? null
+    this.person_id = person_id ?? null
+    this.strasse = strasse ?? null
+    this.plz = plz ?? null
+    this.ort = ort ?? null
+    this.geom_point = geom_point ?? null
+    this.wgs84_lat = wgs84_lat ?? null
+    this.wgs84_long = wgs84_long ?? null
+    this.lv95_x = lv95_x ?? null
+    this.lv95_y = lv95_y ?? null
+    this.aktiv = aktiv ?? true
+    this.aktiv_indexable = aktiv === false ? 0 : 1
+    this.bemerkungen = bemerkungen ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  async label() {
+    const person = this.person_id
+      ? dexie.persons.get(this.person_id)
+      : undefined
+
+    return gartenLabelFromGarten({
+      garten: this,
+      person,
+    })
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`garten.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      garten_id: this.id,
+      name: field === 'name' ? toStringIfPossible(value) : this.name,
+      person_id: field === 'person_id' ? value : this.person_id,
+      strasse: field === 'strasse' ? toStringIfPossible(value) : this.strasse,
+      plz: field === 'plz' ? value : this.plz,
+      ort: field === 'ort' ? toStringIfPossible(value) : this.ort,
+      geom_point: field === 'geom_point' ? value : this.geom_point,
+      aktiv: field === 'aktiv' ? value : this.aktiv,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_garten_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'garten_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'garten',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['_deleted', 'aktiv'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.gartens.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface IKultur {
+  id: string
+  art_id?: string
+  herkunft_id?: string
+  garten_id?: string
+  zwischenlager?: boolean
+  zwischenlager_indexable?: number
+  erhaltungskultur?: boolean
+  erhaltungskultur_indexable?: number
+  von_anzahl_individuen?: number
+  bemerkungen?: string
+  aktiv?: boolean
+  aktiv_indexable?: number
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Kultur implements IKultur {
+  id: string
+  art_id?: string
+  herkunft_id?: string
+  garten_id?: string
+  zwischenlager?: boolean
+  zwischenlager_indexable?: number
+  erhaltungskultur?: boolean
+  erhaltungskultur_indexable?: number
+  von_anzahl_individuen?: number
+  bemerkungen?: string
+  aktiv?: boolean
+  aktiv_indexable?: number
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    art_id?: string,
+    herkunft_id?: string,
+    garten_id?: string,
+    zwischenlager?: boolean,
+    zwischenlager_indexable?: number,
+    erhaltungskultur?: boolean,
+    erhaltungskultur_indexable?: number,
+    von_anzahl_individuen?: number,
+    bemerkungen?: string,
+    aktiv?: boolean,
+    aktiv_indexable?: number,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.art_id = art_id ?? null
+    this.herkunft_id = herkunft_id ?? null
+    this.garten_id = garten_id ?? null
+    this.zwischenlager = zwischenlager ?? false
+    this.zwischenlager_indexable = zwischenlager ? 1 : 0
+    this.erhaltungskultur = erhaltungskultur ?? false
+    this.erhaltungskultur_indexable = erhaltungskultur ? 1 : 0
+    this.von_anzahl_individuen = von_anzahl_individuen ?? null
+    this.bemerkungen = bemerkungen ?? null
+    this.aktiv = aktiv ?? true
+    this.aktiv_indexable = aktiv === false ? 0 : 1
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  async anlieferungs() {
+    return await dexie.lieferungs.where({ nach_kultur_id: this.id }).toArray()
+  }
+  async auslieferungs() {
+    return await dexie.lieferungs.where({ von_kultur_id: this.id }).toArray()
+  }
+
+  async label() {
+    const garten = this.garten_id
+      ? await dexie.gartens.get(this.garten_id)
+      : undefined
+    const gartenPerson = garten?.person_id
+      ? await dexie.persons.get(garten.person_id)
+      : undefined
+    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
+    const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
+    const herkunft = this.herkunft_id
+      ? await dexie.herkunfts.get(this.herkunft_id)
+      : undefined
+
+    return kulturLabelFromKultur({
+      kultur: this,
+      garten,
+      gartenPerson,
+      art,
+      aeArt,
+      herkunft,
+    })
+  }
+
+  async labelUnderArt() {
+    const garten = this.garten_id
+      ? await dexie.gartens.get(this.garten_id)
+      : undefined
+    const gartenPerson = garten?.person_id
+      ? await dexie.persons.get(garten.person_id)
+      : undefined
+    const herkunft = this.herkunft_id
+      ? await dexie.herkunfts.get(this.herkunft_id)
+      : undefined
+
+    return kulturLabelFromKulturUnderArt({
+      kultur: this,
+      garten,
+      gartenPerson,
+      herkunft,
+    })
+  }
+
+  async labelUnderGarten() {
+    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
+    const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
+    const herkunft = this.herkunft_id
+      ? await dexie.herkunfts.get(this.herkunft_id)
+      : undefined
+
+    return kulturLabelFromKulturUnderGarten({
+      kultur: this,
+      art,
+      aeArt,
+      herkunft,
+    })
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`kultur.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      kultur_id: this.id,
+      art_id: field === 'art_id' ? value : this.art_id,
+      herkunft_id: field === 'herkunft_id' ? value : this.herkunft_id,
+      garten_id: field === 'garten_id' ? value : this.garten_id,
+      zwischenlager: field === 'zwischenlager' ? value : this.zwischenlager,
+      erhaltungskultur:
+        field === 'erhaltungskultur' ? value : this.erhaltungskultur,
+      von_anzahl_individuen:
+        field === 'von_anzahl_individuen' ? value : this.von_anzahl_individuen,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      aktiv: field === 'aktiv' ? value : this.aktiv,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_kultur_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'kultur_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'kultur',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (
+      ['_deleted', 'aktiv', 'erhaltungskultur', 'zwischenlager'].includes(field)
+    ) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.kulturs.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
+
+export interface ITeilkultur {
+  id: string
+  kultur_id?: string
+  name?: string
+  ort1?: string
+  ort2?: string
+  ort3?: string
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+}
+
+export class Teilkultur implements ITeilkultur {
+  id: string
+  kultur_id?: string
+  name?: string
+  ort1?: string
+  ort2?: string
+  ort3?: string
+  bemerkungen?: string
+  changed?: Date
+  changed_by?: string
+  _rev?: string
+  _parent_rev?: string
+  _revisions?: string[]
+  _depth?: number
+  _deleted?: boolean
+  _deleted_indexable?: number
+  _conflicts?: string[]
+
+  constructor(
+    id: string,
+    kultur_id?: string,
+    name?: string,
+    ort1?: string,
+    ort2?: string,
+    ort3?: string,
+    bemerkungen?: string,
+    changed?: Date,
+    changed_by?: string,
+    _rev?: string,
+    _parent_rev?: string,
+    _revisions?: string[],
+    _depth?: number,
+    _deleted?: boolean,
+    _deleted_indexable?: number,
+    _conflicts?: string[],
+  ) {
+    this.id = id ?? uuidv1()
+    this.kultur_id = kultur_id ?? null
+    this.name = name ?? null
+    this.ort1 = ort1 ?? null
+    this.ort2 = ort2 ?? null
+    this.ort3 = ort3 ?? null
+    this.bemerkungen = bemerkungen ?? null
+    this.changed = changed ?? new window.Date().toISOString()
+    this.changed_by = changed_by ?? null
+    this._rev = _rev ?? null
+    this._parent_rev = _parent_rev ?? null
+    this._revisions = _revisions ?? null
+    this._depth = _depth ?? 1
+    this._deleted = _deleted ?? false
+    this._deleted_indexable = _deleted ? 1 : 0
+    this._conflicts = _conflicts ?? null
+  }
+
+  removeConflict(_rev: string) {
+    this._conflicts = this._conflicts.filter((r) => r !== _rev)
+  }
+
+  async edit({ field, value, store }) {
+    const { addQueuedQuery, user, unsetError } = store
+
+    unsetError(`teilkultur.${field}`)
+    // first build the part that will be revisioned
+    const newDepth = this._depth + 1
+    const newObject = {
+      teilkultur_id: this.id,
+      kultur_id: field === 'kultur_id' ? value : this.kultur_id,
+      name: field === 'name' ? toStringIfPossible(value) : this.name,
+      ort1: field === 'ort1' ? toStringIfPossible(value) : this.ort1,
+      ort2: field === 'ort2' ? toStringIfPossible(value) : this.ort2,
+      ort3: field === 'ort3' ? toStringIfPossible(value) : this.ort3,
+      bemerkungen:
+        field === 'bemerkungen' ? toStringIfPossible(value) : this.bemerkungen,
+      _parent_rev: this._rev,
+      _depth: newDepth,
+      _deleted: field === '_deleted' ? value : this._deleted,
+    }
+    const rev = `${newDepth}-${md5(JSON.stringify(newObject))}`
+    // DO NOT include id in rev - or revs with same data will conflict
+    newObject.id = uuidv1()
+    newObject._rev = rev
+    // do not revision the following fields as this leads to unwanted conflicts
+    newObject.changed = new window.Date().toISOString()
+    newObject.changed_by = user.email
+    // convert to string as hasura does not support arrays yet
+    // https://github.com/hasura/graphql-engine/pull/2243
+    newObject._revisions = this._revisions
+      ? toPgArray([rev, ...this._revisions])
+      : toPgArray([rev])
+    addQueuedQuery({
+      name: 'mutateInsert_teilkultur_rev_one',
+      variables: JSON.stringify({
+        object: newObject,
+        on_conflict: {
+          constraint: 'teilkultur_rev_pkey',
+          update_columns: ['id'],
+        },
+      }),
+      revertTable: 'teilkultur',
+      revertId: this.id,
+      revertField: field,
+      revertValue: this[field],
+      newValue: value,
+    })
+    // optimistically update store
+    const storeUpdate = {
+      [field]: value,
+      _depth: newObject._depth,
+      _rev: newObject._rev,
+      _parent_rev: newObject._parent_rev,
+      changed: newObject.changed,
+      changed_by: newObject.changed_by,
+      _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
+    }
+    // set all indexable boolean fields
+    if (['_deleted'].includes(field)) {
+      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
+        ? value
+        : value
+        ? 1
+        : 0
+    }
+    dexie.teilkulturs.update(this.id, storeUpdate)
+  }
+
+  delete({ store }) {
+    this.edit({ field: '_deleted', value: true, store })
+  }
+}
 
 export interface IZaehlung {
   id: string
@@ -4343,14 +4343,14 @@ export class QueuedUpdate implements IQueuedUpdate {
 }
 
 export class MySubClassedDexie extends Dexie {
-  // herkunfts!: DexieTable<Herkunft, string>
-  // sammlungs!: DexieTable<Sammlung, string>
-  // lieferungs!: DexieTable<Lieferung, string>
-  // arts!: DexieTable<Art, string>
-  // ae_arts!: DexieTable<AeArt, string>
-  // gartens!: DexieTable<Garten, string>
-  // kulturs!: DexieTable<Kultur, string>
-  // teilkulturs!: DexieTable<Teilkultur, string>
+  herkunfts!: DexieTable<Herkunft, string>
+  sammlungs!: DexieTable<Sammlung, string>
+  lieferungs!: DexieTable<Lieferung, string>
+  arts!: DexieTable<Art, string>
+  ae_arts!: DexieTable<AeArt, string>
+  gartens!: DexieTable<Garten, string>
+  kulturs!: DexieTable<Kultur, string>
+  teilkulturs!: DexieTable<Teilkultur, string>
   zaehlungs!: DexieTable<Zaehlung, string>
   teilzaehlungs!: DexieTable<Teilzaehlung, string>
   persons!: DexieTable<Person, string>
@@ -4375,16 +4375,16 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(21).stores({
+    this.version(1).stores({
       // TODO: set indexes
-      // herkunfts: 'id, _deleted_indexable',
-      // sammlungs: 'id, _deleted_indexable',
-      // lieferungs: 'id, _deleted_indexable',
-      // arts: 'id, _deleted_indexable',
-      // ae_arts: 'id',
-      // gartens: 'id, _deleted_indexable',
-      // kulturs: 'id, _deleted_indexable',
-      // teilkulturs: 'id, _deleted_indexable',
+      herkunfts: 'id, _deleted_indexable',
+      sammlungs: 'id, _deleted_indexable',
+      lieferungs: 'id, _deleted_indexable',
+      arts: 'id, _deleted_indexable',
+      ae_arts: 'id',
+      gartens: 'id, _deleted_indexable',
+      kulturs: 'id, _deleted_indexable',
+      teilkulturs: 'id, _deleted_indexable',
       zaehlungs: 'id, _deleted_indexable',
       teilzaehlungs: 'id, _deleted_indexable',
       persons: 'id, _deleted_indexable',
@@ -4407,14 +4407,14 @@ export class MySubClassedDexie extends Dexie {
       stores: 'id',
       queued_updates: '++id',
     })
-    // this.herkunfts.mapToClass(Herkunft)
-    // this.sammlungs.mapToClass(Sammlung)
-    // this.lieferungs.mapToClass(Lieferung)
-    // this.arts.mapToClass(Art)
-    // this.ae_arts.mapToClass(AeArt)
-    // this.gartens.mapToClass(Garten)
-    // this.kulturs.mapToClass(Kultur)
-    // this.teilkulturs.mapToClass(Teilkultur)
+    this.herkunfts.mapToClass(Herkunft)
+    this.sammlungs.mapToClass(Sammlung)
+    this.lieferungs.mapToClass(Lieferung)
+    this.arts.mapToClass(Art)
+    this.ae_arts.mapToClass(AeArt)
+    this.gartens.mapToClass(Garten)
+    this.kulturs.mapToClass(Kultur)
+    this.teilkulturs.mapToClass(Teilkultur)
     this.zaehlungs.mapToClass(Zaehlung)
     this.teilzaehlungs.mapToClass(Teilzaehlung)
     this.persons.mapToClass(Person)
