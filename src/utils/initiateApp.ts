@@ -104,9 +104,9 @@ const initiateApp = async () => {
   })
   store.setGqlClient(gqlClient)
 
-  const module = await import('./recreatePersistedStore')
-  const recreatePersistedStore = module.default
-  const unregisterAuthObserver = await recreatePersistedStore({ store })
+  const module = await import('./initiateAuth')
+  const initiateAuth = module.default
+  const unregisterAuthObserver = await initiateAuth({ store })
   const unregister = () => {
     unregisterAuthObserver()
     gqlWsClient.dispose()
