@@ -41,27 +41,68 @@ const App = ({ element }) => {
   const [database, setDatabase] = useState(null)
 
   useEffect(() => {
-    let isActive = true
-    let unregister
-    initiateApp().then(
-      ({ store: storeReturned, unregister: unregisterReturned }) => {
-        if (!isActive) return
-
-        // console.log('App, effect, storeReturned:',storeReturned)
-        setStore(storeReturned)
-        unregister = unregisterReturned
-        // const db = initiateDb(store)
-        // setDatabase(db)
-        // storeReturned.setDb(db)
-      },
-    )
+    // on first render regenerate store (if exists)
+    dexie.stores.get('store').then((dbStore) => {
+      let st
+      if (dbStore) {
+        // reset some values
+        if (!dbStore?.store?.showMap) dbStore.store.mapInitiated = false
+        dbStore.store.notifications = {}
+        st = MobxStore.create(dbStore?.store)
+      } else {
+        st = MobxStore.create()
+      }
+      setStore(st)
+      fetchFromServer(st)
+      // navigate to previous activeNodeArray - if exists
+      const shouldNavigate =
+        dbStore?.activeNodeArray?.length &&
+        !isEqual(
+          activeNodeArrayFromUrl(window.location.pathname),
+          dbStore?.activeNodeArray,
+        )
+      if (shouldNavigate) {
+        window.location.href = `${
+          window.location.origin
+        }/${dbStore?.activeNodeArray?.join('/')}`
+      }
+      // persist store on every snapshot
+      onSnapshot(st, (ss) => dexie.stores.put({ id: 'store', store: ss }))
+    })
 
     return () => {
-      isActive = false
-      unregister()
+      // TODO: remove subscriptions
+      // supabase.removeAllSubscriptions()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    persist().then((val) => console.log('storage is persisted safely:', val))
+  }, [])
+
+  // useEffect(() => {
+  //   let isActive = true
+  //   let unregister
+  //   initiateApp().then(
+  //     ({ store: storeReturned, unregister: unregisterReturned }) => {
+  //       if (!isActive) return
+
+  //       // console.log('App, effect, storeReturned:',storeReturned)
+  //       setStore(storeReturned)
+  //       unregister = unregisterReturned
+  //       const db = initiateDb(store)
+  //       setDatabase(db)
+  //       storeReturned.setDb(db)
+  //     },
+  //   )
+
+  //   return () => {
+  //     isActive = false
+  //     unregister()
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   // without store bad things happen
   if (!store) return null

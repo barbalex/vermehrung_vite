@@ -19,7 +19,8 @@ import sammlungLabelFromSammlungUnderHerkunft from './utils/sammlungLabelFromSam
 import zaehlungLabelFromZaehlung from './utils/zaehlungLabelFromZaehlung'
 import toPgArray from './utils/toPgArray'
 import deleteAccount from './utils/deleteAccount'
-import updateAllLieferungen from './components/Data/SammelLieferung/FormTitle/Copy/updateAllLieferungen' // 2
+// TODO: reinstate when file was copied
+// import updateAllLieferungen from './components/Data/SammelLieferung/FormTitle/Copy/updateAllLieferungen' // 2
 import {
   artFile as artFileFragment,
   gartenFile as gartenFileFragment,
@@ -2210,11 +2211,12 @@ export class SammelLieferung implements ISammelLieferung {
           id: newObject.sammel_lieferung_id,
         }
         delete newSammelLieferung.sammel_lieferung_id
-        updateAllLieferungen({
-          sammelLieferung: newSammelLieferung,
-          store,
-          field,
-        })
+        // TODO: reinstate when file was copied
+        // updateAllLieferungen({
+        //   sammelLieferung: newSammelLieferung,
+        //   store,
+        //   field,
+        // })
       }
     }, 50)
   }
