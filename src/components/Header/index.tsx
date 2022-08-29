@@ -25,7 +25,7 @@ const StyledAppBar = styled(AppBar)`
 
 const Header = () => {
   const location = useLocation()
-  const  pathname  = location.pathname
+  const pathname  = location.pathname
   const isHome = pathname === '/'
   const isVermehrung = pathname.startsWith('/Vermehrung')
 

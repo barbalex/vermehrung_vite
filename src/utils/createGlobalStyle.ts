@@ -1,15 +1,18 @@
 import { createGlobalStyle } from 'styled-components'
 
-const createGlobalStyleModule = () => createGlobalStyle`
+const createGlobalStyleModule = () => createGlobalStyle` 
   html {
     overflow: hidden !important;
+    height: 100%;
   }
 
   body {
+    margin: 0;
     font-family: Roboto, sans-serif, system-ui;
+    height: 100%;
   }
 
-  #___gatsby{
+  #root{
   /* works in firefox, not yet in chrome. https://caniuse.com/?search=scrollbar-color */
   scrollbar-color: #4a148c rgba(0, 0, 0, 0.4);}
 
@@ -74,6 +77,12 @@ const createGlobalStyleModule = () => createGlobalStyle`
       overflow: visible !important;
       
     }
+  }
+
+  /* labels should not be selectable */
+
+  label {
+    user-select: none;
   }
 
   /* scrollbars */
