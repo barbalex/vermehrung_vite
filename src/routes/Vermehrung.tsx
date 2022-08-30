@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import activeNodeArrayFromPathname from '../utils/activeNodeArrayFromPathname'
 import openNodesFromActiveNodeArray from '../utils/openNodesFromActiveNodeArray'
 import fetchFromServer from '../utils/fetchFromServer'
-// import Tree from '../components/Tree'
+import Tree from '../components/Tree'
 import Data from '../components/Data'
 import Filter from '../components/Filter'
 import Login from '../components/Login'
@@ -229,8 +229,7 @@ const Vermehrung = ({ location }) => {
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            {/* <Tree /> */}
-            <div>Tree</div>
+            <Tree />
             {showFilter ? <Filter /> : <Data />}
           </StyledSplitPane>
         </Container>
