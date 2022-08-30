@@ -32,6 +32,7 @@ import kulturIdOfAusLieferungInUrl from '../utils/kulturIdOfAusLieferungInUrl'
 import zaehlungIdInUrl from '../utils/zaehlungIdInUrl'
 import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
+import { dexie } from '../dexieClient'
 
 const myTypes = types
   .model({
@@ -126,7 +127,6 @@ const myTypes = types
     user: {},
     firebaseAuth: null,
     gqlWsClient: null,
-    db: null,
     gqlClient: null,
     navigate: undefined,
   }))
@@ -258,9 +258,6 @@ const myTypes = types
       },
       setGqlClient(val) {
         self.gqlClient = val
-      },
-      setDb(val) {
-        self.db = val
       },
       setLastUpdated({ table, val: valPassed }) {
         // 1. enable not having to pass val

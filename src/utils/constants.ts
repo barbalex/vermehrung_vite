@@ -18,7 +18,7 @@ const constants = {
   authUri: 'https://auth.vermehrung.ch',
   getAppUri: () =>
     window?.location?.hostname === 'localhost'
-      ? `http://${window.location.hostname}:3000`
+      ? `http://${window.location.hostname}:5173`
       : 'https://vermehrung.ch',
   testArten: ['1ab6bbb1-979a-4232-a5d8-62efb5cb984a'],
   tree: {

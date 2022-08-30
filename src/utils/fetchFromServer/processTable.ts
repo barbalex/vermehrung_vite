@@ -23,6 +23,8 @@ const processSubscriptionResult = async ({
   }
   setInitiallyQuerying(table)
 
+  console.log('processTable, dexie:', dexie)
+
   // const collection = db.get(table)
   // const incomingIds = dataToCheck.map((d) => d.id)
 
@@ -53,17 +55,18 @@ const processSubscriptionResult = async ({
   //   const dat = stripTypename(dataToCheck.find((d) => d.id === o.id))
   //   return !Object.entries(dat).every(([key, value]) => isEqual(value, o[key]))
   // })
-  console.log('processSubscriptionResult:', {
-    table,
-    toUpdate: objectsToUpdate.length,
-    toCreate: missingIds.length,
-  })
+  // console.log('processSubscriptionResult:', {
+  //   table,
+  //   toUpdate: objectsToUpdate.length,
+  //   toCreate: missingIds.length,
+  // })
 
   // use a timeout to stagger the imports
   // reason: indexedDB creates indexes right after a table was imported
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
     // TODO: strip out typeName
+    console.log('processTable',{dexie, table, dexieTable: dexie[table]})
     await dexie[table].bulkPut(dataToCheck)
     setInitiallyQueried({ table })
     // try {

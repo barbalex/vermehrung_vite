@@ -14,7 +14,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-const recreatePersistedStore = async ({ store }) => {
+const initiateAuth = async ({ store }) => {
   console.log('recreatePersistedStore running')
   let unregisterAuthObserver = () => {}
   const {
@@ -37,7 +37,7 @@ const recreatePersistedStore = async ({ store }) => {
   }
   const auth = getAuth(fbApp)
   setFirebaseAuth(auth)
-  unregisterAuthObserver = onAuthStateChanged(auth, async (user) => {
+  unregisterAuthObserver = onAuthStateChanged(auth, async (user) => { 
     // BEWARE: this is called at least twice
     // https://stackoverflow.com/questions/37673616/firebase-android-onauthstatechanged-called-twice
     if (store.user?.uid) return
@@ -64,4 +64,4 @@ const recreatePersistedStore = async ({ store }) => {
   return unregisterAuthObserver
 }
 
-export default recreatePersistedStore
+export default initiateAuth

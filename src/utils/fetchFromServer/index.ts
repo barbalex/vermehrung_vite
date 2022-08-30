@@ -1,7 +1,7 @@
 import processTable from './processTable'
 
-const initializeSubscriptions = ({ store }) => {
-  console.log('initializing subscriptions')
+const fetchFromServer = ({ store }) => {
+  console.log('initializing subscriptions, store:', store)
   const {
     ae_art_lastUpdated,
     art_lastUpdated,
@@ -53,7 +53,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.ae_art,
-          table: 'ae_art',
+          table: 'ae_arts',
           store,
         })
       },
@@ -94,7 +94,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art,
-          table: 'art',
+          table: 'arts',
           store,
         })
       },
@@ -125,7 +125,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art_file,
-          table: 'art_file',
+          table: 'art_files',
           store,
         })
       },
@@ -161,7 +161,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art_qk,
-          table: 'art_qk',
+          table: 'art_qks',
           store,
         })
       },
@@ -195,7 +195,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.av,
-          table: 'av',
+          table: 'avs',
           store,
         })
       },
@@ -233,7 +233,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.event,
-          table: 'event',
+          table: 'events',
           store,
         })
       },
@@ -277,7 +277,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.garten,
-          table: 'garten',
+          table: 'gartens',
           store,
         })
       },
@@ -308,7 +308,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.garten_file,
-          table: 'garten_file',
+          table: 'garten_files',
           store,
         })
       },
@@ -342,7 +342,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.gv,
-          table: 'gv',
+          table: 'gvs',
           store,
         })
       },
@@ -385,7 +385,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.herkunft,
-          table: 'herkunft',
+          table: 'herkunfts',
           store,
         })
       },
@@ -416,7 +416,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.herkunft_file,
-          table: 'herkunft_file',
+          table: 'herkunft_files',
           store,
         })
       },
@@ -456,7 +456,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur,
-          table: 'kultur',
+          table: 'kulturs',
           store,
         })
       },
@@ -487,7 +487,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_file,
-          table: 'kultur_file',
+          table: 'kultur_files',
           store,
         })
       },
@@ -528,7 +528,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_option,
-          table: 'kultur_option',
+          table: 'kultur_options',
           store,
         })
       },
@@ -564,7 +564,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_qk,
-          table: 'kultur_qk',
+          table: 'kultur_qks',
           store,
         })
       },
@@ -611,7 +611,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.lieferung,
-          table: 'lieferung',
+          table: 'lieferungs',
           store,
         })
       },
@@ -642,7 +642,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.lieferung_file,
-          table: 'lieferung_file',
+          table: 'lieferung_files',
           store,
         })
       },
@@ -692,7 +692,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person,
-          table: 'person',
+          table: 'persons',
           store,
         })
       },
@@ -723,7 +723,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person_file,
-          table: 'person_file',
+          table: 'person_files',
           store,
         })
       },
@@ -778,7 +778,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person_option,
-          table: 'person_option',
+          table: 'person_options',
           store,
         })
       },
@@ -822,7 +822,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammel_lieferung,
-          table: 'sammel_lieferung',
+          table: 'sammel_lieferungs',
           store,
         })
       },
@@ -871,7 +871,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammlung,
-          table: 'sammlung',
+          table: 'sammlungs',
           store,
         })
       },
@@ -902,7 +902,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammlung_file,
-          table: 'sammlung_file',
+          table: 'sammlung_files',
           store,
         })
       },
@@ -940,7 +940,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.teilkultur,
-          table: 'teilkultur',
+          table: 'teilkulturs',
           store,
         })
       },
@@ -980,7 +980,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.teilzaehlung,
-          table: 'teilzaehlung',
+          table: 'teilzaehlungs',
           store,
         })
       },
@@ -1009,7 +1009,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.user_role,
-          table: 'user_role',
+          table: 'user_roles',
           store,
         })
       },
@@ -1045,7 +1045,7 @@ const initializeSubscriptions = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.zaehlung,
-          table: 'zaehlung',
+          table: 'zaehlungs',
           store,
         })
       },
@@ -1056,4 +1056,4 @@ const initializeSubscriptions = ({ store }) => {
   return unsubscribe
 }
 
-export default initializeSubscriptions
+export default fetchFromServer
