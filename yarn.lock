@@ -2563,6 +2563,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nozbe/simdjson@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@nozbe/simdjson@npm:1.0.0"
+  checksum: 283eb33917a3a0ffc627ac87e39f3aa8bd3a2057e40607452ab497158dff90d791533028489264172a30476f1a217f4f0f75082f54e0c0e8fc0ece4a40e1e99b
+  languageName: node
+  linkType: hard
+
+"@nozbe/sqlite@npm:3.36.0":
+  version: 3.36.0
+  resolution: "@nozbe/sqlite@npm:3.36.0"
+  checksum: 2e432398aad78b6244339974ee9371dfecb78f46bc1aa179fbb74dff673dc728fad394aba0371599414b62842de7085635b74cb5eb0c5c6200578ecdac3453de
+  languageName: node
+  linkType: hard
+
+"@nozbe/watermelondb@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@nozbe/watermelondb@npm:0.24.0"
+  dependencies:
+    "@babel/runtime": ^7.11.2
+    "@nozbe/simdjson": 1.0.0
+    "@nozbe/sqlite": 3.36.0
+    "@nozbe/with-observables": 1.4.0
+    hoist-non-react-statics: ^3.3.2
+    lokijs: "npm:@nozbe/lokijs@1.5.12-wmelon4"
+    rxjs: ^7.3.0
+    sql-escape-string: ^1.1.0
+  checksum: 7306e150857c90650d2872a8a368f5f25555a0ca3df40737424e546e8cc9c4de6f91f0ea782e29799882205436de25f45845b55454e1aa03f4dc42a740c96d45
+  languageName: node
+  linkType: hard
+
+"@nozbe/with-observables@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@nozbe/with-observables@npm:1.4.0"
+  dependencies:
+    hoist-non-react-statics: ^3.3.2
+  peerDependencies:
+    "@types/hoist-non-react-statics": ^3.3.1
+    "@types/react": ^16.9.23||^17
+    react: ^16.4.2||^17
+  checksum: 8d0212131c040ab8a4938de10c457de0c85cd2f3472897a99afde06c72a66e3977c55c934a6342eb9aec85490ce6126ef61d8118861fc086f47f54111abf001e
+  languageName: node
+  linkType: hard
+
 "@npmcli/fs@npm:^2.1.0":
   version: 2.1.2
   resolution: "@npmcli/fs@npm:2.1.2"
@@ -7130,7 +7173,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.0.0, hoist-non-react-statics@npm:^3.3.1":
+"hoist-non-react-statics@npm:^3.0.0, hoist-non-react-statics@npm:^3.3.1, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
   dependencies:
@@ -8512,6 +8555,13 @@ __metadata:
     safe-stable-stringify: ^2.3.1
     triple-beam: ^1.3.0
   checksum: 3d00f4e1ccaf0a86886aabbf66d1f1d207441d5b408f103457da6d64d055aee76c02af4b40a31ca77a1db4cbcdecb007149f731536c39cbd89b7b6ba3dda6d7b
+  languageName: node
+  linkType: hard
+
+"lokijs@npm:@nozbe/lokijs@1.5.12-wmelon4":
+  version: 1.5.12-wmelon4
+  resolution: "@nozbe/lokijs@npm:1.5.12-wmelon4"
+  checksum: 3b646ff9d7050d6dd283bc4c5e75ef62859e0eb8b7e5905c4f926db5cae9ba818d8b5f393297ca3a662e9d20f7d8633cc7c7a4c183bb23b2659a38cd7551898b
   languageName: node
   linkType: hard
 
@@ -9987,6 +10037,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-contextmenu@npm:^2.14.0":
+  version: 2.14.0
+  resolution: "react-contextmenu@npm:2.14.0"
+  dependencies:
+    classnames: ^2.2.5
+    object-assign: ^4.1.0
+  peerDependencies:
+    prop-types: ^15.0.0
+    react: ^0.14.0 || ^15.0.0 || ^16.0.1
+    react-dom: ^0.14.0 || ^15.0.0 || ^16.0.1
+  checksum: a250ed92535b339fb5dd8ec11b6a75e28b46fe46b43771ea4fefad6ca88afc44a157620c1596ced90c9fc9fe5270502f4cd1d0b29d71e698ec93a87b3c43b13e
+  languageName: node
+  linkType: hard
+
 "react-copy-to-clipboard@npm:5.1.0":
   version: 5.1.0
   resolution: "react-copy-to-clipboard@npm:5.1.0"
@@ -10847,7 +10911,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.5.5":
+"rxjs@npm:^7.3.0, rxjs@npm:^7.5.5, rxjs@npm:^7.5.6":
   version: 7.5.6
   resolution: "rxjs@npm:7.5.6"
   dependencies:
@@ -11222,6 +11286,13 @@ __metadata:
   version: 1.0.3
   resolution: "sprintf-js@npm:1.0.3"
   checksum: 19d79aec211f09b99ec3099b5b2ae2f6e9cdefe50bc91ac4c69144b6d3928a640bb6ae5b3def70c2e85a2c3d9f5ec2719921e3a59d3ca3ef4b2fd1a4656a0df3
+  languageName: node
+  linkType: hard
+
+"sql-escape-string@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "sql-escape-string@npm:1.1.0"
+  checksum: 4e65c06031ba81d2bf3d94301b606d2c0254a2b0725ae426bb32015e407dedd45942c85386a8cacad64a76714d296652f94500331657a7676a57b1be48b85380
   languageName: node
   linkType: hard
 
@@ -12303,6 +12374,7 @@ __metadata:
     "@mui/material": 5.10.3
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
     "@mui/styled-engine-sc": 5.10.3
+    "@nozbe/watermelondb": ^0.24.0
     "@types/react": 18.0.17
     "@types/react-dom": 18.0.6
     "@typescript-eslint/eslint-plugin": 5.36.0
@@ -12341,6 +12413,7 @@ __metadata:
     proj4: 2.8.0
     prop-types: 15.8.1
     react: 18.2.0
+    react-contextmenu: ^2.14.0
     react-copy-to-clipboard: 5.1.0
     react-datepicker: 4.8.0
     react-dom: 18.2.0
@@ -12361,6 +12434,7 @@ __metadata:
     react-window: 1.8.7
     recharts: 2.1.13
     redaxios: 0.5.1
+    rxjs: ^7.5.6
     simplebar: 5.3.8
     simplebar-react: 2.4.1
     slick-carousel: 1.8.1

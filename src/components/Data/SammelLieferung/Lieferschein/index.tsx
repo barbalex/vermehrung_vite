@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { StaticImage } from 'gatsby-plugin-image'
+// TODO: work on image
+// import { StaticImage } from 'gatsby-plugin-image'
 import { DateTime } from 'luxon'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -151,7 +152,7 @@ const Lieferschein = ({ row }) => {
   return (
     <Container>
       <PageContainer className="querformat printer-content">
-        <StaticImage
+        <img
           src="../../../../images/toposLogo.png"
           alt="topos Logo"
           width={500}
