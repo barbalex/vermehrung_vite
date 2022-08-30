@@ -13,7 +13,6 @@ const getToken = () => window.localStorage.getItem('token') ?? noToken
 
 const initiateApp = async () => {
   const store = await createStore()
-  console.log('initiateApp, store:', store)
   // ws client only works in the browser
   // need to prevent gatsby from executing it server side
   // see: https://github.com/apollographql/subscriptions-transport-ws/issues/333#issuecomment-359261024

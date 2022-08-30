@@ -6,9 +6,7 @@ import MobxStore from '../store'
 import { defaultValue as defaultErrors } from '../store/Errors'
 
 const createStore = async () => {
-  console.log('createStore, dexie:', dexie)
   const dbStore = await dexie.stores.get('store')
-  console.log('createStore, dbStore:', dbStore)
   let st
   if (dbStore) {
     console.log('recreating persisted store')
@@ -53,9 +51,7 @@ const createStore = async () => {
     dbStore.store.zaehlung_initially_queried = false
     st = MobxStore.create(dbStore?.store)
   } else {
-    console.log('createStore, store 1:', st)
     st = MobxStore.create()
-    console.log('createStore, store 2:', st)
   }
   // navigate to previous activeNodeArray - if exists
   const shouldNavigate =

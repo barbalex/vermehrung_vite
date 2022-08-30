@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import uploadcare from 'uploadcare-widget'
+
 import { signature, expire } from '../utils/uploadcareSignature'
 
 if (typeof window !== 'undefined') {
@@ -28,8 +30,6 @@ if (typeof window !== 'undefined') {
   window.UPLOADCARE_SECURE_SIGNATURE = signature
   window.UPLOADCARE_SECURE_EXPIRE = expire
 }
-
-const uploadcare = require('uploadcare-widget')
 
 class Uploader extends Component {
   componentDidMount() {

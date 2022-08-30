@@ -50,7 +50,6 @@ const App = ({ element }) => {
       ({ store: storeReturned, unregister: unregisterReturned }) => {
         if (!isActive) return
 
-        console.log('App, effect, storeReturned:',storeReturned)
         setStore(storeReturned)
         unregister = unregisterReturned
       },
@@ -64,11 +63,7 @@ const App = ({ element }) => {
   }, [])
 
   // without store bad things happen
-  // if (!store) return null
-
-  // return <p>hi</p>
-
-  // console.log('hi from App, store:', store)
+  if (!store) return null
 
   return (
     <BrowserRouter>

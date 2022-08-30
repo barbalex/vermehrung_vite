@@ -104,9 +104,7 @@ const CardTitle = styled.h3`
   font-weight: 700;
 `
 
-const Index = () => {
-  console.log('hi from index')
-  return(
+const Index = () => (
   <ErrorBoundary>
     <OuterContainer>
       <ProgressiveImg src={image} placeholderSrc={placeholderSrc} />
@@ -215,6 +213,6 @@ const Index = () => {
       </ScrollContainer>
     </OuterContainer>
   </ErrorBoundary>
-)}
+)
 
 export default Index

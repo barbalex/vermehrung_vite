@@ -23,8 +23,6 @@ const processSubscriptionResult = async ({
   }
   setInitiallyQuerying(table)
 
-  console.log('processTable, dexie:', dexie)
-
   // const collection = db.get(table)
   // const incomingIds = dataToCheck.map((d) => d.id)
 

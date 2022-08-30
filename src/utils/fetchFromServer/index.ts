@@ -1,7 +1,6 @@
 import processTable from './processTable'
 
 const fetchFromServer = ({ store }) => {
-  console.log('initializing subscriptions, store:', store)
   const {
     ae_art_lastUpdated,
     art_lastUpdated,
