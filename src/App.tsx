@@ -23,12 +23,12 @@ const App = ({ element }) => (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={materialTheme}>
         <GlobalStyle />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="Dokumentation/*" element={<Dokumentation />} />
-            <Route path="Vermehrung/*" element={<Vermehrung />}/>
-            <Route path="*" element={<FourOhFour />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="Dokumentation/*" element={<Dokumentation />} />
+          <Route path="Vermehrung/*" element={<Vermehrung />}/>
+          <Route path="*" element={<FourOhFour />} />
+        </Routes>
       </ThemeProvider>
     </StyledEngineProvider>
   </BrowserRouter>
