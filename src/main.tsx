@@ -16,13 +16,15 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 
+import browserUpdate from 'browser-update'
+
 import App from './App'
 
 registerLocale('de', de)
 setDefaultLocale('de')
 
 // inform users of old browsers
-const browserUpdateConfiguration = {
+browserUpdate({
   required: { e: -2, f: -2, o: -2, s: -2, c: -2 },
   text: {
     msg: 'Ihr Browser ({brow_name}) ist veraltet.',
@@ -33,10 +35,7 @@ const browserUpdateConfiguration = {
   },
   style: 'bottom',
   //test: true,
-}
-import('browser-update').then((module) =>
-  module.default(browserUpdateConfiguration),
-)
+})
 
 // https://vite-plugin-pwa.netlify.app/guide/prompt-for-update.html#runtime
 registerSW({

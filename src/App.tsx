@@ -46,16 +46,19 @@ const App = ({ element }) => {
   useEffect(() => {
     let isActive = true
     let unregister = () => {}
+    console.log('App, effect, will initiate App')
     initiateApp().then(
       ({ store: storeReturned, unregister: unregisterReturned }) => {
         if (!isActive) return
 
+        console.log('App, setting store:', storeReturned)
         setStore(storeReturned)
         unregister = unregisterReturned
       },
     )
 
     return () => {
+      console.log('App, effect, will unregister')
       isActive = false
       unregister()
     }
@@ -72,7 +75,7 @@ const App = ({ element }) => {
           <MobxProvider value={store}>
             <UrqlProvider value={store.gqlClient}>
               <GlobalStyle />
-              <NavigationSyncController />
+              {/* <NavigationSyncController /> */}
               <Layout>
                 <Routes>
                   <Route path="/" element={<Home />} />
