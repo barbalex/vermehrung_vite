@@ -58,7 +58,7 @@ const createStore = async () => {
       activeNodeArrayFromUrl(window.location.pathname),
       dbStore?.activeNodeArray,
     )
-    console.log('createStore shouldNavigate:', shouldNavigate)
+  // console.log('createStore shouldNavigate:', shouldNavigate)
   if (shouldNavigate) {
     window.location.href = `${
       window.location.origin

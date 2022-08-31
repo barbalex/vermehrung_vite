@@ -5,7 +5,7 @@ import constants from './constants'
 import MobxStore from '../store'
 import getAuthToken from './getAuthToken'
 import createStore from './createStore'
-import fetchFromServer from './fetchFromServer'
+// import fetchFromServer from './fetchFromServer'
 import initiateAuth from './initiateAuth'
  
 const noToken =
@@ -109,16 +109,21 @@ const initiateApp = async () => {
   store.setGqlClient(gqlClient)
 
   
-  const unsubscribe = fetchFromServer({ store})
+  // const unsubscribe = fetchFromServer({ store})
+  // function cleanup() {
+  //   if (unsubscribe && Object.values(unsubscribe)) {
+  //     Object.values(unsubscribe).forEach((value) => value?.unsubscribe?.())
+  //   }
+  // }
 
   const unregisterAuthObserver = await initiateAuth({ store })
   const unregister = () => {
+    // cleanup()
     unregisterAuthObserver()
     gqlWsClient.dispose()
-    unsubscribe()
   }
 
-  console.log('initiateApp, store:', store)
+  // console.log('initiateApp, store:', store)
   return { store, unregister }
 }
 

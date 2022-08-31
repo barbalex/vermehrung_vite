@@ -4,20 +4,20 @@ import SplitPane from 'react-split-pane'
 import { observer } from 'mobx-react-lite'
 import CircularProgress from '@mui/material/CircularProgress'
 
-import StoreContext from '../storeContext'
-import Layout from '../components/Layout'
-import activeNodeArrayFromPathname from '../utils/activeNodeArrayFromPathname'
-import openNodesFromActiveNodeArray from '../utils/openNodesFromActiveNodeArray'
-import fetchFromServer from '../utils/fetchFromServer'
-import Tree from '../components/Tree'
-import Data from '../components/Data'
-import Filter from '../components/Filter'
-import Login from '../components/Login'
-import ErrorBoundary from '../components/shared/ErrorBoundary'
-import ApiDetector from '../components/ApiDetector'
-import QueuedQueries from '../components/QueuedQueries'
-import tableNames from '../utils/tableNames'
-import constants from '../utils/constants'
+import StoreContext from '../../storeContext'
+import activeNodeArrayFromPathname from '../../utils/activeNodeArrayFromPathname'
+import openNodesFromActiveNodeArray from '../../utils/openNodesFromActiveNodeArray'
+import fetchFromServer from '../../utils/fetchFromServer'
+import Tree from '../../components/Tree'
+import Data from '../../components/Data'
+import Filter from '../../components/Filter'
+import Login from '../../components/Login'
+import ErrorBoundary from '../../components/shared/ErrorBoundary'
+import ApiDetector from '../../components/ApiDetector'
+import QueuedQueries from '../../components/QueuedQueries'
+import tableNames from '../../utils/tableNames'
+import constants from '../../utils/constants'
+
 
 const Container = styled.div`
   min-height: calc(100vh - ${constants.appBarHeight}px);
@@ -68,6 +68,7 @@ const StyledSplitPane = styled(SplitPane)`
 
 const Vermehrung = ({ location }) => {
   const store = useContext(StoreContext)
+  console.log('Vermehrung, store:', store)
   const {
     activeForm,
     gettingAuthUser,
@@ -120,8 +121,8 @@ const Vermehrung = ({ location }) => {
   }, [activeNodeArray, pathname, setActiveNodeArray])
 
   useEffect(() => {
-    // console.log('vermehrung, subscription effect: authorizing:', authorizing)
-    // console.log('vermehrung, subscription effect: existsUser:', existsUser)
+    console.log('vermehrung, subscription effect: authorizing:', authorizing)
+    console.log('vermehrung, subscription effect: existsUser:', existsUser)
     let unsubscribe
     if (existsUser && !authorizing) {
       // TODO:
@@ -150,13 +151,11 @@ const Vermehrung = ({ location }) => {
   if (gettingAuthUser) {
     return (
       <ErrorBoundary>
-        <Layout>
-          <SpinnerContainer>
-            <CircularProgress />
-            {/* <SpinnerText>{isIOS ? 'prüfe' : 'autorisiere'}</SpinnerText> */}
-            <SpinnerText>autorisiere</SpinnerText>
-          </SpinnerContainer>
-        </Layout>
+        <SpinnerContainer>
+          <CircularProgress />
+          {/* <SpinnerText>{isIOS ? 'prüfe' : 'autorisiere'}</SpinnerText> */}
+          <SpinnerText>autorisiere</SpinnerText>
+        </SpinnerContainer>
       </ErrorBoundary>
     )
   }
@@ -164,11 +163,9 @@ const Vermehrung = ({ location }) => {
   if (!existsUser) {
     return (
       <ErrorBoundary>
-        <Layout>
-          <LoginContainer>
-            <Login />
-          </LoginContainer>
-        </Layout>
+        <LoginContainer>
+          <Login />
+        </LoginContainer>
       </ErrorBoundary>
     )
   }
@@ -176,13 +173,11 @@ const Vermehrung = ({ location }) => {
   if (online && !initialDataQueried) {
     return (
       <ErrorBoundary>
-        <Layout>
-          <SpinnerContainer>
-            <CircularProgress />
-            <SpinnerText>lade Daten für offline-Nutzung</SpinnerText>
-            <SpinnerText2>{tableNames(initiallyQuerying)}</SpinnerText2>
-          </SpinnerContainer>
-        </Layout>
+        <SpinnerContainer>
+          <CircularProgress />
+          <SpinnerText>lade Daten für offline-Nutzung</SpinnerText>
+          <SpinnerText2>{tableNames(initiallyQuerying)}</SpinnerText2>
+        </SpinnerContainer>
       </ErrorBoundary>
     )
   }
@@ -194,9 +189,7 @@ const Vermehrung = ({ location }) => {
   ) {
     return (
       <ErrorBoundary>
-        <Layout>
-          <ErrorContainer>{error.message}</ErrorContainer>
-        </Layout>
+        <ErrorContainer>{error.message}</ErrorContainer>
       </ErrorBoundary>
     )
   }
@@ -206,11 +199,9 @@ const Vermehrung = ({ location }) => {
   if (showQueuedQueries) {
     return (
       <>
-        <Layout>
-          <Container>
-            <QueuedQueries />
-          </Container>
-        </Layout>
+        <Container>
+          <QueuedQueries />
+        </Container>
         <ApiDetector />
       </>
     )
@@ -221,19 +212,17 @@ const Vermehrung = ({ location }) => {
 
   return (
     <ErrorBoundary>
-      <Layout>
-        <Container>
-          <StyledSplitPane
-            split="vertical"
-            size={treeWidth}
-            maxSize={-10}
-            resizerStyle={resizerStyle}
-          >
-            <Tree />
-            {showFilter ? <Filter /> : <Data />}
-          </StyledSplitPane>
-        </Container>
-      </Layout>
+      <Container>
+        <StyledSplitPane
+          split="vertical"
+          size={treeWidth}
+          maxSize={-10}
+          resizerStyle={resizerStyle}
+        >
+          <Tree />
+          {showFilter ? <Filter /> : <Data />}
+        </StyledSplitPane>
+      </Container>
       <ApiDetector />
     </ErrorBoundary>
   )

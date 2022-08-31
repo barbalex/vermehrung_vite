@@ -1,9 +1,12 @@
 import React from 'react'
 
 import Documentation from '../components/Documentation'
+import Header from '../components/Header'
 
 const Dokumentation = ({ data, location }) => (
-  <p>TODO documentation</p>
+  <Header>
+    <p>TODO documentation</p>
+  </Header>
 )
 
 

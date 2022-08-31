@@ -64,8 +64,12 @@ const processSubscriptionResult = async ({
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
     // TODO: strip out typeName
-    console.log('processTable',{dexie, table, dexieTable: dexie[table]})
-    await dexie[table].bulkPut(dataToCheck)
+    console.log('processTable',{ dexie, table, dexieTable: dexie[table] })
+    try {
+      await dexie[table].bulkPut(dataToCheck)
+    } catch (error) {
+      console.log('Error in processSubscriptionResult > db.action:', error)
+    }
     setInitiallyQueried({ table })
     // try {
     //   await db.write(async () => {

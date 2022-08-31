@@ -54,6 +54,9 @@ registerSW({
     console.log('the service worker is offline ready')
   },
 })
+
+console.log('main running')
+
 const container = document.getElementById('root')
 const root = createRoot(container)
 
