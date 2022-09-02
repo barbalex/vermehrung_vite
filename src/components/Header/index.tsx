@@ -2,7 +2,7 @@ import React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import styled from 'styled-components'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import ErrorBoundary from '../shared/ErrorBoundary'
 import constants from '../../utils/constants'
@@ -24,24 +24,16 @@ const StyledAppBar = styled(AppBar)`
 
 const Header = () => {
   const location = useLocation()
-  const pathname  = location.pathname
+  const pathname = location.pathname
   const isHome = pathname === '/'
-  const isVermehrung = pathname.startsWith('/Vermehrung')
 
   return (
     <ErrorBoundary>
       <StyledAppBar position="static">
-        <Toolbar>
-          {isHome ? (
-            <Home location={location} />
-          ) : (
-            <Doku />
-          )}
-        </Toolbar>
+        <Toolbar>{isHome ? <Home location={location} /> : <Doku />}</Toolbar>
       </StyledAppBar>
     </ErrorBoundary>
   )
 }
-
 
 export default Header
