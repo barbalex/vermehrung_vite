@@ -27,16 +27,7 @@ const ScrollContainer = styled.div`
 const Container = styled.div`
   height: 100%;
   box-sizing: border-box;
-  padding: 15px;
-  @media (min-width: 700px) {
-    padding: 20px;
-  }
-  @media (min-width: 1200px) {
-    padding: 25px;
-  }
-  @media (min-width: 1700px) {
-    padding: 30px;
-  }
+  padding-top: 25px;
 `
 const CardContainer = styled.div`
   color: black !important;
@@ -44,20 +35,24 @@ const CardContainer = styled.div`
   grid-template-columns: 1fr;
   grid-column-gap: 15px;
   grid-row-gap: 15px;
+  padding: 15px;
   @media (min-width: 700px) {
     grid-template-columns: 1fr 1fr;
     grid-column-gap: 20px;
     grid-row-gap: 20px;
+    padding: 20px;
   }
   @media (min-width: 1200px) {
     grid-template-columns: 1fr 1fr 1fr;
     grid-column-gap: 25px;
     grid-row-gap: 25px;
+    padding: 25px;
   }
   @media (min-width: 1700px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-column-gap: 30px;
     grid-row-gap: 30px;
+    padding: 30px;
   }
   p {
     margin-bottom: 10px !important;
