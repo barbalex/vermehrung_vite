@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { observer } from 'mobx-react-lite'
-import { Provider as UrqlProvider } from 'urql'
+import React from 'react'
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
@@ -8,17 +6,12 @@ import materialTheme from './utils/materialTheme'
 import createGlobalStyle from './utils/createGlobalStyle'
 const GlobalStyle = createGlobalStyle()
 
-import { Provider as MobxProvider } from './storeContext'
-
-import initiateApp from './utils/initiateApp'
-
-import Layout from './components/Layout'
 import Home from './routes/index.js'
 import Vermehrung from './routes/Vermehrung'
 import Dokumentation from './routes/Dokumentation'
 import FourOhFour from './routes/404'
 
-const App = ({ element }) => (
+const App = () => (
   <BrowserRouter>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={materialTheme}>
@@ -34,4 +27,4 @@ const App = ({ element }) => (
   </BrowserRouter>
 )
 
-export default observer(App)
+export default App

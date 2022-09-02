@@ -6,7 +6,6 @@ import { Provider as MobxProvider } from '../../storeContext'
 import NavigationSyncController from '../../components/NavigationSyncController'
 import Notifications from '../../components/Notifications'
 
-import { dexie } from '../../dexieClient'
 import Vermehrung from './Vermehrung'
 import initiateApp from '../../utils/initiateApp'
 import Header from '../../components/HeaderVermehrung'
@@ -24,7 +23,7 @@ async function persist() {
   )
 }
 
-const App = ({ element }) => {
+const App = () => {
   const [store, setStore] = useState(null)
 
   useEffect(() => {

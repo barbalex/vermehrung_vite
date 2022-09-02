@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import ErrorBoundary from '../shared/ErrorBoundary'
 import constants from '../../utils/constants'
 
-import Vermehrung from './Vermehrung' 
+import Vermehrung from './Vermehrung'
 
 const StyledAppBar = styled(AppBar)`
   min-height: ${constants.appBarHeight}px !important;
@@ -29,7 +29,5 @@ const Header = () => (
     </StyledAppBar>
   </ErrorBoundary>
 )
-
-
 
 export default Header

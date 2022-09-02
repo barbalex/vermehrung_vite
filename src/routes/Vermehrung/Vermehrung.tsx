@@ -19,7 +19,7 @@ import tableNames from '../../utils/tableNames'
 import constants from '../../utils/constants'
 
 
-const Container = styled.div`
+const Container = styled.div` 
   min-height: calc(100vh - ${constants.appBarHeight}px);
   position: relative;
 `

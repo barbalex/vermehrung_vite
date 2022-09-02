@@ -24,6 +24,7 @@ import {
 import ErrorBoundary from './shared/ErrorBoundary'
 import StoreContext from '../storeContext'
 import constants from '../utils/constants'
+import { dexie } from '../dexieClient'
 
 const StyledDialog = styled(Dialog)``
 const StyledDiv = styled.div`
@@ -69,6 +70,7 @@ const Login = () => {
       // do everything to clean up so no data is left
       await signOut(firebaseAuth)
       await localForage.clear()
+      // await dexie.delete()
       window.localStorage.removeItem('token')
       await db.write(async () => db.unsafeResetDatabase())
       setTimeout(async () => {

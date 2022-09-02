@@ -1,4 +1,3 @@
-import localForage from 'localforage'
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
@@ -14,8 +13,7 @@ const firebaseConfig = {
 }
 
 const initiateAuth = async ({ store }) => {
-  console.log('recreatePersistedStore running')
-  let unregisterAuthObserver = () => {}
+  console.log('initiateAuth running')
   const {
     setUser,
     setGettingAuthUser,
@@ -36,7 +34,7 @@ const initiateAuth = async ({ store }) => {
   }
   const auth = getAuth(fbApp)
   setFirebaseAuth(auth)
-  unregisterAuthObserver = onAuthStateChanged(auth, async (user) => { 
+  const unregisterAuthObserver = onAuthStateChanged(auth, async (user) => {
     // BEWARE: this is called at least twice
     // https://stackoverflow.com/questions/37673616/firebase-android-onauthstatechanged-called-twice
     if (store.user?.uid) return
@@ -55,11 +53,12 @@ const initiateAuth = async ({ store }) => {
     if (nowOnline !== online) setOnline(nowOnline)
     if (nowOnline !== shortTermOnline) setShortTermOnline(nowOnline)
     if (nowOnline) {
-      console.log('recreatePersistedStore getting auth token')
+      console.log('initiateAuth getting auth token')
       await getAuthToken({ store })
     }
     setGettingAuthUser(false)
   })
+
   return unregisterAuthObserver
 }
 
