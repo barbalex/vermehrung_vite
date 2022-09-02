@@ -26,13 +26,12 @@ const App = ({ element }) => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="Dokumentation/*" element={<Dokumentation />} />
-          <Route path="Vermehrung/*" element={<Vermehrung />}/>
+          <Route path="Vermehrung/*" element={<Vermehrung />} />
           <Route path="*" element={<FourOhFour />} />
         </Routes>
       </ThemeProvider>
     </StyledEngineProvider>
   </BrowserRouter>
 )
-
 
 export default observer(App)

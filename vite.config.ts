@@ -6,7 +6,12 @@ import svgrPlugin from 'vite-plugin-svgr'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    svgrPlugin({
+      svgrOptions: {
+        icon: true,
+        // ...svgr options (https://react-svgr.com/docs/options/)
+      },
+    }),
     VitePWA({
       workbox: {
         sourcemap: true,
@@ -50,11 +55,6 @@ export default defineConfig({
         //enabled: true,
       },
     }),
-    svgrPlugin({
-      svgrOptions: {
-        icon: true,
-        // ...svgr options (https://react-svgr.com/docs/options/)
-      },
-    }),
+    react(),
   ],
 });
