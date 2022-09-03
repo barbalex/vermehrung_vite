@@ -35,18 +35,20 @@ const FieldsContainer = styled.div`
 
 const Root = ({ filter: showFilter }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
   const { activeNodeArray: activeNodeArrayRaw } = store.tree
   const activeNodeArray = activeNodeArrayRaw.toJSON()
 
   const data = useLiveQuery(async () => {
     const person: Person = await dexie.persons.get({ account_id: user.uid })
     const userRole = await dexie.user_roles.get(person.user_role_id)
+    const userPersonOption = await dexie.person_options.get(person.id)
 
-    return { userRole }
+    return { userRole, userPersonOption }
   })
 
   const userRole = data?.userRole
+  const userPersonOption = data?.userPersonOption
 
   const showArt = getShowArt({ userRole, activeNodeArray })
   const showEvent = getShowEvent({ userPersonOption, activeNodeArray })
