@@ -1392,36 +1392,6 @@ const myTypes = types
   })
   .views((self) => ({
     get initialDataQueried() {
-      console.log('view initialDataQueried', {
-        ae_art_initially_queried: self.ae_art_initially_queried,
-        art_initially_queried: self.art_initially_queried,
-        art_file_initially_queried: self.art_file_initially_queried,
-        art_qk_initially_queried: self.art_qk_initially_queried,
-        av_initially_queried: self.av_initially_queried,
-        event_initially_queried: self.event_initially_queried,
-        garten_initially_queried: self.garten_initially_queried,
-        garten_file_initially_queried: self.garten_file_initially_queried,
-        gv_initially_queried: self.gv_initially_queried,
-        herkunft_initially_queried: self.herkunft_initially_queried,
-        herkunft_file_initially_queried: self.herkunft_file_initially_queried,
-        kultur_initially_queried: self.kultur_initially_queried,
-        kultur_file_initially_queried: self.kultur_file_initially_queried,
-        kultur_option_initially_queried: self.kultur_option_initially_queried,
-        kultur_qk_initially_queried: self.kultur_qk_initially_queried,
-        lieferung_initially_queried: self.lieferung_initially_queried,
-        lieferung_file_initially_queried: self.lieferung_file_initially_queried,
-        person_initially_queried: self.person_initially_queried,
-        person_file_initially_queried: self.person_file_initially_queried,
-        person_option_initially_queried: self.person_option_initially_queried,
-        sammel_lieferung_initially_queried:
-          self.sammel_lieferung_initially_queried,
-        sammlung_initially_queried: self.sammlung_initially_queried,
-        sammlung_file_initially_queried: self.sammlung_file_initially_queried,
-        teilkultur_initially_queried: self.teilkultur_initially_queried,
-        teilzaehlung_initially_queried: self.teilzaehlung_initially_queried,
-        user_role_initially_queried: self.user_role_initially_queried,
-        zaehlung_initially_queried: self.zaehlung_initially_queried,
-      })
       return (
         self.ae_art_initially_queried &&
         self.art_initially_queried &&

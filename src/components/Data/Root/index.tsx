@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { combineLatest, of as $of } from 'rxjs'
 import { Q } from '@nozbe/watermelondb'
 
@@ -18,6 +19,7 @@ import getShowSammelLieferung from '../../../utils/showSammelLieferung'
 import getShowSammlung from '../../../utils/showSammlung'
 import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
+import { dexie, Person } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -36,6 +38,39 @@ const Root = ({ filter: showFilter }) => {
   const { user, db } = store
   const { activeNodeArray: activeNodeArrayRaw } = store.tree
   const activeNodeArray = activeNodeArrayRaw.toJSON()
+
+  const data = useLiveQuery(async () => {
+    const person: Person = await dexie.persons.get({ account_id: user.uid })
+    const userRole = await dexie.user_roles.get(person.user_role_id)
+
+    return { userRole }
+  })
+
+  const userRole = data?.userRole
+
+  const showArt = getShowArt({ userRole, activeNodeArray })
+  const showEvent = getShowEvent({ userPersonOption, activeNodeArray })
+  const showGarten = getShowGarten()
+  const showHerkunft = getShowHerkunft({ userRole, activeNodeArray })
+  const showKultur = getShowKultur({ userPersonOption, activeNodeArray })
+  const showLieferung = getShowLieferung({
+    userPersonOption,
+    activeNodeArray,
+  })
+  const showPerson = getShowPerson()
+  const showSammelLieferung = getShowSammelLieferung({
+    userPersonOption,
+    activeNodeArray,
+  })
+  const showSammlung = getShowSammlung({ userRole, activeNodeArray })
+  const showTeilkultur = getShowTeilkultur({
+    userPersonOption,
+    activeNodeArray,
+  })
+  const showZaehlung = getShowZaehlung({
+    userPersonOption,
+    activeNodeArray,
+  })
 
   const [dataState, setDataState] = useState({
     showArt: false,
@@ -214,6 +249,8 @@ const Root = ({ filter: showFilter }) => {
       ? [{ name: 'Personen', url: ['Personen'], table: 'person', sort: 11 }]
       : []),
   ]
+
+  console.log('Root rendering')
 
   return (
     <ErrorBoundary>

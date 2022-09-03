@@ -82,33 +82,6 @@ const Vermehrung = () => {
     showTreeInSingleColumnView,
     user,
     online,
-    ae_art_initially_queried,
-    art_initially_queried,
-    art_file_initially_queried,
-    art_qk_initially_queried,
-    av_initially_queried,
-    event_initially_queried,
-    garten_initially_queried,
-    garten_file_initially_queried,
-    gv_initially_queried,
-    herkunft_initially_queried,
-    herkunft_file_initially_queried,
-    kultur_initially_queried,
-    kultur_file_initially_queried,
-    kultur_option_initially_queried,
-    kultur_qk_initially_queried,
-    lieferung_initially_queried,
-    lieferung_file_initially_queried,
-    person_initially_queried,
-    person_file_initially_queried,
-    person_option_initially_queried,
-    sammel_lieferung_initially_queried,
-    sammlung_initially_queried,
-    sammlung_file_initially_queried,
-    teilkultur_initially_queried,
-    teilzaehlung_initially_queried,
-    user_role_initially_queried,
-    zaehlung_initially_queried,
   } = store
   const {
     setActiveNodeArray,
@@ -173,36 +146,6 @@ const Vermehrung = () => {
     // wsReconnectCount is made so a subscription can provoke re-subscription on error
     // see fetchFromServer, unsubscribe.ae_art
   }, [existsUser, store, wsReconnectCount, authorizing])
-
-  console.log('Vermehrung', {
-    ae_art_initially_queried,
-    art_initially_queried,
-    art_file_initially_queried,
-    art_qk_initially_queried,
-    av_initially_queried,
-    event_initially_queried,
-    garten_initially_queried,
-    garten_file_initially_queried,
-    gv_initially_queried,
-    herkunft_initially_queried,
-    herkunft_file_initially_queried,
-    kultur_initially_queried,
-    kultur_file_initially_queried,
-    kultur_option_initially_queried,
-    kultur_qk_initially_queried,
-    lieferung_initially_queried,
-    lieferung_file_initially_queried,
-    person_initially_queried,
-    person_file_initially_queried,
-    person_option_initially_queried,
-    sammel_lieferung_initially_queried,
-    sammlung_initially_queried,
-    sammlung_file_initially_queried,
-    teilkultur_initially_queried,
-    teilzaehlung_initially_queried,
-    user_role_initially_queried,
-    zaehlung_initially_queried,
-  })
 
   //if (gettingAuthUser || isIOS) {
   if (gettingAuthUser) {
@@ -276,8 +219,10 @@ const Vermehrung = () => {
           maxSize={-10}
           resizerStyle={resizerStyle}
         >
-          <Tree />
-          {showFilter ? <Filter /> : <Data />}
+          <p>Tree</p>
+          <Data />
+          {/* <Tree />
+          {showFilter ? <Filter /> : <Data />} */}
         </StyledSplitPane>
       </Container>
       <ApiDetector />

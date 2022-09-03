@@ -4387,7 +4387,7 @@ export class MySubClassedDexie extends Dexie {
       teilkulturs: 'id, _deleted_indexable',
       zaehlungs: 'id, _deleted_indexable',
       teilzaehlungs: 'id, _deleted_indexable',
-      persons: 'id, _deleted_indexable',
+      persons: 'id, &account_id, _deleted_indexable',
       sammel_lieferungs: 'id, _deleted_indexable',
       events: 'id, _deleted_indexable',
       avs: 'id, _deleted_indexable',
