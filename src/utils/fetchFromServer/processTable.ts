@@ -65,7 +65,7 @@ const processSubscriptionResult = async ({
     // TODO: strip out typeName
     console.log('processTable', { dexie, table, dexieTable: dexie[table] })
     try {
-      await dexie[table].bulkPut(dataToCheck)
+      await dexie[`${table}s`].bulkPut(dataToCheck)
     } catch (error) {
       console.log('Error in processSubscriptionResult > db.action:', error)
     }

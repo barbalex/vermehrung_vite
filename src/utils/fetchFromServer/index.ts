@@ -52,7 +52,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.ae_art,
-          table: 'ae_arts',
+          table: 'ae_art',
           store,
         })
       },
@@ -93,7 +93,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art,
-          table: 'arts',
+          table: 'art',
           store,
         })
       },
@@ -124,7 +124,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art_file,
-          table: 'art_files',
+          table: 'art_file',
           store,
         })
       },
@@ -160,7 +160,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.art_qk,
-          table: 'art_qks',
+          table: 'art_qk',
           store,
         })
       },
@@ -194,7 +194,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.av,
-          table: 'avs',
+          table: 'av',
           store,
         })
       },
@@ -232,7 +232,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.event,
-          table: 'events',
+          table: 'event',
           store,
         })
       },
@@ -276,7 +276,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.garten,
-          table: 'gartens',
+          table: 'garten',
           store,
         })
       },
@@ -307,7 +307,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.garten_file,
-          table: 'garten_files',
+          table: 'garten_file',
           store,
         })
       },
@@ -341,7 +341,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.gv,
-          table: 'gvs',
+          table: 'gv',
           store,
         })
       },
@@ -384,7 +384,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.herkunft,
-          table: 'herkunfts',
+          table: 'herkunft',
           store,
         })
       },
@@ -415,7 +415,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.herkunft_file,
-          table: 'herkunft_files',
+          table: 'herkunft_file',
           store,
         })
       },
@@ -455,7 +455,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur,
-          table: 'kulturs',
+          table: 'kultur',
           store,
         })
       },
@@ -486,7 +486,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_file,
-          table: 'kultur_files',
+          table: 'kultur_file',
           store,
         })
       },
@@ -527,7 +527,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_option,
-          table: 'kultur_options',
+          table: 'kultur_option',
           store,
         })
       },
@@ -563,7 +563,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.kultur_qk,
-          table: 'kultur_qks',
+          table: 'kultur_qk',
           store,
         })
       },
@@ -610,7 +610,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.lieferung,
-          table: 'lieferungs',
+          table: 'lieferung',
           store,
         })
       },
@@ -641,7 +641,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.lieferung_file,
-          table: 'lieferung_files',
+          table: 'lieferung_file',
           store,
         })
       },
@@ -691,7 +691,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person,
-          table: 'persons',
+          table: 'person',
           store,
         })
       },
@@ -722,7 +722,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person_file,
-          table: 'person_files',
+          table: 'person_file',
           store,
         })
       },
@@ -777,7 +777,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.person_option,
-          table: 'person_options',
+          table: 'person_option',
           store,
         })
       },
@@ -821,7 +821,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammel_lieferung,
-          table: 'sammel_lieferungs',
+          table: 'sammel_lieferung',
           store,
         })
       },
@@ -870,7 +870,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammlung,
-          table: 'sammlungs',
+          table: 'sammlung',
           store,
         })
       },
@@ -901,7 +901,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.sammlung_file,
-          table: 'sammlung_files',
+          table: 'sammlung_file',
           store,
         })
       },
@@ -939,7 +939,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.teilkultur,
-          table: 'teilkulturs',
+          table: 'teilkultur',
           store,
         })
       },
@@ -979,7 +979,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.teilzaehlung,
-          table: 'teilzaehlungs',
+          table: 'teilzaehlung',
           store,
         })
       },
@@ -1008,7 +1008,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.user_role,
-          table: 'user_roles',
+          table: 'user_role',
           store,
         })
       },
@@ -1044,7 +1044,7 @@ const fetchFromServer = ({ store }) => {
       next: (data) => {
         processTable({
           data: data.data.zaehlung,
-          table: 'zaehlungs',
+          table: 'zaehlung',
           store,
         })
       },
