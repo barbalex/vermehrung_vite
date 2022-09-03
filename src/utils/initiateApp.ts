@@ -4,7 +4,6 @@ import { createClient as createWsClient } from 'graphql-ws'
 import constants from './constants'
 import getAuthToken from './getAuthToken'
 import createStore from './createStore'
-// import fetchFromServer from './fetchFromServer'
 import initiateAuth from './initiateAuth'
 
 const noToken =
@@ -15,8 +14,7 @@ const initiateApp = async () => {
   const store = await createStore()
   // ws client only works in the browser
   // need to prevent gatsby from executing it server side
-  // see: https://github.com/apollographql/subscriptions-transport-ws/issues/333#issuecomment-359261024
-  let gqlWsClient
+  // see: https://github.com/apollographql/subscriptions-transport-ws/issues/333#issuecomment-359261024gqlWsClient
   let token
   // enable gracefull restart: https://github.com/enisdenjo/graphql-ws#graceful-restart
   const createRestartableClient = (options) => {
@@ -68,7 +66,7 @@ const initiateApp = async () => {
     }
   }
 
-  gqlWsClient = (() => {
+  const gqlWsClient = (() => {
     token = getToken()
 
     return createRestartableClient({
@@ -106,13 +104,6 @@ const initiateApp = async () => {
   })
   // console.log('initiateApp, setting gqlClient:', gqlClient)
   store.setGqlClient(gqlClient)
-
-  // const unsubscribe = fetchFromServer({ store})
-  // function cleanup() {
-  //   if (unsubscribe && Object.values(unsubscribe)) {
-  //     Object.values(unsubscribe).forEach((value) => value?.unsubscribe?.())
-  //   }
-  // }
 
   const unregisterAuthObserver = await initiateAuth({ store })
   const unregister = () => {

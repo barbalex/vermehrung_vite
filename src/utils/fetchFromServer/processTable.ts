@@ -1,6 +1,6 @@
 import isEqual from 'lodash/isEqual'
 
-import parseComplexFieldsForWm from './parseComplexFieldsForWm'  
+import parseComplexFieldsForWm from './parseComplexFieldsForWm'
 import { dexie } from '../../dexieClient'
 
 const stripTypename = (object) => {
@@ -15,8 +15,7 @@ const processSubscriptionResult = async ({
   table,
   store,
 }) => {
-  const { db, setInitiallyQueried, setLastUpdated, setInitiallyQuerying } =
-    store
+  const { setInitiallyQueried, setLastUpdated, setInitiallyQuerying } = store
   if (!dataToCheck.length) {
     setInitiallyQueried({ table })
     return
@@ -64,12 +63,13 @@ const processSubscriptionResult = async ({
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
     // TODO: strip out typeName
-    console.log('processTable',{ dexie, table, dexieTable: dexie[table] })
+    console.log('processTable', { dexie, table, dexieTable: dexie[table] })
     try {
       await dexie[table].bulkPut(dataToCheck)
     } catch (error) {
       console.log('Error in processSubscriptionResult > db.action:', error)
     }
+    console.log('processTable setting initially queried:', table)
     setInitiallyQueried({ table })
     // try {
     //   await db.write(async () => {
