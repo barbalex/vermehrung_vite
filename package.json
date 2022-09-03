@@ -70,7 +70,7 @@
     "styled-components": "5.3.5",
     "typography": "0.16.21",
     "uploadcare-widget": "3.19.0",
-    "urql": "3.0.1",
+    "urql": "3.0.2",
     "use-debounce": "8.0.4",
     "uuid": "8.3.2"
   },
@@ -83,14 +83,14 @@
     "@yarnpkg/sdks": "^2.6.3",
     "eslint": "8.23.0",
     "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-react": "7.31.1",
+    "eslint-plugin-react": "7.31.4",
     "eslint-plugin-react-hooks": "4.6.0",
     "firebase-tools": "11.8.0",
     "prettier": "2.7.1",
     "tslint-config-prettier": "1.18.0",
     "typescript": "4.8.2",
     "vite": "3.0.9",
-    "vite-plugin-pwa": "0.12.4",
+    "vite-plugin-pwa": "0.12.6",
     "vite-plugin-svgr": "2.2.1"
   },
   "resolutions": {
@@ -102,9 +102,6 @@
     "react-is": "is needed by styled-components",
     "prop-types": "is used by react-typography",
     "jquery": "is peer",
-    "simplebar": "is peer",
-    "webpack": "is peer",
-    "core-js": "is peer",
-    "@babel/core": "is peer"
+    "simplebar": "is peer"
   }
 }
