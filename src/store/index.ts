@@ -32,7 +32,7 @@ import kulturIdOfAusLieferungInUrl from '../utils/kulturIdOfAusLieferungInUrl'
 import zaehlungIdInUrl from '../utils/zaehlungIdInUrl'
 import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
-import { dexie } from '../dexieClient'
+import filteredObjectsFromTable from '../utils/filteredObjectsFromTable'
 
 const myTypes = types
   .model({
@@ -122,6 +122,17 @@ const myTypes = types
     // wsReconnectCount is made so a subscription can provoke re-subscription on error
     // see initializeSubscriptions, unsubscribe.ae_art
     wsReconnectCount: types.maybeNull(types.number, 0),
+    artsFilteredCount: types.maybeNull(types.number, 0),
+    herkunftsFilteredCount: types.maybeNull(types.number, 0),
+    sammlungsFilteredCount: types.maybeNull(types.number, 0),
+    gartensFilteredCount: types.maybeNull(types.number, 0),
+    kultursFilteredCount: types.maybeNull(types.number, 0),
+    teilkultursFilteredCount: types.maybeNull(types.number, 0),
+    zaehlungsFilteredCount: types.maybeNull(types.number, 0),
+    lieferungsFilteredCount: types.maybeNull(types.number, 0),
+    sammelLieferungsFilteredCount: types.maybeNull(types.number, 0),
+    eventsFilteredCount: types.maybeNull(types.number, 0),
+    personsFilteredCount: types.maybeNull(types.number, 0),
   })
   .volatile(() => ({
     user: {},
@@ -132,121 +143,279 @@ const myTypes = types
   }))
   .actions((self) => {
     reaction(
-      () => `${self.queuedQueries.size}/${self.shortTermOnline}`,
+      () => `${self.filter.art}/${self.art_initially_queried}`,
       flow(function* () {
-        /*console.log('Store, reaction, shortTermOnline:', {
+        const count = yield filteredObjectsFromTable({
+          store: self,
+          table: 'art',
+          count: true,
+        })
+        self.setArtsFilteredCount(count)
+      }),
+    ),
+      reaction(
+        () => `${self.filter.herkunft}/${self.herkunft_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'herkunft',
+            count: true,
+          })
+          self.setHerkunftsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.sammlung}/${self.sammlung_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'sammlung',
+            count: true,
+          })
+          self.setSammlungsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.garten}/${self.garten_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'garten',
+            count: true,
+          })
+          self.setGartensFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.kultur}/${self.kultur_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'kultur',
+            count: true,
+          })
+          self.setKultursFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.teilkultur}/${self.teilkultur_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'teilkultur',
+            count: true,
+          })
+          self.setTeilkultursFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.zaehlung}/${self.zaehlung_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'zaehlung',
+            count: true,
+          })
+          self.setZaehlungsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.lieferung}/${self.lieferung_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'lieferung',
+            count: true,
+          })
+          self.setLieferungsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () =>
+          `${self.filter.sammel_lieferung}/${self.sammel_lieferung_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'sammel_lieferung',
+            count: true,
+          })
+          self.setSammellieferungsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.event}/${self.event_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'event',
+            count: true,
+          })
+          self.setEventsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.filter.person}/${self.person_initially_queried}`,
+        flow(function* () {
+          const count = yield filteredObjectsFromTable({
+            store: self,
+            table: 'person',
+            count: true,
+          })
+          self.setPersonsFilteredCount(count)
+        }),
+      ),
+      reaction(
+        () => `${self.queuedQueries.size}/${self.shortTermOnline}`,
+        flow(function* () {
+          /*console.log('Store, reaction, shortTermOnline:', {
           shortTermOnline: self.shortTermOnline,
           queuedQueriesSize: self.queuedQueries.size,
         })*/
-        /**
-         * TODO:
-         * When new query is added
-         * check if same exists already
-         * then combine them into one
-         * Goal: reduce network traffic and revision numbers when many fields were updated
-         * Build new reaction for this that only depends on self.queuedQueries.length? (but must run first...)
-         * Also important: How to combine when online?
-         * as long as same id is active?
-         */
-        if (self.shortTermOnline) {
-          // execute operation
-          const query = self.queuedQueriesSorted[0]
-          //console.log('Store, reaction, shortTermOnline:', self.shortTermOnline)
-          if (!query) return
-          const {
-            name,
-            variables,
-            revertTable,
-            revertField,
-            revertId,
-            revertValue,
-          } = query
-          const mutation = mutations[name]
-          if (!mutation) throw new Error('keine Mutation gefunden für: ', name)
-          let response
-          // see: https://formidable.com/open-source/urql/docs/concepts/core-package/#one-off-queries-and-mutations
-          variables
-            ? (response = yield self.gqlClient
-                .mutation(mutation, JSON.parse(variables))
-                .toPromise())
-            : (response = yield self.gqlClient.mutation(mutation).toPromise())
-          if (response.error) {
-            // TODO:
-            // use urql difference between networkError and graphQLErrors
-            console.log('operation reaction error:', response.error)
-            // TODO: if offline, return and set shortTermOffline
-            const lcMessage = response.error.message.toLowerCase()
-            // In case a conflict was caused by two EXACT SAME changes,
-            // this will bounce because of the same rev. We want to ignore this:
-            if (response.error.message.includes('JWT')) {
-              console.log('getting auth token due to jwt error')
-              return getAuthToken({ store: self })
-            } else if (
-              lcMessage.includes('uniqueness violation') &&
-              lcMessage.includes('_rev_id__rev_key')
-            ) {
-              console.log(
-                'There is a conflict with exact same changes - ingoring the error thrown',
-              )
-            } else if (
-              response.error?.graphQLErrors?.[0]?.extensions?.internal?.error
-                ?.status_code === '21000'
-            ) {
-              console.log('user sent same edit to soon again')
-            } else if (lcMessage.includes('unique-constraint')) {
-              let { message } = response.error
-              if (lcMessage.includes('single_art_herkunft_garden_active_idx')) {
-                message =
-                  'Pro Art, Herkunft und Garten darf nur eine Kultur aktiv sein (plus ein Zwischenlager). Offenbar gibt es schon eine aktive Kultur'
+          /**
+           * TODO:
+           * When new query is added
+           * check if same exists already
+           * then combine them into one
+           * Goal: reduce network traffic and revision numbers when many fields were updated
+           * Build new reaction for this that only depends on self.queuedQueries.length? (but must run first...)
+           * Also important: How to combine when online?
+           * as long as same id is active?
+           */
+          if (self.shortTermOnline) {
+            // execute operation
+            const query = self.queuedQueriesSorted[0]
+            //console.log('Store, reaction, shortTermOnline:', self.shortTermOnline)
+            if (!query) return
+            const {
+              name,
+              variables,
+              revertTable,
+              revertField,
+              revertId,
+              revertValue,
+            } = query
+            const mutation = mutations[name]
+            if (!mutation)
+              throw new Error('keine Mutation gefunden für: ', name)
+            let response
+            // see: https://formidable.com/open-source/urql/docs/concepts/core-package/#one-off-queries-and-mutations
+            variables
+              ? (response = yield self.gqlClient
+                  .mutation(mutation, JSON.parse(variables))
+                  .toPromise())
+              : (response = yield self.gqlClient.mutation(mutation).toPromise())
+            if (response.error) {
+              // TODO:
+              // use urql difference between networkError and graphQLErrors
+              console.log('operation reaction error:', response.error)
+              // TODO: if offline, return and set shortTermOffline
+              const lcMessage = response.error.message.toLowerCase()
+              // In case a conflict was caused by two EXACT SAME changes,
+              // this will bounce because of the same rev. We want to ignore this:
+              if (response.error.message.includes('JWT')) {
+                console.log('getting auth token due to jwt error')
+                return getAuthToken({ store: self })
+              } else if (
+                lcMessage.includes('uniqueness violation') &&
+                lcMessage.includes('_rev_id__rev_key')
+              ) {
+                console.log(
+                  'There is a conflict with exact same changes - ingoring the error thrown',
+                )
+              } else if (
+                response.error?.graphQLErrors?.[0]?.extensions?.internal?.error
+                  ?.status_code === '21000'
+              ) {
+                console.log('user sent same edit to soon again')
+              } else if (lcMessage.includes('unique-constraint')) {
+                let { message } = response.error
+                if (
+                  lcMessage.includes('single_art_herkunft_garden_active_idx')
+                ) {
+                  message =
+                    'Pro Art, Herkunft und Garten darf nur eine Kultur aktiv sein (plus ein Zwischenlager). Offenbar gibt es schon eine aktive Kultur'
+                }
+                // do not add a notification: show this response.error below the field
+                self.setError({
+                  path: `${revertTable}.${revertField}`,
+                  value: message,
+                })
+                console.log('a unique constraint was violated')
+              } else if (response.error.message.includes('Failed to fetch')) {
+                console.log('network is failing')
+                self.setShortTermOnline(false)
+                return
+              } else {
+                self.setError({
+                  path: `${revertTable}.${revertField}`,
+                  value: response.error.message,
+                })
+                return self.addNotification({
+                  title:
+                    'Eine Operation kann nicht in die Datenbank geschrieben werden',
+                  message: response.error.message,
+                  actionLabel: 'Operation löschen',
+                  actionName: 'removeQueuedQueryById',
+                  actionArgument: query.id,
+                })
               }
-              // do not add a notification: show this response.error below the field
-              self.setError({
-                path: `${revertTable}.${revertField}`,
-                value: message,
-              })
-              console.log('a unique constraint was violated')
-            } else if (response.error.message.includes('Failed to fetch')) {
-              console.log('network is failing')
-              self.setShortTermOnline(false)
-              return
-            } else {
-              self.setError({
-                path: `${revertTable}.${revertField}`,
-                value: response.error.message,
-              })
-              return self.addNotification({
-                title:
-                  'Eine Operation kann nicht in die Datenbank geschrieben werden',
-                message: response.error.message,
-                actionLabel: 'Operation löschen',
-                actionName: 'removeQueuedQueryById',
-                actionArgument: query.id,
+              // revert change
+              self.updateModelValue({
+                table: revertTable,
+                id: revertId,
+                field: revertField,
+                value: revertValue,
               })
             }
-            // revert change
-            self.updateModelValue({
-              table: revertTable,
-              id: revertId,
-              field: revertField,
-              value: revertValue,
-            })
+            // remove operation from queue
+            // use action because this is async
+            self.removeQueuedQueryById(query.id)
           }
-          // remove operation from queue
-          // use action because this is async
-          self.removeQueuedQueryById(query.id)
-        }
-      }),
-      {
-        // make sure retried in a minute
-        // https://github.com/mobxjs/mst-gql/issues/198#issuecomment-628083160
-        scheduler: (run) => {
-          run() // ensure it runs immediately if online
-          setInterval(run, 30000) // 30000 = thirty seconds
+        }),
+        {
+          // make sure retried in a minute
+          // https://github.com/mobxjs/mst-gql/issues/198#issuecomment-628083160
+          scheduler: (run) => {
+            run() // ensure it runs immediately if online
+            setInterval(run, 30000) // 30000 = thirty seconds
+          },
+          fireImmediately: true,
         },
-        fireImmediately: true,
-      },
-    )
+      )
     return {
+      setArtsFilteredCount(val) {
+        self.artsFilteredCount = val
+      },
+      setHerkunftsFilteredCount(val) {
+        self.herkunftsFilteredCount = val
+      },
+      setSammlungsFilteredCount(val) {
+        self.sammlungsFilteredCount = val
+      },
+      setGartensFilteredCount(val) {
+        self.gartensFilteredCount = val
+      },
+      setKultursFilteredCount(val) {
+        self.kultursFilteredCount = val
+      },
+      setTeilkultursFilteredCount(val) {
+        self.teilkultursFilteredCount = val
+      },
+      setZaehlungsFilteredCount(val) {
+        self.zaehlungsFilteredCount = val
+      },
+      setLieferungsFilteredCount(val) {
+        self.lieferungsFilteredCount = val
+      },
+      setSammellieferungsFilteredCount(val) {
+        self.sammelLieferungsFilteredCount = val
+      },
+      setEventsFilteredCount(val) {
+        self.eventsFilteredCount = val
+      },
+      setPersonsFilteredCount(val) {
+        self.personsFilteredCount = val
+      },
       setNavigate(val) {
         return (self.navigate = val)
       },

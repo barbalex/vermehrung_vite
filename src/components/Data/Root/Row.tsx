@@ -1,10 +1,9 @@
 import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { useLiveQuery } from 'dexie-react-hooks'
+import camelCase from 'lodash/camelCase'
 
 import StoreContext from '../../../storeContext'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import constants from '../../../utils/constants'
 
 const Row = styled.div`
@@ -33,11 +32,7 @@ const RootRow = ({ row, style, last }) => {
   const store = useContext(StoreContext)
   const { setActiveNodeArray } = store.tree
 
-  const count = useLiveQuery(
-    async () =>
-      await filteredObjectsFromTable({ store, table: row.table, count: true }),
-    [row.table],
-  )
+  const count = store[`${camelCase(row.table)}sFilteredCount`] ?? '...'
 
   const onClickRow = useCallback(
     () => setActiveNodeArray(row.url),
@@ -46,7 +41,7 @@ const RootRow = ({ row, style, last }) => {
 
   return (
     <Row key={row.id} onClick={onClickRow} style={style} data-last={last}>
-      <div>{`${row.name} (${count ?? '...'})`}</div>
+      <div>{`${row.name} (${count})`}</div>
     </Row>
   )
 }
