@@ -40,35 +40,41 @@ const Root = ({ filter: showFilter }) => {
   const data = useLiveQuery(async () => {
     const person: Person = await dexie.persons.get({ account_id: user.uid })
     const userRole = await dexie.user_roles.get(person.user_role_id)
-    const userPersonOption = await dexie.person_options.get(person.id)
+    const personOption = await dexie.person_options.get(person.id)
 
-    return { userRole, userPersonOption }
+    return { userRole, personOption }
   }, [user.uid])
 
   const userRole = data?.userRole
-  const userPersonOption = data?.userPersonOption
+  const personOption = data?.personOption
 
   const showArt = getShowArt({ userRole, activeNodeArray })
-  const showEvent = getShowEvent({ userPersonOption, activeNodeArray })
+  const showEvent = getShowEvent({
+    userPersonOption: personOption,
+    activeNodeArray,
+  })
   const showGarten = getShowGarten()
   const showHerkunft = getShowHerkunft({ userRole, activeNodeArray })
-  const showKultur = getShowKultur({ userPersonOption, activeNodeArray })
+  const showKultur = getShowKultur({
+    userPersonOption: personOption,
+    activeNodeArray,
+  })
   const showLieferung = getShowLieferung({
-    userPersonOption,
+    userPersonOption: personOption,
     activeNodeArray,
   })
   const showPerson = getShowPerson()
   const showSammelLieferung = getShowSammelLieferung({
-    userPersonOption,
+    userPersonOption: personOption,
     activeNodeArray,
   })
   const showSammlung = getShowSammlung({ userRole, activeNodeArray })
   const showTeilkultur = getShowTeilkultur({
-    userPersonOption,
+    userPersonOption: personOption,
     activeNodeArray,
   })
   const showZaehlung = getShowZaehlung({
-    userPersonOption,
+    userPersonOption: personOption,
     activeNodeArray,
   })
 
@@ -137,8 +143,6 @@ const Root = ({ filter: showFilter }) => {
       ? [{ name: 'Personen', url: ['Personen'], table: 'person', sort: 11 }]
       : []),
   ]
-
-  console.log('Root rendering')
 
   return (
     <ErrorBoundary>

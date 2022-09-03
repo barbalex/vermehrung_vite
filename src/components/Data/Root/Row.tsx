@@ -46,7 +46,7 @@ const RootRow = ({ row, style, last }) => {
 
   return (
     <Row key={row.id} onClick={onClickRow} style={style} data-last={last}>
-      <div>{`${row.name} (${count})`}</div>
+      <div>{`${row.name} (${count ?? '...'})`}</div>
     </Row>
   )
 }
