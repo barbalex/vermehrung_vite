@@ -1,13 +1,11 @@
-
 import { onSnapshot } from 'mobx-state-tree'
 
-import { dexie } from '../dexieClient' 
+import { dexie } from '../dexieClient'
 import MobxStore from '../store'
 import { defaultValue as defaultErrors } from '../store/Errors'
 
 const createStore = async () => {
   const dbStore = await dexie.stores.get('store')
-  let st
   if (dbStore) {
     console.log('recreating persisted store:', dbStore.store)
     // reset some values
@@ -50,19 +48,19 @@ const createStore = async () => {
     dbStore.store.user_role_initially_queried = false
     dbStore.store.zaehlung_initially_queried = false
   }
-  st = MobxStore.create(dbStore?.store)
+  const st = MobxStore.create(dbStore?.store)
   // navigate to previous activeNodeArray - if exists
   const shouldNavigate =
-    dbStore?.activeNodeArray?.length &&
+    st?.activeNodeArray?.length &&
     !isEqual(
       activeNodeArrayFromUrl(window.location.pathname),
-      dbStore?.activeNodeArray,
+      st?.activeNodeArray,
     )
   // console.log('createStore shouldNavigate:', shouldNavigate)
   if (shouldNavigate) {
     window.location.href = `${
       window.location.origin
-    }/${dbStore?.activeNodeArray?.join('/')}`
+    }/${st?.activeNodeArray?.join('/')}`
   }
   // persist store on every snapshot
   onSnapshot(st, (ss) => dexie.stores.put({ id: 'store', store: ss }))

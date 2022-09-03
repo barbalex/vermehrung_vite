@@ -69,7 +69,7 @@ const StyledSplitPane = styled(SplitPane)`
 const Vermehrung = () => {
   const { pathname } = useLocation()
   const store = useContext(StoreContext)
-  console.log('Vermehrung, store:', store)
+  // console.log('Vermehrung, store:', store)
   const {
     activeForm,
     gettingAuthUser,
@@ -121,8 +121,8 @@ const Vermehrung = () => {
   }, [activeNodeArray, pathname, setActiveNodeArray])
 
   useEffect(() => {
-    console.log('vermehrung, subscription effect: authorizing:', authorizing)
-    console.log('vermehrung, subscription effect: existsUser:', existsUser)
+    // console.log('vermehrung, subscription effect: authorizing:', authorizing)
+    // console.log('vermehrung, subscription effect: existsUser:', existsUser)
     let unsubscribe
     if (existsUser && !authorizing) {
       // TODO:
@@ -147,11 +147,11 @@ const Vermehrung = () => {
     // see fetchFromServer, unsubscribe.ae_art
   }, [existsUser, store, wsReconnectCount, authorizing])
 
-  console.log('Vermehrung', {
-    gettingAuthUser,
-    existsUser,
-    showQueuedQueries,
-  })
+  // console.log('Vermehrung', {
+  //   gettingAuthUser,
+  //   existsUser,
+  //   showQueuedQueries,
+  // })
 
   //if (gettingAuthUser || isIOS) {
   if (gettingAuthUser) {
