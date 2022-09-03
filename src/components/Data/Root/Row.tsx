@@ -1,9 +1,10 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
-import tableFilter from '../../../utils/tableFilter'
+import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import constants from '../../../utils/constants'
 
 const Row = styled.div`
@@ -30,30 +31,13 @@ const Row = styled.div`
 
 const RootRow = ({ row, style, last }) => {
   const store = useContext(StoreContext)
-  const { db } = store
   const { setActiveNodeArray } = store.tree
 
-  const filter = store.filter?.[row.table] ?? {}
-
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    let isActive = true
-    const run = async () => {
-      const count = await db
-        .get(row.table)
-        .query(...tableFilter({ store, table: row.table }))
-        .fetchCount()
-      if (!isActive) return
-
-      setCount(count)
-    }
-    run()
-
-    return () => {
-      isActive = false
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [db, row.table, store, ...Object.values(filter)])
+  const count = useLiveQuery(
+    async () =>
+      await filteredObjectsFromTable({ store, table: row.table, count: true }),
+    [row.table],
+  )
 
   const onClickRow = useCallback(
     () => setActiveNodeArray(row.url),

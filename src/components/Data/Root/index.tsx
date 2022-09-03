@@ -43,7 +43,7 @@ const Root = ({ filter: showFilter }) => {
     const userPersonOption = await dexie.person_options.get(person.id)
 
     return { userRole, userPersonOption }
-  })
+  }, [user.uid])
 
   const userRole = data?.userRole
   const userPersonOption = data?.userPersonOption

@@ -6,48 +6,35 @@ import exists from './exists'
 
 const tableFilter = ({ store, table }) => {
   if (!table) throw `no table passed`
-  const filter = store.filter[table]
-  if (!filter) throw `no filter found for table ${table}`
 
-  const filterEntries = Object.entries(filter).filter(
+  const storeFilter = store.filter[table]
+  if (!storeFilter) throw `no filter found for table ${table}`
+
+  const filterEntries = Object.entries(storeFilter).filter(
     // eslint-disable-next-line no-unused-vars
     ([key, value]) => exists(value),
   )
 
   //console.log('tableFilter', { filter, table, filterEntries })
 
-  if (!filterEntries.length) return []
+  const filter = {}
 
-  const filterArray = filterEntries.map(([key, filterValue]) => {
-    const type = types[table][key] ?? 'string'
-    return 'TODO: dexie'
-    //console.log('tableFilter', { key, filterValue, type })
-    if (type === 'string' && filterValue) {
-      if (filterValue?.toString()?.toLowerCase()) {
-        // return Q.where(
-        //   key,
-        //   Q.like(
-        //     `%${Q.sanitizeLikeString(filterValue?.toString()?.toLowerCase())}%`,
-        //   ),
-        // )
-      }
-      // return Q.where(key, Q.like(`%${Q.sanitizeLikeString(filterValue)}%`))
-    }
-    // return Q.where(key, Q.eq(filterValue))
+  filterEntries.forEach(([key, value]) => {
+    filter[key] = value
   })
 
   // if a url is opened, a dataset should always show
   // even if it was filtered away
   const tableIdInActiveNodeArray =
-    store[`${camelCase(table)}IdInActiveNodeArray`]  
+    store[`${camelCase(table)}IdInActiveNodeArray`]
   if (tableIdInActiveNodeArray) {
-  return 'TODO: dexie'
+    return 'TODO: dexie'
     // return [
     //   Q.or(Q.where('id', tableIdInActiveNodeArray), Q.and(...filterArray)),
     // ]
   }
 
-  return filterArray
+  return filter
 }
 
 export default tableFilter
