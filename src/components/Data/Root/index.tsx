@@ -1,9 +1,7 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 
 import Row from './Row'
 import StoreContext from '../../../storeContext'
