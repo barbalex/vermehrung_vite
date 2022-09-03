@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
 import { observer } from 'mobx-react-lite'
 import CircularProgress from '@mui/material/CircularProgress'
+import { useLocation } from 'react-router-dom'
 
 import StoreContext from '../../storeContext'
 import activeNodeArrayFromPathname from '../../utils/activeNodeArrayFromPathname'
@@ -18,8 +19,7 @@ import QueuedQueries from '../../components/QueuedQueries'
 import tableNames from '../../utils/tableNames'
 import constants from '../../utils/constants'
 
-
-const Container = styled.div` 
+const Container = styled.div`
   min-height: calc(100vh - ${constants.appBarHeight}px);
   position: relative;
 `
@@ -66,7 +66,8 @@ const StyledSplitPane = styled(SplitPane)`
   }
 `
 
-const Vermehrung = ({ location }) => {
+const Vermehrung = () => {
+  const { pathname } = useLocation()
   const store = useContext(StoreContext)
   console.log('Vermehrung, store:', store)
   const {
@@ -102,7 +103,6 @@ const Vermehrung = ({ location }) => {
   // (caused errors to render form without tree while printing)
   if (isPrint) treeWidth = 0
 
-  const { pathname } = location
   const activeNodeArray = activeNodeArrayFromPathname(pathname)
 
   // on first render set openNodes
@@ -146,6 +146,13 @@ const Vermehrung = ({ location }) => {
     // wsReconnectCount is made so a subscription can provoke re-subscription on error
     // see fetchFromServer, unsubscribe.ae_art
   }, [existsUser, store, wsReconnectCount, authorizing])
+
+  console.log('Vermehrung', {
+    gettingAuthUser,
+    wsReconnectCount,
+    existsUser,
+    showQueuedQueries,
+  })
 
   //if (gettingAuthUser || isIOS) {
   if (gettingAuthUser) {

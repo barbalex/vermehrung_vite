@@ -11,7 +11,7 @@ import Home from './Home'
 import Doku from './Doku'
 
 const StyledAppBar = styled(AppBar)`
-  min-height: ${constants.appBarHeight}px !important;
+  min-height: ${constants.appBarHeight}px !important; 
   .MuiToolbar-root {
     min-height: ${constants.appBarHeight}px !important;
     padding-left: 0 !important;

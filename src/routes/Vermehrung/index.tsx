@@ -11,7 +11,7 @@ import initiateApp from '../../utils/initiateApp'
 import Header from '../../components/HeaderVermehrung'
 
 // trying to persist indexedDB
-// https://dexie.org/docs/StorageManager#controlling-persistence 
+// https://dexie.org/docs/StorageManager#controlling-persistence
 // TODO: consider calling this only if user choose it in settings
 // or pop own window to explain as shown in above link
 // because it pops a request window
@@ -52,17 +52,18 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  console.log('Vermehrung index, store:', store)
+
   // without store bad things happen
   if (!store) return null
 
   return (
     <MobxProvider value={store}>
       <UrqlProvider value={store.gqlClient}>
-        <Header>
-          <NavigationSyncController />
-          <Vermehrung />
-          <Notifications />
-        </Header>
+        <Header />
+        <NavigationSyncController />
+        <Vermehrung />
+        <Notifications />
       </UrqlProvider>
     </MobxProvider>
   )
