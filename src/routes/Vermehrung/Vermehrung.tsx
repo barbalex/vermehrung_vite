@@ -149,7 +149,6 @@ const Vermehrung = () => {
 
   console.log('Vermehrung', {
     gettingAuthUser,
-    wsReconnectCount,
     existsUser,
     showQueuedQueries,
   })

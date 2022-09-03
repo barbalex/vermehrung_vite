@@ -45,7 +45,7 @@ const ResetButton = styled(Button)`
 `
 
 const Login = () => {
-  const { db, firebaseAuth } = useContext(StoreContext)
+  const { firebaseAuth } = useContext(StoreContext)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -69,10 +69,9 @@ const Login = () => {
         passwordPassed || password || passwordInput.current.value
       // do everything to clean up so no data is left
       await signOut(firebaseAuth)
-      await localForage.clear()
-      // await dexie.delete()
+      // await localForage.clear()
+      await dexie.delete()
       window.localStorage.removeItem('token')
-      await db.write(async () => db.unsafeResetDatabase())
       setTimeout(async () => {
         try {
           await signInWithEmailAndPassword(
@@ -88,7 +87,7 @@ const Login = () => {
         //setTimeout(() => window.location.reload(true))
       })
     },
-    [db, email, password, firebaseAuth],
+    [email, password, firebaseAuth],
   )
   const onBlurEmail = useCallback(
     (e) => {
