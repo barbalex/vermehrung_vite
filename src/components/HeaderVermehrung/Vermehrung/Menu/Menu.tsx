@@ -71,9 +71,10 @@ const SettingsOverallMenu = ({
     filter.teilzaehlung._deleted === false &&
     filter.zaehlung._deleted === false
 
-  const onClose = useCallback(() => setParentAnchorEl(null), [
-    setParentAnchorEl,
-  ])
+  const onClose = useCallback(
+    () => setParentAnchorEl(null),
+    [setParentAnchorEl],
+  )
 
   const [anchorEl, setAnchorEl] = useState(null)
   const onClickExporte = useCallback(
@@ -82,7 +83,7 @@ const SettingsOverallMenu = ({
   )
 
   const onClickUptime = useCallback(() => {
-    typeof window !== 'undefined' && window.open('https://uptime.vermehrung.ch')
+    window.open('https://uptime.vermehrung.ch')
     setAnchorEl(null)
   }, [])
 
