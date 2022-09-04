@@ -73,11 +73,11 @@ const updateLieferung = async ({
     Object.entries(sammelLieferung)
       .filter(
         // only accept lieferung's fields
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ([key, value]) => lieferungRevFields.includes(key),
       )
       // only update with existing values
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .filter(([key, val]) => {
         if (field) return key === field
         return exists(val)
@@ -88,7 +88,7 @@ const updateLieferung = async ({
   const oldValuesFromL = Object.fromEntries(
     Object.entries(lfLastVersion).filter(
       // only accept lieferung's fields
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ([key, value]) => lieferungFields.includes(key),
     ),
   )

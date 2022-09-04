@@ -11,7 +11,7 @@ const tableFilter = ({ store, table }) => {
   if (!storeFilter) throw `no filter found for table ${table}`
 
   const filterEntries = Object.entries(storeFilter).filter(
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ([key, value]) => exists(value),
   )
 

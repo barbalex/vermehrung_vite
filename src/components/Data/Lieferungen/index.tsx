@@ -163,7 +163,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
 
       const entries = Object.entries(sl)
         .filter(
-          // eslint-disable-next-line no-unused-vars
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           ([key, value]) =>
             !key.startsWith('_') &&
             ![
@@ -174,7 +174,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
               'sammlung',
             ].includes(key),
         )
-        // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         .filter(([key, value]) => exists(value))
       for (const [key, value] of entries) {
         const keyToUse = key === 'id' ? 'sammel_lieferung_id' : key

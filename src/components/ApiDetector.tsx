@@ -2,7 +2,7 @@
  * based on:
  * https://hasura.io/docs/1.0/graphql/core/api-reference/health.html
  */
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useContext, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 

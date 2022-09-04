@@ -194,7 +194,7 @@ const buildData = async ({ row }) => {
   )
   const zaehlungenData = Object.entries(
     zaehlungenDataGroupedByDatum,
-    // eslint-disable-next-line no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ).map(([key, value]) => Object.assign({}, ...value))
 
   let anLieferungenDone = []

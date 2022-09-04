@@ -157,7 +157,7 @@ const Tree = () => {
       kulturOptionsObservable,
     ]).pipe(throttle(() => interval(100)))
     const subscription = combinedObservables.subscribe(
-      // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ([[userPersonOption], [userRole], ...rest]) => {
         //console.log('Tree data-useEffect ordering rebuild')
         setDataState({ userPersonOption, userRole })
