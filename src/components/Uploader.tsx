@@ -3,33 +3,31 @@ import uploadcare from 'uploadcare-widget'
 
 import { signature, expire } from '../utils/uploadcareSignature'
 
-if (typeof window !== 'undefined') {
-  window.UPLOADCARE_PUBLIC_KEY = import.meta.env.UPLOADCARE_PUBLIC_KEY
-  window.UPLOADCARE_LOCALE = 'de'
-  window.UPLOADCARE_TABS =
-    'file camera url gdrive gphotos dropbox onedrive box instagram'
-  window.UPLOADCARE_EFFECTS = 'crop'
-  window.UPLOADCARE_IMAGE_SHRINK = '2056x2056'
-  window.UPLOADCARE_IMAGES_ONLY = true
-  window.UPLOADCARE_PREVIEW_STEP = true
-  window.UPLOADCARE_IMAGES_ONLY = false
-  window.UPLOADCARE_LOCALE_TRANSLATIONS = {
-    buttons: {
-      choose: {
-        files: {
-          one: 'Neue Datei hochladen',
-          other: 'Neue Dateien hochladen',
-        },
-        images: {
-          one: 'Neues Bild hochladen',
-          other: 'Neue Bilder hochladen',
-        },
+window.UPLOADCARE_PUBLIC_KEY = import.meta.env.UPLOADCARE_PUBLIC_KEY
+window.UPLOADCARE_LOCALE = 'de'
+window.UPLOADCARE_TABS =
+  'file camera url gdrive gphotos dropbox onedrive box instagram'
+window.UPLOADCARE_EFFECTS = 'crop'
+window.UPLOADCARE_IMAGE_SHRINK = '2056x2056'
+window.UPLOADCARE_IMAGES_ONLY = true
+window.UPLOADCARE_PREVIEW_STEP = true
+window.UPLOADCARE_IMAGES_ONLY = false
+window.UPLOADCARE_LOCALE_TRANSLATIONS = {
+  buttons: {
+    choose: {
+      files: {
+        one: 'Neue Datei hochladen',
+        other: 'Neue Dateien hochladen',
+      },
+      images: {
+        one: 'Neues Bild hochladen',
+        other: 'Neue Bilder hochladen',
       },
     },
-  }
-  window.UPLOADCARE_SECURE_SIGNATURE = signature
-  window.UPLOADCARE_SECURE_EXPIRE = expire
+  },
 }
+window.UPLOADCARE_SECURE_SIGNATURE = signature
+window.UPLOADCARE_SECURE_EXPIRE = expire
 
 class Uploader extends Component {
   componentDidMount() {
@@ -40,7 +38,7 @@ class Uploader extends Component {
       widget.value(value)
     }
     if (typeof onChange === 'function') {
-      widget.onChange(files => {
+      widget.onChange((files) => {
         if (files) {
           this.files =
             this.files && this.files.files ? this.files.files() : [this.files]
@@ -54,9 +52,9 @@ class Uploader extends Component {
     if (typeof onUploadComplete === 'function') {
       widget.onUploadComplete(onUploadComplete)
     }
-    widget.onDialogOpen(dialog => (this.dialog = dialog))
+    widget.onDialogOpen((dialog) => (this.dialog = dialog))
     // reset widget after upload
-    widget.onUploadComplete(function() {
+    widget.onUploadComplete(function () {
       widget.value(null)
     })
   }
@@ -95,7 +93,7 @@ class Uploader extends Component {
     return (
       <input
         type="hidden"
-        ref={input => (this.uploader = input)}
+        ref={(input) => (this.uploader = input)}
         data-image-shrink="2400x1600"
         //data-multiple="true"
         //data-multiple-min="1"

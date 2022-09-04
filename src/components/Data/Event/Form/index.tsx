@@ -253,12 +253,10 @@ const EventForm = ({
   )
   const openPlanenDocs = useCallback(() => {
     const url = `${constants?.getAppUri()}/Dokumentation/Planen`
-    if (typeof window !== 'undefined') {
-      if (window.matchMedia('(display-mode: standalone)').matches) {
-        return window.open(url, '_blank', 'toolbar=no')
-      }
-      window.open(url)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return window.open(url, '_blank', 'toolbar=no')
     }
+    window.open(url)
   }, [])
 
   const onCreateNewTeilkultur = useCallback(

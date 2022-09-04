@@ -31,9 +31,7 @@ import {
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
 
-if (typeof window !== 'undefined') {
-  window.Dexie = Dexie
-}
+window.Dexie = Dexie
 
 export interface IHerkunft {
   id: string
