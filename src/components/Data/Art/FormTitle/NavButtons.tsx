@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 
 import StoreContext from '../../../../storeContext'
-import UpSvg from '../../../../svg/to_up.inline.svg'
-import SaDownSvg from '../../../../svg/to_sa_down.inline.svg'
-import KuDownSvg from '../../../../svg/to_ku_down.inline.svg'
+import { ReactComponent as UpSvg } from '../../../../svg/to_up.inline.svg'
+import { ReactComponent as SaDownSvg } from '../../../../svg/to_sa_down.inline.svg'
+import { ReactComponent as KuDownSvg } from '../../../../svg/to_ku_down.inline.svg'
 
 const ArtNavButtons = () => {
   const store = useContext(StoreContext)
@@ -25,23 +25,27 @@ const ArtNavButtons = () => {
     [activeNodeArray, setActiveNodeArray],
   )
 
-  return <>
-    <IconButton title="Zur Liste" onClick={onClickUp} size="large">
-      <UpSvg />
-    </IconButton>
-    <IconButton
-      title="Zu den Sammlungen dieser Art"
-      onClick={onClickToSammlungen}
-      size="large">
-      <SaDownSvg />
-    </IconButton>
-    <IconButton
-      title="Zu den Kulturen dieser Art"
-      onClick={onClickToKulturen}
-      size="large">
-      <KuDownSvg />
-    </IconButton>
-  </>;
+  return (
+    <>
+      <IconButton title="Zur Liste" onClick={onClickUp} size="large">
+        <UpSvg />
+      </IconButton>
+      <IconButton
+        title="Zu den Sammlungen dieser Art"
+        onClick={onClickToSammlungen}
+        size="large"
+      >
+        <SaDownSvg />
+      </IconButton>
+      <IconButton
+        title="Zu den Kulturen dieser Art"
+        onClick={onClickToKulturen}
+        size="large"
+      >
+        <KuDownSvg />
+      </IconButton>
+    </>
+  )
 }
 
 export default observer(ArtNavButtons)

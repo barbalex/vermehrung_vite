@@ -33,12 +33,12 @@ const App = () => {
   useEffect(() => {
     let isActive = true
     let unregister
-    console.log('App, effect, will initiate App')
+    // console.log('App, effect, will initiate App')
     initiateApp().then(
       ({ store: storeReturned, unregister: unregisterReturned }) => {
         if (!isActive) return
 
-        console.log('App, setting store:', storeReturned)
+        // console.log('App, setting store:', storeReturned)
         setStore(storeReturned)
         unregister = unregisterReturned
       },
@@ -52,7 +52,7 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log('Vermehrung index, store:', store)
+  // console.log('Vermehrung index, store:', store)
 
   // without store bad things happen
   if (!store) return null

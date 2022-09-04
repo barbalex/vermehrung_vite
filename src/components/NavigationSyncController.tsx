@@ -25,6 +25,10 @@ const NavigationSyncController = () => {
   // need to update activeNodeArray on every navigation
   useEffect(() => {
     const activeNodeArray = getActiveNodeArrayFromUrl(pathname)
+    console.log('NavigationSyncController, setting activeNodeArray to', {
+      activeNodeArrayFromUrl: activeNodeArray,
+      activeNodeArrayFromStore: store.activeNodeArray?.slice(),
+    })
 
     if (!isEqual(activeNodeArray, store.activeNodeArray?.slice())) {
       console.log(

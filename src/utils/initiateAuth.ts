@@ -13,7 +13,7 @@ const firebaseConfig = {
 }
 
 const initiateAuth = async ({ store }) => {
-  console.log('initiateAuth running')
+  // console.log('initiateAuth running')
   const {
     setUser,
     setGettingAuthUser,
@@ -53,7 +53,7 @@ const initiateAuth = async ({ store }) => {
     if (nowOnline !== online) setOnline(nowOnline)
     if (nowOnline !== shortTermOnline) setShortTermOnline(nowOnline)
     if (nowOnline) {
-      console.log('initiateAuth getting auth token')
+      // console.log('initiateAuth getting auth token')
       await getAuthToken({ store })
     }
     setGettingAuthUser(false)

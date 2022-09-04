@@ -10,7 +10,7 @@ const filteredObjectsFromTable = async ({ store, table, count }) => {
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
 
-  console.log('filteredObjectsFromTable running for table:', table)
+  // console.log('filteredObjectsFromTable running for table:', table)
 
   const whereObject = {}
 
