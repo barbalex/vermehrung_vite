@@ -1,5 +1,5 @@
 const activeFormFromActiveNodeArray = (url) => {
-  //console.log('acitveFormFromActiveNodeArray, url:', url.slice())
+  console.log('activeFormFromActiveNodeArray, url:', url.slice())
   if (url.length === 1) {
     return 'root'
   }

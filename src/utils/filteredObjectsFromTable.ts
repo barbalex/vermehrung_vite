@@ -55,11 +55,12 @@ const filteredObjectsFromTable = async ({ store, table, count }) => {
           .filter(filterFunction)
           .or('id')
           .equals(tableIdInActiveNodeArray)
+          .toArray()
   }
 
   return count
     ? await dexie[`${table}s`].filter(filterFunction).count()
-    : await dexie[`${table}s`].filter(filterFunction)
+    : await dexie[`${table}s`].filter(filterFunction).toArray()
 }
 
 export default filteredObjectsFromTable

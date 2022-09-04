@@ -1,5 +1,6 @@
 import { types, getParent } from 'mobx-state-tree'
 import isEqual from 'lodash/isEqual'
+import { resolvePath } from 'react-router-dom'
 
 export default types
   .model('Tree', {
@@ -26,8 +27,10 @@ export default types
       self.widthInPercentOfScreen = val
     },
     setActiveNodeArray(val) {
+      const store = getParent(self, 1)
       console.log('store.Tree, setting activeNodeArray to:', val)
       self.activeNodeArray = val
+      store.navigate(resolvePath(val.join('/')))
     },
     addNode(url) {
       // add all parent nodes

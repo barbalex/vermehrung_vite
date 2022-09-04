@@ -11,6 +11,11 @@ const NavigationSyncController = () => {
   const { pathname } = useLocation()
 
   const navigate = useNavigate()
+
+  const store = useContext(storeContext)
+  const { setNavigate } = store
+  const { setActiveNodeArray, addNode, activeNodeArray } = store.tree
+
   // enable navigating in store > set this as store value
   // (can't be passed when creating store yet)
   useEffect(() => {
@@ -18,28 +23,30 @@ const NavigationSyncController = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const store = useContext(storeContext)
-  const { setNavigate } = store
-  const { setActiveNodeArray, addNode } = store.tree
-
   // need to update activeNodeArray on every navigation
   useEffect(() => {
-    const activeNodeArray = getActiveNodeArrayFromUrl(pathname)
+    const activeNodeArrayFromUrl = getActiveNodeArrayFromUrl(pathname)
     console.log('NavigationSyncController, setting activeNodeArray to', {
-      activeNodeArrayFromUrl: activeNodeArray,
-      activeNodeArrayFromStore: store.activeNodeArray?.slice(),
+      activeNodeArrayFromUrl: activeNodeArrayFromUrl,
+      activeNodeArrayFromStore: activeNodeArray?.slice(),
     })
 
-    if (!isEqual(activeNodeArray, store.activeNodeArray?.slice())) {
+    if (!isEqual(activeNodeArrayFromUrl, activeNodeArray?.slice())) {
       console.log(
         'NavigationSyncController, setting activeNodeArray to',
-        activeNodeArray,
+        activeNodeArrayFromUrl,
       )
-      setActiveNodeArray(activeNodeArray)
-      addNode(activeNodeArray)
+      setActiveNodeArray(activeNodeArrayFromUrl)
+      addNode(activeNodeArrayFromUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, setActiveNodeArray, store.activeNodeArray])
+  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [pathname, setActiveNodeArray, activeNodeArray])
+
+  // useEffect(() => {
+  //   console.log('NavigationSyncController, pathname changed to:', pathname)
+  // }, [pathname])
 
   return null
 }

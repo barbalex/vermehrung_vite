@@ -34,10 +34,9 @@ const RootRow = ({ row, style, last }) => {
 
   const count = store[`${camelCase(row.table)}sFilteredCount`] ?? '...'
 
-  const onClickRow = useCallback(
-    () => setActiveNodeArray(row.url),
-    [row.url, setActiveNodeArray],
-  )
+  const onClickRow = useCallback(() => {
+    setActiveNodeArray(row.url)
+  }, [row.url, setActiveNodeArray])
 
   return (
     <Row key={row.id} onClick={onClickRow} style={style} data-last={last}>

@@ -8,7 +8,7 @@ import Notifications from '../../components/Notifications'
 
 import Vermehrung from './Vermehrung'
 import initiateApp from '../../utils/initiateApp'
-import Header from '../../components/HeaderVermehrung' 
+import Header from '../../components/HeaderVermehrung'
 
 // trying to persist indexedDB
 // https://dexie.org/docs/StorageManager#controlling-persistence
@@ -23,7 +23,7 @@ async function persist() {
   )
 }
 
-const App = () => {
+const VermehrungIndex = () => {
   const [store, setStore] = useState(null)
 
   useEffect(() => {
@@ -69,4 +69,4 @@ const App = () => {
   )
 }
 
-export default App
+export default VermehrungIndex

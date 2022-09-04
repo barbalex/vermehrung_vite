@@ -61,8 +61,11 @@ const Arten = ({ filter: showFilter, width, height }) => {
       dexie.arts.filter(notDeletedFilter).count(),
     ])
 
-    return { arts, totalCount }
+    const artsSorted = await artsSortedFromArts(arts)
+
+    return { arts: artsSorted, totalCount }
   }, [store.filter.art, store.art_initially_queried])
+
   const arts: Art[] = data?.arts ?? []
   const totalCount = data?.totalCount
   const filteredCount = arts.length
@@ -80,6 +83,16 @@ const Arten = ({ filter: showFilter, width, height }) => {
   if (activeNodeArray[1] === 'Arten') {
     upTitle = 'Zu allen Listen'
   }
+
+  // console.log('Arten', {
+  //   height,
+  //   arts,
+  //   artsLength: arts.length,
+  //   showFilter,
+  //   totalCount,
+  //   filteredCount,
+  //   singleRowHeight: constants.singleRowHeight,
+  // })
 
   return (
     <ErrorBoundary>
