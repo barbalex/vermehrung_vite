@@ -7,7 +7,7 @@ const activeNodeArrayFromUrl = (url) => {
       .split('/')
       .filter((e) => e !== '')
   }
-  return urlToUse.split('/').filter((e) => e !== '')
+  return urlToUse.split('/').filter((e) => e !== '') 
 }
 
 export default activeNodeArrayFromUrl

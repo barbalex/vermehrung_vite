@@ -118,8 +118,10 @@ const Vermehrung = () => {
   useEffect(() => {
     // user pushed back button > update activeNodeArray
     console.log(
-      'Vermehrung, effect setting activeNodeArray with nonavigate (user pushed back button)',
+      'Vermehrung, effect setting activeNodeArray with nonavigate (user pushed back button) to:',
+      activeNodeArray,
     )
+
     setActiveNodeArray(activeNodeArray, 'nonavigate')
   }, [activeNodeArray, pathname, setActiveNodeArray])
 
