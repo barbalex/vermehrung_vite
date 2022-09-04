@@ -53,6 +53,7 @@ const LieferungTitleFormTitle = ({
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   const nachKulturId = row?.nach_kultur_id
   const onClickToKultur = useCallback(
     () =>

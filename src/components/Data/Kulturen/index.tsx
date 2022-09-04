@@ -141,6 +141,7 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   let upTitle = 'Eine Ebene höher'
   if (activeNodeArray[0] === 'Kulturen') {
     upTitle = 'Zu allen Listen'
@@ -151,6 +152,7 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
   if (activeNodeArray[activeNodeArray.length - 3] === 'Gaerten') {
     upTitle = 'Zum Garten'
   }
+
   const add = useCallback(() => {
     insertKulturRev()
   }, [insertKulturRev])

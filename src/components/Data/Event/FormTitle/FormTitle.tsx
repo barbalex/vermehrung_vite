@@ -52,6 +52,7 @@ const EventFormTitle = ({
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   if (width < 520) {
     return (
       <TitleContainer>

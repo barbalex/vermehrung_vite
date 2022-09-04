@@ -192,6 +192,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   let upTitle = 'Eine Ebene höher'
   if (activeNodeArray[0] === 'Lieferungen') {
     upTitle = 'Zu allen Listen'

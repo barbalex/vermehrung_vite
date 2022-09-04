@@ -15,6 +15,7 @@ const SlNavButtons = () => {
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   const onClickToLieferungen = useCallback(
     () => setActiveNodeArray([...activeNodeArray, 'Lieferungen']),
     [activeNodeArray, setActiveNodeArray],

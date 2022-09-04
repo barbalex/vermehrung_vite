@@ -54,6 +54,7 @@ const GartenFormTitle = ({
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   const onClickToKulturen = useCallback(
     () => setActiveNodeArray([...activeNodeArray, 'Kulturen']),
     [activeNodeArray, setActiveNodeArray],

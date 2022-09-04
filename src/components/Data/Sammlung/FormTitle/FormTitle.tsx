@@ -53,14 +53,17 @@ const SammlungFormTitle = ({
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   const onClickToLieferungen = useCallback(
     () => setActiveNodeArray([...activeNodeArray, 'Aus-Lieferungen']),
     [activeNodeArray, setActiveNodeArray],
   )
+
   const onClickToHerkuenfte = useCallback(
     () => setActiveNodeArray([...activeNodeArray, 'Herkuenfte']),
     [activeNodeArray, setActiveNodeArray],
   )
+
   const showToHe = activeNodeArray[0] === 'Sammlungen'
   const showToLi = activeNodeArray[0] !== 'Personen'
 

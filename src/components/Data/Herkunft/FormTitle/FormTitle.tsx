@@ -59,6 +59,7 @@ const Herkunft = ({
     removeOpenNode(activeNodeArray)
     setActiveNodeArray(activeNodeArray.slice(0, -1))
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
+
   const onClickToSammlungen = useCallback(
     () => setActiveNodeArray([...activeNodeArray, 'Sammlungen']),
     [activeNodeArray, setActiveNodeArray],
