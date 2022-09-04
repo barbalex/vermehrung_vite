@@ -37,8 +37,6 @@ const ArtenRow = ({ row, style, last }) => {
     row.label().then(setLabel)
   }, [row])
 
-  // console.log('ArtenRow, constants.singleRowHeight', constants.singleRowHeight)
-
   const onClickRow = useCallback(
     () => setActiveNodeArray([...activeNodeArray, row.id]),
     [activeNodeArray, row.id, setActiveNodeArray],

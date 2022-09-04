@@ -1,7 +1,6 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { first as first$ } from 'rxjs/operators'
 
 import StoreContext from '../../../storeContext'
 import constants from '../../../utils/constants'
@@ -35,19 +34,7 @@ const Gaerten = ({ row, style, last }) => {
 
   const [label, setLabel] = useState('')
   useEffect(() => {
-    let isActive = true
-    row.label
-      .pipe(first$())
-      .toPromise()
-      .then((label) => {
-        if (!isActive) return
-
-        setLabel(label)
-      })
-
-    return () => {
-      isActive = false
-    }
+    row.label().then(setLabel)
   }, [row])
 
   const onClickRow = useCallback(

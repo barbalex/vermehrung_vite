@@ -26,10 +26,10 @@ const NavigationSyncController = () => {
   // need to update activeNodeArray on every navigation
   useEffect(() => {
     const activeNodeArrayFromUrl = getActiveNodeArrayFromUrl(pathname)
-    console.log('NavigationSyncController, setting activeNodeArray to', {
-      activeNodeArrayFromUrl: activeNodeArrayFromUrl,
-      activeNodeArrayFromStore: activeNodeArray?.slice(),
-    })
+    // console.log('NavigationSyncController, setting activeNodeArray to', {
+    //   activeNodeArrayFromUrl: activeNodeArrayFromUrl,
+    //   activeNodeArrayFromStore: activeNodeArray?.slice(),
+    // })
 
     if (!isEqual(activeNodeArrayFromUrl, activeNodeArray?.slice())) {
       console.log(
@@ -40,7 +40,7 @@ const NavigationSyncController = () => {
       addNode(activeNodeArrayFromUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [pathname])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [pathname, setActiveNodeArray, activeNodeArray])
 

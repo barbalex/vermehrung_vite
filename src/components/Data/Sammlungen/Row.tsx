@@ -1,7 +1,6 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { first as first$ } from 'rxjs/operators'
 
 import StoreContext from '../../../storeContext'
 import constants from '../../../utils/constants'
@@ -36,28 +35,9 @@ const Arten = ({ row, style, last }) => {
 
   const [label, setLabel] = useState('')
   useEffect(() => {
-    let isActive = true
     herkunftIdInActiveNodeArray
-      ? row.labelUnderHerkunft
-          .pipe(first$())
-          .toPromise()
-          .then((label) => {
-            if (!isActive) return
-
-            setLabel(label)
-          })
-      : row.label
-          .pipe(first$())
-          .toPromise()
-          .then((label) => {
-            if (!isActive) return
-
-            setLabel(label)
-          })
-
-    return () => {
-      isActive = false
-    }
+      ? row.labelUnderHerkunft().then(setLabel)
+      : row.label().then(setLabel)
   }, [herkunftIdInActiveNodeArray, row])
 
   const onClickRow = useCallback(

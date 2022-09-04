@@ -1,12 +1,11 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FilterTitle from '../../shared/FilterTitle'
@@ -15,8 +14,10 @@ import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import eventSort from '../../../utils/eventSort'
-import tableFilter from '../../../utils/tableFilter'
 import constants from '../../../utils/constants'
+import { dexie, Event } from '../../../dexieClient'
+import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import notDeletedFilter from '../../../utils/notDeletedFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -52,59 +53,22 @@ const FieldsContainer = styled.div`
 
 const Events = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertEventRev, kulturIdInActiveNodeArray, db, filter } = store
+  const { insertEventRev } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { event: eventFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ events: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = kulturIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['kultur']),
-          Q.on('kultur', 'id', kulturIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('event')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.event._deleted === false
-              ? [false]
-              : filter.event._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(...tableFilter({ store, table: 'event' }), ...hierarchyQuery)
-      .observeWithColumns(['datum', 'beschreibung'])
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, events]) => {
-        setDataState({
-          events: events.sort(eventSort),
-          totalCount,
-        })
-      },
-    )
+  const data = useLiveQuery(async () => {
+    const [events, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'event' }),
+      dexie.events.filter(notDeletedFilter).count(),
+    ])
 
-    return () => subscription?.unsubscribe?.()
-    // need to rerender if any of the values of eventFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    db,
-    kulturIdInActiveNodeArray,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(eventFilter),
-    eventFilter,
-  ])
+    const eventsSorted = events.sort(eventSort)
 
-  const { events, totalCount } = dataState
+    return { events: eventsSorted, totalCount }
+  }, [store.filter.event, store.event_initially_queried])
+
+  const events: Event[] = data?.events ?? []
+  const totalCount = data?.totalCount
   const filteredCount = events.length
 
   const add = useCallback(() => {

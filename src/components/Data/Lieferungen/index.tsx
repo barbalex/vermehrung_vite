@@ -7,6 +7,7 @@ import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
 import { Q } from '@nozbe/watermelondb'
 import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FilterTitle from '../../shared/FilterTitle'
@@ -18,6 +19,9 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import tableFilter from '../../../utils/tableFilter'
 import lieferungSort from '../../../utils/lieferungSort'
 import constants from '../../../utils/constants'
+import { dexie, Lieferung } from '../../../dexieClient'
+import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import notDeletedFilter from '../../../utils/notDeletedFilter'
 
 const Container = styled.div`
   height: 100%;

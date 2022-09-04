@@ -6,8 +6,7 @@ const gartensSortedFromGartens = async (gartens) => {
     gartens.map(async (garten) => {
       let label = ''
       try {
-        label = 'TODO: dexie'
-        // await garten?.label?.pipe(first$()).toPromise()
+        label = await garten.label?.()
       } catch {}
       const sort = label?.toString()?.toLowerCase()
 

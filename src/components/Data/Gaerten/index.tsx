@@ -1,12 +1,11 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FilterTitle from '../../shared/FilterTitle'
@@ -14,9 +13,11 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import gartensSortedFromGartens from '../../../utils/gartensSortedFromGartens'
 import constants from '../../../utils/constants'
+import { dexie, Garten } from '../../../dexieClient'
+import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import notDeletedFilter from '../../../utils/notDeletedFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -52,75 +53,22 @@ const FieldsContainer = styled.div`
 
 const Gaerten = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertGartenRev, personIdInActiveNodeArray, db, filter } = store
+  const { insertGartenRev } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { garten: gartenFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ gartens: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = personIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['person']),
-          Q.on('person', 'id', personIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('garten')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.garten._deleted === false
-              ? [false]
-              : filter.garten._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.garten.aktiv === true
-              ? [true]
-              : filter.garten.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const gartenObservable = collection
-      .query(...tableFilter({ store, table: 'garten' }), ...hierarchyQuery)
-      .observeWithColumns(['name', 'person_id'])
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      gartenObservable,
+  const data = useLiveQuery(async () => {
+    const [gartens, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'garten' }),
+      dexie.gartens.filter(notDeletedFilter).count(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([totalCount, gartens]) => {
-        const gartensSorted = await gartensSortedFromGartens(gartens)
-        setDataState({
-          gartens: gartensSorted,
-          totalCount,
-        })
-      },
-    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    personIdInActiveNodeArray,
-    // need to rerender if any of the values of gartenFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(gartenFilter),
-    gartenFilter,
-    store,
-    filter.garten._deleted,
-    filter.garten.aktiv,
-  ])
+    const gartensSorted = await gartensSortedFromGartens(gartens)
 
-  const { gartens, totalCount } = dataState
+    return { gartens: gartensSorted, totalCount }
+  }, [store.filter.garten, store.garten_initially_queried])
+
+  const gartens: Garten[] = data?.gartens ?? []
+  const totalCount = data?.totalCount
   const filteredCount = gartens.length
 
   const add = useCallback(() => {
