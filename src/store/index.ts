@@ -142,6 +142,12 @@ const myTypes = types
     navigate: undefined,
   }))
   .actions((self) => {
+    /*
+     * Setting counts on every change of relevant values
+     * Reason: reduce computation
+     * TODO: only re-calculate when data is shown according to person_options?
+     * For instance: person_options.tree_lieferung
+     */
     reaction(
       () => `${self.filter.art}/${self.art_initially_queried}`,
       flow(function* () {
