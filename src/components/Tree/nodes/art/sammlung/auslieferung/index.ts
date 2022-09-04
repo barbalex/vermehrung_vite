@@ -13,7 +13,7 @@ const artSammlungAuslieferungNodes = ({
   table: 'lieferung',
   id: `${artId}${sammlungId}${lieferung.id}`,
   label: lieferungLabelFromLieferung({ lieferung }),
-  url: [
+  url: ['Vermehrung', 
     'Arten',
     artId,
     'Sammlungen',
@@ -21,7 +21,7 @@ const artSammlungAuslieferungNodes = ({
     'Aus-Lieferungen',
     lieferung.id,
   ],
-  sort: [1, artIndex, 2, sammlungIndex, 1, lieferungIndex],
+  sort: [1, 1, artIndex, 2, sammlungIndex, 1, lieferungIndex],
   hasChildren: false,
   mono: true,
 })

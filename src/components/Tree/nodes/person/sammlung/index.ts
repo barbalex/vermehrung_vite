@@ -17,8 +17,8 @@ const personSammlungNodes = async ({
     table: 'sammlung',
     id: `${personId}${sammlung.id}`,
     label,
-    url: ['Personen', personId, 'Sammlungen', sammlung.id],
-    sort: [11, personIndex, 1, index],
+    url: ['Vermehrung', 'Personen', personId, 'Sammlungen', sammlung.id],
+    sort: [1, 11, personIndex, 1, index],
     hasChildren: false,
   }
 }

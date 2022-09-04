@@ -8,9 +8,9 @@ const allParentNodesAreOpen = ({ store, url: urlPassed }) => {
   }
   // remove 'Projekte' as that is not contained in openNodes
   parentUrls = parentUrls.filter(
-    (n) => !(n.length === 1 && n[0] === 'Projekte'),
+    (n) => !(n.length === 2 && n[1] === 'Projekte'),
   )
-  if (parentUrls.length === 0) return true
+  if (parentUrls.length === 1) return true
   return parentUrls.every((url) => isNodeOpen({ store, url }))
 }
 

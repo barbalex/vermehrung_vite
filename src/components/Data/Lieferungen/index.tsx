@@ -152,9 +152,9 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
 
   const add = useCallback(async () => {
     const isSammelLieferung =
-      activeNodeArray.length >= 2 && activeNodeArray[0] === 'Sammel-Lieferungen'
+      activeNodeArray.length >= 2 && activeNodeArray[1] === 'Sammel-Lieferungen'
     if (isSammelLieferung) {
-      const slId = activeNodeArray[1]
+      const slId = activeNodeArray[2]
       let sl
       try {
         sl = await db.get('sammel_lieferung').find(slId)
@@ -194,7 +194,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Lieferungen') {
+  if (activeNodeArray[1] === 'Lieferungen') {
     upTitle = 'Zu allen Listen'
   }
   if (activeNodeArray[activeNodeArray.length - 3] === 'Kulturen') {

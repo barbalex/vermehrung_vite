@@ -13,8 +13,8 @@ const gartenKulturEventNodes = ({
   table: 'event',
   id: `${gartenId}${kulturId}${event.id}`,
   label: eventLabelFromEvent({ event }),
-  url: ['Gaerten', gartenId, 'Kulturen', kulturId, 'Events', event.id],
-  sort: [4, gartenIndex, 1, kulturIndex, 5, eventIndex],
+  url: ['Vermehrung', 'Gaerten', gartenId, 'Kulturen', kulturId, 'Events', event.id],
+  sort: [1, 4, gartenIndex, 1, kulturIndex, 5, eventIndex],
   hasChildren: false,
 })
 

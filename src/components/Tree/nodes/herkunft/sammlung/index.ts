@@ -17,8 +17,8 @@ const herkunftSammlungNodes = async ({
     table: 'sammlung',
     id: `${herkunftId}${sammlung.id}`,
     label,
-    url: ['Herkuenfte', herkunftId, 'Sammlungen', sammlung.id],
-    sort: [2, herkunftIndex, 2, sammlungIndex],
+    url: ['Vermehrung', 'Herkuenfte', herkunftId, 'Sammlungen', sammlung.id],
+    sort: [1, 2, herkunftIndex, 2, sammlungIndex],
     hasChildren: true,
   }
 }

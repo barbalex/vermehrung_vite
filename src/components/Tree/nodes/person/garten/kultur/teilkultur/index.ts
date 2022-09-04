@@ -13,7 +13,7 @@ const personGartenKulturTeilkulturNodes = ({
   table: 'teilkultur',
   id: `${personId}${gartenId}${kulturId}${teilkultur.id}`,
   label: teilkultur.name || '(kein Name)',
-  url: [
+  url: ['Vermehrung', 
     'Personen',
     personId,
     'Gaerten',
@@ -23,7 +23,7 @@ const personGartenKulturTeilkulturNodes = ({
     'Teilkulturen',
     teilkultur.id,
   ],
-  sort: [11, personIndex, 2, gartenIndex, 1, kulturIndex, 1, teilkulturIndex],
+  sort: [1, 11, personIndex, 2, gartenIndex, 1, kulturIndex, 1, teilkulturIndex],
   hasChildren: false,
 })
 

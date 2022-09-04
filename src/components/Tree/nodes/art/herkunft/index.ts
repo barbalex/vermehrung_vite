@@ -11,8 +11,8 @@ const artHerkunftNode = async ({
   table: 'herkunft',
   id: `${artId}${herkunft.id}`,
   label: herkunftLabelFromHerkunft({ herkunft }),
-  url: ['Arten', artId, 'Herkuenfte', herkunft.id],
-  sort: [1, artIndex, 1, herkunftIndex],
+  url: ['Vermehrung', 'Arten', artId, 'Herkuenfte', herkunft.id],
+  sort: [1, 1, artIndex, 1, herkunftIndex],
   hasChildren: false,
   hasMenu: false,
   menuExplainerText:

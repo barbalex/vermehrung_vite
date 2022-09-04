@@ -140,7 +140,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId],
+              url: ['Vermehrung', 'Kulturen', kulturId],
               text,
             }
           }),
@@ -157,7 +157,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId],
+              url: ['Vermehrung', 'Kulturen', kulturId],
               text,
             }
           }),
@@ -174,7 +174,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId],
+              url: ['Vermehrung', 'Kulturen', kulturId],
               text,
             }
           }),
@@ -200,7 +200,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId],
+              url: ['Vermehrung', 'Kulturen', kulturId],
               text,
             }
           }),
@@ -221,7 +221,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId, 'Teilkulturen', tk.id],
+              url: ['Vermehrung', 'Kulturen', kulturId, 'Teilkulturen', tk.id],
               text: `${kulturLabel ?? '(keine Kultur)'}, Teilkultur-ID: ${
                 tk.id
               }`,
@@ -246,6 +246,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
 
             return {
               url: [
+                'Vermehrung',
                 'Arten',
                 kultur?.art_id,
                 'Kulturen',
@@ -274,6 +275,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
 
             return {
               url: [
+                'Vermehrung',
                 'Arten',
                 kultur?.art_id,
                 'Kulturen',
@@ -317,6 +319,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
 
             return {
               url: [
+                'Vermehrung',
                 'Arten',
                 kultur?.art_id,
                 'Kulturen',
@@ -361,6 +364,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
 
             return {
               url: [
+                'Vermehrung',
                 'Arten',
                 kultur?.art_id,
                 'Kulturen',
@@ -405,6 +409,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
 
             return {
               url: [
+                'Vermehrung',
                 'Arten',
                 kultur?.art_id,
                 'Kulturen',
@@ -416,56 +421,58 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen: async () =>
-      await Promise.all(
-        zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
-          .filter(async (z) => {
-            let kulturOption
-            try {
-              kulturOption = await z.kultur_option.fetch()
-            } catch {}
+    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
+      async () =>
+        await Promise.all(
+          zaehlungsSorted
+            .filter((z) => z.kultur_id === kulturId)
+            .filter(async (z) => {
+              let kulturOption
+              try {
+                kulturOption = await z.kultur_option.fetch()
+              } catch {}
 
-            return !!kulturOption?.tk
-          })
-          .filter((z) => {
-            const tzs = teilzaehlungs
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted)
-            return tzs.length && tzs.filter((tz) => !tz.teilkultur_id).length
-          })
-          .map(async (z) => {
-            let kultur
-            try {
-              kultur = await z.kultur.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur.label.pipe(first$()).toPromise()
-            } catch {}
-            const zaehlung = z.datum
-              ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-              : `Zählung-ID: ${z.id}`
-            const anzTz = teilzaehlungs
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted).length
-            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+              return !!kulturOption?.tk
+            })
+            .filter((z) => {
+              const tzs = teilzaehlungs
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+              return tzs.length && tzs.filter((tz) => !tz.teilkultur_id).length
+            })
+            .map(async (z) => {
+              let kultur
+              try {
+                kultur = await z.kultur.fetch()
+              } catch {}
+              let kulturLabel
+              try {
+                kulturLabel = await kultur.label.pipe(first$()).toPromise()
+              } catch {}
+              const zaehlung = z.datum
+                ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+                : `Zählung-ID: ${z.id}`
+              const anzTz = teilzaehlungs
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted).length
+              const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
 
-            return {
-              url: [
-                'Arten',
-                kultur?.art_id,
-                'Kulturen',
-                kultur?.id,
-                'Zaehlungen',
-                z.id,
-              ],
-              text: `${
-                kulturLabel ?? '(keine Kultur)'
-              }, ${zaehlung}${teilzaehlung}`,
-            }
-          }),
-      ),
+              return {
+                url: [
+                  'Vermehrung',
+                  'Arten',
+                  kultur?.art_id,
+                  'Kulturen',
+                  kultur?.id,
+                  'Zaehlungen',
+                  z.id,
+                ],
+                text: `${
+                  kulturLabel ?? '(keine Kultur)'
+                }, ${zaehlung}${teilzaehlung}`,
+              }
+            }),
+        ),
     lieferungsWithMultipleVon: async () =>
       lieferungsSorted
         .filter((l) => l.von_kultur_id === kulturId)
@@ -478,7 +485,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -494,7 +501,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -510,7 +517,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -526,7 +533,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -542,7 +549,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -558,7 +565,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -574,7 +581,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -590,7 +597,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -607,7 +614,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -624,7 +631,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -640,7 +647,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -656,7 +663,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -672,7 +679,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'An-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
             text,
           }
         }),
@@ -688,7 +695,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
             text,
           }
         }),
@@ -708,7 +715,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId, 'Events', ev.id],
+              url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
               text: `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${ev.id}`,
             }
           }),
@@ -729,7 +736,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Kulturen', kulturId, 'Events', ev.id],
+              url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
               text: `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${ev.id}`,
             }
           }),

@@ -77,7 +77,7 @@ const Arten = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Arten') {
+  if (activeNodeArray[1] === 'Arten') {
     upTitle = 'Zu allen Listen'
   }
 

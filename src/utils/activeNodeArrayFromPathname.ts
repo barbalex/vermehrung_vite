@@ -5,7 +5,7 @@ export default (pathnamePassed) => {
     pathname
       .split('/')
       .filter((e) => !!e && e !== 0)
-      .filter((e) => e !== 'Vermehrung') // TODO: remove
+      // .filter((e) => e !== 'Vermehrung') // TODO: remove
       // need to decode in case of Umlaute
       .map((e) => decodeURIComponent(e))
       // convert numbers to numbers

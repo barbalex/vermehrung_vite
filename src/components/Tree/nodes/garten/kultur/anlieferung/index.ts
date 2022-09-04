@@ -13,7 +13,7 @@ const gartenKulturAnlieferungNodes = ({
   table: 'lieferung',
   id: `${gartenId}${kulturId}${lieferung.id}`,
   label: lieferungLabelFromLieferung({ lieferung }),
-  url: [
+  url: ['Vermehrung', 
     'Gaerten',
     gartenId,
     'Kulturen',
@@ -21,7 +21,7 @@ const gartenKulturAnlieferungNodes = ({
     'An-Lieferungen',
     lieferung.id,
   ],
-  sort: [4, gartenIndex, 1, kulturIndex, 3, lieferungIndex],
+  sort: [1, 4, gartenIndex, 1, kulturIndex, 3, lieferungIndex],
   hasChildren: false,
   mono: true,
 })

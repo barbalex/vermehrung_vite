@@ -73,7 +73,7 @@ const SammelLieferungFormTitle = ({
   const { sl_auto_copy_edits } = userPersonOption ?? {}
 
   const shownAsSammelLieferung =
-    activeNodeArray.length === 2 && activeNodeArray[0] === 'Sammel-Lieferungen'
+    activeNodeArray.length === 3 && activeNodeArray[1] === 'Sammel-Lieferungen'
 
   if (!row || (!showFilter && filter.show)) return null
 

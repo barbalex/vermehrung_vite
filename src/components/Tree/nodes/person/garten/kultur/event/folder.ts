@@ -11,7 +11,7 @@ const personGartenKulturEventFolder = ({
   menuTitle: 'Events',
   id: `${personId}${gartenId}${kulturId}EventFolder`,
   label: `Events (${count})`,
-  url: [
+  url: ['Vermehrung', 
     'Personen',
     personId,
     'Gaerten',
@@ -20,7 +20,7 @@ const personGartenKulturEventFolder = ({
     kulturId,
     'Events',
   ],
-  sort: [11, personIndex, 2, gartenIndex, 1, kulturIndex, 5],
+  sort: [1, 11, personIndex, 2, gartenIndex, 1, kulturIndex, 5],
   hasChildren: true,
   childrenCount: count,
 })

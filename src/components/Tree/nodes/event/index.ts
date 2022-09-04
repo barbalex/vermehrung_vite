@@ -6,8 +6,8 @@ const eventNodes = ({ event, index }) => ({
   table: 'event',
   id: event.id,
   label: eventLabelFromEvent({ event }),
-  url: ['Events', event.id],
-  sort: [10, index],
+  url: ['Vermehrung', 'Events', event.id],
+  sort: [1, 10, index],
   hasChildren: false,
 })
 export default eventNodes

@@ -124,7 +124,7 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Teilkulturen') {
+  if (activeNodeArray[1] === 'Teilkulturen') {
     upTitle = 'Zu allen Listen'
   }
   if (activeNodeArray[activeNodeArray.length - 3] === 'Kulturen') {

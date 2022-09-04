@@ -17,8 +17,8 @@ const gartenKulturNodes = async ({
     table: 'kultur',
     id: `${gartenId}${kultur.id}`,
     label,
-    url: ['Gaerten', gartenId, 'Kulturen', kultur.id],
-    sort: [4, gartenIndex, 1, kulturIndex],
+    url: ['Vermehrung', 'Gaerten', gartenId, 'Kulturen', kultur.id],
+    sort: [1, 4, gartenIndex, 1, kulturIndex],
     hasChildren: true,
   }
 }

@@ -64,7 +64,7 @@ const Herkunft = ({
     () => setActiveNodeArray([...activeNodeArray, 'Sammlungen']),
     [activeNodeArray, setActiveNodeArray],
   )
-  const showToSa = activeNodeArray[0] === 'Herkuenfte'
+  const showToSa = activeNodeArray[1] === 'Herkuenfte'
 
   // herkunft is top node
   // never enable adding below that

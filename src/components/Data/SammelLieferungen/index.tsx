@@ -118,7 +118,7 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Sammel-Lieferungen') {
+  if (activeNodeArray[1] === 'Sammel-Lieferungen') {
     upTitle = 'Zu allen Listen'
   }
 

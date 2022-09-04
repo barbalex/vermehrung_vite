@@ -266,7 +266,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             const fullname = personFullname(v)
 
             return {
-              url: ['Personen', v.id],
+              url: ['Vermehrung', 'Personen', v.id],
               text: `${v.nr}${fullname ? `, ${fullname}` : ''}`,
             }
           }),
@@ -278,7 +278,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
         .filter((v) => v.length > 1)
         .flatMap((vs) =>
           vs.map((v) => ({
-            url: ['Herkuenfte', v.id],
+            url: ['Vermehrung', 'Herkuenfte', v.id],
             text: `${v.nr}${v.lokalname ? `, ${v.lokalname}` : ''}${
               v.gemeinde ? `, ${v.gemeinde}` : ''
             }`,
@@ -302,7 +302,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', a.id],
+              url: ['Vermehrung', 'Arten', a.id],
               text,
             }
           }),
@@ -321,7 +321,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Sammlungen', s.id],
+              url: ['Vermehrung', 'Sammlungen', s.id],
               text,
             }
           }),
@@ -342,7 +342,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
               } catch {}
 
               return {
-                url: ['Sammlungen', s.id],
+                url: ['Vermehrung', 'Sammlungen', s.id],
                 text,
               }
             }),
@@ -361,7 +361,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -378,7 +378,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -395,7 +395,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -412,7 +412,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -429,7 +429,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -446,7 +446,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Sammlungen', s.id],
+              url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
               text,
             }
           }),
@@ -496,7 +496,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           } catch {}
 
           return {
-            url: ['Gaerten', g.id],
+            url: ['Vermehrung', 'Gaerten', g.id],
             text,
           }
         }),
@@ -513,7 +513,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Kulturen', k.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
               text,
             }
           }),
@@ -529,7 +529,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Kulturen', k.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
               text,
             }
           }),
@@ -545,7 +545,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Kulturen', k.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
               text,
             }
           }),
@@ -570,7 +570,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             } catch {}
 
             return {
-              url: ['Arten', artId, 'Kulturen', k.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
               text,
             }
           }),
@@ -593,7 +593,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }`
 
             return {
-              url: [
+              url: ['Vermehrung', 
                 'Arten',
                 artId,
                 'Kulturen',
@@ -639,7 +639,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
 
           return {
-            url: ['Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
+            url: ['Vermehrung', 'Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
             text,
           }
         }),
@@ -681,7 +681,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`
 
           return {
-            url: ['Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
+            url: ['Vermehrung', 'Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
             text,
           }
         }),
@@ -718,7 +718,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
               text,
             }
           }),
@@ -754,7 +754,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
               text,
             }
           }),
@@ -790,7 +790,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
               text,
             }
           }),
@@ -848,7 +848,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
               text,
             }
           }),
@@ -867,7 +867,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -884,7 +884,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -900,7 +900,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -916,7 +916,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -932,7 +932,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -949,7 +949,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -967,7 +967,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -983,7 +983,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -999,7 +999,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${datum}, ID: ${l.id}${geplant}`
 
           return {
-            url: ['Lieferungen', l.id],
+            url: ['Vermehrung', 'Lieferungen', l.id],
             text,
           }
         }),
@@ -1019,7 +1019,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur?.id, 'Events', e.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Events', e.id],
               text,
             }
           }),
@@ -1040,7 +1040,7 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
             return {
-              url: ['Arten', artId, 'Kulturen', kultur.id, 'Events', e.id],
+              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Events', e.id],
               text,
             }
           }),

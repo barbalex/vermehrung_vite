@@ -3,8 +3,8 @@ const artSammlungFolder = ({ count, artIndex, artId }) => ({
   menuTitle: 'Sammlungen',
   id: `${artId}SammlungFolder`,
   label: `Sammlungen (${count})`,
-  url: ['Arten', artId, 'Sammlungen'],
-  sort: [1, artIndex, 2],
+  url: ['Vermehrung', 'Arten', artId, 'Sammlungen'],
+  sort: [1, 1, artIndex, 2],
   hasChildren: true,
   childrenCount: count,
 })

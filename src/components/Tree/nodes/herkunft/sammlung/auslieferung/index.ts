@@ -13,7 +13,7 @@ const herkunftSammlungAuslieferungNodes = ({
   table: 'lieferung',
   id: `${herkunftId}${sammlungId}${lieferung.id}`,
   label: lieferungLabelFromLieferung({ lieferung }),
-  url: [
+  url: ['Vermehrung', 
     'Herkuenfte',
     herkunftId,
     'Sammlungen',
@@ -21,7 +21,7 @@ const herkunftSammlungAuslieferungNodes = ({
     'Aus-Lieferungen',
     lieferung.id,
   ],
-  sort: [2, herkunftIndex, 2, sammlungIndex, 1, lieferungIndex],
+  sort: [1, 2, herkunftIndex, 2, sammlungIndex, 1, lieferungIndex],
   hasChildren: false,
 })
 

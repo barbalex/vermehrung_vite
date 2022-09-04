@@ -12,8 +12,8 @@ const sammlungNodes = async ({ sammlung, index }) => {
     table: 'sammlung',
     id: sammlung.id,
     label,
-    url: ['Sammlungen', sammlung.id],
-    sort: [3, index],
+    url: ['Vermehrung', 'Sammlungen', sammlung.id],
+    sort: [1, 3, index],
     hasChildren: true,
   }
 }

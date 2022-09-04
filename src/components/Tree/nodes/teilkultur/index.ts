@@ -6,8 +6,8 @@ const teilkulturNodes = ({ teilkultur, index }) => ({
   table: 'teilkultur',
   id: teilkultur.id,
   label: teilkulturLabelFromTeilkultur({ teilkultur: teilkultur }),
-  url: ['Teilkulturen', teilkultur.id],
-  sort: [6, index],
+  url: ['Vermehrung', 'Teilkulturen', teilkultur.id],
+  sort: [1, 6, index],
   hasChildren: false,
 })
 

@@ -143,7 +143,7 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Kulturen') {
+  if (activeNodeArray[1] === 'Kulturen') {
     upTitle = 'Zu allen Listen'
   }
   if (activeNodeArray[activeNodeArray.length - 3] === 'Arten') {

@@ -147,7 +147,7 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Sammlungen') {
+  if (activeNodeArray[1] === 'Sammlungen') {
     upTitle = 'Zu allen Listen'
   }
   if (activeNodeArray[activeNodeArray.length - 3] === 'Arten') {

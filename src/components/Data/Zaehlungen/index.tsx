@@ -125,7 +125,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Zaehlungen') {
+  if (activeNodeArray[1] === 'Zaehlungen') {
     upTitle = 'Zu allen Listen'
   }
   if (activeNodeArray[activeNodeArray.length - 3] === 'Kulturen') {

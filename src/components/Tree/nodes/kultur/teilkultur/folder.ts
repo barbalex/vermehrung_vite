@@ -3,8 +3,8 @@ const kulturTeilkulturFolder = ({ count, kulturIndex, kulturId }) => ({
   menuTitle: 'Teilkulturen',
   id: `${kulturId}TeilkulturFolder`,
   label: `Teilkulturen (${count})`,
-  url: ['Kulturen', kulturId, 'Teilkulturen'],
-  sort: [5, kulturIndex, 1],
+  url: ['Vermehrung', 'Kulturen', kulturId, 'Teilkulturen'],
+  sort: [1, 5, kulturIndex, 1],
   hasChildren: true,
   childrenCount: count,
 })

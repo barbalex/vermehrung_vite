@@ -9,8 +9,8 @@ const artSammlungAuslieferungFolder = ({
   menuTitle: 'Lieferungen',
   id: `${artId}${sammlungId}LieferungFolder`,
   label: `Aus-Lieferungen (${children.length})`,
-  url: ['Arten', artId, 'Sammlungen', sammlungId, 'Aus-Lieferungen'],
-  sort: [1, artIndex, 2, sammlungIndex, 1],
+  url: ['Vermehrung', 'Arten', artId, 'Sammlungen', sammlungId, 'Aus-Lieferungen'],
+  sort: [1, 1, artIndex, 2, sammlungIndex, 1],
   hasChildren: true,
   childrenCount: children.length,
 })

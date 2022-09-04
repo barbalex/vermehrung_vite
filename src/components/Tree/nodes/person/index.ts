@@ -6,8 +6,8 @@ const personNodes = ({ person, index }) => ({
   table: 'person',
   id: person.id,
   label: personLabelFromPerson({ person }),
-  url: ['Personen', person.id],
-  sort: [11, index],
+  url: ['Vermehrung', 'Personen', person.id],
+  sort: [1, 11, index],
   hasChildren: true,
 })
 

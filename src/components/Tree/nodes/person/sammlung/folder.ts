@@ -3,8 +3,8 @@ const personSammlungFolder = ({ count, personIndex, personId }) => ({
   menuTitle: 'Sammlungen',
   id: `${personId}SammlungFolder`,
   label: `Sammlungen (${count})`,
-  url: ['Personen', personId, 'Sammlungen'],
-  sort: [11, personIndex, 1],
+  url: ['Vermehrung', 'Personen', personId, 'Sammlungen'],
+  sort: [1, 11, personIndex, 1],
   hasChildren: true,
   childrenCount: count,
 })

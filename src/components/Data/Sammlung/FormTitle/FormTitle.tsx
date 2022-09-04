@@ -64,8 +64,8 @@ const SammlungFormTitle = ({
     [activeNodeArray, setActiveNodeArray],
   )
 
-  const showToHe = activeNodeArray[0] === 'Sammlungen'
-  const showToLi = activeNodeArray[0] !== 'Personen'
+  const showToHe = activeNodeArray[1] === 'Sammlungen'
+  const showToLi = activeNodeArray[1] !== 'Personen'
 
   if (width < 520) {
     return (

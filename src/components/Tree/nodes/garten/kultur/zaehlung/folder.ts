@@ -9,8 +9,8 @@ const gartenKulturZaehlungFolder = ({
   menuTitle: 'Zählungen',
   id: `${gartenId}${kulturId}ZaehlungFolder`,
   label: `Zählungen (${children.length})`,
-  url: ['Gaerten', gartenId, 'Kulturen', kulturId, 'Zaehlungen'],
-  sort: [4, gartenIndex, 1, kulturIndex, 2],
+  url: ['Vermehrung', 'Gaerten', gartenId, 'Kulturen', kulturId, 'Zaehlungen'],
+  sort: [1, 4, gartenIndex, 1, kulturIndex, 2],
   hasChildren: true,
   childrenCount: children.length,
 })

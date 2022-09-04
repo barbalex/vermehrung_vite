@@ -127,7 +127,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   }, [activeNodeArray, removeOpenNode, setActiveNodeArray])
 
   let upTitle = 'Eine Ebene höher'
-  if (activeNodeArray[0] === 'Herkuenfte') {
+  if (activeNodeArray[1] === 'Herkuenfte') {
     upTitle = 'Zu allen Listen'
   }
 

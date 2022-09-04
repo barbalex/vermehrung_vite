@@ -11,7 +11,7 @@ const personGartenKulturAnlieferungFolder = ({
   menuTitle: 'An-Lieferungen',
   id: `${personId}${gartenId}${kulturId}AnLieferungFolder`,
   label: `An-Lieferungen (${count})`,
-  url: [
+  url: ['Vermehrung', 
     'Personen',
     personId,
     'Gaerten',
@@ -20,7 +20,7 @@ const personGartenKulturAnlieferungFolder = ({
     kulturId,
     'An-Lieferungen',
   ],
-  sort: [11, personIndex, 2, gartenIndex, 1, kulturIndex, 3],
+  sort: [1, 11, personIndex, 2, gartenIndex, 1, kulturIndex, 3],
   hasChildren: true,
   childrenCount: count,
 })

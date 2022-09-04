@@ -3,8 +3,8 @@ const sammlungHerkunftFolder = ({ count, sammlungIndex, sammlungId }) => ({
   menuTitle: 'Herkünfte',
   id: `${sammlungId}HerkunftFolder`,
   label: `Herkünfte (${count})`,
-  url: ['Sammlungen', sammlungId, 'Herkuenfte'],
-  sort: [3, sammlungIndex, 1],
+  url: ['Vermehrung', 'Sammlungen', sammlungId, 'Herkuenfte'],
+  sort: [1, 3, sammlungIndex, 1],
   hasChildren: true,
   hasMenu: false,
   menuExplainerText:

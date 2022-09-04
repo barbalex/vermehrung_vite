@@ -155,7 +155,7 @@ const SammelLieferungForm = ({
     [filter, row, showFilter, store],
   )
   const shownAsSammelLieferung =
-    activeNodeArray.length === 2 && activeNodeArray[0] === 'Sammel-Lieferungen'
+    activeNodeArray.length === 3 && activeNodeArray[1] === 'Sammel-Lieferungen'
 
   const ifNeeded = useCallback(
     (field) => {

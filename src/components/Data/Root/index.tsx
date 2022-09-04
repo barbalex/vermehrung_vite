@@ -82,45 +82,45 @@ const Root = ({ filter: showFilter }) => {
   // by adding each role name as key and true/false as value
   const rows = [
     ...(showArt
-      ? [{ name: 'Arten', url: ['Arten'], table: 'art', sort: 1 }]
+      ? [{ name: 'Arten', url: ['Vermehrung', 'Arten'], table: 'art', sort: 1 }]
       : []),
     ...(showHerkunft
-      ? [{ name: 'Herkünfte', url: ['Herkuenfte'], table: 'herkunft', sort: 2 }]
+      ? [{ name: 'Herkünfte', url: ['Vermehrung', 'Herkuenfte'], table: 'herkunft', sort: 2 }]
       : []),
     ...(showSammlung
       ? [
           {
             name: 'Sammlungen',
-            url: ['Sammlungen'],
+            url: ['Vermehrung', 'Sammlungen'],
             table: 'sammlung',
             sort: 3,
           },
         ]
       : []),
     ...(showGarten
-      ? [{ name: 'Gärten', url: ['Gaerten'], table: 'garten', sort: 4 }]
+      ? [{ name: 'Gärten', url: ['Vermehrung', 'Gaerten'], table: 'garten', sort: 4 }]
       : []),
     ...(showKultur
-      ? [{ name: 'Kulturen', url: ['Kulturen'], table: 'kultur', sort: 5 }]
+      ? [{ name: 'Kulturen', url: ['Vermehrung', 'Kulturen'], table: 'kultur', sort: 5 }]
       : []),
     ...(showTeilkultur
       ? [
           {
             name: 'Teilkulturen',
-            url: ['Teilkulturen'],
+            url: ['Vermehrung', 'Teilkulturen'],
             table: 'teilkultur',
             sort: 6,
           },
         ]
       : []),
     ...(showZaehlung
-      ? [{ name: 'Zählungen', url: ['Zaehlungen'], table: 'zaehlung', sort: 7 }]
+      ? [{ name: 'Zählungen', url: ['Vermehrung', 'Zaehlungen'], table: 'zaehlung', sort: 7 }]
       : []),
     ...(showLieferung
       ? [
           {
             name: 'Lieferungen',
-            url: ['Lieferungen'],
+            url: ['Vermehrung', 'Lieferungen'],
             table: 'lieferung',
             sort: 8,
           },
@@ -130,17 +130,17 @@ const Root = ({ filter: showFilter }) => {
       ? [
           {
             name: 'Sammel-Lieferungen',
-            url: ['Sammel-Lieferungen'],
+            url: ['Vermehrung', 'Sammel-Lieferungen'],
             table: 'sammel_lieferung',
             sort: 9,
           },
         ]
       : []),
     ...(showEvent
-      ? [{ name: 'Events', url: ['Events'], table: 'event', sort: 10 }]
+      ? [{ name: 'Events', url: ['Vermehrung', 'Events'], table: 'event', sort: 10 }]
       : []),
     ...(showPerson
-      ? [{ name: 'Personen', url: ['Personen'], table: 'person', sort: 11 }]
+      ? [{ name: 'Personen', url: ['Vermehrung', 'Personen'], table: 'person', sort: 11 }]
       : []),
   ]
 

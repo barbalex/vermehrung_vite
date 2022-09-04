@@ -6,8 +6,8 @@ const herkunftNodes = ({ herkunft, index }) => ({
   table: 'herkunft',
   id: herkunft.id,
   label: herkunftLabelFromHerkunft({ herkunft }),
-  url: ['Herkuenfte', herkunft.id],
-  sort: [2, index],
+  url: ['Vermehrung', 'Herkuenfte', herkunft.id],
+  sort: [1, 2, index],
   hasChildren: true,
 })
 

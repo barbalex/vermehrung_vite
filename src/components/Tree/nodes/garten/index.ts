@@ -12,8 +12,8 @@ const gartenNodes = async ({ garten, index }) => {
     table: 'garten',
     id: garten.id,
     label,
-    url: ['Gaerten', garten.id],
-    sort: [4, index],
+    url: ['Vermehrung', 'Gaerten', garten.id],
+    sort: [1, 4, index],
     hasChildren: true,
   }
 }

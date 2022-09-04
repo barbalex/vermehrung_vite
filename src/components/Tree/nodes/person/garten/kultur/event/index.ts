@@ -15,7 +15,7 @@ const personGartenKulturEventNodes = ({
   table: 'event',
   id: `${personId}${gartenId}${kulturId}${event.id}`,
   label: eventLabelFromEvent({ event }),
-  url: [
+  url: ['Vermehrung', 
     'Personen',
     personId,
     'Gaerten',
@@ -25,7 +25,7 @@ const personGartenKulturEventNodes = ({
     'Events',
     event.id,
   ],
-  sort: [11, personIndex, 2, gartenIndex, 1, kulturIndex, 5, eventIndex],
+  sort: [1, 11, personIndex, 2, gartenIndex, 1, kulturIndex, 5, eventIndex],
   hasChildren: false,
 })
 

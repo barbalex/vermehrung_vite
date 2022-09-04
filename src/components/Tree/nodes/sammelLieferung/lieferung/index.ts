@@ -11,8 +11,8 @@ const sammelLieferungLieferungNodes = ({
   table: 'lieferung',
   id: `${sammelLieferungId}${lieferung.id}`,
   label: lieferungLabelFromLieferung({ lieferung }),
-  url: ['Sammel-Lieferungen', sammelLieferungId, 'Lieferungen', lieferung.id],
-  sort: [9, sammelLieferungIndex, 3, lieferungIndex],
+  url: ['Vermehrung', 'Sammel-Lieferungen', sammelLieferungId, 'Lieferungen', lieferung.id],
+  sort: [1, 9, sammelLieferungIndex, 3, lieferungIndex],
   hasChildren: false,
   mono: true,
 })

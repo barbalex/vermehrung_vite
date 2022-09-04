@@ -65,7 +65,7 @@ const LieferungTitleFormTitle = ({
     [activeNodeArray, nachKulturId, setActiveNodeArray],
   )
   // to kulturen is not implemented in nodes, so turned off
-  const showToKu = false && activeNodeArray[0] === 'Sammlungen'
+  const showToKu = false && activeNodeArray[1] === 'Sammlungen'
 
   if (width < 520) {
     return (
