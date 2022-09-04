@@ -115,15 +115,16 @@ const Vermehrung = () => {
     setLastTouchedNode(activeNodeArray)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    // user pushed back button > update activeNodeArray
-    console.log(
-      'Vermehrung, effect setting activeNodeArray with nonavigate (user pushed back button) to:',
-      activeNodeArray,
-    )
+  // TODO: test if necessary
+  // useEffect(() => {
+  //   // user pushed back button > update activeNodeArray
+  //   console.log(
+  //     'Vermehrung, effect setting activeNodeArray with nonavigate (user pushed back button) to:',
+  //     activeNodeArray,
+  //   )
 
-    setActiveNodeArray(activeNodeArray, 'nonavigate')
-  }, [activeNodeArray, pathname, setActiveNodeArray])
+  //   setActiveNodeArray(activeNodeArray, 'nonavigate')
+  // }, [activeNodeArray, pathname, setActiveNodeArray])
 
   useEffect(() => {
     // console.log('vermehrung, subscription effect: authorizing:', authorizing)

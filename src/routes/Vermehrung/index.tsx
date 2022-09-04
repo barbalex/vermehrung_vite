@@ -8,7 +8,7 @@ import Notifications from '../../components/Notifications'
 
 import Vermehrung from './Vermehrung'
 import initiateApp from '../../utils/initiateApp'
-import Header from '../../components/HeaderVermehrung'
+import Header from '../../components/HeaderVermehrung' 
 
 // trying to persist indexedDB
 // https://dexie.org/docs/StorageManager#controlling-persistence
