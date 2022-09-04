@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
@@ -6,17 +6,18 @@ import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
 import UpSvg from '../../../svg/to_up.inline.svg'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FilterTitle from '../../shared/FilterTitle'
 import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
-import tableFilter from '../../../utils/tableFilter'
 import artsSortedFromArts from '../../../utils/artsSortedFromArts'
 import constants from '../../../utils/constants'
+import { dexie, Art } from '../../../dexieClient'
+import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import notDeletedFilter from '../../../utils/notDeletedFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -51,47 +52,19 @@ const FieldsContainer = styled.div`
 
 const Arten = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertArtRev, db, filter } = store
+  const { insertArtRev } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { art: artFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ arts: [], totalCount: 0 })
-  useEffect(() => {
-    const collection = db.get('art')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeCount()
-    const artsObservable = collection
-      .query(...tableFilter({ store, table: 'art' }))
-      .observeWithColumns(['ae_id'])
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      artsObservable,
+  const data = useLiveQuery(async () => {
+    const [arts, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'art' }),
+      dexie.arts.filter(notDeletedFilter).count(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([totalCount, arts]) => {
-        const artsSorted = await artsSortedFromArts(arts)
-        setDataState({ arts: artsSorted, totalCount })
-      },
-    )
 
-    return () => subscription?.unsubscribe?.()
-    // need to rerender if any of the values of herkunftFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [db, ...Object.values(artFilter), artFilter, store])
-
-  const { arts, totalCount } = dataState
+    return { arts, totalCount }
+  }, [store.filter.art, store.art_initially_queried])
+  const arts: Art[] = data?.arts ?? []
+  const totalCount = data?.totalCount
   const filteredCount = arts.length
 
   const add = useCallback(() => {

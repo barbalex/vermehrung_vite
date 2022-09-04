@@ -26,6 +26,7 @@ export default types
       self.widthInPercentOfScreen = val
     },
     setActiveNodeArray(val) {
+      console.log('store.Tree, setting activeNodeArray to:', val)
       self.activeNodeArray = val
     },
     addNode(url) {

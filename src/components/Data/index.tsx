@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import last from 'lodash/last'
 import isUuid from 'is-uuid'
 
-import Art from './Art'
+import ArtForm from './Art'
 import Arten from './Arten'
 import Event from './Event'
 import Events from './Events'
@@ -40,7 +40,7 @@ const Data = () => {
       return <Root />
     }
     case 'art': {
-      return <Art id={id} />
+      return <ArtForm id={id} />
     }
     case 'arten': {
       return <Arten />

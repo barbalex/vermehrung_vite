@@ -3,7 +3,7 @@ import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import styled from 'styled-components'
 
-import Art from './Data/Art'
+import ArtForm from './Data/Art'
 import Event from './Data/Event'
 import Garten from './Data/Garten'
 import Herkunft from './Data/Herkunft'
@@ -68,7 +68,7 @@ const Filter = () => {
   const onChangeTab = useCallback((event, value) => setActiveTab(value), [])
 
   const formObject = {
-    art: <Art filter />,
+    art: <ArtForm filter />,
     event: <Event filter />,
     herkunft: <Herkunft filter />,
     garten: <Garten filter />,

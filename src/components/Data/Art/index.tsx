@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import ErrorBoundary from '../../shared/ErrorBoundary'
@@ -11,6 +11,7 @@ import Conflict from './Conflict'
 import FormTitle from './FormTitle'
 import Form from './Form'
 import History from './History'
+import { dexie, Art } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -50,26 +51,14 @@ const StyledSplitPane = styled(SplitPane)`
   }
 `
 
-const Art = ({
+const ArtForm = ({
   filter: showFilter,
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db } = store
+  const { filter, online } = store
 
-  const [row, setRow] = useState(null)
-  // need raw row because observable does not provoke rerendering of components
-  const [rawRow, setRawRow] = useState(null)
-  useEffect(() => {
-    const observable = showFilter
-      ? $of(filter.art)
-      : db.get('art').findAndObserve(id)
-    const subscription = observable.subscribe((newRow) => {
-      setRow(newRow)
-      setRawRow(JSON.stringify(newRow?._raw ?? newRow))
-    })
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.art, id, showFilter])
+  const row: Art = useLiveQuery(async () => await dexie.arts.get(id), [id])
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -156,4 +145,4 @@ const Art = ({
   )
 }
 
-export default observer(Art)
+export default observer(ArtForm)
