@@ -33,21 +33,12 @@ const ArtenRow = ({ row, style, last }) => {
   const { herkunftIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray } = store.tree
 
-  // console.log('ArtenRow, row:', row)
-
   const [label, setLabel] = useState('')
   useEffect(() => {
     herkunftIdInActiveNodeArray
       ? row.labelUnderHerkunft().then(setLabel)
       : row.label().then(setLabel)
   }, [herkunftIdInActiveNodeArray, row])
-  // useEffect(() => {
-  //   herkunftIdInActiveNodeArray
-  //     ? row.labelUnderHerkunft().then(setLabel)
-  //     : row.label().then(setLabel)
-  // }, [herkunftIdInActiveNodeArray, row])
-
-  // console.log('ArtenRow, label:', label)
 
   const onClickRow = useCallback(
     () => setActiveNodeArray([...activeNodeArray, row.id]),

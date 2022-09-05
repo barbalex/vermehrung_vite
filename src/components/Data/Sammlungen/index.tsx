@@ -94,8 +94,6 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   const totalCount = data?.totalCount
   const filteredCount = sammlungs.length
 
-  console.log('Sammlungen', { sammlungs, totalCount, filteredCount })
-
   const add = useCallback(() => {
     insertSammlungRev()
   }, [insertSammlungRev])
