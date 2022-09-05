@@ -1,15 +1,12 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 
 import StoreContext from '../../../../storeContext'
 import SelectLoadingOptions from '../../../shared/SelectLoadingOptions'
 import Checkbox2States from '../../../shared/Checkbox2States'
 import JesNo from '../../../shared/JesNo'
 import ifIsNumericAsNumber from '../../../../utils/ifIsNumericAsNumber'
-import aeArtSort from '../../../../utils/aeArtSort'
 import Files from '../../Files'
 import Timeline from './Timeline'
 import HerkunftTimeline from './HerkunftTimeline'
@@ -18,6 +15,7 @@ import Personen from './Personen'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
+import { dexie, Art, AeArt } from '../../../../dexieClient'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -43,44 +41,21 @@ const ArtForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, errors, unsetError, db } = store
+  const { filter, online, errors, unsetError } = store
 
-  const [dataState, setDataState] = useState({
-    artsSorted: [],
-    aeArts: [],
-  })
-  useEffect(() => {
-    const aeArtObservable = db.get('ae_art').query().observe()
-    const artsObservable = db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const combinedObservables = combineLatest([aeArtObservable, artsObservable])
-    const subscription = combinedObservables.subscribe(
-      async ([aeArts, arts]) => {
-        const artsSorted = await artsSortedFromArts(arts)
+  const data = useLiveQuery(async () => {
+    const [arts, aeArts] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'art' }),
+      dexie.ae_arts.orderBy('name'),
+    ])
 
-        setDataState({
-          aeArts: aeArts.sort(aeArtSort),
-          artsSorted,
-        })
-      },
-    )
+    const artsSorted = await artsSortedFromArts(arts)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.art._deleted])
-  const { artsSorted, aeArts } = dataState
+    return { artsSorted, aeArts }
+  }, [store.filter.art, store.art_initially_queried])
+
+  const arts: Art[] = data?.artsSorted ?? []
+  const aeArts: AeArt[] = data?.aeArts ?? []
 
   useEffect(() => {
     unsetError('art')
@@ -105,14 +80,14 @@ const ArtForm = ({
     [filter, row, showFilter, store],
   )
 
-  const aeArtIdsNotToShow = artsSorted
+  const aeArtIdsNotToShow = arts
     .map((a) => a.ae_id)
     .filter((ae_id) => ae_id !== row.ae_id)
 
   const aeArtsFilter = (val) => {
     if (showFilter) {
       return aeArts
-        .filter((a) => artsSorted.map((ar) => ar.ae_id).includes(a.id))
+        .filter((a) => arts.map((ar) => ar.ae_id).includes(a.id))
         .filter((a) => a.name.toLowerCase().includes(val))
     }
     if (val) {
