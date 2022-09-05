@@ -8,6 +8,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../storeContext'
 import ErrorBoundary from './ErrorBoundary'
+import { dexie } from '../../dexieClient'
 
 const StyledMenuItem = styled(MenuItem)`
   ${(props) =>
@@ -27,7 +28,12 @@ const HistoryButton = ({ asMenu, id, showHistory, setShowHistory, table }) => {
   const store = useContext(StoreContext)
   const { online } = store
 
-  const row = useLiveQuery(async () => await dexie[table].get(id), [id, table])
+  console.log('HistoryButton, table:', table)
+
+  const row = useLiveQuery(
+    async () => await dexie[`${table}s`].get(id),
+    [id, table],
+  )
 
   const existMultipleRevisions =
     row?._revisions?.length && row?._revisions?.length > 1

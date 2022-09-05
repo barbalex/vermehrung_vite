@@ -1,12 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import tableFilter from '../../../../utils/tableFilter' 
+import totalFilter from '../../../../utils/totalFilter'
+import { dexie } from '../../../../dexieClient'
 
 const ArtFormTitleChooser = ({
   row,
@@ -16,51 +16,16 @@ const ArtFormTitleChooser = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { db, filter } = store
 
-  const [countState, setCountState] = useState({
-    totalCount: 0,
-    filteredCount: 0,
-  })
-  useEffect(() => {
-    const collection = db.get('art')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeCount()
-    const filteredCountObservable = collection
-      .query(...tableFilter({ store, table: 'art' }))
-      .observeCount()
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      filteredCountObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, filteredCount]) =>
-        setCountState({ totalCount, filteredCount }),
-    )
+  const totalCount = useLiveQuery(
+    async () =>
+      await dexie.arts
+        .filter((value) => totalFilter({ value, store, table: 'art' }))
+        .count(),
+    [store.filter.art, store.art_initially_queried],
+  )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of artFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(store.filter.art),
-    store,
-    filter.art._deleted,
-  ])
-
-  const { totalCount, filteredCount } = countState
+  const filteredCount = store.artsFilteredCount ?? '...'
 
   if (showFilter) {
     return (

@@ -105,14 +105,15 @@ const ArtForm = ({
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            <Form
+            {/* <Form
               showFilter={showFilter}
               id={id}
               row={row}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            />
+            /> */}
+            <div>Form</div>
             <>
               {/* {online && (
                 <>

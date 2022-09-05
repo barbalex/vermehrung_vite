@@ -16,6 +16,7 @@ import Personen from './Personen'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 import { dexie, Art, AeArt } from '../../../../dexieClient'
 
 const FieldsContainer = styled.div`
