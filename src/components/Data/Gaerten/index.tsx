@@ -53,14 +53,22 @@ const FieldsContainer = styled.div`
 
 const Gaerten = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertGartenRev } = store
+  const { insertGartenRev, personIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
+
+  let conditionAdder
+  if (personIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('person_id').equals(personIdInActiveNodeArray)
+  }
 
   const data = useLiveQuery(async () => {
     const [gartens, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'garten' }),
       dexie.gartens
-        .filter((value) => totalFilter({ value, store, table: 'garten' }))
+        .filter((value) =>
+          totalFilter({ value, store, table: 'garten', conditionAdder }),
+        )
         .count(),
     ])
 

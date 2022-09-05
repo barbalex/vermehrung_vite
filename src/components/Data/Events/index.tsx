@@ -53,14 +53,22 @@ const FieldsContainer = styled.div`
 
 const Events = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertEventRev } = store
+  const { insertEventRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
+
+  let conditionAdder
+  if (kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('kultur_id').equals(kulturIdInActiveNodeArray)
+  }
 
   const data = useLiveQuery(async () => {
     const [events, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'event' }),
       dexie.events
-        .filter((value) => totalFilter({ value, store, table: 'event' }))
+        .filter((value) =>
+          totalFilter({ value, store, table: 'event', conditionAdder }),
+        )
         .count(),
     ])
 

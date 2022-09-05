@@ -69,89 +69,50 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
   const { lieferung: lieferungFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ lieferungs: [], totalCount: 0 })
-  useEffect(() => {
+  let conditionAdder
+  if (kulturIdInActiveNodeArray) {
+    // this should get kulturen connected by von_kultur_id or nach_kultur_id
+    // depending on activeNodeArray[last] being 'An-Lieferung' or 'Aus-Lieferung'
     let kulturOnField = 'von_kultur_id'
     if (kulturIdInActiveNodeArray) {
       const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
       if (lastAnAElement === 'An-Lieferungen') kulturOnField = 'nach_kultur_id'
     }
-    const hierarchyQuery = kulturIdInActiveNodeArray
-      ? // this should get kulturen connected by von_kultur_id or nach_kultur_id
-        // depending on activeNodeArray[last] being 'An-Lieferung' or 'Aus-Lieferung'
-        // Q.on did not work because only one association can be declared per table
-        [Q.where(kulturOnField, kulturIdInActiveNodeArray)]
-      : sammelLieferungIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['sammel_lieferung']),
-          Q.on('sammel_lieferung', 'id', sammelLieferungIdInActiveNodeArray),
-        ]
-      : personIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['person']),
-          Q.on('person', 'id', personIdInActiveNodeArray),
-        ]
-      : sammlungIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['sammlung']),
-          Q.on('sammlung', 'id', sammlungIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('lieferung')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.lieferung._deleted === false
-              ? [false]
-              : filter.lieferung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(
-        ...tableFilter({
-          table: 'lieferung',
-          store,
-        }),
-        ...hierarchyQuery,
-      )
-      .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, lieferungs]) => {
-        setDataState({
-          lieferungs: lieferungs.sort(lieferungSort),
-          totalCount,
-        })
-      },
-    )
+    conditionAdder = async (collection) =>
+      collection.and(kulturOnField).equals(kulturIdInActiveNodeArray)
+  }
+  if (sammelLieferungIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection
+        .and('sammel_lieferung_id')
+        .equals(sammelLieferungIdInActiveNodeArray)
+  }
+  if (personIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('person_id').equals(personIdInActiveNodeArray)
+  }
+  if (sammlungIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('von_sammlung_id').equals(sammlungIdInActiveNodeArray)
+  }
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of lieferungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(lieferungFilter),
-    lieferungFilter,
-    kulturIdInActiveNodeArray,
-    personIdInActiveNodeArray,
-    sammelLieferungIdInActiveNodeArray,
-    sammlungIdInActiveNodeArray,
-    activeNodeArray,
-    // need to rerender if last element of activeNodeArray changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    activeNodeArray[activeNodeArray.length - 1],
-    store,
-    filter.lieferung._deleted,
-  ])
+  const data = useLiveQuery(async () => {
+    const [lieferungs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'lieferung' }),
+      dexie.lieferungs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'lieferung', conditionAdder }),
+        )
+        .count(),
+    ])
 
-  const { lieferungs, totalCount } = dataState
+    const lieferungsSorted = lieferungs.sort(lieferungSort)
+
+    return { lieferungs: lieferungsSorted, totalCount }
+  }, [store.filter.lieferung, store.lieferung_initially_queried])
+
+  const lieferungs: Kultur[] = data?.lieferungs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = lieferungs.length
 
   const add = useCallback(async () => {

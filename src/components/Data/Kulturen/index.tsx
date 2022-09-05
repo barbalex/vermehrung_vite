@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,7 +13,6 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import kultursSortedFromKulturs from '../../../utils/kultursSortedFromKulturs'
 import constants from '../../../utils/constants'
 import { dexie, Kultur } from '../../../dexieClient'
@@ -56,89 +53,37 @@ const FieldsContainer = styled.div`
 
 const Kulturen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const {
-    artIdInActiveNodeArray,
-    db,
-    filter,
-    gartenIdInActiveNodeArray,
-    insertKulturRev,
-  } = store
+  const { artIdInActiveNodeArray, gartenIdInActiveNodeArray, insertKulturRev } =
+    store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { kultur: kulturFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ kulturs: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = gartenIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['garten']),
-          Q.on('garten', 'id', gartenIdInActiveNodeArray),
-        ]
-      : artIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['art']),
-          Q.on('art', 'id', artIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('kultur')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.kultur._deleted === false
-              ? [false]
-              : filter.kultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.kultur.aktiv === true
-              ? [true]
-              : filter.kultur.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(...tableFilter({ table: 'kultur', store }), ...hierarchyQuery)
-      .observeWithColumns([
-        'art_id',
-        'herkunft_id',
-        'garten_id',
-        'zwischenlager',
-      ])
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      async ([totalCount, kulturs]) => {
-        const kultursSorted = await kultursSortedFromKulturs(kulturs)
-        setDataState({
-          kulturs: kultursSorted,
-          totalCount,
-        })
-      },
-    )
+  let conditionAdder
+  if (gartenIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('garten_id').equals(gartenIdInActiveNodeArray)
+  }
+  if (artIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('art_id').equals(artIdInActiveNodeArray)
+  }
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of kulturFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(kulturFilter),
-    kulturFilter,
-    gartenIdInActiveNodeArray,
-    artIdInActiveNodeArray,
-    store,
-    filter.kultur._deleted,
-    filter.kultur.aktiv,
-  ])
+  const data = useLiveQuery(async () => {
+    const [kulturs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'kultur' }),
+      dexie.kulturs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'kultur', conditionAdder }),
+        )
+        .count(),
+    ])
 
-  const { kulturs, totalCount } = dataState
+    const kultursSorted = await kultursSortedFromKulturs(kulturs)
+
+    return { kulturs: kultursSorted, totalCount }
+  }, [store.filter.kultur, store.kultur_initially_queried])
+
+  const kulturs: Kultur[] = data?.kulturs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = kulturs.length
 
   const onClickUp = useCallback(() => {
