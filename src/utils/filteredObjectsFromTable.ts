@@ -15,8 +15,6 @@ const filteredObjectsFromTable = async ({
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
 
-  // console.log('filteredObjectsFromTable running for table:', table)
-
   const whereObject = {}
 
   Object.entries(storeFilter).forEach(([key, value]) => {
