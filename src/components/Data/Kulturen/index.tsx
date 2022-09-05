@@ -20,7 +20,7 @@ import kultursSortedFromKulturs from '../../../utils/kultursSortedFromKulturs'
 import constants from '../../../utils/constants'
 import { dexie, Kultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;

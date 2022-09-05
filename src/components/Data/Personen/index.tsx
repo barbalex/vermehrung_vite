@@ -20,7 +20,7 @@ import personSort from '../../../utils/personSort'
 import constants from '../../../utils/constants'
 import { dexie, Person } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;

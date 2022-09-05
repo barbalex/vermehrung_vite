@@ -4,7 +4,12 @@ import types from '../store/Filter/simpleTypes'
 import exists from './exists'
 import { dexie } from '../dexieClient'
 
-const filteredObjectsFromTable = async ({ store, table, count }) => {
+const filteredObjectsFromTable = async ({
+  store,
+  table,
+  count,
+  conditionAdder,
+}) => {
   if (!table) throw `no table passed`
 
   const storeFilter = store.filter[table]
@@ -40,27 +45,25 @@ const filteredObjectsFromTable = async ({ store, table, count }) => {
     return returnValue
   }
 
+  const filteredColection1 = dexie[`${table}s`].filter(filterFunction)
+
   // if a url is opened, a dataset should always show
   // even if it was filtered away
   const tableIdInActiveNodeArray =
     store[`${camelCase(table)}IdInActiveNodeArray`]
-  if (tableIdInActiveNodeArray) {
-    return count
-      ? await dexie[`${table}s`]
-          .filter(filterFunction)
-          .or('id')
-          .equals(tableIdInActiveNodeArray)
-          .count()
-      : await dexie[`${table}s`]
-          .filter(filterFunction)
-          .or('id')
-          .equals(tableIdInActiveNodeArray)
-          .toArray()
-  }
+  const orIdInUrlAdder = (collection) =>
+    tableIdInActiveNodeArray
+      ? collection.or('id').equals(tableIdInActiveNodeArray)
+      : collection
+  const filteredCollection2 = orIdInUrlAdder(filteredColection1)
+
+  const filteredCollection3 = conditionAdder
+    ? await conditionAdder(filteredCollection2)
+    : filteredCollection2
 
   return count
-    ? await dexie[`${table}s`].filter(filterFunction).count()
-    : await dexie[`${table}s`].filter(filterFunction).toArray()
+    ? await filteredCollection3.count()
+    : await filteredCollection3.toArray()
 }
 
 export default filteredObjectsFromTable

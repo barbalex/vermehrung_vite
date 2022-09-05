@@ -20,7 +20,7 @@ import teilkulturSort from '../../../utils/teilkulturSort'
 import constants from '../../../utils/constants'
 import { dexie, Teilkultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;

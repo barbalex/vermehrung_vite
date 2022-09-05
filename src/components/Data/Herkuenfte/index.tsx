@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,12 +13,11 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import herkunftSort from '../../../utils/herkunftSort'
 import constants from '../../../utils/constants'
 import { dexie, Herkunft } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -60,8 +57,6 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     insertHerkunftRev,
     sammlungIdInActiveNodeArray,
     artIdInActiveNodeArray,
-    db,
-    filter,
   } = store
   const {
     activeNodeArray: anaRaw,
@@ -70,57 +65,42 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   } = store.tree
   const activeNodeArray = anaRaw.toJSON()
 
-  const [dataState, setDataState] = useState({ herkunfts: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = sammlungIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['sammlung']),
-          Q.on('sammlung', 'id', sammlungIdInActiveNodeArray),
-        ]
-      : artIdInActiveNodeArray
-      ? [
-          Q.experimentalNestedJoin('sammlung', 'art'),
-          Q.on('sammlung', 'art_id', artIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('herkunft')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.herkunft._deleted === false
-              ? [false]
-              : filter.herkunft._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
+  let conditionAdder
+  if (sammlungIdInActiveNodeArray) {
+    conditionAdder = async (collection) => {
+      const activeSammlung = await dexie.sammlungs.get(
+        sammlungIdInActiveNodeArray,
       )
-      .observeCount()
-    const herkunftsObservable = collection
-      .query(...tableFilter({ store, table: 'herkunft' }), ...hierarchyQuery)
-      .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
-    const combinedObservables = combineLatest([
-      countObservable,
-      herkunftsObservable,
+      return collection.and('id').equals(activeSammlung.herkunft_id)
+    }
+  }
+  if (artIdInActiveNodeArray) {
+    conditionAdder = async (collection) => {
+      const sammlungsOfArt = await dexie.sammlungs
+        .where({
+          art_id: artIdInActiveNodeArray,
+        })
+        .toArray()
+      const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
+      return collection.and('id').anyOf(herkunftIds)
+    }
+  }
+
+  const data = useLiveQuery(async () => {
+    const [herkunfts, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'herkunft', conditionAdder }),
+      dexie.herkunfts
+        .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+        .count(),
     ])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, herkunfts]) =>
-        setDataState({ herkunfts: herkunfts.sort(herkunftSort), totalCount }),
-    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    sammlungIdInActiveNodeArray,
-    store,
-    filter.herkunft._deleted,
-    artIdInActiveNodeArray,
-  ])
+    const herkunftsSorted = herkunfts.sort(herkunftSort)
 
-  const { herkunfts, totalCount } = dataState
+    return { herkunfts: herkunftsSorted, totalCount }
+  }, [store.filter.herkunft, store.herkunft_initially_queried])
+
+  const herkunfts: Herkunft[] = data?.herkunfts ?? []
+  const totalCount = data?.totalCount
   const filteredCount = herkunfts.length
 
   const add = useCallback(() => insertHerkunftRev(), [insertHerkunftRev])

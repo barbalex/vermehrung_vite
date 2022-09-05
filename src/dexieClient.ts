@@ -4373,10 +4373,10 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(4).stores({
+    this.version(6).stores({
       // TODO: set indexes
       herkunfts: 'id, _deleted, _deleted_indexable',
-      sammlungs: 'id, _deleted, _deleted_indexable',
+      sammlungs: 'id, *herkunft_id, *art_id, _deleted, _deleted_indexable',
       lieferungs: 'id, _deleted, _deleted_indexable',
       arts: 'id, _deleted, _deleted_indexable',
       ae_arts: 'id',

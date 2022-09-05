@@ -17,7 +17,7 @@ import eventSort from '../../../utils/eventSort'
 import constants from '../../../utils/constants'
 import { dexie, Event } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -59,7 +59,9 @@ const Events = ({ filter: showFilter, width, height }) => {
   const data = useLiveQuery(async () => {
     const [events, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'event' }),
-      dexie.events.filter(notDeletedFilter).count(),
+      dexie.events
+        .filter((value) => totalFilter({ value, store, table: 'event' }))
+        .count(),
     ])
 
     const eventsSorted = events.sort(eventSort)

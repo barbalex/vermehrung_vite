@@ -17,7 +17,7 @@ import artsSortedFromArts from '../../../utils/artsSortedFromArts'
 import constants from '../../../utils/constants'
 import { dexie, Art } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -58,7 +58,9 @@ const Arten = ({ filter: showFilter, width, height }) => {
   const data = useLiveQuery(async () => {
     const [arts, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'art' }),
-      dexie.arts.filter(notDeletedFilter).count(),
+      dexie.arts
+        .filter((value) => totalFilter({ value, store, table: 'art' }))
+        .count(),
     ])
 
     const artsSorted = await artsSortedFromArts(arts)
@@ -83,16 +85,6 @@ const Arten = ({ filter: showFilter, width, height }) => {
   if (activeNodeArray[1] === 'Arten') {
     upTitle = 'Zu allen Listen'
   }
-
-  // console.log('Arten', {
-  //   height,
-  //   arts,
-  //   artsLength: arts.length,
-  //   showFilter,
-  //   totalCount,
-  //   filteredCount,
-  //   singleRowHeight: constants.singleRowHeight,
-  // })
 
   return (
     <ErrorBoundary>

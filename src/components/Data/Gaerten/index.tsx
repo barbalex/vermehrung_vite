@@ -17,7 +17,7 @@ import gartensSortedFromGartens from '../../../utils/gartensSortedFromGartens'
 import constants from '../../../utils/constants'
 import { dexie, Garten } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import notDeletedFilter from '../../../utils/notDeletedFilter'
+import totalFilter from '../../../utils/totalFilter'
 
 const Container = styled.div`
   height: 100%;
@@ -59,7 +59,9 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
   const data = useLiveQuery(async () => {
     const [gartens, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'garten' }),
-      dexie.gartens.filter(notDeletedFilter).count(),
+      dexie.gartens
+        .filter((value) => totalFilter({ value, store, table: 'garten' }))
+        .count(),
     ])
 
     const gartensSorted = await gartensSortedFromGartens(gartens)
