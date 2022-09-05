@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -16,7 +14,6 @@ import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import exists from '../../../utils/exists'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import lieferungSort from '../../../utils/lieferungSort'
 import constants from '../../../utils/constants'
 import { dexie, Lieferung } from '../../../dexieClient'
@@ -64,10 +61,8 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
     personIdInActiveNodeArray,
     sammelLieferungIdInActiveNodeArray,
     sammlungIdInActiveNodeArray,
-    filter,
   } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { lieferung: lieferungFilter } = store.filter
 
   let conditionAdder
   if (kulturIdInActiveNodeArray) {
@@ -111,7 +106,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
     return { lieferungs: lieferungsSorted, totalCount }
   }, [store.filter.lieferung, store.lieferung_initially_queried])
 
-  const lieferungs: Kultur[] = data?.lieferungs ?? []
+  const lieferungs: Lieferung[] = data?.lieferungs ?? []
   const totalCount = data?.totalCount
   const filteredCount = lieferungs.length
 

@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,7 +13,6 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import sammlungsSortedFromSammlungs from '../../../utils/sammlungsSortedFromSammlungs'
 import constants from '../../../utils/constants'
 import { dexie, Sammlung } from '../../../dexieClient'
@@ -61,84 +58,40 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
     artIdInActiveNodeArray,
     herkunftIdInActiveNodeArray,
     personIdInActiveNodeArray,
-    db,
-    filter,
   } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { sammlung: sammlungFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ sammlungs: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = artIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['art']),
-          Q.on('art', 'id', artIdInActiveNodeArray),
-        ]
-      : herkunftIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['herkunft']),
-          Q.on('herkunft', 'id', herkunftIdInActiveNodeArray),
-        ]
-      : personIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['person']),
-          Q.on('person', 'id', personIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('sammlung')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.sammlung._deleted === false
-              ? [false]
-              : filter.sammlung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(
-        ...tableFilter({
-          table: 'sammlung',
-          store,
-        }),
-        ...hierarchyQuery,
-      )
-      .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
+  let conditionAdder
+  if (artIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('art_id').equals(artIdInActiveNodeArray)
+  }
+  if (herkunftIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('herkunft_id').equals(herkunftIdInActiveNodeArray)
+  }
+  if (personIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('person_id').equals(personIdInActiveNodeArray)
+  }
 
-    // so need to hackily use merge
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      async ([totalCount, sammlungs]) => {
-        const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
-        setDataState({
-          sammlungs: sammlungsSorted,
-          totalCount,
-        })
-      },
-    )
+  const data = useLiveQuery(async () => {
+    const [sammlungs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'sammlung' }),
+      dexie.sammlungs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'sammlung', conditionAdder }),
+        )
+        .count(),
+    ])
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of sammlungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(sammlungFilter),
+    const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
 
-    sammlungFilter,
-    artIdInActiveNodeArray,
-    herkunftIdInActiveNodeArray,
-    personIdInActiveNodeArray,
-    store,
-    filter.sammlung._deleted,
-  ])
+    return { sammlungs: sammlungsSorted, totalCount }
+  }, [store.filter.sammlung, store.sammlung_initially_queried])
 
-  const { sammlungs, totalCount } = dataState
+  const sammlungs: Sammlung[] = data?.sammlungs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = sammlungs.length
 
   const add = useCallback(() => {

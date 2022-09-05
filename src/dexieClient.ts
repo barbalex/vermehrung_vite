@@ -4373,21 +4373,23 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(6).stores({
+    this.version(10).stores({
       // TODO: set indexes
       herkunfts: 'id, _deleted, _deleted_indexable',
-      sammlungs: 'id, *herkunft_id, *art_id, _deleted, _deleted_indexable',
-      lieferungs: 'id, _deleted, _deleted_indexable',
+      sammlungs:
+        'id, *herkunft_id, *art_id, *person_id, _deleted, _deleted_indexable',
+      lieferungs:
+        'id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted, _deleted_indexable',
       arts: 'id, _deleted, _deleted_indexable',
       ae_arts: 'id',
-      gartens: 'id, _deleted, _deleted_indexable',
-      kulturs: 'id, _deleted, _deleted_indexable',
+      gartens: 'id, *person_id, _deleted, _deleted_indexable',
+      kulturs: 'id, *garten_id, *art_id, _deleted, _deleted_indexable',
       teilkulturs: 'id, _deleted, _deleted_indexable',
       zaehlungs: 'id, _deleted, _deleted_indexable',
       teilzaehlungs: 'id, _deleted, _deleted_indexable',
       persons: 'id, &account_id, aktiv, _deleted, _deleted_indexable',
       sammel_lieferungs: 'id, _deleted, _deleted_indexable',
-      events: 'id, _deleted, _deleted_indexable',
+      events: 'id, *kultur_id, _deleted, _deleted_indexable',
       avs: 'id, _deleted, _deleted_indexable',
       gvs: 'id, _deleted, _deleted_indexable',
       art_files: 'id',
