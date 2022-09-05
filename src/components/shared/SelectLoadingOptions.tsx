@@ -3,6 +3,7 @@ import AsyncSelect from 'react-select/async'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
 import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../storeContext'
 import artLabelFromAeArt from '../../utils/artLabelFromAeArt'
