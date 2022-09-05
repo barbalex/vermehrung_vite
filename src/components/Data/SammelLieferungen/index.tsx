@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,7 +13,6 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import lieferungSort from '../../../utils/lieferungSort'
 import constants from '../../../utils/constants'
 import { dexie, SammelLieferung } from '../../../dexieClient'
@@ -56,60 +53,30 @@ const FieldsContainer = styled.div`
 
 const SammelLieferungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertSammelLieferungRev, db, filter } = store
+  const { insertSammelLieferungRev } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { sammel_lieferung: sammelLieferungFilter } = store.filter
 
-  const [dataState, setDataState] = useState({
-    sammelLieferungs: [],
-    totalCount: 0,
-  })
-  useEffect(() => {
-    const collection = db.get('sammel_lieferung')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.sammel_lieferung._deleted === false
-              ? [false]
-              : filter.sammel_lieferung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(
-        ...tableFilter({
-          table: 'sammel_lieferung',
-          store,
-        }),
-      )
-      .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, sammelLieferungs]) => {
-        setDataState({
-          sammelLieferungs: sammelLieferungs.sort(lieferungSort),
-          totalCount,
-        })
-      },
-    )
+  const data = useLiveQuery(async () => {
+    const [sammelLieferungs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'sammel_lieferung' }),
+      dexie.sammel_lieferungs
+        .filter((value) =>
+          totalFilter({
+            value,
+            store,
+            table: 'sammel_lieferung',
+          }),
+        )
+        .count(),
+    ])
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of sammelLieferungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(sammelLieferungFilter),
-    sammelLieferungFilter,
-    store,
-    filter.sammel_lieferung._deleted,
-  ])
+    const sammelLieferungsSorted = sammelLieferungs.sort(lieferungSort)
 
-  const { sammelLieferungs, totalCount } = dataState
+    return { sammelLieferungs: sammelLieferungsSorted, totalCount }
+  }, [store.filter.sammel_lieferung, store.sammel_lieferung_initially_queried])
+
+  const sammelLieferungs: SammelLieferung[] = data?.sammelLieferungs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = sammelLieferungs.length
 
   const add = useCallback(() => {
