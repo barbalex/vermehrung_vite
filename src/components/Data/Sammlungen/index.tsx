@@ -74,6 +74,7 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
     conditionAdder = async (collection) =>
       collection.and('person_id').equals(personIdInActiveNodeArray)
   }
+  console.log('Sammlungen, conditionAdder:', conditionAdder)
 
   const data = useLiveQuery(async () => {
     const [sammlungs, totalCount] = await Promise.all([
@@ -93,6 +94,8 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   const sammlungs: Sammlung[] = data?.sammlungs ?? []
   const totalCount = data?.totalCount
   const filteredCount = sammlungs.length
+
+  console.log('Sammlungen', { sammlungs, totalCount, filteredCount })
 
   const add = useCallback(() => {
     insertSammlungRev()

@@ -28,10 +28,12 @@ const Row = styled.div`
   }
 `
 
-const Arten = ({ row, style, last }) => {
+const ArtenRow = ({ row, style, last }) => {
   const store = useContext(StoreContext)
   const { herkunftIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray } = store.tree
+
+  console.log('ArtenRow, row:', row)
 
   const [label, setLabel] = useState('')
   useEffect(() => {
@@ -39,6 +41,8 @@ const Arten = ({ row, style, last }) => {
       ? row.labelUnderHerkunft().then(setLabel)
       : row.label().then(setLabel)
   }, [herkunftIdInActiveNodeArray, row])
+
+  console.log('ArtenRow, label:', label)
 
   const onClickRow = useCallback(
     () => setActiveNodeArray([...activeNodeArray, row.id]),
@@ -52,4 +56,4 @@ const Arten = ({ row, style, last }) => {
   )
 }
 
-export default observer(Arten)
+export default observer(ArtenRow)
