@@ -114,7 +114,7 @@ const ArtForm = ({
               showHistory={showHistory}
             />
             <>
-              {online && (
+              {/* {online && (
                 <>
                   {activeConflict ? (
                     <Conflict
@@ -132,7 +132,7 @@ const ArtForm = ({
                     />
                   ) : null}
                 </>
-              )}
+              )} */}
             </>
           </StyledSplitPane>
         </SplitPaneContainer>

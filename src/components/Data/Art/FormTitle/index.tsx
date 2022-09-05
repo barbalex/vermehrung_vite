@@ -6,7 +6,7 @@ import { Q } from '@nozbe/watermelondb'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import tableFilter from '../../../../utils/tableFilter'
+import tableFilter from '../../../../utils/tableFilter' 
 
 const ArtFormTitleChooser = ({
   row,

@@ -1,10 +1,10 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { FaHistory } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import styled from 'styled-components'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../storeContext'
 import ErrorBoundary from './ErrorBoundary'
@@ -25,16 +25,9 @@ const StyledIconButton = styled(IconButton)`
 
 const HistoryButton = ({ asMenu, id, showHistory, setShowHistory, table }) => {
   const store = useContext(StoreContext)
-  const { online, db } = store
+  const { online } = store
 
-  const [dataState, setDataState] = useState({ row })
-  useEffect(() => {
-    const observable = id ? db.get(table).findAndObserve(id) : $of(null)
-    const subscription = observable.subscribe((row) => setDataState({ row }))
-
-    return () => subscription?.unsubscribe?.()
-  }, [id, db, table])
-  const { row } = dataState
+  const row = useLiveQuery(async () => await dexie[table].get(id), [id, table])
 
   const existMultipleRevisions =
     row?._revisions?.length && row?._revisions?.length > 1
