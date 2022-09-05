@@ -4375,7 +4375,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(10).stores({
+    this.version(11).stores({
       // TODO: set indexes
       herkunfts: 'id, _deleted, _deleted_indexable',
       sammlungs:
@@ -4388,7 +4388,7 @@ export class MySubClassedDexie extends Dexie {
       kulturs: 'id, *garten_id, *art_id, _deleted, _deleted_indexable',
       teilkulturs: 'id, _deleted, _deleted_indexable',
       zaehlungs: 'id, _deleted, _deleted_indexable',
-      teilzaehlungs: 'id, _deleted, _deleted_indexable',
+      teilzaehlungs: 'id, *zaehlung_id, _deleted, _deleted_indexable',
       persons: 'id, &account_id, aktiv, _deleted, _deleted_indexable',
       sammel_lieferungs: 'id, _deleted, _deleted_indexable',
       events: 'id, *kultur_id, _deleted, _deleted_indexable',

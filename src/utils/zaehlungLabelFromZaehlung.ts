@@ -14,9 +14,8 @@ const zaehlungLabelFromZaehlung = ({ zaehlung, teilzaehlungs }) => {
   const anzahlenPfl = tzs
     .map((tz) => tz.anzahl_pflanzen)
     .filter((a) => exists(a))
-  const anzPflanzen = (anzahlenPfl.length
-    ? anzahlenPfl.reduce((a, b) => a + b, 0)
-    : ''
+  const anzPflanzen = (
+    anzahlenPfl.length ? anzahlenPfl.reduce((a, b) => a + b, 0) : ''
   )
     .toString()
     .padStart(3, '_')

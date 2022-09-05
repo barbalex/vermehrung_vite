@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,7 +13,6 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import teilkulturSort from '../../../utils/teilkulturSort'
 import constants from '../../../utils/constants'
 import { dexie, Teilkultur } from '../../../dexieClient'
@@ -56,66 +53,32 @@ const FieldsContainer = styled.div`
 
 const Teilkulturen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertTeilkulturRev, kulturIdInActiveNodeArray, db, filter } = store
+  const { insertTeilkulturRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { teilkultur: teilkulturFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ teilkulturs: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = kulturIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['kultur']),
-          Q.on('kultur', 'id', kulturIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('teilkultur')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.teilkultur._deleted === false
-              ? [false]
-              : filter.teilkultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(
-        ...tableFilter({
-          table: 'teilkultur',
-          store,
-        }),
-        ...hierarchyQuery,
-      )
-      .observeWithColumns(['name', 'ort1', 'ort2', 'ort3'])
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, teilkulturs]) => {
-        setDataState({
-          teilkulturs: teilkulturs.sort(teilkulturSort),
-          totalCount,
-        })
-      },
-    )
+  let conditionAdder
+  if (kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('kultur_id').equals(kulturIdInActiveNodeArray)
+  }
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of teilkulturFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(teilkulturFilter),
-    teilkulturFilter,
-    kulturIdInActiveNodeArray,
-    store,
-    filter.teilkultur._deleted,
-  ])
+  const data = useLiveQuery(async () => {
+    const [teilkulturs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'teilkultur' }),
+      dexie.teilkulturs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'teilkultur', conditionAdder }),
+        )
+        .count(),
+    ])
 
-  const { teilkulturs, totalCount } = dataState
+    const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+
+    return { teilkulturs: teilkultursSorted, totalCount }
+  }, [store.filter.teilkultur, store.teilkultur_initially_queried])
+
+  const teilkulturs: Teilkultur[] = data?.teilkulturs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = teilkulturs.length
 
   const add = useCallback(() => {

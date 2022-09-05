@@ -1,12 +1,10 @@
-import React, { useContext, useCallback, useEffect, useState } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaPlus } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { FixedSizeList } from 'react-window'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
@@ -15,7 +13,6 @@ import Row from './Row'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
-import tableFilter from '../../../utils/tableFilter'
 import zaehlungSort from '../../../utils/zaehlungSort'
 import constants from '../../../utils/constants'
 import { dexie, Zaehlung } from '../../../dexieClient'
@@ -56,67 +53,32 @@ const FieldsContainer = styled.div`
 
 const Zaehlungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { insertZaehlungRev, kulturIdInActiveNodeArray, db, filter } = store
+  const { insertZaehlungRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-  const { zaehlung: zaehlungFilter } = store.filter
 
-  const [dataState, setDataState] = useState({ zaehlungs: [], totalCount: 0 })
-  useEffect(() => {
-    const hierarchyQuery = kulturIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['kultur']),
-          Q.on('kultur', 'id', kulturIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('zaehlung')
-    const countObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.zaehlung._deleted === false
-              ? [false]
-              : filter.zaehlung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const dataObservable = collection
-      .query(
-        ...tableFilter({
-          table: 'zaehlung',
-          store,
-        }),
-        ...hierarchyQuery,
-      )
-      .observeWithColumns(['datum', 'anzahl_pflanzen'])
+  let conditionAdder
+  if (kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('kultur_id').equals(kulturIdInActiveNodeArray)
+  }
 
-    const combinedObservables = combineLatest([countObservable, dataObservable])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, zaehlungs]) => {
-        setDataState({
-          zaehlungs: zaehlungs.sort(zaehlungSort),
-          totalCount,
-        })
-      },
-    )
+  const data = useLiveQuery(async () => {
+    const [zaehlungs, totalCount] = await Promise.all([
+      filteredObjectsFromTable({ store, table: 'zaehlung' }),
+      dexie.zaehlungs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'zaehlung', conditionAdder }),
+        )
+        .count(),
+    ])
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of zaehlungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(zaehlungFilter),
-    zaehlungFilter,
-    kulturIdInActiveNodeArray,
-    store,
-    filter.zaehlung._deleted,
-  ])
+    const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
 
-  const { zaehlungs, totalCount } = dataState
+    return { zaehlungs: zaehlungsSorted, totalCount }
+  }, [store.filter.zaehlung, store.zaehlung_initially_queried])
+
+  const zaehlungs: Zaehlung[] = data?.zaehlungs ?? []
+  const totalCount = data?.totalCount
   const filteredCount = zaehlungs.length
 
   const add = useCallback(() => {
