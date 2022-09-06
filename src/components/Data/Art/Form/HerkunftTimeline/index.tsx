@@ -1,18 +1,16 @@
-import React, { useCallback, useState, useContext, useEffect } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
-import { observer } from 'mobx-react-lite'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import uniq from 'lodash/uniq'
 import { motion, useAnimation } from 'framer-motion'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import Pflanzen from './Pflanzen'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
-import StoreContext from '../../../../../storeContext'
 import herkunftSort from '../../../../../utils/herkunftSort'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -40,42 +38,26 @@ const Title = styled.div`
 `
 
 const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
-  const store = useContext(StoreContext)
-  const { db, filter } = store
-
   const [herkunfts, setHerkunfts] = useState([])
-  useEffect(() => {
-    const sammlungsObservable = db
-      .get('sammlung')
-      .query(
-        Q.where('_deleted', false),
-        Q.where('art_id', artId),
-        Q.where('herkunft_id', Q.notEq(null)),
-      )
-      .observe()
-    const herkunftsObservable = db
-      .get('herkunft')
-      .query(Q.where('_deleted', false))
-      .observe()
-    const combinedObservables = combineLatest([
-      sammlungsObservable,
-      herkunftsObservable,
+  useLiveQuery(async () => {
+    const [sammlungs, herkunfts] = await Promise.all([
+      dexie.sammlungs
+        .filter(
+          (s) => s._deleted === false && s.art_id === artId && !!s.herkunft_id,
+        )
+        .toArray(),
+      dexie.herkunfts.filter((h) => h._deleted === false).toArray(),
     ])
-    const subscription = combinedObservables.subscribe(
-      ([sammlungs, herkunfts]) => {
-        const herkunftIds = uniq(sammlungs.map((s) => s.herkunft_id))
-        const herkunftsSorted = herkunfts
-          .filter((h) => herkunftIds.includes(h.id))
-          .sort(herkunftSort)
-        setHerkunfts(herkunftsSorted)
-      },
-    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [artId, db, filter.herkunft._deleted])
+    const herkunftIds = uniq(sammlungs.map((s) => s.herkunft_id))
+    const herkunftsSorted = herkunfts
+      .filter((h) => herkunftIds.includes(h.id))
+      .sort(herkunftSort)
+    setHerkunfts(herkunftsSorted)
+  }, [artId])
 
   const [open, setOpen] = useState(false)
-  let anim = useAnimation()
+  const anim = useAnimation()
   const onClickToggle = useCallback(
     async (e) => {
       e.stopPropagation()
@@ -120,4 +102,4 @@ const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
   )
 }
 
-export default observer(TimelineArea)
+export default TimelineArea

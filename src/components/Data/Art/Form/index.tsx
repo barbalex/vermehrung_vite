@@ -154,9 +154,10 @@ const ArtForm = ({
         {!showFilter && (
           <>
             <Personen art={row} />
-            {/* 
             <Timeline artId={id} />
             <HerkunftTimeline artId={id} />
+            {/* 
+            
             <QK artId={id} />
             <Files parent={row} parentTable="art" /> */}
           </>
