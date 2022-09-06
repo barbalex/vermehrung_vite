@@ -1,12 +1,10 @@
-import React, { useCallback, useContext, useState, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import AsyncSelect from 'react-select/async'
 import styled from 'styled-components'
-import { observer } from 'mobx-react-lite'
-import { of as $of } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
-import StoreContext from '../../storeContext'
 import artLabelFromAeArt from '../../utils/artLabelFromAeArt'
+import { dexie } from '../../dexieClient'
 
 const Container = styled.div`
   display: flex;
@@ -83,30 +81,28 @@ const SelectLoadingOptions = ({
   labelTable,
   labelField,
 }) => {
-  const store = useContext(StoreContext)
-  const { db } = store
+  const data = useLiveQuery(
+    async () =>
+      dexie[labelTable ? `${labelTable}s` : 'arts'].get(
+        row[field] ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    [labelTable, field, row],
+  )
 
-  const [stateValue, setStateValue] = useState({
-    value: row[field] || '',
-    label: '',
-  })
-  useEffect(() => {
-    const observable =
-      labelTable && row[field]
-        ? db.get(labelTable).findAndObserve(row[field])
-        : $of({})
-    const subscription = observable.subscribe((record) =>
-      setStateValue({
-        value: row[field] || '',
-        label: record[labelField] ?? '',
-      }),
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, field, labelField, labelTable, row])
+  const stateValue =
+    labelTable && row[field] && data
+      ? {
+          value: row[field] || '',
+          label: data[labelField] ?? '',
+        }
+      : {}
 
   const loadOptions = useCallback(
     (inputValue, cb) => {
+      console.log('SelectLoadingOptions, loadOptions', {
+        inputValue,
+        data: modelFilter(inputValue),
+      })
       const data = modelFilter(inputValue).slice(0, 7)
       const options = data.map((o) => {
         return {
@@ -121,12 +117,10 @@ const SelectLoadingOptions = ({
 
   const onChange = useCallback(
     (option) => {
-      const value = option && option.value ? option.value : null
-      setStateValue(value ?? '')
       const fakeEvent = {
         target: {
           name: field,
-          value,
+          value: option && option.value ? option.value : null,
         },
       }
       saveToDb(fakeEvent)
@@ -164,4 +158,4 @@ const SelectLoadingOptions = ({
   )
 }
 
-export default observer(SelectLoadingOptions)
+export default SelectLoadingOptions
