@@ -1,14 +1,16 @@
-import React, { useCallback, useState, useEffect, useContext } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaTimes } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import StoreContext from '../../../../../storeContext'
+import { dexie, Person } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;
@@ -60,14 +62,10 @@ const Av = ({ av }) => {
     setDelMenuAnchorEl(null)
   }, [av, store])
 
-  const [personLabel, setPersonLabel] = useState(null)
-  useEffect(() => {
-    const observable = av.person.observe()
-    const subscription = observable.subscribe((person) => {
-      setPersonLabel(personLabelFromPerson({ person }))
-    })
-    return () => subscription?.unsubscribe?.()
-  }, [av.person])
+  const personLabel = useLiveQuery(async () => {
+    const person: Person = await dexie.persons.get(av.person_id)
+    return personLabelFromPerson({ person })
+  })
 
   if (!av) return null
   if (!personLabel) return null

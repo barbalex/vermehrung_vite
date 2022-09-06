@@ -33,6 +33,7 @@ import zaehlungIdInUrl from '../utils/zaehlungIdInUrl'
 import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import filteredObjectsFromTable from '../utils/filteredObjectsFromTable'
+import { dexie } from '../dexieClient'
 
 const myTypes = types
   .model({
@@ -651,15 +652,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('av')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        dexie.avs.put(newObjectForStore)
       },
       async insertEventRev(args) {
         const {
