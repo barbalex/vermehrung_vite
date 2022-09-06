@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import AsyncSelect from 'react-select/async'
 import styled from 'styled-components'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -81,13 +81,13 @@ const SelectLoadingOptions = ({
   labelTable,
   labelField,
 }) => {
-  const data = useLiveQuery(
-    async () =>
-      dexie[labelTable ? `${labelTable}s` : 'arts'].get(
-        row[field] ?? '99999999-9999-9999-9999-999999999999',
-      ),
-    [labelTable, field, row],
-  )
+  const [data, setData] = useState({})
+  useLiveQuery(async () => {
+    const data = await dexie[labelTable ? `${labelTable}s` : 'arts'].get(
+      row[field] ?? '99999999-9999-9999-9999-999999999999',
+    )
+    setData(data)
+  }, [labelTable, field, row])
 
   const stateValue =
     labelTable && row[field] && data
@@ -99,10 +99,6 @@ const SelectLoadingOptions = ({
 
   const loadOptions = useCallback(
     (inputValue, cb) => {
-      console.log('SelectLoadingOptions, loadOptions', {
-        inputValue,
-        data: modelFilter(inputValue),
-      })
       const data = modelFilter(inputValue).slice(0, 7)
       const options = data.map((o) => {
         return {

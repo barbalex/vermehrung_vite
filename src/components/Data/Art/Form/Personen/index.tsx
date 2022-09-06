@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton'
 import { motion, useAnimation } from 'framer-motion'
 import { Q } from '@nozbe/watermelondb'
 import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Person from './Person'
@@ -15,6 +16,8 @@ import avsSortByPerson from '../../../../../utils/avsSortByPerson'
 import personSort from '../../../../../utils/personSort'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import constants from '../../../../../utils/constants'
+import { dexie, Avs } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -51,7 +54,7 @@ const ArtPersonen = ({ art }) => {
   useEffect(() => unsetError('av'), [art.id, unsetError])
 
   const [open, setOpen] = useState(false)
-  let anim = useAnimation()
+  const anim = useAnimation()
   const onClickToggle = useCallback(
     async (e) => {
       e.stopPropagation()
@@ -71,58 +74,31 @@ const ArtPersonen = ({ art }) => {
     [anim, open],
   )
 
-  const [dataState, setDataState] = useState({
-    avsSorted: [],
-    personWerte: [],
-  })
-  useEffect(() => {
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const avsObservable = art.avs.extend(Q.where('_deleted', false)).observe()
-    const combinedObservables = combineLatest([
-      personsObservable,
-      avsObservable,
+  const data = useLiveQuery(async () => {
+    const [avs, persons] = await Promise.all([
+      dexie.avs
+        .filter((val) => val._deleted === false && val.art_id === art.id)
+        .toArray(),
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([persons, avs]) => {
-        const avsSorted = await avsSortByPerson(avs)
-        const avPersonIds = avsSorted.map((v) => v.person_id)
-        const personWerte = persons
-          .filter((a) => !avPersonIds.includes(a.id))
-          .sort(personSort)
-          .map((el) => ({
-            value: el.id,
-            label: personLabelFromPerson({ person: el }),
-          }))
-        setDataState({ avsSorted, personWerte })
-      },
-    )
-    return () => subscription?.unsubscribe?.()
-  }, [art.avs, db, filter.person._deleted, filter.person.aktiv])
-  const { avsSorted, personWerte } = dataState
+
+    const avsSorted = await avsSortByPerson(avs)
+    const avPersonIds = avsSorted.map((v) => v.person_id)
+    const personWerte = persons
+      .filter((a) => !avPersonIds.includes(a.id))
+      .sort(personSort)
+      .map((el) => ({
+        value: el.id,
+        label: personLabelFromPerson({ person: el }),
+      }))
+
+    return { avsSorted, personWerte }
+  }, [store.filter.art, store.art_initially_queried])
+
+  const avsSorted: Avs[] = data?.avsSorted ?? []
+  const personWerte = data?.personWerte ?? []
 
   const saveToDb = useCallback(
     async (event) => {
