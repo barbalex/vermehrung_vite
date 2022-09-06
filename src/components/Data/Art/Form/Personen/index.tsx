@@ -4,8 +4,6 @@ import { observer } from 'mobx-react-lite'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { motion, useAnimation } from 'framer-motion'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
@@ -49,7 +47,7 @@ const Aven = styled.div`
 
 const ArtPersonen = ({ art }) => {
   const store = useContext(StoreContext)
-  const { db, insertAvRev, errors, unsetError, filter } = store
+  const { insertAvRev, errors, unsetError } = store
 
   useEffect(() => unsetError('av'), [art.id, unsetError])
 
