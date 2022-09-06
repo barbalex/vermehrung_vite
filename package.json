@@ -12,7 +12,7 @@
   "dependencies": {
     "@fontsource/roboto": "4.5.8",
     "@fontsource/roboto-mono": "4.5.8",
-    "@mui/material": "5.10.3",
+    "@mui/material": "5.10.4",
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
     "@mui/styled-engine-sc": "5.10.3",
     "@nozbe/watermelondb": "^0.24.0",
@@ -70,30 +70,29 @@
     "styled-components": "5.3.5",
     "typography": "0.16.21",
     "uploadcare-widget": "3.19.0",
-    "urql": "3.0.2",
+    "urql": "3.0.3",
     "use-debounce": "8.0.4",
-    "uuid": "8.3.2"
+    "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/react": "18.0.18",
     "@types/react-dom": "18.0.6",
-    "@typescript-eslint/eslint-plugin": "5.36.1",
-    "@typescript-eslint/parser": "5.36.1",
-    "@vitejs/plugin-react": "2.0.1",
-    "@yarnpkg/sdks": "^2.6.3",
+    "@typescript-eslint/eslint-plugin": "5.36.2",
+    "@typescript-eslint/parser": "5.36.2",
+    "@vitejs/plugin-react": "2.1.0",
     "eslint": "8.23.0",
     "eslint-plugin-import": "2.26.0",
-    "eslint-plugin-react": "7.31.4",
+    "eslint-plugin-react": "7.31.7",
     "eslint-plugin-react-hooks": "4.6.0",
     "firebase-tools": "11.8.0",
     "prettier": "2.7.1",
     "tslint-config-prettier": "1.18.0",
     "typescript": "4.8.2",
-    "vite": "3.0.9",
+    "vite": "3.1.0",
     "vite-plugin-pwa": "0.12.6",
     "vite-plugin-svgr": "2.2.1"
   },
-  "resolutions": {
+  "overrides": {
     "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
   },
   "dev-comments": {
