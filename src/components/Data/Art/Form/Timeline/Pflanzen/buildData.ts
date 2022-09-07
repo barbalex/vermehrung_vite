@@ -55,14 +55,6 @@ const buildData = async ({ artId }) => {
         z.prognose === true && zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
     )
     .toArray()
-  console.log('Art Timeline', {
-    zaehlungsDone,
-    zaehlungs,
-    zaehlungsIds,
-    zaehlungIdsOfTzWithAnzahlPflanzen,
-    zaehlungsPlannedAll,
-    zaehlungsObservable: zaehlungsObservableForZaehlungs,
-  })
   const zaehlungsPlannedIgnored = zaehlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
     zaehlungsDone.some((z) => z.datum >= zg.datum),
@@ -71,32 +63,26 @@ const buildData = async ({ artId }) => {
     (lg) => !zaehlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const sammlungsDone = []
-  // try {
-  //   sammlungsDone = await db
-  //     .get('sammlung')
-  //     .query(
-  //       Q.where('art_id', artId),
-  //       Q.where('geplant', false),
-  //       Q.where('datum', Q.notEq(null)),
-  //       Q.where('anzahl_pflanzen', Q.notEq(null)),
-  //       Q.where('_deleted', false),
-  //     )
-  //     .fetch()
-  // } catch {}
-  const sammlungsPlannedAll = []
-  // try {
-  //   sammlungsPlannedAll = await db
-  //     .get('sammlung')
-  //     .query(
-  //       Q.where('art_id', artId),
-  //       Q.where('geplant', true),
-  //       Q.where('datum', Q.notEq(null)),
-  //       Q.where('anzahl_pflanzen', Q.notEq(null)),
-  //       Q.where('_deleted', false),
-  //     )
-  //     .fetch()
-  // } catch {}
+  const sammlungsDone = await dexie.sammlungs
+    .filter(
+      (s) =>
+        s.art_id === artId &&
+        s.geplant === false &&
+        !!s.datum &&
+        s.anzahl_pflanzen !== null &&
+        s._deleted === false,
+    )
+    .toArray()
+  const sammlungsPlannedAll = await dexie.sammlungs
+    .filter(
+      (s) =>
+        s.art_id === artId &&
+        s.geplant === true &&
+        !!s.datum &&
+        s.anzahl_pflanzen !== null &&
+        s._deleted === false,
+    )
+    .toArray()
   const sammlungsPlannedIgnored = sammlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
     sammlungsDone.some((z) => z.datum >= zg.datum),
@@ -105,34 +91,28 @@ const buildData = async ({ artId }) => {
     (lg) => !sammlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const lieferungsDone = []
-  // try {
-  //   lieferungsDone = await db
-  //     .get('lieferung')
-  //     .query(
-  //       Q.where('art_id', artId),
-  //       Q.where('nach_ausgepflanzt', true),
-  //       Q.where('geplant', false),
-  //       Q.where('datum', Q.notEq(null)),
-  //       Q.where('anzahl_pflanzen', Q.notEq(null)),
-  //       Q.where('_deleted', false),
-  //     )
-  //     .fetch()
-  // } catch {}
-  const lieferungsPlannedAll = []
-  // try {
-  //   lieferungsPlannedAll = await db
-  //     .get('lieferung')
-  //     .query(
-  //       Q.where('art_id', artId),
-  //       Q.where('nach_ausgepflanzt', true),
-  //       Q.where('geplant', true),
-  //       Q.where('datum', Q.notEq(null)),
-  //       Q.where('anzahl_pflanzen', Q.notEq(null)),
-  //       Q.where('_deleted', false),
-  //     )
-  //     .fetch()
-  // } catch {}
+  const lieferungsDone = await dexie.lieferungs
+    .filter(
+      (s) =>
+        s.art_id === artId &&
+        s.nach_ausgepflanzt === true &&
+        s.geplant === false &&
+        !!s.datum &&
+        s.anzahl_pflanzen !== null &&
+        s._deleted === false,
+    )
+    .toArray()
+  const lieferungsPlannedAll = await dexie.lieferungs
+    .filter(
+      (s) =>
+        s.art_id === artId &&
+        s.nach_ausgepflanzt === true &&
+        s.geplant === true &&
+        !!s.datum &&
+        s.anzahl_pflanzen !== null &&
+        s._deleted === false,
+    )
+    .toArray()
   const lieferungsPlannedIgnored = lieferungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
     lieferungsDone.some((z) => z.datum >= zg.datum),
@@ -140,6 +120,14 @@ const buildData = async ({ artId }) => {
   const lieferungsPlanned = lieferungsPlannedAll.filter(
     (lg) => !lieferungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
+  console.log('Art Timeline buildData', {
+    sammlungsDone,
+    sammlungsPlanned,
+    lieferungsDone,
+    lieferungsPlanned,
+    zaehlungsDone,
+    zaehlungsPlanned,
+  })
 
   // 1. get list of all dates when something was counted
   const dates = uniq(
