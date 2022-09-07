@@ -120,14 +120,6 @@ const buildData = async ({ artId }) => {
   const lieferungsPlanned = lieferungsPlannedAll.filter(
     (lg) => !lieferungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
-  console.log('Art Timeline buildData', {
-    sammlungsDone,
-    sammlungsPlanned,
-    lieferungsDone,
-    lieferungsPlanned,
-    zaehlungsDone,
-    zaehlungsPlanned,
-  })
 
   // 1. get list of all dates when something was counted
   const dates = uniq(
@@ -140,6 +132,15 @@ const buildData = async ({ artId }) => {
       ...lieferungsPlanned,
     ].map((z) => z.datum),
   ).sort()
+
+  console.log('Art Timeline buildData', {
+    sammlungsDone,
+    sammlungsPlanned,
+    lieferungsDone,
+    lieferungsPlanned,
+    zaehlungsDone,
+    zaehlungsPlanned,
+  })
 
   // 3. for every date get:
   //    - sum of last zaehlung
@@ -168,39 +169,41 @@ const buildData = async ({ artId }) => {
           .map((s) => s.anzahl_pflanzen),
       )
 
-      const lastZaehlungsByKultur = []
-      // const lastZaehlungsByKultur = await Promise.all(
-      //   kulturs.map(async (k) => {
-      //     // for every kultur return
-      //     // last zaehlung and whether it is prognose
-      //     const zaehlungs = await k.zaehlungs.fetch(
-      //       Q.experimentalJoinTables(['teilzaehlung']),
-      //       Q.where('_deleted', false),
-      //       Q.where('datum', Q.notEq(null)),
-      //       Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-      //     )
-      //     const lastZaehlungDatum = max(
-      //       zaehlungs.map((z) => z.datum).filter((d) => d <= date),
-      //     )
-      //     const lastZaehlungsOfKultur = await Promise.all(
-      //       zaehlungs.filter((z) => z.datum === lastZaehlungDatum),
-      //     )
-      //     const lastTzAnzahls = await Promise.all(
-      //       lastZaehlungsOfKultur.map(async (z) => {
-      //         let tzs = []
-      //         try {
-      //           tzs = (await z.teilzaehlungs?.fetch()) ?? []
-      //         } catch {}
+      const lastZaehlungsByKultur = await Promise.all(
+        kulturs.map(async (k) => {
+          // for every kultur return
+          // last zaehlung and whether it is prognose
+          const zaehlungs = await dexie.zaehlungs
+            .filter(
+              (z) =>
+                z.kultur_id === k.id &&
+                z._deleted === false &&
+                !!zaehlungs.datum &&
+                zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
+            )
+            .toArray()
+          const lastZaehlungDatum = max(
+            zaehlungs.map((z) => z.datum).filter((d) => d <= date),
+          )
+          const lastZaehlungsOfKultur = await Promise.all(
+            zaehlungs.filter((z) => z.datum === lastZaehlungDatum),
+          )
+          const lastTzAnzahls = await Promise.all(
+            lastZaehlungsOfKultur.map(async (z) => {
+              let tzs = []
+              try {
+                tzs = (await z.teilzaehlungs?.fetch()) ?? []
+              } catch {}
 
-      //         return sum(tzs.map((tz) => tz.anzahl_pflanzen))
-      //       }),
-      //     )
-      //     return {
-      //       anzahl_pflanzen: sum(lastTzAnzahls),
-      //       prognose: lastZaehlungsOfKultur.some((z) => z.prognose),
-      //     }
-      //   }),
-      // )
+              return sum(tzs.map((tz) => tz.anzahl_pflanzen))
+            }),
+          )
+          return {
+            anzahl_pflanzen: sum(lastTzAnzahls),
+            prognose: lastZaehlungsOfKultur.some((z) => z.prognose),
+          }
+        }),
+      )
       const lastZaehlungs = {
         anzahl_pflanzen: sum(
           lastZaehlungsByKultur.map((z) => z.anzahl_pflanzen),
