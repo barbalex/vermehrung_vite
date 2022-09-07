@@ -2,6 +2,7 @@ import uniq from 'lodash/uniq'
 import sum from 'lodash/sum'
 import max from 'lodash/max'
 import { Q } from '@nozbe/watermelondb'
+import { dexie } from '../../../../../../dexieClient'
 
 const buildData = async ({ artId, herkunftId, db }) => {
   let zaehlungsDone = []
