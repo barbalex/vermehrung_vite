@@ -67,8 +67,6 @@ const Files = ({ parentTable, parent }) => {
     [parentTable],
   )
 
-  console.log({ files })
-
   const onChangeUploader = useCallback(
     async (file) => {
       if (file) {
