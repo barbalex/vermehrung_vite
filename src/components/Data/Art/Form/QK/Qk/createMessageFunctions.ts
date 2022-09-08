@@ -1,7 +1,5 @@
 import format from 'date-fns/format'
 import groupBy from 'lodash/groupBy'
-import { first as first$ } from 'rxjs/operators'
-import { Q } from '@nozbe/watermelondb'
 
 import exists from '../../../../../../utils/exists'
 
@@ -171,10 +169,7 @@ const createMessageFunctions = async ({ artId, store }) => {
                 .filter((av) => !av._deleted).length,
           )
           .map(async (a) => {
-            let text
-            try {
-              text = await a.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await a.label()
 
             return {
               url: ['Vermehrung', 'Arten', a.id],
@@ -190,10 +185,7 @@ const createMessageFunctions = async ({ artId, store }) => {
             (s) => !lieferungsSorted.find((l) => l.von_sammlung_id === s.id),
           )
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Sammlungen', s.id],
@@ -211,10 +203,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.length > 1)
           .flatMap((vs) =>
             vs.map(async (s) => {
-              let text
-              try {
-                text = await s.label.pipe(first$()).toPromise()
-              } catch {}
+              const text = await s.label()
 
               return {
                 url: ['Vermehrung', 'Sammlungen', s.id],
@@ -230,10 +219,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.nr))
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -247,10 +233,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.herkunft_id)
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -264,10 +247,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.person_id)
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -281,10 +261,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.datum)
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -298,10 +275,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.anzahl_pflanzen))
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -315,10 +289,7 @@ const createMessageFunctions = async ({ artId, store }) => {
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.von_anzahl_individuen))
           .map(async (s) => {
-            let text
-            try {
-              text = await s.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await s.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Sammlungen', s.id],
@@ -365,10 +336,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     //   )
     //   return await Promise.all(
     //     gartensFiltered.map(async (g) => {
-    //       let text
-    //       try {
-    //         text = await g.label.pipe(first$()).toPromise()
-    //       } catch {}
+    //       const text = await g.label()
 
     //       return {
     //         url: ['Vermehrung', 'Gaerten', g.id],
@@ -382,10 +350,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         kultursSorted
           .filter((s) => !exists(s.von_anzahl_individuen))
           .map(async (k) => {
-            let text
-            try {
-              text = await k.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await k.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
@@ -398,10 +363,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         kultursSorted
           .filter((s) => !s.garten_id)
           .map(async (k) => {
-            let text
-            try {
-              text = await k.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await k.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
@@ -414,10 +376,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         kultursSorted
           .filter((s) => !s.herkunft_id)
           .map(async (k) => {
-            let text
-            try {
-              text = await k.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await k.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
@@ -439,10 +398,7 @@ const createMessageFunctions = async ({ artId, store }) => {
                 ).length === 0,
           )
           .map(async (k) => {
-            let text
-            try {
-              text = await k.label.pipe(first$()).toPromise()
-            } catch {}
+            const text = await k.label()
 
             return {
               url: ['Vermehrung', 'Arten', artId, 'Kulturen', k.id],
@@ -455,14 +411,8 @@ const createMessageFunctions = async ({ artId, store }) => {
         teilkultursOfArtSorted
           .filter((tk) => !tk.name)
           .map(async (tk) => {
-            let kultur
-            try {
-              kultur = await tk.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
+            const kultur = await dexie.kulturs.get(tk.kultur_id)
+            const kulturLabel = await kultur?.label()
             const text = `${kulturLabel ?? '(keine Kultur)'}, Teilkultur-ID: ${
               tk.id
             }`
@@ -506,12 +456,9 @@ const createMessageFunctions = async ({ artId, store }) => {
     //     zaehlungs.map(async (z) => {
     //       let kultur
     //       try {
-    //         kultur = await z.kultur?.fetch()
+    // kultur = await dexie.kulturs.get(z.kultur_id)
     //       } catch {}
-    //       let kulturLabel
-    //       try {
-    //         kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //       } catch {}
+    //       const kulturLabel = await kultur?.label()
     //       const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
 
     //       return {
@@ -556,12 +503,9 @@ const createMessageFunctions = async ({ artId, store }) => {
     //     zaehlungs.map(async (z) => {
     //       let kultur
     //       try {
-    //         kultur = await z.kultur?.fetch()
+    // kultur = await dexie.kulturs.get(z.kultur_id)
     //       } catch {}
-    //       let kulturLabel
-    //       try {
-    //         kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //       } catch {}
+    //       const kulturLabel = await kultur?.label()
     //       const text = `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`
 
     //       return {
@@ -579,138 +523,120 @@ const createMessageFunctions = async ({ artId, store }) => {
     //     }),
     //   )
     // },
-    // zaehlungsWithoutAnzahlPflanzen: async () =>
-    //   await Promise.all(
-    //     zaehlungsOfArtSorted
-    //       .filter(
-    //         (z) =>
-    //           teilzaehlungsOfArt
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted)
-    //             .filter((tz) => !exists(tz.anzahl_pflanzen)).length,
-    //       )
-    //       .map(async (z) => {
-    //         let kultur
-    //         try {
-    //           kultur = await z.kultur?.fetch()
-    //         } catch {}
-    //         let kulturLabel
-    //         try {
-    //           kulturLabel = await kultur.label.pipe(first$()).toPromise()
-    //         } catch {}
-    //         const zaehlung = z.datum
-    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //           : `Zählung-ID: ${z.id}`
-    //         const anzTz = teilzaehlungsOfArt
-    //           .filter((tz) => tz.zaehlung_id === z.id)
-    //           .filter((tz) => !tz._deleted).length
-    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //         const text = `${
-    //           kulturLabel ?? '(keine Kultur)'
-    //         }, ${zaehlung}${teilzaehlung}`
+    zaehlungsWithoutAnzahlPflanzen: async () =>
+      await Promise.all(
+        zaehlungsOfArtSorted
+          .filter(
+            (z) =>
+              teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+                .filter((tz) => !exists(tz.anzahl_pflanzen)).length,
+          )
+          .map(async (z) => {
+            const kultur = await dexie.kulturs.get(z.kultur_id)
+            const kulturLabel = await kultur.label()
+            const zaehlung = z.datum
+              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+              : `Zählung-ID: ${z.id}`
+            const anzTz = teilzaehlungsOfArt
+              .filter((tz) => tz.zaehlung_id === z.id)
+              .filter((tz) => !tz._deleted).length
+            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+            const text = `${
+              kulturLabel ?? '(keine Kultur)'
+            }, ${zaehlung}${teilzaehlung}`
 
-    //         return {
-    //           url: [
-    //             'Vermehrung',
-    //             'Arten',
-    //             artId,
-    //             'Kulturen',
-    //             kultur.id,
-    //             'Zaehlungen',
-    //             z.id,
-    //           ],
-    //           text,
-    //         }
-    //       }),
-    //   ),
-    // zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
-    //   await Promise.all(
-    //     zaehlungsOfArtSorted
-    //       .filter(
-    //         (z) =>
-    //           teilzaehlungsOfArt
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted)
-    //             .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
-    //       )
-    //       .map(async (z) => {
-    //         let kultur
-    //         try {
-    //           kultur = await z.kultur.fetch()
-    //         } catch {}
-    //         let kulturLabel
-    //         try {
-    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //         } catch {}
-    //         const zaehlung = z.datum
-    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //           : `Zählung-ID: ${z.id}`
-    //         const anzTz = teilzaehlungsOfArt
-    //           .filter((tz) => tz.zaehlung_id === z.id)
-    //           .filter((tz) => !tz._deleted).length
-    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //         const text = `${
-    //           kulturLabel ?? '(keine Kultur)'
-    //         }, ${zaehlung}${teilzaehlung}`
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Zaehlungen',
+                z.id,
+              ],
+              text,
+            }
+          }),
+      ),
+    zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
+      await Promise.all(
+        zaehlungsOfArtSorted
+          .filter(
+            (z) =>
+              teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+                .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
+          )
+          .map(async (z) => {
+            const kultur = await dexie.kulturs.get(z.kultur_id)
+            const kulturLabel = await kultur?.label()
+            const zaehlung = z.datum
+              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+              : `Zählung-ID: ${z.id}`
+            const anzTz = teilzaehlungsOfArt
+              .filter((tz) => tz.zaehlung_id === z.id)
+              .filter((tz) => !tz._deleted).length
+            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+            const text = `${
+              kulturLabel ?? '(keine Kultur)'
+            }, ${zaehlung}${teilzaehlung}`
 
-    //         return {
-    //           url: [
-    //             'Vermehrung',
-    //             'Arten',
-    //             artId,
-    //             'Kulturen',
-    //             kultur.id,
-    //             'Zaehlungen',
-    //             z.id,
-    //           ],
-    //           text,
-    //         }
-    //       }),
-    //   ),
-    // zaehlungsWithoutAnzahlMutterpflanzen: async () =>
-    //   await Promise.all(
-    //     zaehlungsOfArtSorted
-    //       .filter(
-    //         (z) =>
-    //           teilzaehlungsOfArt
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted)
-    //             .filter((tz) => !exists(tz.anzahl_mutterpflanzen)).length,
-    //       )
-    //       .map(async (z) => {
-    //         let kultur
-    //         try {
-    //           kultur = await z.kultur?.fetch()
-    //         } catch {}
-    //         let kulturLabel
-    //         try {
-    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //         } catch {}
-    //         const zaehlung = z.datum
-    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //           : `Zählung-ID: ${z.id}`
-    //         const anzTz = teilzaehlungsOfArt
-    //           .filter((tz) => tz.zaehlung_id === z.id)
-    //           .filter((tz) => !tz._deleted).length
-    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //         const text = `${
-    //           kulturLabel ?? '(keine Kultur)'
-    //         }, ${zaehlung}${teilzaehlung}`
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Zaehlungen',
+                z.id,
+              ],
+              text,
+            }
+          }),
+      ),
+    zaehlungsWithoutAnzahlMutterpflanzen: async () =>
+      await Promise.all(
+        zaehlungsOfArtSorted
+          .filter(
+            (z) =>
+              teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+                .filter((tz) => !exists(tz.anzahl_mutterpflanzen)).length,
+          )
+          .map(async (z) => {
+            const kultur = await dexie.kulturs.get(z.kultur_id)
+            const kulturLabel = await kultur?.label()
+            const zaehlung = z.datum
+              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+              : `Zählung-ID: ${z.id}`
+            const anzTz = teilzaehlungsOfArt
+              .filter((tz) => tz.zaehlung_id === z.id)
+              .filter((tz) => !tz._deleted).length
+            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+            const text = `${
+              kulturLabel ?? '(keine Kultur)'
+            }, ${zaehlung}${teilzaehlung}`
 
-    //         return {
-    //           url: [
-    //             'Vermehrung',
-    //             'Arten',
-    //             artId,
-    //             'Kulturen',
-    //             kultur?.id,
-    //             'Zaehlungen',
-    //             z.id,
-    //           ],
-    //           text,
-    //         }
-    //       }),
-    //   ),
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur?.id,
+                'Zaehlungen',
+                z.id,
+              ],
+              text,
+            }
+          }),
+      ),
     // zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
     //   async () => {
     //     let zaehlungsOfArt = []
@@ -745,14 +671,8 @@ const createMessageFunctions = async ({ artId, store }) => {
     //           return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
     //         })
     //         .map(async (z) => {
-    //           let kultur
-    //           try {
-    //             kultur = await z.kultur?.fetch()
-    //           } catch {}
-    //           let kulturLabel
-    //           try {
-    //             kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //           } catch {}
+    //           const kultur = await dexie.kulturs.get(z.kultur_id)
+    //           const kulturLabel = await kultur?.label()
     //           const zaehlung = z.datum
     //             ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
     //             : `Zählung-ID: ${z.id}`
@@ -779,213 +699,201 @@ const createMessageFunctions = async ({ artId, store }) => {
     //         }),
     //     )
     //   },
-    // lieferungsWithMultipleVon: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !!l.von_sammlung_id)
-    //     .filter((l) => !!l.von_kultur_id)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+    lieferungsWithMultipleVon: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !!l.von_sammlung_id)
+        .filter((l) => !!l.von_kultur_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithMultipleNach: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => l.nach_ausgepflanzt)
-    //     .filter((l) => !!l.nach_kultur_id)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithMultipleNach: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => l.nach_ausgepflanzt)
+        .filter((l) => !!l.nach_kultur_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutAnzahlPflanzen: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !exists(l.anzahl_pflanzen))
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutAnzahlPflanzen: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !exists(l.anzahl_pflanzen))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutAnzahlAuspflanzbereit: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !exists(l.anzahl_auspflanzbereit))
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutAnzahlAuspflanzbereit: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !exists(l.anzahl_auspflanzbereit))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutVonAnzahlIndividuen: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !exists(l.von_anzahl_individuen))
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutVonAnzahlIndividuen: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !exists(l.von_anzahl_individuen))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutVon: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !l.von_kultur_id)
-    //     .filter((l) => !l.von_sammlung_id)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutVon: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !l.von_kultur_id)
+        .filter((l) => !l.von_sammlung_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutNach: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !!l.von_kultur_id || !!l.von_sammlung_id)
-    //     .filter((l) => !l.nach_kultur_id)
-    //     .filter((l) => !l.nach_ausgepflanzt)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutNach: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !!l.von_kultur_id || !!l.von_sammlung_id)
+        .filter((l) => !l.nach_kultur_id)
+        .filter((l) => !l.nach_ausgepflanzt)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutDatum: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !l.datum)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutDatum: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !l.datum)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // lieferungsWithoutPerson: async () =>
-    //   lieferungsSorted
-    //     .filter((l) => l.art_id === artId)
-    //     .filter((l) => !l.person_id)
-    //     .map((l) => {
-    //       const datum = l.datum
-    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //         : `kein Datum`
-    //       const geplant = l.geplant ? ', (geplant)' : ''
-    //       const text = `${datum}, ID: ${l.id}${geplant}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    lieferungsWithoutPerson: async () =>
+      lieferungsSorted
+        .filter((l) => l.art_id === artId)
+        .filter((l) => !l.person_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
 
-    //       return {
-    //         url: ['Vermehrung', 'Lieferungen', l.id],
-    //         text,
-    //       }
-    //     }),
-    // eventsWithoutBeschreibung: async () =>
-    //   await Promise.all(
-    //     eventsOfArtSorted
-    //       .filter((e) => !e.beschreibung)
-    //       .map(async (e) => {
-    //         let kultur
-    //         try {
-    //           kultur = await e.kultur?.fetch()
-    //         } catch {}
-    //         let kulturLabel
-    //         try {
-    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //         } catch {}
-    //         const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
+          return {
+            url: ['Vermehrung', 'Lieferungen', l.id],
+            text,
+          }
+        }),
+    eventsWithoutBeschreibung: async () =>
+      await Promise.all(
+        eventsOfArtSorted
+          .filter((e) => !e.beschreibung)
+          .map(async (e) => {
+            const kultur = await dexie.kulturs.get(e.kultur_id)
+            const kulturLabel = await kultur?.label()
+            const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
-    //         return {
-    //           url: [
-    //             'Vermehrung',
-    //             'Arten',
-    //             artId,
-    //             'Kulturen',
-    //             kultur?.id,
-    //             'Events',
-    //             e.id,
-    //           ],
-    //           text,
-    //         }
-    //       }),
-    //   ),
-    // eventsWithoutDatum: async () =>
-    //   await Promise.all(
-    //     eventsOfArtSorted
-    //       .filter((e) => !e.datum)
-    //       .map(async (e) => {
-    //         let kultur
-    //         try {
-    //           kultur = await e.kultur?.fetch()
-    //         } catch {}
-    //         let kulturLabel
-    //         try {
-    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-    //         } catch {}
-    //         const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur?.id,
+                'Events',
+                e.id,
+              ],
+              text,
+            }
+          }),
+      ),
+    eventsWithoutDatum: async () =>
+      await Promise.all(
+        eventsOfArtSorted
+          .filter((e) => !e.datum)
+          .map(async (e) => {
+            const kultur = await dexie.kulturs.get(e.kultur_id)
+            const kulturLabel = await kultur?.label()
+            const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
-    //         return {
-    //           url: [
-    //             'Vermehrung',
-    //             'Arten',
-    //             artId,
-    //             'Kulturen',
-    //             kultur.id,
-    //             'Events',
-    //             e.id,
-    //           ],
-    //           text,
-    //         }
-    //       }),
-    //   ),
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Events',
+                e.id,
+              ],
+              text,
+            }
+          }),
+      ),
   }
 }
 

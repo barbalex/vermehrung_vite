@@ -59,7 +59,6 @@ const ApQk = ({ artId }) => {
       dexie.persons.get({ account_id: user.uid }),
       dexie.art_qks.filter((q) => q._deleted === false).sortBy('name'),
     ])
-    console.log({ person, qks })
 
     const personOption: PersonOption = await dexie.person_options.get(person.id)
 
