@@ -91,12 +91,12 @@ const Garten = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        {/* <FormTitle
+        <FormTitle
           row={row}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        /> */}
+        />
         <div>FormTitle</div>
         <SplitPaneContainer>
           <StyledSplitPane
