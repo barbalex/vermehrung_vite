@@ -5,7 +5,6 @@ import { Q } from '@nozbe/watermelondb'
 
 import exists from '../../../../../../utils/exists'
 
-import notDeletedQuery from '../../../../../../utils/notDeletedQuery'
 import artsSortedFromArts from '../../../../../../utils/artsSortedFromArts'
 import gartensSortedFromGartens from '../../../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
@@ -18,6 +17,7 @@ import teilkulturSort from '../../../../../../utils/teilkulturSort'
 import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
 import { dexie } from '../../../../../../dexieClient'
+import totalFilter from '../../../../../../utils/totalFilter'
 
 const createMessageFunctions = async ({ artId, db, store }) => {
   const { filter } = store
@@ -25,151 +25,47 @@ const createMessageFunctions = async ({ artId, db, store }) => {
   const startYear = `${year}-01-01`
   const startNextYear = `${year + 1}-01-01`
 
-  let arts = []
-  try {
-    arts = await db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const arts = await dexie.arts
+    .filter((value) => totalFilter({ value, store, table: 'art' }))
+    .toArray()
   const artsSorted = await artsSortedFromArts(arts)
 
-  let avs
-  try {
-    avs = await db.get('av').query(notDeletedQuery).fetch()
-  } catch {}
+  const avs = await dexie.avs
+    .filter((value) => totalFilter({ value, store, table: 'av' }))
+    .toArray()
 
-  let herkunfts = []
-  try {
-    herkunfts = await db
-      .get('herkunft')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.herkunft._deleted === false
-              ? [false]
-              : filter.herkunft._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const herkunfts = await dexie.herkunfts
+    .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+    .toArray()
   const herkunftsSorted = herkunfts.sort(herkunftSort)
 
-  let kulturs = []
-  try {
-    kulturs = await db
-      .get('kultur')
-      .query(
-        Q.where('art_id', Q.eq(artId)),
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.kultur._deleted === false
-              ? [false]
-              : filter.kultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.kultur.aktiv === true
-              ? [true]
-              : filter.kultur.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const kulturs = await dexie.kulturs
+    .filter(
+      (value) =>
+        totalFilter({ value, store, table: 'kultur' }) &&
+        value.art_id === artId,
+    )
+    .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
+  const kulturIds = kultursSorted.map((k) => k.id)
 
-  let lieferungs = []
-  try {
-    lieferungs = await db
-      .get('lieferung')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.lieferung._deleted === false
-              ? [false]
-              : filter.lieferung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const lieferungs = await dexie.lieferungs
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
-  let persons = []
-  try {
-    persons = await db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const persons = await dexie.persons
+    .filter((value) => totalFilter({ value, store, table: 'person' }))
+    .toArray()
   const personsSorted = persons.sort(personSort)
 
-  let sammlungsOfArt = []
-  try {
-    sammlungsOfArt = await db
-      .get('sammlung')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.sammlung._deleted === false
-              ? [false]
-              : filter.sammlung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.on('art', 'id', artId),
-      )
-      .fetch()
-  } catch {}
+  const sammlungsOfArt = await dexie.sammlungs
+    .filter(
+      (value) =>
+        totalFilter({ value, store, table: 'sammlung' }) &&
+        value.art_id === artId,
+    )
+    .toArray()
   const sammlungsOfArtSorted = await sammlungsSortedFromSammlungs(
     sammlungsOfArt,
   )
@@ -196,61 +92,61 @@ const createMessageFunctions = async ({ artId, db, store }) => {
   } catch {}
   const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
 
-  let teilzaehlungsOfArt = []
-  try {
-    teilzaehlungsOfArt = await db
-      .get('teilzaehlung')
-      .query(
-        Q.experimentalNestedJoin('zaehlung', 'kultur'),
-        Q.experimentalNestedJoin('kultur', 'art'),
-        Q.on('zaehlung', Q.on('kultur', Q.on('art', 'id', artId))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const teilzaehlungsOfArt = []
+  // try {
+  //   teilzaehlungsOfArt = await db
+  //     .get('teilzaehlung')
+  //     .query(
+  //       Q.experimentalNestedJoin('zaehlung', 'kultur'),
+  //       Q.experimentalNestedJoin('kultur', 'art'),
+  //       Q.on('zaehlung', Q.on('kultur', Q.on('art', 'id', artId))),
+  //       Q.where('_deleted', false),
+  //     )
+  //     .fetch()
+  // } catch {}
 
-  let teilkultursOfArt = []
-  try {
-    teilkultursOfArt = await db
-      .get('teilkultur')
-      .query(
-        Q.experimentalNestedJoin('kultur', 'art'),
-        Q.on('kultur', Q.on('art', 'id', artId)),
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.teilkultur._deleted === false
-              ? [false]
-              : filter.teilkultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const teilkultursOfArt = []
+  // try {
+  //   teilkultursOfArt = await db
+  //     .get('teilkultur')
+  //     .query(
+  //       Q.experimentalNestedJoin('kultur', 'art'),
+  //       Q.on('kultur', Q.on('art', 'id', artId)),
+  //       Q.where(
+  //         '_deleted',
+  //         Q.oneOf(
+  //           filter.teilkultur._deleted === false
+  //             ? [false]
+  //             : filter.teilkultur._deleted === true
+  //             ? [true]
+  //             : [true, false, null],
+  //         ),
+  //       ),
+  //     )
+  //     .fetch()
+  // } catch {}
   const teilkultursOfArtSorted = teilkultursOfArt.sort(teilkulturSort)
 
-  let eventsOfArt = []
-  try {
-    eventsOfArt = await db
-      .get('event')
-      .query(
-        Q.experimentalNestedJoin('kultur', 'art'),
-        Q.on('kultur', Q.on('art', 'id', artId)),
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.event._deleted === false
-              ? [false]
-              : filter.event._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const eventsOfArt = []
+  // try {
+  //   eventsOfArt = await db
+  //     .get('event')
+  //     .query(
+  //       Q.experimentalNestedJoin('kultur', 'art'),
+  //       Q.on('kultur', Q.on('art', 'id', artId)),
+  //       Q.where(
+  //         '_deleted',
+  //         Q.oneOf(
+  //           filter.event._deleted === false
+  //             ? [false]
+  //             : filter.event._deleted === true
+  //             ? [true]
+  //             : [true, false, null],
+  //         ),
+  //       ),
+  //     )
+  //     .fetch()
+  // } catch {}
   const eventsOfArtSorted = eventsOfArt.sort(eventSort)
 
   // TODO: check if some of this could be optimized using watermelon queries
