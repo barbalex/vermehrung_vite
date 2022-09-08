@@ -88,29 +88,13 @@ const createMessageFunctions = async ({ artId, store }) => {
     .toArray()
   const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
-  const eventsOfArt = []
-  // try {
-  //   eventsOfArt = await db
-  //     .get('event')
-  //     .query(
-  //       Q.experimentalNestedJoin('kultur', 'art'),
-  //       Q.on('kultur', Q.on('art', 'id', artId)),
-  //       Q.where(
-  //         '_deleted',
-  //         Q.oneOf(
-  //           filter.event._deleted === false
-  //             ? [false]
-  //             : filter.event._deleted === true
-  //             ? [true]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //     )
-  //     .fetch()
-  // } catch {}
-  const eventsOfArtSorted = eventsOfArt.sort(eventSort)
+  const events = await dexie.events
+    .where('kultur_id')
+    .anyOf(kulturIds)
+    .and((value) => totalFilter({ value, store, table: 'event' }))
+    .toArray()
+  const eventsSorted = events.sort(eventSort)
 
-  // TODO: check if some of this could be optimized using watermelon queries
   return {
     personsWithNonUniqueNr: async () => {
       const pGroupedByNr = groupBy(
@@ -132,6 +116,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     },
     herkunftsWithNonUniqueNr: async () => {
       const hkGroupedByNr = groupBy(herkunftsSorted, (h) => h.nr)
+
       return Object.values(hkGroupedByNr)
         .filter((v) => v.length > 1)
         .flatMap((vs) =>
@@ -183,6 +168,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         sammlungsOfArtSorted.filter((s) => s.art_id === artId),
         (h) => h.nr,
       )
+
       return await Promise.all(
         Object.values(sGroupedByNr)
           .filter((s) => s.length > 1)
@@ -835,7 +821,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     eventsWithoutBeschreibung: async () =>
       await Promise.all(
-        eventsOfArtSorted
+        eventsSorted
           .filter((e) => !e.beschreibung)
           .map(async (e) => {
             const kultur = await dexie.kulturs.get(e.kultur_id)
@@ -858,7 +844,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     eventsWithoutDatum: async () =>
       await Promise.all(
-        eventsOfArtSorted
+        eventsSorted
           .filter((e) => !e.datum)
           .map(async (e) => {
             const kultur = await dexie.kulturs.get(e.kultur_id)
