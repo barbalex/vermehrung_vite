@@ -281,10 +281,10 @@ const createMessageFunctions = async ({ artId, store }) => {
         .toArray()
       const gartensSorted = await gartensSortedFromGartens(gartens)
       const filterPromiseArray = gartensSorted.map(async (g) => {
-        let kulturs = []
-        try {
-          kulturs = await g.kulturs.extend(Q.where('_deleted', false)).fetch()
-        } catch {}
+        const kulturs = await dexie.kulturs
+          .where({ garten_id: g.id })
+          .filter((g) => g._deleted === false)
+          .toArray()
 
         return !!kulturs.length && kulturs.every((k) => !k.aktiv)
       })
