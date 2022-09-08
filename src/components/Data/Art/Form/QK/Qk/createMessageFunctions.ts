@@ -268,54 +268,40 @@ const createMessageFunctions = async ({ artId, store }) => {
             }
           }),
       ),
-    // gartensAllKultursInactive: async () => {
-    //   let kulturs = []
-    //   try {
-    //     kulturs = await db
-    //       .get('kultur')
-    //       .query(Q.where('art_id', Q.eq(artId)), Q.where('_deleted', false))
-    //       .fetch()
-    //   } catch {}
+    gartensAllKultursInactive: async () => {
+      const gartenIds = kulturs
+        .filter((s) => !!s.garten_id)
+        .map((k) => k.garten_id)
+      const uniqueGartenIds = [...new Set(gartenIds)]
 
-    //   const gartenIds = kulturs
-    //     .filter((s) => !!s.garten_id)
-    //     .map((k) => k.garten_id)
-    //   const uniqueGartenIds = [...new Set(gartenIds)]
+      const gartens = await dexie.gartens
+        .where('id')
+        .anyOf(uniqueGartenIds)
+        .and((value) => totalFilter({ value, store, table: 'garten' }))
+        .toArray()
+      const gartensSorted = await gartensSortedFromGartens(gartens)
+      const filterPromiseArray = gartensSorted.map(async (g) => {
+        let kulturs = []
+        try {
+          kulturs = await g.kulturs.extend(Q.where('_deleted', false)).fetch()
+        } catch {}
 
-    //   let gartens = []
-    //   try {
-    //     gartens = await db
-    //       .get('garten')
-    //       .query(
-    //         Q.where('_deleted', false),
-    //         Q.where('aktiv', true),
-    //         Q.where('id', Q.oneOf(uniqueGartenIds)),
-    //       )
-    //       .fetch()
-    //   } catch {}
-    //   const gartensOfArt = await gartensSortedFromGartens(gartens)
-    //   const filterPromiseArray = gartensOfArt.map(async (g) => {
-    //     let kulturs = []
-    //     try {
-    //       kulturs = await g.kulturs.extend(Q.where('_deleted', false)).fetch()
-    //     } catch {}
+        return !!kulturs.length && kulturs.every((k) => !k.aktiv)
+      })
+      const gartensFiltered = gartensSorted.filter(
+        (g, i) => filterPromiseArray[i] && g.aktiv,
+      )
+      return await Promise.all(
+        gartensFiltered.map(async (g) => {
+          const text = await g.label()
 
-    //     return !!kulturs.length && kulturs.every((k) => !k.aktiv)
-    //   })
-    //   const gartensFiltered = gartensOfArt.filter(
-    //     (g, i) => filterPromiseArray[i] && g.aktiv,
-    //   )
-    //   return await Promise.all(
-    //     gartensFiltered.map(async (g) => {
-    //       const text = await g.label()
-
-    //       return {
-    //         url: ['Vermehrung', 'Gaerten', g.id],
-    //         text,
-    //       }
-    //     }),
-    //   )
-    // },
+          return {
+            url: ['Vermehrung', 'Gaerten', g.id],
+            text,
+          }
+        }),
+      )
+    },
     kultursWithoutVonAnzahlIndividuen: async () =>
       await Promise.all(
         kultursSorted
