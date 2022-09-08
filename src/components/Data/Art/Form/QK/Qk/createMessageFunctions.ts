@@ -81,27 +81,12 @@ const createMessageFunctions = async ({ artId, store }) => {
     .and((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
     .toArray()
 
-  const teilkultursOfArt = []
-  // try {
-  //   teilkultursOfArt = await db
-  //     .get('teilkultur')
-  //     .query(
-  //       Q.experimentalNestedJoin('kultur', 'art'),
-  //       Q.on('kultur', Q.on('art', 'id', artId)),
-  //       Q.where(
-  //         '_deleted',
-  //         Q.oneOf(
-  //           filter.teilkultur._deleted === false
-  //             ? [false]
-  //             : filter.teilkultur._deleted === true
-  //             ? [true]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //     )
-  //     .fetch()
-  // } catch {}
-  const teilkultursOfArtSorted = teilkultursOfArt.sort(teilkulturSort)
+  const teilkulturs = await dexie.teilkulturs
+    .where('kultur_id')
+    .anyOf(kulturIds)
+    .and((value) => totalFilter({ value, store, table: 'teilkultur' }))
+    .toArray()
+  const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
   const eventsOfArt = []
   // try {
@@ -408,7 +393,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     teilkultursWithoutName: async () =>
       await Promise.all(
-        teilkultursOfArtSorted
+        teilkultursSorted
           .filter((tk) => !tk.name)
           .map(async (tk) => {
             const kultur = await dexie.kulturs.get(tk.kultur_id)
