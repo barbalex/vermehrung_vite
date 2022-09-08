@@ -4,8 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { motion, useAnimation } from 'framer-motion'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Person from './Person'
@@ -15,6 +14,8 @@ import gvsSortByPerson from '../../../../../utils/gvsSortByPerson'
 import personSort from '../../../../../utils/personSort'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -46,13 +47,13 @@ const Aven = styled.div`
 
 const GartenPersonen = ({ garten }) => {
   const store = useContext(StoreContext)
-  const { db, insertGvRev, filter } = store
+  const { insertGvRev } = store
 
   const [errors, setErrors] = useState({})
   useEffect(() => setErrors({}), [garten.id])
 
   const [open, setOpen] = useState(false)
-  let anim = useAnimation()
+  const anim = useAnimation()
   const onClickToggle = useCallback(
     async (e) => {
       e.stopPropagation()
@@ -72,61 +73,31 @@ const GartenPersonen = ({ garten }) => {
     [anim, open],
   )
 
-  const [dataState, setDataState] = useState({
-    gvsSorted: [],
-    personWerte: [],
-  })
-  useEffect(() => {
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const gvsObservable = garten?.gvs
-      ?.extend(Q.where('_deleted', false))
-      .observe()
-    const combinedObservables = combineLatest([
-      gvsObservable,
-      personsObservable,
+  const data = useLiveQuery(async () => {
+    const [persons, gvs] = await Promise.all([
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
+      dexie.gvs
+        .filter((g) => g._deleted === false && g.garten_id === garten.id)
+        .toArray(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([gvs, persons]) => {
-        const gvsSorted = await gvsSortByPerson(gvs)
-        const gvPersonIds = gvsSorted.map((v) => v.person_id)
-        const personWerte = persons
-          .filter((a) => !gvPersonIds.includes(a.id))
-          .sort(personSort)
-          .map((el) => ({
-            value: el.id,
-            label: personLabelFromPerson({ person: el }),
-          }))
 
-        setDataState({ gvsSorted, personWerte })
-      },
-    )
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.person._deleted, filter.person.aktiv, garten?.gvs])
-  const { gvsSorted, personWerte } = dataState
+    const gvsSorted = await gvsSortByPerson(gvs)
+    const gvPersonIds = gvsSorted.map((v) => v.person_id)
+    const personWerte = persons
+      .filter((a) => !gvPersonIds.includes(a.id))
+      .sort(personSort)
+      .map((el) => ({
+        value: el.id,
+        label: personLabelFromPerson({ person: el }),
+      }))
+
+    return { gvsSorted, personWerte }
+  }, [store.filter.art, store.art_initially_queried])
+
+  const gvsSorted = data?.gvsSorted ?? []
+  const personWerte = data?.personWerte ?? []
 
   const saveToDb = useCallback(
     async (event) => {

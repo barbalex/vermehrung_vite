@@ -9,6 +9,7 @@ import MenuItem from '@mui/material/MenuItem'
 import StoreContext from '../../../../../storeContext'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
+import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;
@@ -49,12 +50,12 @@ const Gv = ({ gv }) => {
 
   const [personLabel, setPersonLabel] = useState(null)
   useEffect(() => {
-    const personSubscription = gv.person
-      .observe()
-      .subscribe((person) => setPersonLabel(personLabelFromPerson({ person })))
+    if (!gv.person_id) return
 
-    return () => personSubscription?.unsubscribe?.()
-  }, [gv.person])
+    dexie.persons
+      .get(gv.person_id)
+      .then((person) => setPersonLabel(personLabelFromPerson({ person })))
+  }, [gv.person_id])
 
   const [delMenuAnchorEl, setDelMenuAnchorEl] = React.useState(null)
   const delMenuOpen = Boolean(delMenuAnchorEl)

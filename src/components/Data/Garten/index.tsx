@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import ErrorBoundary from '../../shared/ErrorBoundary'
@@ -11,6 +11,7 @@ import Conflict from './Conflict'
 import Form from './Form'
 import FormTitle from './FormTitle'
 import History from './History'
+import { dexie } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -55,22 +56,10 @@ const Garten = ({
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db } = store
+  const { filter, online } = store
 
-  const [row, setRow] = useState(null)
-  // need raw row because observable does not provoke rerendering of components
-  const [rawRow, setRawRow] = useState(null)
-  useEffect(() => {
-    const observable = showFilter
-      ? $of(filter.garten)
-      : db.get('garten').findAndObserve(id)
-    const subscription = observable.subscribe((newRow) => {
-      setRow(newRow)
-      setRawRow(JSON.stringify(newRow?._raw ?? newRow))
-    })
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.garten, id, showFilter])
+  let row = useLiveQuery(async () => await dexie.gartens.get(id), [id])
+  if (showFilter) row = filter.garten
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -102,13 +91,13 @@ const Garten = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        <FormTitle
+        {/* <FormTitle
           row={row}
-          rawRow={rawRow}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        />
+        /> */}
+        <div>FormTitle</div>
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
@@ -120,7 +109,6 @@ const Garten = ({
               showFilter={showFilter}
               id={id}
               row={row}
-              rawRow={rawRow}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
@@ -133,7 +121,6 @@ const Garten = ({
                       rev={activeConflict}
                       id={id}
                       row={row}
-                      rawRow={rawRow}
                       conflictDisposalCallback={conflictDisposalCallback}
                       conflictSelectionCallback={conflictSelectionCallback}
                       setActiveConflict={setActiveConflict}
@@ -141,7 +128,6 @@ const Garten = ({
                   ) : showHistory ? (
                     <History
                       row={row}
-                      rawRow={rawRow}
                       historyTakeoverCallback={historyTakeoverCallback}
                     />
                   ) : null}

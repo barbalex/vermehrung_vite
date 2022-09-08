@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { Q } from '@nozbe/watermelondb'
-//import { first as first$ } from 'rxjs/operators'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -18,6 +16,8 @@ import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import Personen from './Personen'
 import ConflictList from '../../../shared/ConflictList'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -44,99 +44,46 @@ const GartenForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, errors, unsetError, insertGvRev, db, user } = store
+  const { filter, online, errors, unsetError, insertGvRev, user } = store
+
+  const data = useLiveQuery(async () => {
+    const [persons, userPerson, gvs] = await Promise.all([
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.gvs.filter((g) => g._deleted === false).toArray(),
+    ])
+
+    // need to show a choosen person even if inactive but not if deleted
+    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    try {
+      person = await row.person.fetch()
+    } catch {}
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen
+      .sort(personSort)
+      .map((person) => ({
+        value: person.id,
+        label: personLabelFromPerson({ person }),
+      }))
+
+    const userPersonOption = await dexie.person_options.get(userPerson.id)
+
+    return { personWerte, userPersonOption, gvs }
+  }, [store.filter.garten, store.garten_initially_queried])
+
+  const personWerte = data?.personWerte ?? []
+  const userPersonOption = data?.userPersonOption ?? {}
+  const gvs = data?.gvs ?? []
 
   useEffect(() => {
     unsetError('garten')
   }, [id, unsetError])
 
-  const [dataState, setDataState] = useState({
-    personWerte: [],
-    userPersonOption: {},
-    gvs: [],
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns([
-            'ga_strasse',
-            'ga_plz',
-            'ga_ort',
-            'ga_geom_point',
-            'ga_aktiv',
-            'ga_bemerkungen',
-          ])
-      : $of({})
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['vorname', 'name'])
-    const personObservable = row.person ? row.person.observe() : $of({})
-    const gvsObservable = row.gvs
-      ? row.gvs.extend(Q.where('_deleted', false)).observe()
-      : $of([])
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      personsObservable,
-      personObservable,
-      gvsObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions, persons, person, gvs]) => {
-        // need to show a choosen person even if inactive but not if deleted
-        const personsIncludingChoosen = uniqBy(
-          [...persons, ...(person?.id && !showFilter ? [person] : [])],
-          'id',
-        )
-        const personWerte = personsIncludingChoosen
-          .sort(personSort)
-          .map((person) => ({
-            value: person.id,
-            label: personLabelFromPerson({ person }),
-          }))
-
-        setDataState({
-          personWerte,
-          userPersonOption: userPersonOptions?.[0],
-          gvs,
-        })
-      },
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    filter.person._deleted,
-    filter.person.aktiv,
-    row.gvs,
-    row.person,
-    showFilter,
-    user,
-  ])
-  const { personWerte, userPersonOption, gvs } = dataState
   const gvPersonIds = gvs.map((v) => v.person_id)
 
   const {
@@ -307,7 +254,7 @@ const GartenForm = ({
       )}
       {!showFilter && (
         <>
-          <Personen gartenId={row.id} garten={row} />{' '}
+          <Personen gartenId={row.id} garten={row} />
           <Files parentTable="garten" parent={row} />
         </>
       )}
