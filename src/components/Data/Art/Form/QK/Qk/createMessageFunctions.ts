@@ -16,7 +16,6 @@ import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
-import { where } from '@nozbe/watermelondb/QueryDescription'
 
 const createMessageFunctions = async ({ artId, store }) => {
   const year = +format(new Date(), 'yyyy')
