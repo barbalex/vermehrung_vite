@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FormTitle from './FormTitle'
@@ -11,6 +11,7 @@ import Spinner from '../../shared/Spinner'
 import Conflict from './Conflict'
 import Form from './Form'
 import History from './History'
+import { dexie, Event } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -50,26 +51,15 @@ const StyledSplitPane = styled(SplitPane)`
   }
 `
 
-const Event = ({
+const EventComponent = ({
   filter: showFilter,
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db } = store
+  const { filter, online } = store
 
-  const [row, setRow] = useState(null)
-  // need raw row because observable does not provoke rerendering of components
-  const [rawRow, setRawRow] = useState(null)
-  useEffect(() => {
-    const observable = showFilter
-      ? $of(filter.event)
-      : db.get('event').findAndObserve(id)
-    const subscription = observable.subscribe((newRow) => {
-      setRow(newRow)
-      setRawRow(JSON.stringify(newRow?._raw ?? newRow))
-    })
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.event, id, showFilter])
+  let row: Event = useLiveQuery(async () => dexie.events.get(id), [id])
+  if (showFilter) row = filter.event
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -103,7 +93,6 @@ const Event = ({
       <Container showfilter={showFilter}>
         <FormTitle
           row={row}
-          rawRow={rawRow}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
@@ -131,7 +120,6 @@ const Event = ({
                       rev={activeConflict}
                       id={id}
                       row={row}
-                      rawRow={rawRow}
                       conflictDisposalCallback={conflictDisposalCallback}
                       conflictSelectionCallback={conflictSelectionCallback}
                       setActiveConflict={setActiveConflict}
@@ -139,7 +127,6 @@ const Event = ({
                   ) : showHistory ? (
                     <History
                       row={row}
-                      rawRow={rawRow}
                       historyTakeoverCallback={historyTakeoverCallback}
                     />
                   ) : null}
@@ -153,4 +140,4 @@ const Event = ({
   )
 }
 
-export default observer(Event)
+export default observer(EventComponent)

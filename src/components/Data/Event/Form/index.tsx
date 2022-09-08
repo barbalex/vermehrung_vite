@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -23,6 +21,8 @@ import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import teilkulturSort from '../../../../utils/teilkulturSort'
 import personSort from '../../../../utils/personSort'
 import constants from '../../../../utils/constants'
+import { dexie, KulturOption } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -55,7 +55,7 @@ const EventForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, insertTeilkulturRev, errors, unsetError, db } = store
+  const { filter, online, insertTeilkulturRev, errors, unsetError } = store
 
   useEffect(() => {
     unsetError('event')
@@ -63,173 +63,80 @@ const EventForm = ({
 
   const kulturId = row?.kultur_id
 
-  const [dataState, setDataState] = useState({
-    kulturWerte: [],
-    teilkulturWerte: [],
-    personWerte: [],
-    kulturOption: undefined,
-  })
-  useEffect(() => {
-    const kultursObservable = db
-      .get('kultur')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.kultur._deleted === false
-              ? [false]
-              : filter.kultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.kultur.aktiv === true
-              ? [true]
-              : filter.kultur.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns([
-        'garten_id',
-        'art_id',
-        'herkunft_id',
-        'zwischenlager',
-      ])
-    const teilkulturObservable = db
-      .get('teilkultur')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.teilkultur._deleted === false
-              ? [false]
-              : filter.teilkultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...(showFilter ? [] : [Q.where('kultur_id', kulturId)]),
-      )
-      .observeWithColumns(['name'])
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['vorname', 'name'])
-    const kulturOptionObservable = row?.kultur_id
-      ? db.get('kultur_option').findAndObserve(row.kultur_id)
-      : $of({})
-    const combinedObservables = combineLatest([
-      kultursObservable,
-      teilkulturObservable,
-      personsObservable,
-      kulturOptionObservable,
+  const data = useLiveQuery(async () => {
+    const [kulturs, teilkulturs, persons, kulturOption] = await Promise.all([
+      dexie.kulturs
+        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+        .toArray(),
+      dexie.teilkulturs
+        .filter(
+          (t) =>
+            t._deleted === false &&
+            (showFilter ? true : t.kultur_id === kulturId),
+        )
+        .toArray(),
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
+      dexie.kultur_options.get(row.kultur_id),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([kulturs, teilkulturs, persons, kulturOption]) => {
-        // need to show a choosen kultur even if inactive but not if deleted
-        let kultur
-        try {
-          kultur = await row.kultur.fetch()
-        } catch {}
-        const kultursIncludingChoosen = uniqBy(
-          [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
-          'id',
-        )
-        const kultursSorted = await kultursSortedFromKulturs(
-          kultursIncludingChoosen,
-        )
-        const kulturWerte = await Promise.all(
-          kultursSorted.map(async (t) => {
-            let label
-            try {
-              label = await t.label.pipe(first$()).toPromise()
-            } catch {}
+    // need to show a choosen kultur even if inactive but not if deleted
+    const kultur = await dexie.kulturs.get(row.kultur_id)
+    const kultursIncludingChoosen = uniqBy(
+      [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
+      'id',
+    )
+    const kultursSorted = await kultursSortedFromKulturs(
+      kultursIncludingChoosen,
+    )
+    const kulturWerte = await Promise.all(
+      kultursSorted.map(async (t) => {
+        const label = await t.label()
 
-            return {
-              value: t.id,
-              label,
-            }
-          }),
-        )
-        let teilkultur
-        try {
-          teilkultur = await row.teilkultur.fetch()
-        } catch {}
-        const teilkultursIncludingChoosen = uniqBy(
-          [...teilkulturs, ...(teilkultur && !showFilter ? [teilkultur] : [])],
-          'id',
-        )
-        const teilkulturWerte = teilkultursIncludingChoosen
-          .sort(teilkulturSort)
-          .map((t) => ({
-            value: t.id,
-            label: t.name || '(kein Name)',
-          }))
-        // need to show a choosen person even if inactive but not if deleted
-        let person
-        try {
-          person = await row.person.fetch()
-        } catch {}
-        const personsIncludingChoosen = uniqBy(
-          [...persons, ...(person && !showFilter ? [person] : [])],
-          'id',
-        )
-        const personWerte = personsIncludingChoosen
-          .sort(personSort)
-          .map((person) => ({
-            value: person.id,
-            label: personLabelFromPerson({ person }),
-          }))
-        setDataState({
-          kulturWerte,
-          teilkulturWerte,
-          personWerte,
-          kulturOption,
-        })
-      },
+        return {
+          value: t.id,
+          label,
+        }
+      }),
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    filter.kultur,
-    filter.person._deleted,
-    filter.person.aktiv,
-    filter.teilkultur._deleted,
-    kulturId,
-    row,
-    row?.kultur,
-    row?.kultur_option,
-    row?.person,
-    showFilter,
-  ])
-  const { kulturWerte, teilkulturWerte, personWerte, kulturOption } = dataState
+    const teilkultur = row.teilkultur_id
+      ? await dexie.teilkulturs.get(row.teilkultur_id)
+      : {}
+    const teilkultursIncludingChoosen = uniqBy(
+      [...teilkulturs, ...(teilkultur && !showFilter ? [teilkultur] : [])],
+      'id',
+    )
+    const teilkulturWerte = teilkultursIncludingChoosen
+      .sort(teilkulturSort)
+      .map((t) => ({
+        value: t.id,
+        label: t.name || '(kein Name)',
+      }))
+
+    // need to show a choosen person even if inactive but not if deleted
+    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    try {
+      person = await row.person.fetch()
+    } catch {}
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen
+      .sort(personSort)
+      .map((person) => ({
+        value: person.id,
+        label: personLabelFromPerson({ person }),
+      }))
+
+    return { kulturWerte, teilkulturWerte, personWerte, kulturOption }
+  }, [store.filter.art, store.art_initially_queried])
+
+  const kulturWerte = data?.kulturWerte ?? []
+  const teilkulturWerte = data?.teilkulturWerte ?? []
+  const personWerte = data?.personWerte ?? []
+  const kulturOption: KulturOption = data?.kulturOption
 
   const { tk, ev_datum, ev_geplant, ev_person_id } = kulturOption ?? {}
 

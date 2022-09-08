@@ -5,7 +5,7 @@ import isUuid from 'is-uuid'
 
 import ArtForm from './Art'
 import Arten from './Arten'
-import Event from './Event'
+import EventComponent from './Event'
 import Events from './Events'
 import Herkunft from './Herkunft'
 import Herkuenfte from './Herkuenfte'
@@ -48,7 +48,7 @@ const Data = () => {
       return <Arten />
     }
     case 'event': {
-      return <Event id={id} />
+      return <EventComponent id={id} />
     }
     case 'events': {
       return <Events />

@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab'
 import styled from 'styled-components'
 
 import ArtForm from './Data/Art'
-import Event from './Data/Event'
+import EventComponent from './Data/Event'
 import Garten from './Data/Garten'
 import Herkunft from './Data/Herkunft'
 import Kultur from './Data/Kultur'
@@ -69,7 +69,7 @@ const Filter = () => {
 
   const formObject = {
     art: <ArtForm filter />,
-    event: <Event filter />,
+    event: <EventComponent filter />,
     herkunft: <Herkunft filter />,
     garten: <Garten filter />,
     kultur: <Kultur filter />,
