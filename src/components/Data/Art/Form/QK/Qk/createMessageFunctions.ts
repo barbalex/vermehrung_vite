@@ -19,8 +19,7 @@ import personFullname from '../../../../../../utils/personFullname'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
 
-const createMessageFunctions = async ({ artId, db, store }) => {
-  const { filter } = store
+const createMessageFunctions = async ({ artId, store }) => {
   const year = +format(new Date(), 'yyyy')
   const startYear = `${year}-01-01`
   const startNextYear = `${year + 1}-01-01`
@@ -70,40 +69,19 @@ const createMessageFunctions = async ({ artId, db, store }) => {
     sammlungsOfArt,
   )
 
-  let zaehlungsOfArt = []
-  try {
-    zaehlungsOfArt = await db
-      .get('zaehlung')
-      .query(
-        Q.experimentalNestedJoin('kultur', 'art'),
-        Q.on('kultur', Q.on('art', 'id', artId)),
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.zaehlung._deleted === false
-              ? [false]
-              : filter.zaehlung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .fetch()
-  } catch {}
+  const zaehlungsOfArt = await dexie.zaehlungs
+    .where('kultur_id')
+    .anyOf(kulturIds)
+    .and((value) => totalFilter({ value, store, table: 'zaehlung' }))
+    .toArray()
   const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
+  const zaehlungIds = zaehlungsOfArtSorted.map((z) => z.id)
 
-  const teilzaehlungsOfArt = []
-  // try {
-  //   teilzaehlungsOfArt = await db
-  //     .get('teilzaehlung')
-  //     .query(
-  //       Q.experimentalNestedJoin('zaehlung', 'kultur'),
-  //       Q.experimentalNestedJoin('kultur', 'art'),
-  //       Q.on('zaehlung', Q.on('kultur', Q.on('art', 'id', artId))),
-  //       Q.where('_deleted', false),
-  //     )
-  //     .fetch()
-  // } catch {}
+  const teilzaehlungsOfArt = await dexie.teilzaehlungs
+    .where('zaehlung_id')
+    .anyOf(zaehlungIds)
+    .and((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+    .toArray()
 
   const teilkultursOfArt = []
   // try {
@@ -348,57 +326,57 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }
           }),
       ),
-    gartensAllKultursInactive: async () => {
-      let kulturs = []
-      try {
-        kulturs = await db
-          .get('kultur')
-          .query(Q.where('art_id', Q.eq(artId)), Q.where('_deleted', false))
-          .fetch()
-      } catch {}
+    // gartensAllKultursInactive: async () => {
+    //   let kulturs = []
+    //   try {
+    //     kulturs = await db
+    //       .get('kultur')
+    //       .query(Q.where('art_id', Q.eq(artId)), Q.where('_deleted', false))
+    //       .fetch()
+    //   } catch {}
 
-      const gartenIds = kulturs
-        .filter((s) => !!s.garten_id)
-        .map((k) => k.garten_id)
-      const uniqueGartenIds = [...new Set(gartenIds)]
+    //   const gartenIds = kulturs
+    //     .filter((s) => !!s.garten_id)
+    //     .map((k) => k.garten_id)
+    //   const uniqueGartenIds = [...new Set(gartenIds)]
 
-      let gartens = []
-      try {
-        gartens = await db
-          .get('garten')
-          .query(
-            Q.where('_deleted', false),
-            Q.where('aktiv', true),
-            Q.where('id', Q.oneOf(uniqueGartenIds)),
-          )
-          .fetch()
-      } catch {}
-      const gartensOfArt = await gartensSortedFromGartens(gartens)
-      const filterPromiseArray = gartensOfArt.map(async (g) => {
-        let kulturs = []
-        try {
-          kulturs = await g.kulturs.extend(Q.where('_deleted', false)).fetch()
-        } catch {}
+    //   let gartens = []
+    //   try {
+    //     gartens = await db
+    //       .get('garten')
+    //       .query(
+    //         Q.where('_deleted', false),
+    //         Q.where('aktiv', true),
+    //         Q.where('id', Q.oneOf(uniqueGartenIds)),
+    //       )
+    //       .fetch()
+    //   } catch {}
+    //   const gartensOfArt = await gartensSortedFromGartens(gartens)
+    //   const filterPromiseArray = gartensOfArt.map(async (g) => {
+    //     let kulturs = []
+    //     try {
+    //       kulturs = await g.kulturs.extend(Q.where('_deleted', false)).fetch()
+    //     } catch {}
 
-        return !!kulturs.length && kulturs.every((k) => !k.aktiv)
-      })
-      const gartensFiltered = gartensOfArt.filter(
-        (g, i) => filterPromiseArray[i] && g.aktiv,
-      )
-      return await Promise.all(
-        gartensFiltered.map(async (g) => {
-          let text
-          try {
-            text = await g.label.pipe(first$()).toPromise()
-          } catch {}
+    //     return !!kulturs.length && kulturs.every((k) => !k.aktiv)
+    //   })
+    //   const gartensFiltered = gartensOfArt.filter(
+    //     (g, i) => filterPromiseArray[i] && g.aktiv,
+    //   )
+    //   return await Promise.all(
+    //     gartensFiltered.map(async (g) => {
+    //       let text
+    //       try {
+    //         text = await g.label.pipe(first$()).toPromise()
+    //       } catch {}
 
-          return {
-            url: ['Vermehrung', 'Gaerten', g.id],
-            text,
-          }
-        }),
-      )
-    },
+    //       return {
+    //         url: ['Vermehrung', 'Gaerten', g.id],
+    //         text,
+    //       }
+    //     }),
+    //   )
+    // },
     kultursWithoutVonAnzahlIndividuen: async () =>
       await Promise.all(
         kultursSorted
@@ -503,511 +481,511 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }
           }),
       ),
-    zaehlungsInFutureNotPrognose: async () => {
-      const zaehlungs = await db
-        .get('zaehlung')
-        .query(
-          Q.experimentalNestedJoin('kultur', 'art'),
-          Q.on('kultur', Q.on('art', 'id', artId)),
-          Q.where(
-            '_deleted',
-            Q.oneOf(
-              filter.zaehlung._deleted === false
-                ? [false]
-                : filter.zaehlung._deleted === true
-                ? [true]
-                : [true, false, null],
-            ),
-          ),
-          Q.where('datum', Q.notEq(null)),
-          Q.where('datum', Q.gte(format(new Date(), 'yyyy-mm-dd'))),
-        )
-        .fetch()
+    // zaehlungsInFutureNotPrognose: async () => {
+    //   const zaehlungs = await db
+    //     .get('zaehlung')
+    //     .query(
+    //       Q.experimentalNestedJoin('kultur', 'art'),
+    //       Q.on('kultur', Q.on('art', 'id', artId)),
+    //       Q.where(
+    //         '_deleted',
+    //         Q.oneOf(
+    //           filter.zaehlung._deleted === false
+    //             ? [false]
+    //             : filter.zaehlung._deleted === true
+    //             ? [true]
+    //             : [true, false, null],
+    //         ),
+    //       ),
+    //       Q.where('datum', Q.notEq(null)),
+    //       Q.where('datum', Q.gte(format(new Date(), 'yyyy-mm-dd'))),
+    //     )
+    //     .fetch()
 
-      return await Promise.all(
-        zaehlungs.map(async (z) => {
-          let kultur
-          try {
-            kultur = await z.kultur?.fetch()
-          } catch {}
-          let kulturLabel
-          try {
-            kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-          } catch {}
-          const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
+    //   return await Promise.all(
+    //     zaehlungs.map(async (z) => {
+    //       let kultur
+    //       try {
+    //         kultur = await z.kultur?.fetch()
+    //       } catch {}
+    //       let kulturLabel
+    //       try {
+    //         kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //       } catch {}
+    //       const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
 
-          return {
-            url: [
-              'Vermehrung',
-              'Arten',
-              artId,
-              'Kulturen',
-              z.id,
-              'Zaehlungen',
-              z.id,
-            ],
-            text,
-          }
-        }),
-      )
-    },
-    zaehlungsWithoutDatum: async () => {
-      let zaehlungs = []
-      try {
-        zaehlungs = await db
-          .get('zaehlung')
-          .query(
-            Q.experimentalNestedJoin('kultur', 'art'),
-            Q.on('kultur', Q.on('art', 'id', artId)),
-            Q.where(
-              '_deleted',
-              Q.oneOf(
-                filter.zaehlung._deleted === false
-                  ? [false]
-                  : filter.zaehlung._deleted === true
-                  ? [true]
-                  : [true, false, null],
-              ),
-            ),
-            Q.where('datum', Q.notEq(null)),
-          )
-          .fetch()
-      } catch {}
+    //       return {
+    //         url: [
+    //           'Vermehrung',
+    //           'Arten',
+    //           artId,
+    //           'Kulturen',
+    //           z.id,
+    //           'Zaehlungen',
+    //           z.id,
+    //         ],
+    //         text,
+    //       }
+    //     }),
+    //   )
+    // },
+    // zaehlungsWithoutDatum: async () => {
+    //   let zaehlungs = []
+    //   try {
+    //     zaehlungs = await db
+    //       .get('zaehlung')
+    //       .query(
+    //         Q.experimentalNestedJoin('kultur', 'art'),
+    //         Q.on('kultur', Q.on('art', 'id', artId)),
+    //         Q.where(
+    //           '_deleted',
+    //           Q.oneOf(
+    //             filter.zaehlung._deleted === false
+    //               ? [false]
+    //               : filter.zaehlung._deleted === true
+    //               ? [true]
+    //               : [true, false, null],
+    //           ),
+    //         ),
+    //         Q.where('datum', Q.notEq(null)),
+    //       )
+    //       .fetch()
+    //   } catch {}
 
-      return await Promise.all(
-        zaehlungs.map(async (z) => {
-          let kultur
-          try {
-            kultur = await z.kultur?.fetch()
-          } catch {}
-          let kulturLabel
-          try {
-            kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-          } catch {}
-          const text = `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`
+    //   return await Promise.all(
+    //     zaehlungs.map(async (z) => {
+    //       let kultur
+    //       try {
+    //         kultur = await z.kultur?.fetch()
+    //       } catch {}
+    //       let kulturLabel
+    //       try {
+    //         kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //       } catch {}
+    //       const text = `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`
 
-          return {
-            url: [
-              'Vermehrung',
-              'Arten',
-              artId,
-              'Kulturen',
-              z.id,
-              'Zaehlungen',
-              z.id,
-            ],
-            text,
-          }
-        }),
-      )
-    },
-    zaehlungsWithoutAnzahlPflanzen: async () =>
-      await Promise.all(
-        zaehlungsOfArtSorted
-          .filter(
-            (z) =>
-              teilzaehlungsOfArt
-                .filter((tz) => tz.zaehlung_id === z.id)
-                .filter((tz) => !tz._deleted)
-                .filter((tz) => !exists(tz.anzahl_pflanzen)).length,
-          )
-          .map(async (z) => {
-            let kultur
-            try {
-              kultur = await z.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur.label.pipe(first$()).toPromise()
-            } catch {}
-            const zaehlung = z.datum
-              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-              : `Zählung-ID: ${z.id}`
-            const anzTz = teilzaehlungsOfArt
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted).length
-            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-            const text = `${
-              kulturLabel ?? '(keine Kultur)'
-            }, ${zaehlung}${teilzaehlung}`
+    //       return {
+    //         url: [
+    //           'Vermehrung',
+    //           'Arten',
+    //           artId,
+    //           'Kulturen',
+    //           z.id,
+    //           'Zaehlungen',
+    //           z.id,
+    //         ],
+    //         text,
+    //       }
+    //     }),
+    //   )
+    // },
+    // zaehlungsWithoutAnzahlPflanzen: async () =>
+    //   await Promise.all(
+    //     zaehlungsOfArtSorted
+    //       .filter(
+    //         (z) =>
+    //           teilzaehlungsOfArt
+    //             .filter((tz) => tz.zaehlung_id === z.id)
+    //             .filter((tz) => !tz._deleted)
+    //             .filter((tz) => !exists(tz.anzahl_pflanzen)).length,
+    //       )
+    //       .map(async (z) => {
+    //         let kultur
+    //         try {
+    //           kultur = await z.kultur?.fetch()
+    //         } catch {}
+    //         let kulturLabel
+    //         try {
+    //           kulturLabel = await kultur.label.pipe(first$()).toPromise()
+    //         } catch {}
+    //         const zaehlung = z.datum
+    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+    //           : `Zählung-ID: ${z.id}`
+    //         const anzTz = teilzaehlungsOfArt
+    //           .filter((tz) => tz.zaehlung_id === z.id)
+    //           .filter((tz) => !tz._deleted).length
+    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+    //         const text = `${
+    //           kulturLabel ?? '(keine Kultur)'
+    //         }, ${zaehlung}${teilzaehlung}`
 
-            return {
-              url: [
-                'Vermehrung',
-                'Arten',
-                artId,
-                'Kulturen',
-                kultur.id,
-                'Zaehlungen',
-                z.id,
-              ],
-              text,
-            }
-          }),
-      ),
-    zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
-      await Promise.all(
-        zaehlungsOfArtSorted
-          .filter(
-            (z) =>
-              teilzaehlungsOfArt
-                .filter((tz) => tz.zaehlung_id === z.id)
-                .filter((tz) => !tz._deleted)
-                .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
-          )
-          .map(async (z) => {
-            let kultur
-            try {
-              kultur = await z.kultur.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
-            const zaehlung = z.datum
-              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-              : `Zählung-ID: ${z.id}`
-            const anzTz = teilzaehlungsOfArt
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted).length
-            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-            const text = `${
-              kulturLabel ?? '(keine Kultur)'
-            }, ${zaehlung}${teilzaehlung}`
+    //         return {
+    //           url: [
+    //             'Vermehrung',
+    //             'Arten',
+    //             artId,
+    //             'Kulturen',
+    //             kultur.id,
+    //             'Zaehlungen',
+    //             z.id,
+    //           ],
+    //           text,
+    //         }
+    //       }),
+    //   ),
+    // zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
+    //   await Promise.all(
+    //     zaehlungsOfArtSorted
+    //       .filter(
+    //         (z) =>
+    //           teilzaehlungsOfArt
+    //             .filter((tz) => tz.zaehlung_id === z.id)
+    //             .filter((tz) => !tz._deleted)
+    //             .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
+    //       )
+    //       .map(async (z) => {
+    //         let kultur
+    //         try {
+    //           kultur = await z.kultur.fetch()
+    //         } catch {}
+    //         let kulturLabel
+    //         try {
+    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //         } catch {}
+    //         const zaehlung = z.datum
+    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+    //           : `Zählung-ID: ${z.id}`
+    //         const anzTz = teilzaehlungsOfArt
+    //           .filter((tz) => tz.zaehlung_id === z.id)
+    //           .filter((tz) => !tz._deleted).length
+    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+    //         const text = `${
+    //           kulturLabel ?? '(keine Kultur)'
+    //         }, ${zaehlung}${teilzaehlung}`
 
-            return {
-              url: [
-                'Vermehrung',
-                'Arten',
-                artId,
-                'Kulturen',
-                kultur.id,
-                'Zaehlungen',
-                z.id,
-              ],
-              text,
-            }
-          }),
-      ),
-    zaehlungsWithoutAnzahlMutterpflanzen: async () =>
-      await Promise.all(
-        zaehlungsOfArtSorted
-          .filter(
-            (z) =>
-              teilzaehlungsOfArt
-                .filter((tz) => tz.zaehlung_id === z.id)
-                .filter((tz) => !tz._deleted)
-                .filter((tz) => !exists(tz.anzahl_mutterpflanzen)).length,
-          )
-          .map(async (z) => {
-            let kultur
-            try {
-              kultur = await z.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
-            const zaehlung = z.datum
-              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-              : `Zählung-ID: ${z.id}`
-            const anzTz = teilzaehlungsOfArt
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted).length
-            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-            const text = `${
-              kulturLabel ?? '(keine Kultur)'
-            }, ${zaehlung}${teilzaehlung}`
+    //         return {
+    //           url: [
+    //             'Vermehrung',
+    //             'Arten',
+    //             artId,
+    //             'Kulturen',
+    //             kultur.id,
+    //             'Zaehlungen',
+    //             z.id,
+    //           ],
+    //           text,
+    //         }
+    //       }),
+    //   ),
+    // zaehlungsWithoutAnzahlMutterpflanzen: async () =>
+    //   await Promise.all(
+    //     zaehlungsOfArtSorted
+    //       .filter(
+    //         (z) =>
+    //           teilzaehlungsOfArt
+    //             .filter((tz) => tz.zaehlung_id === z.id)
+    //             .filter((tz) => !tz._deleted)
+    //             .filter((tz) => !exists(tz.anzahl_mutterpflanzen)).length,
+    //       )
+    //       .map(async (z) => {
+    //         let kultur
+    //         try {
+    //           kultur = await z.kultur?.fetch()
+    //         } catch {}
+    //         let kulturLabel
+    //         try {
+    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //         } catch {}
+    //         const zaehlung = z.datum
+    //           ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+    //           : `Zählung-ID: ${z.id}`
+    //         const anzTz = teilzaehlungsOfArt
+    //           .filter((tz) => tz.zaehlung_id === z.id)
+    //           .filter((tz) => !tz._deleted).length
+    //         const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+    //         const text = `${
+    //           kulturLabel ?? '(keine Kultur)'
+    //         }, ${zaehlung}${teilzaehlung}`
 
-            return {
-              url: [
-                'Vermehrung',
-                'Arten',
-                artId,
-                'Kulturen',
-                kultur?.id,
-                'Zaehlungen',
-                z.id,
-              ],
-              text,
-            }
-          }),
-      ),
-    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
-      async () => {
-        let zaehlungsOfArt = []
-        try {
-          zaehlungsOfArt = await db
-            .get('zaehlung')
-            .query(
-              Q.experimentalNestedJoin('kultur', 'art'),
-              Q.on('kultur', Q.on('art', 'id', artId)),
-              Q.experimentalNestedJoin('kultur', 'kultur_option'),
-              Q.on('kultur', Q.on('kultur_option', 'tk', true)),
-              Q.where(
-                '_deleted',
-                Q.oneOf(
-                  filter.zaehlung._deleted === false
-                    ? [false]
-                    : filter.zaehlung._deleted === true
-                    ? [true]
-                    : [true, false, null],
-                ),
-              ),
-            )
-            .fetch()
-        } catch {}
-        const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
-        return await Promise.all(
-          zaehlungsOfArtSorted
-            .filter((z) => {
-              const tz = teilzaehlungsOfArt
-                .filter((tz) => tz.zaehlung_id === z.id)
-                .filter((tz) => !tz._deleted)
-              return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
-            })
-            .map(async (z) => {
-              let kultur
-              try {
-                kultur = await z.kultur?.fetch()
-              } catch {}
-              let kulturLabel
-              try {
-                kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-              } catch {}
-              const zaehlung = z.datum
-                ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-                : `Zählung-ID: ${z.id}`
-              const anzTz = teilzaehlungsOfArt
-                .filter((tz) => tz.zaehlung_id === z.id)
-                .filter((tz) => !tz._deleted).length
-              const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-              const text = `${
-                kulturLabel ?? '(keine Kultur)'
-              }, ${zaehlung}${teilzaehlung}`
+    //         return {
+    //           url: [
+    //             'Vermehrung',
+    //             'Arten',
+    //             artId,
+    //             'Kulturen',
+    //             kultur?.id,
+    //             'Zaehlungen',
+    //             z.id,
+    //           ],
+    //           text,
+    //         }
+    //       }),
+    //   ),
+    // zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
+    //   async () => {
+    //     let zaehlungsOfArt = []
+    //     try {
+    //       zaehlungsOfArt = await db
+    //         .get('zaehlung')
+    //         .query(
+    //           Q.experimentalNestedJoin('kultur', 'art'),
+    //           Q.on('kultur', Q.on('art', 'id', artId)),
+    //           Q.experimentalNestedJoin('kultur', 'kultur_option'),
+    //           Q.on('kultur', Q.on('kultur_option', 'tk', true)),
+    //           Q.where(
+    //             '_deleted',
+    //             Q.oneOf(
+    //               filter.zaehlung._deleted === false
+    //                 ? [false]
+    //                 : filter.zaehlung._deleted === true
+    //                 ? [true]
+    //                 : [true, false, null],
+    //             ),
+    //           ),
+    //         )
+    //         .fetch()
+    //     } catch {}
+    //     const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
+    //     return await Promise.all(
+    //       zaehlungsOfArtSorted
+    //         .filter((z) => {
+    //           const tz = teilzaehlungsOfArt
+    //             .filter((tz) => tz.zaehlung_id === z.id)
+    //             .filter((tz) => !tz._deleted)
+    //           return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
+    //         })
+    //         .map(async (z) => {
+    //           let kultur
+    //           try {
+    //             kultur = await z.kultur?.fetch()
+    //           } catch {}
+    //           let kulturLabel
+    //           try {
+    //             kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //           } catch {}
+    //           const zaehlung = z.datum
+    //             ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+    //             : `Zählung-ID: ${z.id}`
+    //           const anzTz = teilzaehlungsOfArt
+    //             .filter((tz) => tz.zaehlung_id === z.id)
+    //             .filter((tz) => !tz._deleted).length
+    //           const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+    //           const text = `${
+    //             kulturLabel ?? '(keine Kultur)'
+    //           }, ${zaehlung}${teilzaehlung}`
 
-              return {
-                url: [
-                  'Vermehrung',
-                  'Arten',
-                  artId,
-                  'Kulturen',
-                  kultur?.id,
-                  'Zaehlungen',
-                  z.id,
-                ],
-                text,
-              }
-            }),
-        )
-      },
-    lieferungsWithMultipleVon: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !!l.von_sammlung_id)
-        .filter((l) => !!l.von_kultur_id)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //           return {
+    //             url: [
+    //               'Vermehrung',
+    //               'Arten',
+    //               artId,
+    //               'Kulturen',
+    //               kultur?.id,
+    //               'Zaehlungen',
+    //               z.id,
+    //             ],
+    //             text,
+    //           }
+    //         }),
+    //     )
+    //   },
+    // lieferungsWithMultipleVon: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !!l.von_sammlung_id)
+    //     .filter((l) => !!l.von_kultur_id)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithMultipleNach: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => l.nach_ausgepflanzt)
-        .filter((l) => !!l.nach_kultur_id)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithMultipleNach: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => l.nach_ausgepflanzt)
+    //     .filter((l) => !!l.nach_kultur_id)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutAnzahlPflanzen: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !exists(l.anzahl_pflanzen))
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutAnzahlPflanzen: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !exists(l.anzahl_pflanzen))
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutAnzahlAuspflanzbereit: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !exists(l.anzahl_auspflanzbereit))
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutAnzahlAuspflanzbereit: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !exists(l.anzahl_auspflanzbereit))
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutVonAnzahlIndividuen: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !exists(l.von_anzahl_individuen))
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutVonAnzahlIndividuen: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !exists(l.von_anzahl_individuen))
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutVon: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !l.von_kultur_id)
-        .filter((l) => !l.von_sammlung_id)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutVon: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !l.von_kultur_id)
+    //     .filter((l) => !l.von_sammlung_id)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutNach: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !!l.von_kultur_id || !!l.von_sammlung_id)
-        .filter((l) => !l.nach_kultur_id)
-        .filter((l) => !l.nach_ausgepflanzt)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutNach: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !!l.von_kultur_id || !!l.von_sammlung_id)
+    //     .filter((l) => !l.nach_kultur_id)
+    //     .filter((l) => !l.nach_ausgepflanzt)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutDatum: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !l.datum)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutDatum: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !l.datum)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    lieferungsWithoutPerson: async () =>
-      lieferungsSorted
-        .filter((l) => l.art_id === artId)
-        .filter((l) => !l.person_id)
-        .map((l) => {
-          const datum = l.datum
-            ? format(new Date(l.datum), 'yyyy.MM.dd')
-            : `kein Datum`
-          const geplant = l.geplant ? ', (geplant)' : ''
-          const text = `${datum}, ID: ${l.id}${geplant}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // lieferungsWithoutPerson: async () =>
+    //   lieferungsSorted
+    //     .filter((l) => l.art_id === artId)
+    //     .filter((l) => !l.person_id)
+    //     .map((l) => {
+    //       const datum = l.datum
+    //         ? format(new Date(l.datum), 'yyyy.MM.dd')
+    //         : `kein Datum`
+    //       const geplant = l.geplant ? ', (geplant)' : ''
+    //       const text = `${datum}, ID: ${l.id}${geplant}`
 
-          return {
-            url: ['Vermehrung', 'Lieferungen', l.id],
-            text,
-          }
-        }),
-    eventsWithoutBeschreibung: async () =>
-      await Promise.all(
-        eventsOfArtSorted
-          .filter((e) => !e.beschreibung)
-          .map(async (e) => {
-            let kultur
-            try {
-              kultur = await e.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
-            const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
+    //       return {
+    //         url: ['Vermehrung', 'Lieferungen', l.id],
+    //         text,
+    //       }
+    //     }),
+    // eventsWithoutBeschreibung: async () =>
+    //   await Promise.all(
+    //     eventsOfArtSorted
+    //       .filter((e) => !e.beschreibung)
+    //       .map(async (e) => {
+    //         let kultur
+    //         try {
+    //           kultur = await e.kultur?.fetch()
+    //         } catch {}
+    //         let kulturLabel
+    //         try {
+    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //         } catch {}
+    //         const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
-            return {
-              url: [
-                'Vermehrung',
-                'Arten',
-                artId,
-                'Kulturen',
-                kultur?.id,
-                'Events',
-                e.id,
-              ],
-              text,
-            }
-          }),
-      ),
-    eventsWithoutDatum: async () =>
-      await Promise.all(
-        eventsOfArtSorted
-          .filter((e) => !e.datum)
-          .map(async (e) => {
-            let kultur
-            try {
-              kultur = await e.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
-            const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
+    //         return {
+    //           url: [
+    //             'Vermehrung',
+    //             'Arten',
+    //             artId,
+    //             'Kulturen',
+    //             kultur?.id,
+    //             'Events',
+    //             e.id,
+    //           ],
+    //           text,
+    //         }
+    //       }),
+    //   ),
+    // eventsWithoutDatum: async () =>
+    //   await Promise.all(
+    //     eventsOfArtSorted
+    //       .filter((e) => !e.datum)
+    //       .map(async (e) => {
+    //         let kultur
+    //         try {
+    //           kultur = await e.kultur?.fetch()
+    //         } catch {}
+    //         let kulturLabel
+    //         try {
+    //           kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+    //         } catch {}
+    //         const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
-            return {
-              url: [
-                'Vermehrung',
-                'Arten',
-                artId,
-                'Kulturen',
-                kultur.id,
-                'Events',
-                e.id,
-              ],
-              text,
-            }
-          }),
-      ),
+    //         return {
+    //           url: [
+    //             'Vermehrung',
+    //             'Arten',
+    //             artId,
+    //             'Kulturen',
+    //             kultur.id,
+    //             'Events',
+    //             e.id,
+    //           ],
+    //           text,
+    //         }
+    //       }),
+    //   ),
   }
 }
 
