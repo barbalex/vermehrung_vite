@@ -16,6 +16,7 @@ import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
+import { where } from '@nozbe/watermelondb/QueryDescription'
 
 const createMessageFunctions = async ({ artId, store }) => {
   const year = +format(new Date(), 'yyyy')
@@ -563,68 +564,66 @@ const createMessageFunctions = async ({ artId, store }) => {
             }
           }),
       ),
-    // zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
-    //   async () => {
-    //     let zaehlungsOfArt = []
-    //     try {
-    //       zaehlungsOfArt = await db
-    //         .get('zaehlung')
-    //         .query(
-    //           Q.experimentalNestedJoin('kultur', 'art'),
-    //           Q.on('kultur', Q.on('art', 'id', artId)),
-    //           Q.experimentalNestedJoin('kultur', 'kultur_option'),
-    //           Q.on('kultur', Q.on('kultur_option', 'tk', true)),
-    //           Q.where(
-    //             '_deleted',
-    //             Q.oneOf(
-    //               filter.zaehlung._deleted === false
-    //                 ? [false]
-    //                 : filter.zaehlung._deleted === true
-    //                 ? [true]
-    //                 : [true, false, null],
-    //             ),
-    //           ),
-    //         )
-    //         .fetch()
-    //     } catch {}
-    //     const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
-    //     return await Promise.all(
-    //       zaehlungsOfArtSorted
-    //         .filter((z) => {
-    //           const tz = teilzaehlungsOfArt
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted)
-    //           return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
-    //         })
-    //         .map(async (z) => {
-    //           const kultur = await dexie.kulturs.get(z.kultur_id)
-    //           const kulturLabel = await kultur?.label()
-    //           const zaehlung = z.datum
-    //             ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //             : `Zählung-ID: ${z.id}`
-    //           const anzTz = teilzaehlungsOfArt
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted).length
-    //           const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //           const text = `${
-    //             kulturLabel ?? '(keine Kultur)'
-    //           }, ${zaehlung}${teilzaehlung}`
+    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
+      async () => {
+        const kulturOptionsWithTkSet = await dexie.kultur_options
+          .filter((o) => o.tk === true)
+          .toArray()
+        const idsOfKultursWithTkSet = kulturOptionsWithTkSet.map((o) => o.id)
+        const kulturs = await dexie.kulturs
+          .where('id')
+          .anyOf(idsOfKultursWithTkSet)
+          .and(
+            (value) =>
+              totalFilter({ value, store, table: 'kultur' }) &&
+              value.art_id === artId,
+          )
+          .toArray()
+        const kulturIds = kulturs.map((k) => k.id)
+        const zaehlungs = await dexie.zaehlungs
+          .where('kultur_id')
+          .anyOf(kulturIds)
+          .and((z) => z._deleted === false)
+          .toArray()
+        const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
 
-    //           return {
-    //             url: [
-    //               'Vermehrung',
-    //               'Arten',
-    //               artId,
-    //               'Kulturen',
-    //               kultur?.id,
-    //               'Zaehlungen',
-    //               z.id,
-    //             ],
-    //             text,
-    //           }
-    //         }),
-    //     )
-    //   },
+        return await Promise.all(
+          zaehlungsSorted
+            .filter((z) => {
+              const tz = teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+              return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
+            })
+            .map(async (z) => {
+              const kultur = await dexie.kulturs.get(z.kultur_id)
+              const kulturLabel = await kultur?.label()
+              const zaehlung = z.datum
+                ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+                : `Zählung-ID: ${z.id}`
+              const anzTz = teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted).length
+              const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+              const text = `${
+                kulturLabel ?? '(keine Kultur)'
+              }, ${zaehlung}${teilzaehlung}`
+
+              return {
+                url: [
+                  'Vermehrung',
+                  'Arten',
+                  artId,
+                  'Kulturen',
+                  kultur?.id,
+                  'Zaehlungen',
+                  z.id,
+                ],
+                text,
+              }
+            }),
+        )
+      },
     lieferungsWithMultipleVon: async () =>
       lieferungsSorted
         .filter((l) => l.art_id === artId)
