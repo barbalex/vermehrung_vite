@@ -388,51 +388,39 @@ const createMessageFunctions = async ({ artId, store }) => {
             }
           }),
       ),
-    // zaehlungsInFutureNotPrognose: async () => {
-    //   const zaehlungs = await db
-    //     .get('zaehlung')
-    //     .query(
-    //       Q.experimentalNestedJoin('kultur', 'art'),
-    //       Q.on('kultur', Q.on('art', 'id', artId)),
-    //       Q.where(
-    //         '_deleted',
-    //         Q.oneOf(
-    //           filter.zaehlung._deleted === false
-    //             ? [false]
-    //             : filter.zaehlung._deleted === true
-    //             ? [true]
-    //             : [true, false, null],
-    //         ),
-    //       ),
-    //       Q.where('datum', Q.notEq(null)),
-    //       Q.where('datum', Q.gte(format(new Date(), 'yyyy-mm-dd'))),
-    //     )
-    //     .fetch()
+    zaehlungsInFutureNotPrognose: async () => {
+      const zaehlungs = await dexie.zaehlungs
+        .where('kultur_id')
+        .anyOf(kulturIds)
+        .filter(
+          (z) =>
+            z._deleted === false &&
+            z.datum !== null &&
+            z.datum >= format(new Date(), 'yyyy-mm-dd'),
+        )
+        .toArray()
 
-    //   return await Promise.all(
-    //     zaehlungs.map(async (z) => {
-    //       let kultur
-    //       try {
-    // kultur = await dexie.kulturs.get(z.kultur_id)
-    //       } catch {}
-    //       const kulturLabel = await kultur?.label()
-    //       const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
+      return await Promise.all(
+        zaehlungs.map(async (z) => {
+          const kultur = await dexie.kulturs.get(z.kultur_id)
+          const kulturLabel = await kultur?.label()
+          const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
 
-    //       return {
-    //         url: [
-    //           'Vermehrung',
-    //           'Arten',
-    //           artId,
-    //           'Kulturen',
-    //           z.id,
-    //           'Zaehlungen',
-    //           z.id,
-    //         ],
-    //         text,
-    //       }
-    //     }),
-    //   )
-    // },
+          return {
+            url: [
+              'Vermehrung',
+              'Arten',
+              artId,
+              'Kulturen',
+              z.id,
+              'Zaehlungen',
+              z.id,
+            ],
+            text,
+          }
+        }),
+      )
+    },
     // zaehlungsWithoutDatum: async () => {
     //   let zaehlungs = []
     //   try {
