@@ -17,6 +17,7 @@ import personSort from '../../../../../../utils/personSort'
 import teilkulturSort from '../../../../../../utils/teilkulturSort'
 import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
+import { dexie } from '../../../../../../dexieClient'
 
 const createMessageFunctions = async ({ artId, db, store }) => {
   const { filter } = store
@@ -593,7 +594,8 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }`
 
             return {
-              url: ['Vermehrung', 
+              url: [
+                'Vermehrung',
                 'Arten',
                 artId,
                 'Kulturen',
@@ -639,7 +641,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${kulturLabel ?? '(keine kultur)'}, Zählung-ID: ${z.id}`
 
           return {
-            url: ['Vermehrung', 'Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
+            url: [
+              'Vermehrung',
+              'Arten',
+              artId,
+              'Kulturen',
+              z.id,
+              'Zaehlungen',
+              z.id,
+            ],
             text,
           }
         }),
@@ -681,7 +691,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
           const text = `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`
 
           return {
-            url: ['Vermehrung', 'Arten', artId, 'Kulturen', z.id, 'Zaehlungen', z.id],
+            url: [
+              'Vermehrung',
+              'Arten',
+              artId,
+              'Kulturen',
+              z.id,
+              'Zaehlungen',
+              z.id,
+            ],
             text,
           }
         }),
@@ -718,7 +736,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Zaehlungen',
+                z.id,
+              ],
               text,
             }
           }),
@@ -754,7 +780,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Zaehlungen', z.id],
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Zaehlungen',
+                z.id,
+              ],
               text,
             }
           }),
@@ -790,70 +824,87 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             }, ${zaehlung}${teilzaehlung}`
 
             return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur?.id,
+                'Zaehlungen',
+                z.id,
+              ],
               text,
             }
           }),
       ),
-    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen: async () => {
-      let zaehlungsOfArt = []
-      try {
-        zaehlungsOfArt = await db
-          .get('zaehlung')
-          .query(
-            Q.experimentalNestedJoin('kultur', 'art'),
-            Q.on('kultur', Q.on('art', 'id', artId)),
-            Q.experimentalNestedJoin('kultur', 'kultur_option'),
-            Q.on('kultur', Q.on('kultur_option', 'tk', true)),
-            Q.where(
-              '_deleted',
-              Q.oneOf(
-                filter.zaehlung._deleted === false
-                  ? [false]
-                  : filter.zaehlung._deleted === true
-                  ? [true]
-                  : [true, false, null],
+    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
+      async () => {
+        let zaehlungsOfArt = []
+        try {
+          zaehlungsOfArt = await db
+            .get('zaehlung')
+            .query(
+              Q.experimentalNestedJoin('kultur', 'art'),
+              Q.on('kultur', Q.on('art', 'id', artId)),
+              Q.experimentalNestedJoin('kultur', 'kultur_option'),
+              Q.on('kultur', Q.on('kultur_option', 'tk', true)),
+              Q.where(
+                '_deleted',
+                Q.oneOf(
+                  filter.zaehlung._deleted === false
+                    ? [false]
+                    : filter.zaehlung._deleted === true
+                    ? [true]
+                    : [true, false, null],
+                ),
               ),
-            ),
-          )
-          .fetch()
-      } catch {}
-      const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
-      return await Promise.all(
-        zaehlungsOfArtSorted
-          .filter((z) => {
-            const tz = teilzaehlungsOfArt
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted)
-            return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
-          })
-          .map(async (z) => {
-            let kultur
-            try {
-              kultur = await z.kultur?.fetch()
-            } catch {}
-            let kulturLabel
-            try {
-              kulturLabel = await kultur?.label.pipe(first$()).toPromise()
-            } catch {}
-            const zaehlung = z.datum
-              ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-              : `Zählung-ID: ${z.id}`
-            const anzTz = teilzaehlungsOfArt
-              .filter((tz) => tz.zaehlung_id === z.id)
-              .filter((tz) => !tz._deleted).length
-            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-            const text = `${
-              kulturLabel ?? '(keine Kultur)'
-            }, ${zaehlung}${teilzaehlung}`
+            )
+            .fetch()
+        } catch {}
+        const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
+        return await Promise.all(
+          zaehlungsOfArtSorted
+            .filter((z) => {
+              const tz = teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+              return tz.length && tz.filter((tz) => !tz.teilkultur_id).length
+            })
+            .map(async (z) => {
+              let kultur
+              try {
+                kultur = await z.kultur?.fetch()
+              } catch {}
+              let kulturLabel
+              try {
+                kulturLabel = await kultur?.label.pipe(first$()).toPromise()
+              } catch {}
+              const zaehlung = z.datum
+                ? `Zählung vom ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+                : `Zählung-ID: ${z.id}`
+              const anzTz = teilzaehlungsOfArt
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted).length
+              const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+              const text = `${
+                kulturLabel ?? '(keine Kultur)'
+              }, ${zaehlung}${teilzaehlung}`
 
-            return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Zaehlungen', z.id],
-              text,
-            }
-          }),
-      )
-    },
+              return {
+                url: [
+                  'Vermehrung',
+                  'Arten',
+                  artId,
+                  'Kulturen',
+                  kultur?.id,
+                  'Zaehlungen',
+                  z.id,
+                ],
+                text,
+              }
+            }),
+        )
+      },
     lieferungsWithMultipleVon: async () =>
       lieferungsSorted
         .filter((l) => l.art_id === artId)
@@ -1019,7 +1070,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
             return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur?.id, 'Events', e.id],
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur?.id,
+                'Events',
+                e.id,
+              ],
               text,
             }
           }),
@@ -1040,7 +1099,15 @@ const createMessageFunctions = async ({ artId, db, store }) => {
             const text = `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${e.id}`
 
             return {
-              url: ['Vermehrung', 'Arten', artId, 'Kulturen', kultur.id, 'Events', e.id],
+              url: [
+                'Vermehrung',
+                'Arten',
+                artId,
+                'Kulturen',
+                kultur.id,
+                'Events',
+                e.id,
+              ],
               text,
             }
           }),

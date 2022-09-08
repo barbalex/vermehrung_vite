@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useContext, useEffect } from 'react'
+import React, { useCallback, useState, useContext } from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
@@ -7,14 +7,14 @@ import IconButton from '@mui/material/IconButton'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { motion, useAnimation } from 'framer-motion'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
-import Qk from './Qk'
+import QkComponent from './Qk'
 import Choose from './Choose'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
 import constants from '../../../../../utils/constants'
+import { dexie, Qk, PersonOption } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -49,38 +49,25 @@ const Body = styled.div`
 
 const ApQk = ({ artId }) => {
   const store = useContext(StoreContext)
-  const { db, user } = store
+  const { user } = store
 
   const [tab, setTab] = useState('qk')
   const onChangeTab = useCallback((event, value) => setTab(value), [])
 
-  const [dataState, setDataState] = useState({ qks: [], userPersonOption })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['art_qk_choosen'])
-      : $of({})
-    const artQksObservable = db
-      .get('art_qk')
-      .query(Q.where('_deleted', false), Q.sortBy('name', Q.asc))
-      .observeWithColumns(['name'])
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      artQksObservable,
+  const data = useLiveQuery(async () => {
+    const [person, qks] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.art_qks.filter((q) => q._deleted === false).sortBy('name'),
     ])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions, qks]) =>
-        setDataState({
-          qks,
-          userPersonOption: userPersonOptions?.[0],
-        }),
-    )
+    console.log({ person, qks })
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { qks, userPersonOption } = dataState
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
+
+    return { personOption, qks }
+  }, [user.uid])
+
+  const userPersonOption: PersonOption = data?.personOption ?? {}
+  const qks: Qk[] = data?.qks ?? []
   const qkChoosens = qks.filter((qk) =>
     userPersonOption.art_qk_choosen.includes(qk.id),
   )
@@ -162,7 +149,7 @@ const ApQk = ({ artId }) => {
             </StyledTabs>
             <Body>
               {tab === 'qk' ? (
-                <Qk artId={artId} qkChoosens={qkChoosens} />
+                <QkComponent artId={artId} qkChoosens={qkChoosens} />
               ) : (
                 <Choose qks={qks} />
               )}
