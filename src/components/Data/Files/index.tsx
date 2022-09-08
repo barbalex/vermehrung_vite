@@ -4,16 +4,18 @@ import styled from 'styled-components'
 import Lightbox from 'react-image-lightbox'
 import Button from '@mui/material/Button'
 import { v1 as uuidv1 } from 'uuid'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import Uploader from '../../Uploader'
-import File from './File'
+import FileComponent from './File'
 import 'react-image-lightbox/style.css'
 import isImageFile from './isImageFile'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import fileSort from '../../../utils/fileSort'
 import mutations from '../../../utils/mutations'
 import constants from '../../../utils/constants'
+import { dexie, File } from '../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -55,20 +57,17 @@ const Content = styled.div`
 
 const Files = ({ parentTable, parent }) => {
   const store = useContext(StoreContext)
-  const { online, gqlClient, addNotification, db } = store
+  const { online, gqlClient, addNotification } = store
 
   const [imageIndex, setImageIndex] = useState(0)
   const [lightboxIsOpen, setLightboxIsOpen] = useState(false)
 
-  // use object with two keys to only render once on setting
-  const [files, setEvent] = useState([])
-  useEffect(() => {
-    const subscription = parent.files
-      .observeWithColumns(['name'])
-      .subscribe((files) => setEvent(files.sort(fileSort)))
+  const files: File[] = useLiveQuery(
+    async () => await dexie[`${parentTable}_files`].orderBy('name').toArray(),
+    [parentTable],
+  )
 
-    return () => subscription?.unsubscribe?.()
-  }, [parent.files])
+  console.log({ files })
 
   const onChangeUploader = useCallback(
     async (file) => {
@@ -81,12 +80,12 @@ const Files = ({ parentTable, parent }) => {
             [`${parentTable}_id`]: parent.id,
             name: info.name,
           }
-          await db.write(async () => {
-            const collection = db.get(`${parentTable}_file`)
-            // using batch because can create from raw
-            // which enables overriding watermelons own id
-            await db.batch([collection.prepareCreateFromDirtyRaw(newObject)])
-          })
+          // await db.write(async () => {
+          //   const collection = db.get(`${parentTable}_file`)
+          //   // using batch because can create from raw
+          //   // which enables overriding watermelons own id
+          //   await db.batch([collection.prepareCreateFromDirtyRaw(newObject)])
+          // })
           // TODO: need to add mutations for all file-tables
           const mutation = mutations[`mutateInsert_${parentTable}_file_one`]
           const variables = {
@@ -108,10 +107,10 @@ const Files = ({ parentTable, parent }) => {
         })
       }
     },
-    [parentTable, parent.id, db, gqlClient, addNotification],
+    [parentTable, parent.id, gqlClient, addNotification],
   )
 
-  const images = files.filter((f) => isImageFile(f))
+  const images = (files ?? []).filter((f) => isImageFile(f))
   const imageUrls = images.map(
     (f) =>
       `https://ucarecdn.com/${f.file_id}/-/resize/1200x/-/quality/lightest/${f.name}`,
@@ -140,7 +139,10 @@ const Files = ({ parentTable, parent }) => {
 
   return (
     <ErrorBoundary>
-      <TitleRow data-online={online} data-margin-bottom={!!files.length}>
+      <TitleRow
+        data-online={online}
+        data-margin-bottom={!!(files ?? []).length}
+      >
         <Title>Dateien</Title>
         <Buttons>
           <Uploader
@@ -175,11 +177,11 @@ const Files = ({ parentTable, parent }) => {
           prevLabel="Voriges Bild"
         />
       )}
-      {!!files.length && (
+      {!!files && (
         <>
           <Spacer />
           {files.map((file) => (
-            <File key={file.file_id} file={file} parent={parent} />
+            <FileComponent key={file.file_id} file={file} parent={parent} />
           ))}
         </>
       )}
