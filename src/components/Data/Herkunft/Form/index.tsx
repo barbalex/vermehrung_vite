@@ -44,8 +44,7 @@ const Herkunft = ({
   const { filter, online, errors, setError, unsetError, user } = store
 
   const data = useLiveQuery(async () => {
-    const [herkunft, persons, userPerson] = await Promise.all([
-      await dexie.herkunfts.get(id),
+    const [persons, userPerson] = await Promise.all([
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .toArray(),

@@ -9,8 +9,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import ifIsNumericAsNumber from '../../utils/ifIsNumericAsNumber'
 import epsg2056to4326 from '../../utils/epsg2056to4326'
@@ -31,6 +30,7 @@ import {
   message as wgs84LongMessage,
 } from '../../utils/wgs84LongIsValid'
 import StoreContext from '../../storeContext'
+import { dexie } from '../../dexieClient'
 
 const StyledFormControl = styled(FormControl)`
   padding-bottom: 19px !important;
@@ -70,32 +70,17 @@ const MenuTitle = styled.div`
 
 const Coordinates = ({ row, saveToDb: originalSaveToDb }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
   const { id, lv95_x, lv95_y, wgs84_lat, wgs84_long } = row
 
-  const [dataState, setDataState] = useState({
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['ga_lat_lng'])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions]) => {
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-        })
-      },
-    )
+  const userPersonOption = useLiveQuery(async () => {
+    const userPerson = await dexie.persons.get({ account_id: user.uid })
+    const userPersonOption = await dexie.person_options.get(userPerson.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption } = dataState
+    return userPersonOption
+  }, [user])
+
   const { ga_lat_lng } = userPersonOption ?? {}
 
   const [lv95XState, setLv95XState] = useState(lv95_x || '')
@@ -117,6 +102,19 @@ const Coordinates = ({ row, saveToDb: originalSaveToDb }) => {
     setWgs84LatState(wgs84_lat || '')
     setWgs84LongState(wgs84_long || '')
   }, [wgs84_lat, wgs84_long])
+
+  const saveToDb = useCallback(
+    async (geomPoint) => {
+      const fakeEvent = {
+        target: {
+          name: 'geom_point',
+          value: geomPoint,
+        },
+      }
+      originalSaveToDb(fakeEvent)
+    },
+    [originalSaveToDb],
+  )
 
   const saveToDbLv95 = useCallback(
     (x, y) => {
@@ -219,19 +217,6 @@ const Coordinates = ({ row, saveToDb: originalSaveToDb }) => {
       }
     },
     [saveToDbWgs84, wgs84LatState, wgs84_long],
-  )
-
-  const saveToDb = useCallback(
-    async (geomPoint) => {
-      const fakeEvent = {
-        target: {
-          name: 'geom_point',
-          value: geomPoint,
-        },
-      }
-      originalSaveToDb(fakeEvent)
-    },
-    [originalSaveToDb],
   )
 
   const [mapMenuAnchorEl, setMapMenuAnchorEl] = React.useState(null)

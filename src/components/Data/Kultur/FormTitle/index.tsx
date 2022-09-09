@@ -10,7 +10,6 @@ import tableFilter from '../../../../utils/tableFilter'
 
 const KulturFormTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -102,7 +101,6 @@ const KulturFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}
