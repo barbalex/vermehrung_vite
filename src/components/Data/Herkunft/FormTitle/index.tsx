@@ -1,12 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import tableFilter from '../../../../utils/tableFilter'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const HerkunftFormTitleChooser = ({
   row,
@@ -17,59 +17,40 @@ const HerkunftFormTitleChooser = ({
   activeConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { sammlungIdInActiveNodeArray, db, filter } = store
+  const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
-  const [countState, setCountState] = useState({
-    totalCount: 0,
-    filteredCount: 0,
-  })
-  useEffect(() => {
-    const hierarchyQuery = sammlungIdInActiveNodeArray
-      ? [
-          Q.experimentalJoinTables(['sammlung']),
-          Q.on('sammlung', 'id', sammlungIdInActiveNodeArray),
-        ]
-      : []
-    const collection = db.get('herkunft')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.herkunft._deleted === false
-              ? [false]
-              : filter.herkunft._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
+  let conditionAdder
+  if (sammlungIdInActiveNodeArray) {
+    conditionAdder = async (collection) => {
+      const activeSammlung = await dexie.sammlungs.get(
+        sammlungIdInActiveNodeArray,
       )
-      .observeCount()
-    const filteredCountObservable = collection
-      .query(...tableFilter({ store, table: 'herkunft' }), ...hierarchyQuery)
-      .observeCount()
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      filteredCountObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, filteredCount]) =>
-        setCountState({ totalCount, filteredCount }),
-    )
+      return collection.and('id').equals(activeSammlung.herkunft_id)
+    }
+  }
+  if (artIdInActiveNodeArray) {
+    conditionAdder = async (collection) => {
+      const sammlungsOfArt = await dexie.sammlungs
+        .where({
+          art_id: artIdInActiveNodeArray,
+        })
+        .toArray()
+      const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
+      return collection.and('id').anyOf(herkunftIds)
+    }
+  }
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    sammlungIdInActiveNodeArray,
-    // need to rerender if any of the values of herkunftFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(store.filter.herkunft),
-    store,
-    filter.herkunft._deleted,
-  ])
+  const totalCount = useLiveQuery(
+    async () =>
+      await dexie.herkunfts
+        .filter((value) =>
+          totalFilter({ value, store, table: 'herkunft', conditionAdder }),
+        )
+        .count(),
+    [store.filter.herkunft, store.herkunft_initially_queried],
+  )
 
-  const { totalCount, filteredCount } = countState
+  const filteredCount = store.herkunftsFilteredCount ?? '...'
 
   if (showFilter) {
     return (

@@ -1,18 +1,21 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
+import uniqBy from 'lodash/uniqBy'
 
 import StoreContext from '../../../../storeContext'
 import TextField from '../../../shared/TextField'
 import Checkbox2States from '../../../shared/Checkbox2States'
 import JesNo from '../../../shared/JesNo'
 import ifIsNumericAsNumber from '../../../../utils/ifIsNumericAsNumber'
-import exists from '../../../../utils/exists'
 import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import ConflictList from '../../../shared/ConflictList'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
+import personSort from '../../../../utils/personSort'
+import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 
 const Container = styled.div`
   padding: 10px;
@@ -33,75 +36,60 @@ const Herkunft = ({
   showFilter,
   id,
   row,
-  rawRow,
   activeConflict,
   setActiveConflict,
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, errors, setError, unsetError, db, user } = store
+  const { filter, online, errors, setError, unsetError, user } = store
+
+  const data = useLiveQuery(async () => {
+    const [herkunft, persons, userPerson] = await Promise.all([
+      await dexie.herkunfts.get(id),
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
+      dexie.persons.get({ account_id: user.uid }),
+    ])
+
+    // need to show a choosen person even if inactive but not if deleted
+    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen
+      .sort(personSort)
+      .map((person) => ({
+        value: person.id,
+        label: personLabelFromPerson({ person }),
+      }))
+
+    const userPersonOption = await dexie.person_options.get(userPerson.id)
+    if (!showFilter && row.nr) {
+      const otherHerkunftsWithSameNr = await dexie.herkunfts
+        .filter(
+          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
+        )
+        .toArray()
+      if (otherHerkunftsWithSameNr.length > 0) {
+        setError({
+          path: 'herkunft.nr',
+          value: `Diese Nummer wird ${otherHerkunftsWithSameNr.length} mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
+        })
+      }
+    }
+
+    return { personWerte, userPersonOption }
+  }, [store.filter.garten, store.garten_initially_queried, id, user, row])
+
+  const userPersonOption = data?.userPersonOption ?? {}
 
   // ensure that activeConflict is reset
   // when changing dataset
   useEffect(() => {
     setActiveConflict(null)
   }, [id, setActiveConflict])
-
-  const [dataState, setDataState] = useState({
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns([
-            'hk_kanton',
-            'hk_land',
-            'hk_bemerkungen',
-            'hk_geom_point',
-          ])
-      : $of({})
-    const herkunftsNrCountObservable =
-      showFilter || !exists(row?.nr)
-        ? $of(0)
-        : db
-            .get('herkunft')
-            .query(
-              Q.where(
-                '_deleted',
-                Q.oneOf(
-                  filter.herkunft._deleted === false
-                    ? [false]
-                    : filter.herkunft._deleted === true
-                    ? [true]
-                    : [true, false, null],
-                ),
-              ),
-              Q.where('nr', row.nr),
-            )
-            .observeCount()
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      herkunftsNrCountObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions, nrCount]) => {
-        if (!showFilter && nrCount > 1) {
-          setError({
-            path: 'herkunft.nr',
-            value: `Diese Nummer wird ${nrCount} mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
-          })
-        }
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-        })
-      },
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.herkunft, row.nr, setError, showFilter, user])
-  const { userPersonOption } = dataState
 
   const { hk_kanton, hk_land, hk_bemerkungen, hk_geom_point } =
     userPersonOption ?? {}
@@ -206,7 +194,7 @@ const Herkunft = ({
         />
       )}
       {!showFilter && hk_geom_point && (
-        <Coordinates row={row} rawRow={rawRow} saveToDb={saveToDb} />
+        <Coordinates row={row} saveToDb={saveToDb} />
       )}
       {hk_bemerkungen && (
         <TextField
