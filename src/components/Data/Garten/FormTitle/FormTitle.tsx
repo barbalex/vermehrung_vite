@@ -40,7 +40,6 @@ const TitleSymbols = styled.div`
 
 const GartenFormTitle = ({
   row,
-  rawRow,
   showHistory,
   setShowHistory,
   width,
@@ -76,7 +75,7 @@ const GartenFormTitle = ({
             <KuDownSvg />
           </IconButton>
           <AddButton />
-          <DeleteButton row={row} rawRow={rawRow} />
+          <DeleteButton row={row} />
           <Download gartenId={row.id} />
           <Menu white={false}>
             <HistoryButton

@@ -1,6 +1,7 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import { ReactComponent as ZaDownSvg } from '../../../../svg/to_za_down.inline.svg'
@@ -9,6 +10,7 @@ import { ReactComponent as AusLiDownSvg } from '../../../../svg/to_ausli_down.in
 import { ReactComponent as EvDownSvg } from '../../../../svg/to_ev_down.inline.svg'
 import { ReactComponent as TkDownSvg } from '../../../../svg/to_tk_down.inline.svg'
 import { ReactComponent as UpSvg } from '../../../../svg/to_up.inline.svg'
+import { dexie } from '../../../../dexieClient'
 
 const KulturNavButtons = ({ row }) => {
   const store = useContext(StoreContext)
@@ -39,16 +41,9 @@ const KulturNavButtons = ({ row }) => {
     [activeNodeArray, setActiveNodeArray],
   )
 
-  const [dataState, setDataState] = useState({ kulturOption })
-  useEffect(() => {
-    const kOObservable = row.kultur_option.observe()
-    const subscription = kOObservable.subscribe((kulturOption) =>
-      setDataState({ kulturOption }),
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [row.kultur_option])
-  const { kulturOption } = dataState
+  const kulturOption = useLiveQuery(
+    async () => await dexie.kultur_options.get(row.id),
+  )
 
   return (
     <>

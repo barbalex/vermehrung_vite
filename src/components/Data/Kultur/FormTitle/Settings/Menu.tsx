@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -7,11 +7,11 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import constants from '../../../../../utils/constants'
+import { dexie, PersonOption } from '../../../../../dexieClient'
 
 const Title = styled.div`
   padding: 12px 16px;
@@ -22,41 +22,23 @@ const Title = styled.div`
 
 const SettingsKulturMenu = ({ anchorEl, setAnchorEl, kulturId }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    kulturOption: undefined,
-    userPersonOption: {},
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['ku_zwischenlager', 'ku_erhaltungskultur'])
-      : $of({})
-    const kulturOptionObservable = db
-      .get('kultur_option')
-      .findAndObserve(kulturId)
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      kulturOptionObservable,
+  const data = useLiveQuery(async () => {
+    const [kulturOption, person] = await Promise.all([
+      dexie.kultur_options.get(kulturId),
+      dexie.persons.get({ account_id: user.uid }),
     ])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions, kulturOption]) => {
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-          kulturOption,
-        })
-      },
-    )
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, kulturId, user.uid])
-  const { kulturOption, userPersonOption } = dataState
+    return { kulturOption, personOption }
+  }, [store.filter.art, store.art_initially_queried])
 
+  const kulturOption = data?.kulturOption
+  const userPersonOption = data?.personOption
+
+  const tk = kulturOption?.tk ?? {}
   const { ku_zwischenlager, ku_erhaltungskultur } = userPersonOption ?? {}
-  const { tk } = kulturOption ?? {}
 
   const saveToDbKulturOption = useCallback(
     async (event) => {

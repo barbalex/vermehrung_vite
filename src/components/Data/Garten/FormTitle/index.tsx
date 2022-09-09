@@ -8,13 +8,7 @@ import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
 
-const GartenFormTitle = ({
-  showFilter,
-  row,
-  rawRow,
-  showHistory,
-  setShowHistory,
-}) => {
+const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
   const { personIdInActiveNodeArray } = store
 
@@ -50,7 +44,6 @@ const GartenFormTitle = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       showHistory={showHistory}
       setShowHistory={setShowHistory}
       totalCount={totalCount}
