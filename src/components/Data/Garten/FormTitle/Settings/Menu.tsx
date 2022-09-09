@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -7,8 +7,6 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
@@ -34,38 +32,14 @@ const Info = styled.div`
 
 const SettingsGartenMenu = ({ anchorEl, setAnchorEl }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns([
-            'ga_strasse',
-            'ga_plz',
-            'ga_ort',
-            'ga_geom_point',
-            'ga_lat_lng',
-            'ga_aktiv',
-            'ga_bemerkungen',
-          ])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions]) => {
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-        })
-      },
-    )
+  const userPersonOption = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption } = dataState
+    return personOption
+  }, [user.uid])
 
   const {
     ga_strasse,

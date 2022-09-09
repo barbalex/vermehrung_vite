@@ -34,7 +34,7 @@ const GartenFormTitle = ({
     [store.filter.garten, store.garten_initially_queried],
   )
 
-  const filteredCount = store.eventsFilteredCount ?? '...'
+  const filteredCount = store.gartensFilteredCount ?? '...'
 
   if (showFilter) {
     return (

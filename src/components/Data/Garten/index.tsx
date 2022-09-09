@@ -97,7 +97,6 @@ const Garten = ({
           showHistory={showHistory}
           setShowHistory={setShowHistory}
         />
-        <div>FormTitle</div>
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
