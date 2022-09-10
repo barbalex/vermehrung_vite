@@ -28,7 +28,7 @@ const HistoryButton = ({ asMenu, id, showHistory, setShowHistory, table }) => {
   const store = useContext(StoreContext)
   const { online } = store
 
-  console.log('HistoryButton, table:', table)
+  // console.log('HistoryButton, table:', table)
 
   const row = useLiveQuery(
     async () => await dexie[`${table}s`].get(id),

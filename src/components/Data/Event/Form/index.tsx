@@ -116,9 +116,6 @@ const EventForm = ({
 
     // need to show a choosen person even if inactive but not if deleted
     const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
-    try {
-      person = await row.person.fetch()
-    } catch {}
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',

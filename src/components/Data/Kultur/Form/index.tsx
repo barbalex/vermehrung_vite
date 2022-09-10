@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton'
 import { first as first$ } from 'rxjs/operators'
 import { Q } from '@nozbe/watermelondb'
 import { combineLatest, of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -25,6 +26,9 @@ import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkun
 import constants from '../../../../utils/constants'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import herkunftSort from '../../../../utils/herkunftSort'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
+import { kultur } from '../../../../utils/fragments'
 
 const Container = styled.div`
   padding: 10px;
@@ -71,207 +75,125 @@ const KulturForm = ({
   const art_id = row?.art_id
   const herkunft_id = row?.herkunft_id
 
-  // TODO:
-  // if art was choosen: remove gartens where this art has two kulturs for every herkunft?
-  // if herkunft was choosen: remove gartens where this herkunft has two kulturs
-  const [dataState, setDataState] = useState({
-    gartenWerte: [],
-    userPersonOption: {},
-    artsToChoose: [],
-    herkunftsToChoose: [],
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['ku_zwischenlager', 'ku_erhaltungskultur'])
-      : $of({})
-    const gartensObservable = db
-      .get('garten')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.garten._deleted === false
-              ? [false]
-              : filter.garten._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.garten.aktiv === true
-              ? [true]
-              : filter.garten.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const gartenObservable = row?.garten
-      ? row?.garten?.observe()
-      : $of(filter.garten)
-    const sammlungsObservable = db
-      .get('sammlung')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.sammlung._deleted === false
-              ? [false]
-              : filter.sammlung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('art_id', Q.notEq(null)),
-        Q.where('herkunft_id', Q.notEq(null)),
-      )
-      .observe()
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      gartensObservable,
-      gartenObservable,
-      sammlungsObservable,
+  const data = useLiveQuery(async () => {
+    const [userPerson, gartens, gartenQueried, sammlungs] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.gartens
+        .filter((value) => totalFilter({ value, store, table: 'garten' }))
+        .toArray(),
+      dexie.garten.get(
+        row?.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.sammlungs
+        .filter((s) => s._deleted === false && !!s.art_id && !!s.herkunft_id)
+        .toArray(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions, gartens, garten, sammlungs]) => {
-        const gartensSorted = await gartensSortedFromGartens(gartens)
-        // need to show a choosen garten even if inactive but not if deleted
-        const gartensIncludingChoosen = uniqBy(
-          [...gartensSorted, ...(garten && !showFilter ? [garten] : [])],
-          'id',
-        )
-        const gartenWerte = await Promise.all(
-          gartensIncludingChoosen.map(async (garten) => {
-            let label
-            try {
-              label = await garten.label.pipe(first$()).toPromise()
-            } catch {}
 
-            return {
-              value: garten.id,
-              label,
-            }
-          }),
-        )
-        // only consider kulturen with both art and herkunft chosen
-        const thisGartenKulturs = []
-        try {
-          await garten.kulturs
-            .extend(
-              Q.where(
-                '_deleted',
-                Q.oneOf(
-                  filter.kultur._deleted === false
-                    ? [false]
-                    : filter.kultur._deleted === true
-                    ? [true]
-                    : [true, false, null],
-                ),
-              ),
-              Q.where(
-                'aktiv',
-                Q.oneOf(
-                  filter.kultur.aktiv === true
-                    ? [true]
-                    : filter.kultur.aktiv === false
-                    ? [false]
-                    : [true, false, null],
-                ),
-              ),
-              Q.where('art_id', Q.notEq(null)),
-              Q.where('herkunft_id', Q.notEq(null)),
+    const garten = showFilter ? filter.garten : gartenQueried
+
+    const thisGartenKulturs = await dexie.kulturs
+      .filter(
+        (k) =>
+          kultur._deleted === false &&
+          k.aktiv === true &&
+          !!k.art_id &&
+          !!kultur.herkunft_id,
+      )
+      .toArray()
+
+    // TODO:
+    // if art was choosen: remove gartens where this art has two kulturs for every herkunft?
+    // if herkunft was choosen: remove gartens where this herkunft has two kulturs
+    const artHerkuenfte = uniqBy(
+      sammlungs.map((a) => ({
+        art_id: a.art_id,
+        herkunft_id: a.herkunft_id,
+      })),
+      (ah) => `${ah.art_id}/${ah.herkunft_id}`,
+    )
+    const artHerkunftInGartenNichtZl = thisGartenKulturs
+      .filter((k) => (filter.garten.aktiv === true ? k.aktiv : true))
+      .filter((k) => !k.zwischenlager)
+    const artHerkunftZwischenlagerInGarten = thisGartenKulturs
+      .filter((k) => (filter.garten.aktiv === true ? k.aktiv : true))
+      // only consider kulturen with both art and herkunft chosen
+      .filter((k) => k.zwischenlager)
+    const artsToChoose = uniq([
+      ...artHerkuenfte
+        // only arten with herkunft
+        .filter((ah) => (herkunft_id ? ah.herkunft_id === herkunft_id : true))
+        .filter((s) => {
+          // do not filter if no garten choosen
+          if (!row.garten_id) return true
+          // do not return if exists nicht zl AND zl
+          return !(
+            !!artHerkunftInGartenNichtZl.find(
+              (a) => a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
+            ) &&
+            !!artHerkunftZwischenlagerInGarten.find(
+              (a) => a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
             )
-            .fetch()
-        } catch {}
-        const artHerkuenfte = uniqBy(
-          sammlungs.map((a) => ({
-            art_id: a.art_id,
-            herkunft_id: a.herkunft_id,
-          })),
-          (ah) => `${ah.art_id}/${ah.herkunft_id}`,
-        )
-        const artHerkunftInGartenNichtZl = thisGartenKulturs
-          .filter((k) => (filter.garten.aktiv === true ? k.aktiv : true))
-          .filter((k) => !k.zwischenlager)
-        const artHerkunftZwischenlagerInGarten = thisGartenKulturs
-          .filter((k) => (filter.garten.aktiv === true ? k.aktiv : true))
-          // only consider kulturen with both art and herkunft chosen
-          .filter((k) => k.zwischenlager)
-        const artsToChoose = uniq([
-          ...artHerkuenfte
-            // only arten with herkunft
-            .filter((ah) =>
-              herkunft_id ? ah.herkunft_id === herkunft_id : true,
-            )
-            .filter((s) => {
-              // do not filter if no garten choosen
-              if (!row.garten_id) return true
-              // do not return if exists nicht zl AND zl
-              return !(
-                !!artHerkunftInGartenNichtZl.find(
-                  (a) =>
-                    a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
-                ) &&
-                !!artHerkunftZwischenlagerInGarten.find(
-                  (a) =>
-                    a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
-                )
-              )
-            })
-            // only arten
-            .map((a) => a.art_id),
-          // do show own art
-          ...(art_id ? [art_id] : []),
-        ])
-        const herkunftsToChoose = uniq([
-          ...artHerkuenfte
-            .filter((s) => (art_id ? s.art_id === art_id : true))
-            .filter((s) => {
-              // do not filter if no garten choosen
-              if (!row.garten_id) return true
-              // do not return if exists nicht zl AND zl
-              return !(
-                !!artHerkunftInGartenNichtZl.find(
-                  (a) =>
-                    a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
-                ) &&
-                !!artHerkunftZwischenlagerInGarten.find(
-                  (a) =>
-                    a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
-                )
-              )
-            })
-            .map((a) => a.herkunft_id),
-          // do show own herkunft
-          ...(herkunft_id ? [herkunft_id] : []),
-        ])
-        setDataState({
-          gartenWerte,
-          userPersonOption: userPersonOptions?.[0],
-          artsToChoose,
-          herkunftsToChoose,
+          )
         })
-      },
+        // only arten
+        .map((a) => a.art_id),
+      // do show own art
+      ...(art_id ? [art_id] : []),
+    ])
+    const herkunftsToChoose = uniq([
+      ...artHerkuenfte
+        .filter((s) => (art_id ? s.art_id === art_id : true))
+        .filter((s) => {
+          // do not filter if no garten choosen
+          if (!row.garten_id) return true
+          // do not return if exists nicht zl AND zl
+          return !(
+            !!artHerkunftInGartenNichtZl.find(
+              (a) => a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
+            ) &&
+            !!artHerkunftZwischenlagerInGarten.find(
+              (a) => a.art_id === s.art_id && a.herkunft_id === s.herkunft_id,
+            )
+          )
+        })
+        .map((a) => a.herkunft_id),
+      // do show own herkunft
+      ...(herkunft_id ? [herkunft_id] : []),
+    ])
+
+    const userPersonOption = await dexie.person_options.get(userPerson.id)
+
+    const gartensSorted = await gartensSortedFromGartens(gartens)
+    // need to show a choosen garten even if inactive but not if deleted
+    const gartensIncludingChoosen = uniqBy(
+      [...gartensSorted, ...(garten && !showFilter ? [garten] : [])],
+      'id',
+    )
+    const gartenWerte = await Promise.all(
+      gartensIncludingChoosen.map(async (garten) => {
+        const label = await garten.label()
+
+        return {
+          value: garten.id,
+          label,
+        }
+      }),
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    user.uid,
-    row?.garten,
-    ...Object.values(filter.garten),
-    herkunft_id,
-    art_id,
-    row.garten_id,
-    showFilter,
-  ])
-  const { gartenWerte, userPersonOption, artsToChoose, herkunftsToChoose } =
-    dataState
+    return { gartenWerte, userPersonOption, artsToChoose, herkunftsToChoose }
+  }, [store.filter.kultur, store.kultur_initially_queried])
+
+  const gartenWerte = data?.gartenWerte ?? []
+  const userPersonOption = data?.userPersonOption ?? {}
+  const artsToChoose = data?.artsToChoose ?? []
+  const herkunftsToChoose = data?.herkunftsToChoose ?? []
+
+  console.log('KulturForm', {
+    gartenWerte,
+    userPersonOption,
+    artsToChoose,
+    herkunftsToChoose,
+  })
 
   const { ku_zwischenlager, ku_erhaltungskultur } = userPersonOption ?? {}
 
