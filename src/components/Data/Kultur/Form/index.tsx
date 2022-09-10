@@ -181,7 +181,7 @@ const KulturForm = ({
     )
 
     return { gartenWerte, userPersonOption, artsToChoose, herkunftsToChoose }
-  }, [store.filter.kultur, store.kultur_initially_queried])
+  }, [store.filter.kultur, store.kultur_initially_queried, user, row])
 
   const gartenWerte = data?.gartenWerte ?? []
   const userPersonOption = data?.userPersonOption ?? {}

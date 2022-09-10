@@ -56,8 +56,8 @@ const Kultur = ({
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online,  } = store
-  
+  const { filter, online } = store
+
   let row = useLiveQuery(async () => await dexie.kulturs.get(id), [id])
   if (showFilter) row = filter.kultur
 
@@ -104,15 +104,14 @@ const Kultur = ({
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            {/* <Form
+            <Form
               showFilter={showFilter}
               id={id}
               row={row}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            /> */}
-            <div>Form</div>
+            />
             <>
               {online && (
                 <>
