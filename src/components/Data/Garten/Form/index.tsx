@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniqBy from 'lodash/uniqBy'
-import { useLiveQuery } from 'dexie-react-hooks' 
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -57,9 +57,6 @@ const GartenForm = ({
 
     // need to show a choosen person even if inactive but not if deleted
     const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
-    try {
-      person = await row.person.fetch()
-    } catch {}
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
