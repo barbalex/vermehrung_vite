@@ -8,7 +8,6 @@ import { IoMdInformationCircleOutline } from 'react-icons/io'
 import IconButton from '@mui/material/IconButton'
 import { first as first$ } from 'rxjs/operators'
 import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
