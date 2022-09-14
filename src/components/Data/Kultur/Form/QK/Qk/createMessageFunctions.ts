@@ -77,47 +77,43 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    //   kultursWithoutHerkunft: async () =>
-    //     await Promise.all(
-    //       kultursSorted
-    //         .filter((k) => k.id === kulturId)
-    //         .filter((k) => !k.herkunft_id)
-    //         .map(async (k) => {
-    //           let text
-    //           try {
-    //             text = await k.label()
-    //           } catch {}
-    //           return {
-    //             url: ['Vermehrung', 'Kulturen', kulturId],
-    //             text,
-    //           }
-    //         }),
-    //     ),
-    //   kultursWithoutZaehlungThisYear: async () =>
-    //     await Promise.all(
-    //       kultursSorted
-    //         .filter((k) => k.id === kulturId)
-    //         .filter(
-    //           (k) =>
-    //             zaehlungs
-    //               .filter((z) => z.kultur_id === k.id)
-    //               .filter((z) => !z._deleted)
-    //               .filter(
-    //                 (z) =>
-    //                   z.datum && z.datum > startYear && z.datum < startNextYear,
-    //               ).length === 0,
-    //         )
-    //         .map(async (k) => {
-    //           let text
-    //           try {
-    //             text = await k.label()
-    //           } catch {}
-    //           return {
-    //             url: ['Vermehrung', 'Kulturen', kulturId],
-    //             text,
-    //           }
-    //         }),
-    //     ),
+    kultursWithoutHerkunft: async () =>
+      await Promise.all(
+        kultursSorted
+          .filter((k) => k.id === kulturId)
+          .filter((k) => !k.herkunft_id)
+          .map(async (k) => {
+            const text = await k.label()
+
+            return {
+              url: ['Vermehrung', 'Kulturen', kulturId],
+              text,
+            }
+          }),
+      ),
+      kultursWithoutZaehlungThisYear: async () =>
+        await Promise.all(
+          kultursSorted
+            .filter((k) => k.id === kulturId)
+            .filter(
+              (k) =>
+                zaehlungs
+                  .filter((z) => z.kultur_id === k.id)
+                  .filter((z) => !z._deleted)
+                  .filter(
+                    (z) =>
+                      z.datum && z.datum > startYear && z.datum < startNextYear,
+                  ).length === 0,
+            )
+            .map(async (k) => {
+              const text = await k.label()
+              
+              return {
+                url: ['Vermehrung', 'Kulturen', kulturId],
+                text,
+              }
+            }),
+        ),
     //   teilkultursWithoutName: async () =>
     //     await Promise.all(
     //       teilkultursSorted
