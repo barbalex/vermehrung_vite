@@ -1,13 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniq from 'lodash/uniq'
 import uniqBy from 'lodash/uniqBy'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import IconButton from '@mui/material/IconButton'
-import { first as first$ } from 'rxjs/operators'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
@@ -63,7 +61,7 @@ const KulturForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { errors, filter, online, unsetError, user, db } = store
+  const { errors, filter, online, unsetError, user } = store
 
   // From all collected combinations of art and herkunft show only arten of those not present in this garten
   // => find all combinations of art and herkunft in sammlungen
@@ -80,7 +78,7 @@ const KulturForm = ({
       dexie.gartens
         .filter((value) => totalFilter({ value, store, table: 'garten' }))
         .toArray(),
-      dexie.garten.get(
+      dexie.gartens.get(
         row?.garten_id ?? '99999999-9999-9999-9999-999999999999',
       ),
       dexie.sammlungs
@@ -188,7 +186,7 @@ const KulturForm = ({
       id: row.art_id ?? '99999999-9999-9999-9999-999999999999',
     })
     const artsIncludingChoosen = uniqBy(
-      [...arts, ...(art && !showFilter ? [art] : [])],
+      [...(arts ?? []), ...(art && !showFilter ? [art] : [])],
       'id',
     )
     const artWerte = await Promise.all(
@@ -202,12 +200,32 @@ const KulturForm = ({
       }),
     )
 
+    const herkunfts = await dexie.herkunfts
+      .where('id')
+      .anyOf(herkunftsToChoose)
+      .filter((a) => a._deleted === false)
+      .toArray()
+    const herkunft = await dexie.herkunfts.get({
+      id: row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    })
+    const herkunftsIncludingChoosen = uniqBy(
+      [...(herkunfts ?? []), ...(herkunft && !showFilter ? [herkunft] : [])],
+      'id',
+    )
+    const herkunftWerte = herkunftsIncludingChoosen
+      .sort(herkunftSort)
+      .map((herkunft) => ({
+        value: herkunft.id,
+        label: herkunftLabelFromHerkunft({ herkunft }),
+      }))
+
     return {
       gartenWerte,
       userPersonOption,
       artsToChoose,
       herkunftsToChoose,
       artWerte,
+      herkunftWerte,
     }
   }, [store.filter.kultur, store.kultur_initially_queried, user, row])
 
@@ -216,12 +234,15 @@ const KulturForm = ({
   const artsToChoose = data?.artsToChoose ?? []
   const herkunftsToChoose = data?.herkunftsToChoose ?? []
   const artWerte = data?.artWerte ?? []
+  const herkunftWerte = data?.herkunftWerte ?? []
 
   console.log('KulturForm', {
     gartenWerte,
     userPersonOption,
     artsToChoose,
     herkunftsToChoose,
+    herkunftWerte,
+    artWerte,
   })
 
   const { ku_zwischenlager, ku_erhaltungskultur } = userPersonOption ?? {}
@@ -229,58 +250,6 @@ const KulturForm = ({
   useEffect(() => {
     unsetError('kultur')
   }, [id, unsetError])
-
-  // artForArtWerte not used because too complicated
-  /*const artForArtWerte = artsSorted.filter(
-    (a) => !!a.ae_id && artsToChoose.includes(a.id),
-  )*/
-  const [dataState2, setDataState2] = useState({
-    artWerte: [],
-    herkunftWerte: [],
-  })
-  useEffect(() => {
-    const herkunftsObservable = db
-      .get('herkunft')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.herkunft._deleted === false
-              ? [false]
-              : filter.herkunft._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('id', Q.oneOf(herkunftsToChoose)),
-      )
-      .observe()
-    const combinedObservables = combineLatest([herkunftsObservable])
-    const subscription = combinedObservables.subscribe(async ([herkunfts]) => {
-      let herkunft
-      try {
-        herkunft = await row.herkunft.fetch()
-      } catch {}
-      const herkunftsIncludingChoosen = uniqBy(
-        [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
-        'id',
-      )
-      const herkunftWerte = herkunftsIncludingChoosen
-        .sort(herkunftSort)
-        .map((herkunft) => ({
-          value: herkunft.id,
-          label: herkunftLabelFromHerkunft({ herkunft }),
-        }))
-
-      setDataState2({
-        herkunftWerte,
-      })
-    })
-
-    return () => subscription?.unsubscribe?.()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [db, user, artsToChoose.length, herkunftsToChoose.length])
-  const { artWerte, herkunftWerte } = dataState2
 
   const saveToDb = useCallback(
     async (event) => {
@@ -491,9 +460,9 @@ const KulturForm = ({
         )}
         {!showFilter && row.id && (
           <>
-            <Timeline row={row} />
+            {/* <Timeline row={row} />
             <QK kultur={row} />
-            <Files parentTable="kultur" parent={row} />
+            <Files parentTable="kultur" parent={row} /> */}
           </>
         )}
       </Container>
