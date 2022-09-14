@@ -519,66 +519,70 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             text,
           }
         }),
-    //   anLieferungsWithoutDatum: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.von_kultur_id === kulturId)
-    //       .filter((l) => !l.datum)
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
-    //   ausLieferungsWithoutDatum: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.von_kultur_id === kulturId)
-    //       .filter((l) => !l.datum)
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
-    //   anLieferungsWithoutPerson: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.nach_kultur_id === kulturId)
-    //       .filter((l) => !l.person_id)
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
-    //   ausLieferungsWithoutPerson: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.von_kultur_id === kulturId)
-    //       .filter((l) => !l.person_id)
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
+    anLieferungsWithoutDatum: async () =>
+      lieferungsSorted
+        .filter((l) => l.von_kultur_id === kulturId)
+        .filter((l) => !l.datum)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
+            text,
+          }
+        }),
+    ausLieferungsWithoutDatum: async () =>
+      lieferungsSorted
+        .filter((l) => l.von_kultur_id === kulturId)
+        .filter((l) => !l.datum)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            text,
+          }
+        }),
+    anLieferungsWithoutPerson: async () =>
+      lieferungsSorted
+        .filter((l) => l.nach_kultur_id === kulturId)
+        .filter((l) => !l.person_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
+            text,
+          }
+        }),
+    ausLieferungsWithoutPerson: async () =>
+      lieferungsSorted
+        .filter((l) => l.von_kultur_id === kulturId)
+        .filter((l) => !l.person_id)
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            text,
+          }
+        }),
     //   eventsWithoutBeschreibung: async () =>
     //     await Promise.all(
     //       eventsSorted
