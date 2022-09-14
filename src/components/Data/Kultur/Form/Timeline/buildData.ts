@@ -5,43 +5,33 @@ import { Q } from '@nozbe/watermelondb'
 import format from 'date-fns/format'
 
 import exists from '../../../../../utils/exists'
+import { dexie } from '../../../../../dexieClient'
 
 const buildData = async ({ row }) => {
-  let zaehlungenDone = []
-  try {
-    zaehlungenDone = await row.zaehlungs
-      .extend(
-        Q.experimentalJoinTables(['teilzaehlung']),
-        Q.where('prognose', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('datum', Q.lte(format(new Date(), 'yyyy-mm-dd'))),
-        Q.where('_deleted', false),
-        // following was not included before refactoring but seems a good idea
-        //Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-        Q.sortBy('datum', Q.asc),
-      )
-      .fetch()
-  } catch {}
-  const lastZaehlungDone = zaehlungenDone.slice(-1)[0] ?? {}
+  const zaehlungs = await dexie.zaehlungs
+    .filter((z) => z.kultur_id === row.id && z._deleted === false)
+    .sortBy('datum')
+    .toArray()
+  const zaehlungsDone = await zaehlungs
+    .filter(
+      (z) =>
+        z.prognose === false &&
+        !!z.datum &&
+        z.datum <= format(new Date(), 'yyyy-mm-dd'),
+    )
+    .sortBy('datum')
+    .toArray()
+  const lastZaehlungDone = zaehlungsDone.slice(-1)[0] ?? {}
 
-  let zaehlungenPlanned = []
-  try {
-    zaehlungenPlanned = await row.zaehlungs
-      .extend(
-        Q.experimentalJoinTables(['teilzaehlung']),
-        Q.where('prognose', true),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('_deleted', false),
-        //Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-      )
-      .fetch()
-  } catch {}
-  const zaehlungenPlannedIgnored = zaehlungenPlanned.filter((zg) =>
+  const zaehlungsPlanned = zaehlungs.filter(
+    (z) => z.prognose === true && !!z.datum,
+  )
+  const zaehlungenPlannedIgnored = zaehlungsPlanned.filter((zg) =>
     // check if more recent zaehlungenDone exists
-    zaehlungenDone.some((z) => z.datum >= zg.datum),
+    zaehlungsDone.some((z) => z.datum >= zg.datum),
   )
 
-  let zaehlungenPlannedIncluded = zaehlungenPlanned.filter(
+  let zaehlungenPlannedIncluded = zaehlungsPlanned.filter(
     (lg) => !zaehlungenPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
   if (zaehlungenPlannedIncluded.length) {
@@ -50,15 +40,15 @@ const buildData = async ({ row }) => {
   }
 
   const zaehlungenForLine = sortBy(
-    [...zaehlungenDone, ...zaehlungenPlannedIncluded],
+    [...zaehlungsDone, ...zaehlungenPlannedIncluded],
     'datum',
   )
   const zaehlungenForLineReversed = [...zaehlungenForLine].reverse()
   const zaehlungenDoneData = await Promise.all(
-    zaehlungenDone.map(async (z) => {
-      const teilzaehlungs = await z.teilzaehlungs.extend(
-        Q.where('_deleted', false),
-      )
+    zaehlungsDone.map(async (z) => {
+      const teilzaehlungs = await dexie.teilzaehlungs
+        .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
+        .toArray()
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -100,7 +90,9 @@ const buildData = async ({ row }) => {
   const zaehlungenPlannedIncludedData = await Promise.all(
     zaehlungenPlannedIncluded.map(async (z) => {
       const teilzaehlungs = z.teilzaehlungs
-        ? await z.teilzaehlungs.extend(Q.where('_deleted', false))
+        ? await dexie.teilzaehlungs
+            .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
+            .toArray()
         : []
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
@@ -144,9 +136,9 @@ const buildData = async ({ row }) => {
   )
   const zaehlungenPlannedIgnoredData = await Promise.all(
     zaehlungenPlannedIgnored.map(async (z) => {
-      const teilzaehlungs = await z.teilzaehlungs.extend(
-        Q.where('_deleted', false),
-      )
+      const teilzaehlungs = await dexie.teilzaehlungs
+        .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
+        .toArray()
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
