@@ -395,10 +395,10 @@ const buildData = async ({ row }) => {
           (t) => t._deleted === false && t.zaehlung_id === previousZaehlung.id,
         )
         .toArray()
-      const anzahlenPflanzenOfPrevoiusZaehlung = previousZaehlungTzs
+      const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
-      const anzPflanzen = anzahlenPflanzenOfPrevoiusZaehlung.reduce(
+      const anzPflanzen = anzahlenPflanzenOfPreviousZaehlung.reduce(
         (a, b) => a + b,
         0,
       )
