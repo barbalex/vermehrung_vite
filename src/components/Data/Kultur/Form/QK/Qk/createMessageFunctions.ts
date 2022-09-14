@@ -34,27 +34,13 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
     .toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
-  console.log('createMessageFunctions, lieferungsSorted:', lieferungsSorted)
+  const teilkulturs = await dexie.teilkulturs
+    .filter((value) => totalFilter({ value, store, table: 'teilkultur' }))
+    .toArray()
+  const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
-  // let teilkulturs = []
-  // try {
-  //   teilkulturs = await db
-  //     .get('teilkultur')
-  //     .query(
-  //       Q.where(
-  //         '_deleted',
-  //         Q.oneOf(
-  //           filter.teilkultur._deleted === false
-  //             ? [false]
-  //             : filter.teilkultur._deleted === true
-  //             ? [true]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //     )
-  //     .fetch()
-  // } catch {}
-  // const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+  console.log('createMessageFunctions, teilkultursSorted:', teilkultursSorted)
+
   // let zaehlungs = []
   // try {
   //   zaehlungs = await db
