@@ -29,54 +29,13 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
     .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
 
-  console.log('createMessageFunctions, kultursSorted:', kultursSorted)
-  // try {
-  //   kulturs = await db
-  //     .get('kultur')
-  //     .query(
-  //       Q.where(
-  //         '_deleted',
-  //         Q.oneOf(
-  //           filter.kultur._deleted === false
-  //             ? [false]
-  //             : filter.kultur._deleted === true
-  //             ? [true]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //       Q.where(
-  //         'aktiv',
-  //         Q.oneOf(
-  //           filter.kultur.aktiv === true
-  //             ? [true]
-  //             : filter.kultur.aktiv === false
-  //             ? [false]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //     )
-  //     .fetch()
-  // } catch {}
-  // const kultursSorted = await kultursSortedFromKulturs(kulturs)
-  // let lieferungs = []
-  // try {
-  //   lieferungs = await db
-  //     .get('lieferung')
-  //     .query(
-  //       Q.where(
-  //         '_deleted',
-  //         Q.oneOf(
-  //           filter.lieferung._deleted === false
-  //             ? [false]
-  //             : filter.lieferung._deleted === true
-  //             ? [true]
-  //             : [true, false, null],
-  //         ),
-  //       ),
-  //     )
-  //     .fetch()
-  // } catch {}
-  // const lieferungsSorted = lieferungs.sort(lieferungSort)
+  const lieferungs = await dexie.lieferungs
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
+  const lieferungsSorted = lieferungs.sort(lieferungSort)
+
+  console.log('createMessageFunctions, lieferungsSorted:', lieferungsSorted)
+
   // let teilkulturs = []
   // try {
   //   teilkulturs = await db
