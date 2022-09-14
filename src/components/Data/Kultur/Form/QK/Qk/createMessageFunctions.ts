@@ -159,34 +159,31 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    //   zaehlungsWithoutDatum: async () =>
-    //     await Promise.all(
-    //       zaehlungsSorted
-    //         .filter((z) => z.kultur_id === kulturId)
-    //         .filter((z) => !z.datum)
-    //         .map(async (z) => {
-    //           let kultur
-    //           try {
-    //             kultur = await z.kultur.fetch()
-    //           } catch {}
-    //           let kulturLabel
-    //           try {
-    //             kulturLabel = await kultur.label()
-    //           } catch {}
-    //           return {
-    //             url: [
-    //               'Vermehrung',
-    //               'Arten',
-    //               kultur?.art_id,
-    //               'Kulturen',
-    //               kulturId,
-    //               'Zaehlungen',
-    //               z.id,
-    //             ],
-    //             text: `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`,
-    //           }
-    //         }),
-    //     ),
+    zaehlungsWithoutDatum: async () =>
+      await Promise.all(
+        zaehlungsSorted
+          .filter((z) => z.kultur_id === kulturId)
+          .filter((z) => !z.datum)
+          .map(async (z) => {
+            const kultur = await dexie.kulturs.get(
+              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+            )
+            const kulturLabel = await kultur.label()
+
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                kultur?.art_id,
+                'Kulturen',
+                kulturId,
+                'Zaehlungen',
+                z.id,
+              ],
+              text: `${kulturLabel ?? '(keine Kultur)'}, Zählung-ID: ${z.id}`,
+            }
+          }),
+      ),
     //   zaehlungsWithoutAnzahlPflanzen: async () =>
     //     await Promise.all(
     //       zaehlungsSorted
