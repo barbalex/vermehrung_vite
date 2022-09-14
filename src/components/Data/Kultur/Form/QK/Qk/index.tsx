@@ -56,32 +56,32 @@ const KulturQkQk = ({ kultur, qkChoosens }) => {
   )
 
   const [messageGroups, setMessageGroups] = useState(null)
-  useEffect(() => {
-    let isActive = true
-    createMessageFunctions({
-      kulturId: kultur.id,
-      db,
-      store,
-    }).then(async (messageFunctions) => {
-      const msgGroups = await Promise.all(
-        qkChoosens
-          .filter((qk) => !!messageFunctions[qk.name])
-          .map(async (qk) => ({
-            title: qk?.titel,
-            messages: messageFunctions
-              ? await messageFunctions[qk?.name]()
-              : [],
-          })),
-      )
-      if (!isActive) return
+  // useEffect(() => {
+  //   let isActive = true
+  //   createMessageFunctions({
+  //     kulturId: kultur.id,
+  //     db,
+  //     store,
+  //   }).then(async (messageFunctions) => {
+  //     const msgGroups = await Promise.all(
+  //       qkChoosens
+  //         .filter((qk) => !!messageFunctions[qk.name])
+  //         .map(async (qk) => ({
+  //           title: qk?.titel,
+  //           messages: messageFunctions
+  //             ? await messageFunctions[qk?.name]()
+  //             : [],
+  //         })),
+  //     )
+  //     if (!isActive) return
 
-      setMessageGroups(msgGroups.filter((qk) => qk.messages.length))
-    })
+  //     setMessageGroups(msgGroups.filter((qk) => qk.messages.length))
+  //   })
 
-    return () => {
-      isActive = false
-    }
-  }, [kultur.id, qkChoosens, db, store])
+  //   return () => {
+  //     isActive = false
+  //   }
+  // }, [kultur.id, qkChoosens, db, store])
 
   const messageGroupsFiltered = messageGroups
     ? messageGroups.filter((messageGroup) => {

@@ -449,9 +449,9 @@ const KulturForm = ({
         )}
         {!showFilter && row.id && (
           <>
-            {/* <Timeline row={row} />
+            {/* <Timeline row={row} /> */}
             <QK kultur={row} />
-            <Files parentTable="kultur" parent={row} /> */}
+            {/* <Files parentTable="kultur" parent={row} /> */}
           </>
         )}
       </Container>

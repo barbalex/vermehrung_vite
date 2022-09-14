@@ -9,6 +9,7 @@ import eventSort from '../../../../../../utils/eventSort'
 import lieferungSort from '../../../../../../utils/lieferungSort'
 import teilkulturSort from '../../../../../../utils/teilkulturSort'
 import zaehlungSort from '../../../../../../utils/zaehlungSort'
+import { dexie } from '../../../../../../dexieClient'
 
 const createMessageFunctions = async ({ kulturId, db, store }) => {
   const { filter } = store
