@@ -61,15 +61,15 @@ const ApQk = ({ artId }) => {
     ])
 
     const personOption: PersonOption = await dexie.person_options.get(person.id)
+    const qkChoosens = qks.filter((qk) =>
+      personOption.art_qk_choosen.includes(qk.id),
+    )
 
-    return { personOption, qks }
+    return { qks, qkChoosens }
   }, [user.uid])
 
-  const userPersonOption: PersonOption = data?.personOption ?? {}
+  const qkChoosens: Qk[] = data?.qkChoosens ?? []
   const qks: Qk[] = data?.qks ?? []
-  const qkChoosens = qks.filter((qk) =>
-    userPersonOption.art_qk_choosen.includes(qk.id),
-  )
 
   const qkCount = qks.length
   const qkChoosenCount = qkChoosens.length

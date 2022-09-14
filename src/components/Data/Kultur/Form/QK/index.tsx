@@ -9,12 +9,14 @@ import Tab from '@mui/material/Tab'
 import { motion, useAnimation } from 'framer-motion'
 import { Q } from '@nozbe/watermelondb'
 import { combineLatest, of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Qk from './Qk'
 import Choose from './Choose'
 import constants from '../../../../../utils/constants'
-import ErrorBoundary from '../../../../shared/ErrorBoundary' 
+import ErrorBoundary from '../../../../shared/ErrorBoundary'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
