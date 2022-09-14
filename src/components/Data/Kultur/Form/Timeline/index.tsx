@@ -21,7 +21,7 @@ import { motion, useAnimation } from 'framer-motion'
 
 import CustomTooltip from './Tooltip'
 import LabelLieferung from './LabelLieferung'
-import LabelZaehlung from './LabelZaehlung'
+import LabelZaehlung from './LabelZaehlung' 
 import CustomAxisTick from './CustomAxisTick'
 import constants from '../../../../../utils/constants'
 import exists from '../../../../../utils/exists'

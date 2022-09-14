@@ -236,14 +236,14 @@ const KulturForm = ({
   const artWerte = data?.artWerte ?? []
   const herkunftWerte = data?.herkunftWerte ?? []
 
-  console.log('KulturForm', {
-    gartenWerte,
-    userPersonOption,
-    artsToChoose,
-    herkunftsToChoose,
-    herkunftWerte,
-    artWerte,
-  })
+  // console.log('KulturForm', {
+  //   gartenWerte,
+  //   userPersonOption,
+  //   artsToChoose,
+  //   herkunftsToChoose,
+  //   herkunftWerte,
+  //   artWerte,
+  // })
 
   const { ku_zwischenlager, ku_erhaltungskultur } = userPersonOption ?? {}
 
