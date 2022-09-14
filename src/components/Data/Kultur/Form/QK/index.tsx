@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useContext, useEffect } from 'react'
+import React, { useCallback, useState, useContext } from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
@@ -7,8 +7,6 @@ import IconButton from '@mui/material/IconButton'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import { motion, useAnimation } from 'framer-motion'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
@@ -51,42 +49,27 @@ const Body = styled.div`
 
 const KulturQk = ({ kultur }) => {
   const store = useContext(StoreContext)
-  const { db, user } = store
+  const { user } = store
 
   const [tab, setTab] = useState('qk')
   const onChangeTab = useCallback((event, value) => setTab(value), [])
 
-  const [dataState, setDataState] = useState({
-    qks: [],
-    userPersonOption,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['kultur_qk_choosen'])
-      : $of({})
-    const kulturQksObservable = db
-      .get('kultur_qk')
-      .query(Q.where('_deleted', false))
-      .observeWithColumns(['name'])
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      kulturQksObservable,
+  const data = useLiveQuery(async () => {
+    const [person, qks] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.kultur_qks.filter((q) => q._deleted === false).sortBy('name'),
     ])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions, qks]) => {
-        setDataState({ qks, userPersonOption: userPersonOptions?.[0] })
-      },
+
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
+    const qkChoosens = qks.filter((qk) =>
+      personOption.kultur_qk_choosen.includes(qk.id),
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { qks, userPersonOption } = dataState
-  const qkChoosens = qks.filter((qk) =>
-    userPersonOption.kultur_qk_choosen.includes(qk.id),
-  )
+    return { qks, qkChoosens }
+  }, [user.uid])
+
+  const qkChoosens: Qk[] = data?.qkChoosens ?? []
+  const qks: Qk[] = data?.qks ?? []
 
   const qkCount = qks.length
   const qkChoosenCount = qkChoosens.length
