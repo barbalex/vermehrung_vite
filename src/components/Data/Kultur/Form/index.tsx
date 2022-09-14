@@ -179,13 +179,43 @@ const KulturForm = ({
       }),
     )
 
-    return { gartenWerte, userPersonOption, artsToChoose, herkunftsToChoose }
+    const arts = await dexie.arts
+      .where('id')
+      .anyOf(artsToChoose)
+      .filter((a) => a._deleted === false && !!a.ae_id)
+      .toArray()
+    const art = await dexie.arts.get({
+      id: row.art_id ?? '99999999-9999-9999-9999-999999999999',
+    })
+    const artsIncludingChoosen = uniqBy(
+      [...arts, ...(art && !showFilter ? [art] : [])],
+      'id',
+    )
+    const artWerte = await Promise.all(
+      artsIncludingChoosen.map(async (art) => {
+        const label = await art.label()
+
+        return {
+          value: art.id,
+          label,
+        }
+      }),
+    )
+
+    return {
+      gartenWerte,
+      userPersonOption,
+      artsToChoose,
+      herkunftsToChoose,
+      artWerte,
+    }
   }, [store.filter.kultur, store.kultur_initially_queried, user, row])
 
   const gartenWerte = data?.gartenWerte ?? []
   const userPersonOption = data?.userPersonOption ?? {}
   const artsToChoose = data?.artsToChoose ?? []
   const herkunftsToChoose = data?.herkunftsToChoose ?? []
+  const artWerte = data?.artWerte ?? []
 
   console.log('KulturForm', {
     gartenWerte,
@@ -209,23 +239,6 @@ const KulturForm = ({
     herkunftWerte: [],
   })
   useEffect(() => {
-    const artsObservable = db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('ae_id', Q.notEq(null)),
-        Q.where('id', Q.oneOf(artsToChoose)),
-      )
-      .observe()
     const herkunftsObservable = db
       .get('herkunft')
       .query(
@@ -242,54 +255,27 @@ const KulturForm = ({
         Q.where('id', Q.oneOf(herkunftsToChoose)),
       )
       .observe()
-    const combinedObservables = combineLatest([
-      artsObservable,
-      herkunftsObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      async ([arts, herkunfts]) => {
-        let art
-        try {
-          art = await row.art.fetch()
-        } catch {}
-        const artsIncludingChoosen = uniqBy(
-          [...arts, ...(art && !showFilter ? [art] : [])],
-          'id',
-        )
-        const artWerte = await Promise.all(
-          artsIncludingChoosen.map(async (art) => {
-            let label
-            try {
-              label = await art.label.pipe(first$()).toPromise()
-            } catch {}
+    const combinedObservables = combineLatest([herkunftsObservable])
+    const subscription = combinedObservables.subscribe(async ([herkunfts]) => {
+      let herkunft
+      try {
+        herkunft = await row.herkunft.fetch()
+      } catch {}
+      const herkunftsIncludingChoosen = uniqBy(
+        [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
+        'id',
+      )
+      const herkunftWerte = herkunftsIncludingChoosen
+        .sort(herkunftSort)
+        .map((herkunft) => ({
+          value: herkunft.id,
+          label: herkunftLabelFromHerkunft({ herkunft }),
+        }))
 
-            return {
-              value: art.id,
-              label,
-            }
-          }),
-        )
-        let herkunft
-        try {
-          herkunft = await row.herkunft.fetch()
-        } catch {}
-        const herkunftsIncludingChoosen = uniqBy(
-          [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
-          'id',
-        )
-        const herkunftWerte = herkunftsIncludingChoosen
-          .sort(herkunftSort)
-          .map((herkunft) => ({
-            value: herkunft.id,
-            label: herkunftLabelFromHerkunft({ herkunft }),
-          }))
-
-        setDataState2({
-          artWerte,
-          herkunftWerte,
-        })
-      },
-    )
+      setDataState2({
+        herkunftWerte,
+      })
+    })
 
     return () => subscription?.unsubscribe?.()
     // eslint-disable-next-line react-hooks/exhaustive-deps
