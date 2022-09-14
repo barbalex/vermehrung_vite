@@ -389,51 +389,54 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             text,
           }
         }),
-    //   anLieferungsWithoutAnzahlPflanzen: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.nach_kultur_id === kulturId)
-    //       .filter((l) => !exists(l.anzahl_pflanzen))
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
-    //   ausLieferungsWithoutAnzahlPflanzen: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.von_kultur_id === kulturId)
-    //       .filter((l) => !exists(l.anzahl_pflanzen))
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
-    //   anLieferungsWithoutAnzahlAuspflanzbereit: async () =>
-    //     lieferungsSorted
-    //       .filter((l) => l.nach_kultur_id === kulturId)
-    //       .filter((l) => !exists(l.anzahl_auspflanzbereit))
-    //       .map((l) => {
-    //         const datum = l.datum
-    //           ? format(new Date(l.datum), 'yyyy.MM.dd')
-    //           : `kein Datum`
-    //         const geplant = l.geplant ? ', (geplant)' : ''
-    //         const text = `${datum}, ID: ${l.id}${geplant}`
-    //         return {
-    //           url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
-    //           text,
-    //         }
-    //       }),
+    anLieferungsWithoutAnzahlPflanzen: async () =>
+      lieferungsSorted
+        .filter((l) => l.nach_kultur_id === kulturId)
+        .filter((l) => !exists(l.anzahl_pflanzen))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
+            text,
+          }
+        }),
+    ausLieferungsWithoutAnzahlPflanzen: async () =>
+      lieferungsSorted
+        .filter((l) => l.von_kultur_id === kulturId)
+        .filter((l) => !exists(l.anzahl_pflanzen))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'Aus-Lieferungen', l.id],
+            text,
+          }
+        }),
+    anLieferungsWithoutAnzahlAuspflanzbereit: async () =>
+      lieferungsSorted
+        .filter((l) => l.nach_kultur_id === kulturId)
+        .filter((l) => !exists(l.anzahl_auspflanzbereit))
+        .map((l) => {
+          const datum = l.datum
+            ? format(new Date(l.datum), 'yyyy.MM.dd')
+            : `kein Datum`
+          const geplant = l.geplant ? ', (geplant)' : ''
+          const text = `${datum}, ID: ${l.id}${geplant}`
+
+          return {
+            url: ['Vermehrung', 'Kulturen', kulturId, 'An-Lieferungen', l.id],
+            text,
+          }
+        }),
     //   ausLieferungsWithoutAnzahlAuspflanzbereit: async () =>
     //     lieferungsSorted
     //       .filter((l) => l.von_kultur_id === kulturId)
