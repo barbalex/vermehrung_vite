@@ -44,12 +44,11 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
     .toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
 
-  console.log('createMessageFunctions, zaehlungsSorted:', zaehlungsSorted)
+  const teilzaehlungs = await dexie.teilzaehlungs
+    .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+    .toArray()
 
-  // let teilzaehlungs = []
-  // try {
-  //   teilzaehlungs = await db.get('teilzaehlung').query(notDeletedQuery).fetch()
-  // } catch {}
+  console.log('createMessageFunctions, teilzaehlungs:', teilzaehlungs)
 
   return {}
 
