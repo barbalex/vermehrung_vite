@@ -1,7 +1,6 @@
 import groupBy from 'lodash/groupBy'
 import sortBy from 'lodash/sortBy'
 import sumBy from 'lodash/sumBy'
-import { Q } from '@nozbe/watermelondb'
 import format from 'date-fns/format'
 
 import exists from '../../../../../utils/exists'
@@ -9,18 +8,15 @@ import { dexie } from '../../../../../dexieClient'
 
 const buildData = async ({ row }) => {
   const zaehlungs = await dexie.zaehlungs
+    .orderBy('datum')
     .filter((z) => z.kultur_id === row.id && z._deleted === false)
-    .sortBy('datum')
     .toArray()
-  const zaehlungsDone = await zaehlungs
-    .filter(
-      (z) =>
-        z.prognose === false &&
-        !!z.datum &&
-        z.datum <= format(new Date(), 'yyyy-mm-dd'),
-    )
-    .sortBy('datum')
-    .toArray()
+  const zaehlungsDone = await zaehlungs.filter(
+    (z) =>
+      z.prognose === false &&
+      !!z.datum &&
+      z.datum <= format(new Date(), 'yyyy-mm-dd'),
+  )
   const lastZaehlungDone = zaehlungsDone.slice(-1)[0] ?? {}
 
   const zaehlungsPlanned = zaehlungs.filter(
@@ -38,6 +34,14 @@ const buildData = async ({ row }) => {
     // need to add last zaehlung to zaehlungenPlannedIncluded to connect lines
     zaehlungenPlannedIncluded = [lastZaehlungDone, ...zaehlungenPlannedIncluded]
   }
+
+  console.log('Kultur buildData', {
+    zaehlungs,
+    zaehlungsDone,
+    lastZaehlungDone,
+    zaehlungsPlanned,
+    zaehlungenPlannedIgnored,
+  })
 
   const zaehlungenForLine = sortBy(
     [...zaehlungsDone, ...zaehlungenPlannedIncluded],
@@ -196,7 +200,7 @@ const buildData = async ({ row }) => {
         l.nach_kultur_id === row.id &&
         l.geplant === false &&
         !!l.datum &&
-        let.datum <= format(new Date(), 'yyyy-mm-dd'),
+        l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
   const anLieferungenPlanned = await dexie.lieferungs
@@ -227,7 +231,7 @@ const buildData = async ({ row }) => {
         l.von_kultur_id === row.id &&
         l.geplant === false &&
         !!l.datum &&
-        let.datum <= format(new Date(), 'yyyy-mm-dd'),
+        l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
   const ausLieferungenPlanned = await dexie.lieferungs
@@ -271,7 +275,10 @@ const buildData = async ({ row }) => {
 
       const previousZaehlungTzs = await dexie.teilzaehlungs
         .filter(
-          (t) => t._deleted === false && t.zaehlung_id === previousZaehlung.id,
+          (t) =>
+            t._deleted === false &&
+            !!previousZaehlung &&
+            t.zaehlung_id === previousZaehlung?.id,
         )
         .toArray()
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
@@ -331,7 +338,10 @@ const buildData = async ({ row }) => {
       )
       const previousZaehlungTzs = await dexie.teilzaehlungs
         .filter(
-          (t) => t._deleted === false && t.zaehlung_id === previousZaehlung.id,
+          (t) =>
+            t._deleted === false &&
+            !!previousZaehlung &&
+            t.zaehlung_id === previousZaehlung.id,
         )
         .toArray()
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
@@ -392,7 +402,10 @@ const buildData = async ({ row }) => {
 
       const previousZaehlungTzs = await dexie.teilzaehlungs
         .filter(
-          (t) => t._deleted === false && t.zaehlung_id === previousZaehlung.id,
+          (t) =>
+            t._deleted === false &&
+            !!previousZaehlung &&
+            t.zaehlung_id === previousZaehlung.id,
         )
         .toArray()
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
@@ -473,12 +486,14 @@ const buildData = async ({ row }) => {
           a.datum < l.datum,
       )
 
-      let previousZaehlungTzs = []
-      try {
-        previousZaehlungTzs = await previousZaehlung.teilzaehlungs
-          .extend(Q.where('_deleted', false))
-          .fetch()
-      } catch {}
+      const previousZaehlungTzs = await dexie.teilzaehlungs
+        .filter(
+          (t) =>
+            t._deleted === false &&
+            !!previousZaehlung &&
+            t.zaehlung_id === previousZaehlung.id,
+        )
+        .toArray()
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
