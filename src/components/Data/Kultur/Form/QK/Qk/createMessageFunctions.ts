@@ -205,9 +205,7 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
               ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
               : `Zählung-ID: ${z.id}`
 
-            const tzs = await dexie.teilzaehlungs
-              .filter((t) => t.zaehlung_id === z.id && t._deleted === false)
-              .toArray()
+            const tzs = teilzaehlungs.filter((t) => t.zaehlung_id === z.id)
             const anzTz = tzs.length
             const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
             const text = `${
@@ -228,50 +226,47 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    //   zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
-    //     await Promise.all(
-    //       zaehlungsSorted
-    //         .filter((z) => z.kultur_id === kulturId)
-    //         .filter(
-    //           (z) =>
-    //             teilzaehlungs
-    //               .filter((tz) => tz.zaehlung_id === z.id)
-    //               .filter((tz) => !tz._deleted)
-    //               .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
-    //         )
-    //         .map(async (z) => {
-    //           let kultur
-    //           try {
-    //             kultur = await z.kultur.fetch()
-    //           } catch {}
-    //           let kulturLabel
-    //           try {
-    //             kulturLabel = await kultur.label()
-    //           } catch {}
-    //           const zaehlung = z.datum
-    //             ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //             : `Zählung-ID: ${z.id}`
-    //           const anzTz = teilzaehlungs
-    //             .filter((tz) => tz.zaehlung_id === z.id)
-    //             .filter((tz) => !tz._deleted).length
-    //           const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //           const text = `${
-    //             kulturLabel ?? '(keine Kultur)'
-    //           }, ${zaehlung}${teilzaehlung}`
-    //           return {
-    //             url: [
-    //               'Vermehrung',
-    //               'Arten',
-    //               kultur?.art_id,
-    //               'Kulturen',
-    //               kulturId,
-    //               'Zaehlungen',
-    //               z.id,
-    //             ],
-    //             text,
-    //           }
-    //         }),
-    //     ),
+    zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
+      await Promise.all(
+        zaehlungsSorted
+          .filter((z) => z.kultur_id === kulturId)
+          .filter(
+            (z) =>
+              teilzaehlungs
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+                .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
+          )
+          .map(async (z) => {
+            const kultur = await dexie.kulturs.get(
+              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+            )
+            const kulturLabel = await kultur.label()
+
+            const zaehlung = z.datum
+              ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+              : `Zählung-ID: ${z.id}`
+            const anzTz = teilzaehlungs
+              .filter((tz) => tz.zaehlung_id === z.id)
+              .filter((tz) => !tz._deleted).length
+            const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+            const text = `${
+              kulturLabel ?? '(keine Kultur)'
+            }, ${zaehlung}${teilzaehlung}`
+            return {
+              url: [
+                'Vermehrung',
+                'Arten',
+                kultur?.art_id,
+                'Kulturen',
+                kulturId,
+                'Zaehlungen',
+                z.id,
+              ],
+              text,
+            }
+          }),
+      ),
     //   zaehlungsWithoutAnzahlMutterpflanzen: async () =>
     //     await Promise.all(
     //       zaehlungsSorted
