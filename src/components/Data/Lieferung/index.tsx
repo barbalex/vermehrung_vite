@@ -6,10 +6,12 @@ import isUuid from 'is-uuid'
 import last from 'lodash/last'
 import { combineLatest, of as $of } from 'rxjs'
 import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import Lieferung from './Lieferung'
 import SammelLieferung from '../SammelLieferung'
 import StoreContext from '../../../storeContext'
+import { dexie } from '../../../dexieClient'
 
 const StyledSplitPane = styled(SplitPane)`
   .Resizer {
