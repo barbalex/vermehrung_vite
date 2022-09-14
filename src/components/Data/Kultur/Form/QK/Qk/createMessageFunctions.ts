@@ -600,26 +600,23 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    //   eventsWithoutDatum: async () =>
-    //     await Promise.all(
-    //       eventsSorted
-    //         .filter((e) => e.kultur_id === kulturId)
-    //         .filter((e) => !e.datum)
-    //         .map(async (ev) => {
-    //           let kultur
-    //           try {
-    //             kultur = await ev.kultur.fetch()
-    //           } catch {}
-    //           let kulturLabel
-    //           try {
-    //             kulturLabel = await kultur.label()
-    //           } catch {}
-    //           return {
-    //             url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
-    //             text: `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${ev.id}`,
-    //           }
-    //         }),
-    //     ),
+    eventsWithoutDatum: async () =>
+      await Promise.all(
+        eventsSorted
+          .filter((e) => e.kultur_id === kulturId)
+          .filter((e) => !e.datum)
+          .map(async (ev) => {
+            const kultur = await dexie.kulturs.get(
+              ev.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+            )
+            const kulturLabel = await kultur.label()
+
+            return {
+              url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
+              text: `${kulturLabel ?? '(keine Kultur)'}, Event-ID: ${ev.id}`,
+            }
+          }),
+      ),
   }
 }
 
