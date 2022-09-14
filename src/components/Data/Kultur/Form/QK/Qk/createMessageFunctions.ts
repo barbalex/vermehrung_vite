@@ -309,56 +309,54 @@ const createMessageFunctions = async ({ kulturId, db, store }) => {
             }
           }),
       ),
-    //   zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
-    //     async () =>
-    //       await Promise.all(
-    //         zaehlungsSorted
-    //           .filter((z) => z.kultur_id === kulturId)
-    //           .filter(async (z) => {
-    //             let kulturOption
-    //             try {
-    //               kulturOption = await z.kultur_option.fetch()
-    //             } catch {}
-    //             return !!kulturOption?.tk
-    //           })
-    //           .filter((z) => {
-    //             const tzs = teilzaehlungs
-    //               .filter((tz) => tz.zaehlung_id === z.id)
-    //               .filter((tz) => !tz._deleted)
-    //             return tzs.length && tzs.filter((tz) => !tz.teilkultur_id).length
-    //           })
-    //           .map(async (z) => {
-    //             let kultur
-    //             try {
-    //               kultur = await z.kultur.fetch()
-    //             } catch {}
-    //             let kulturLabel
-    //             try {
-    //               kulturLabel = await kultur.label()
-    //             } catch {}
-    //             const zaehlung = z.datum
-    //               ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
-    //               : `Zählung-ID: ${z.id}`
-    //             const anzTz = teilzaehlungs
-    //               .filter((tz) => tz.zaehlung_id === z.id)
-    //               .filter((tz) => !tz._deleted).length
-    //             const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
-    //             return {
-    //               url: [
-    //                 'Vermehrung',
-    //                 'Arten',
-    //                 kultur?.art_id,
-    //                 'Kulturen',
-    //                 kultur?.id,
-    //                 'Zaehlungen',
-    //                 z.id,
-    //               ],
-    //               text: `${
-    //                 kulturLabel ?? '(keine Kultur)'
-    //               }, ${zaehlung}${teilzaehlung}`,
-    //             }
-    //           }),
-    //       ),
+    zaehlungsWithTeilzaehlungsWithoutTeilkulturThoughTeilkulturIsChoosen:
+      async () =>
+        await Promise.all(
+          zaehlungsSorted
+            .filter((z) => z.kultur_id === kulturId)
+            .filter(async (z) => {
+              let kulturOption
+              try {
+                kulturOption = await z.kultur_option.fetch()
+              } catch {}
+              return !!kulturOption?.tk
+            })
+            .filter((z) => {
+              const tzs = teilzaehlungs
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted)
+              return tzs.length && tzs.filter((tz) => !tz.teilkultur_id).length
+            })
+            .map(async (z) => {
+              const kultur = await dexie.kulturs.get(
+                z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+              )
+              const kulturLabel = await kultur.label()
+
+              const zaehlung = z.datum
+                ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
+                : `Zählung-ID: ${z.id}`
+              const anzTz = teilzaehlungs
+                .filter((tz) => tz.zaehlung_id === z.id)
+                .filter((tz) => !tz._deleted).length
+              const teilzaehlung = anzTz > 1 ? ` (${anzTz} Teilzählungen)` : ''
+
+              return {
+                url: [
+                  'Vermehrung',
+                  'Arten',
+                  kultur?.art_id,
+                  'Kulturen',
+                  kultur?.id,
+                  'Zaehlungen',
+                  z.id,
+                ],
+                text: `${
+                  kulturLabel ?? '(keine Kultur)'
+                }, ${zaehlung}${teilzaehlung}`,
+              }
+            }),
+        ),
     //   lieferungsWithMultipleVon: async () =>
     //     lieferungsSorted
     //       .filter((l) => l.von_kultur_id === kulturId)
