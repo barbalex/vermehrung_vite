@@ -189,27 +189,25 @@ const buildData = async ({ row }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ).map(([key, value]) => Object.assign({}, ...value))
 
-  let anLieferungenDone = []
-  try {
-    anLieferungenDone = await row.anlieferungs
-      .extend(
-        Q.where('geplant', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('datum', Q.lte(format(new Date(), 'yyyy-mm-dd'))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
-  let anLieferungenPlanned = []
-  try {
-    anLieferungenPlanned = await row.anlieferungs
-      .extend(
-        Q.where('geplant', true),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const anLieferungenDone = await dexie.lieferungs
+    .filter(
+      (l) =>
+        l._deleted === false &&
+        l.nach_kultur_id === row.id &&
+        l.geplant === false &&
+        !!l.datum &&
+        let.datum <= format(new Date(), 'yyyy-mm-dd'),
+    )
+    .toArray()
+  const anLieferungenPlanned = await dexie.lieferungs
+    .filter(
+      (l) =>
+        l._deleted === false &&
+        l.nach_kultur_id === row.id &&
+        l.geplant === false &&
+        !!l.datum,
+    )
+    .toArray()
   const anLieferungenPlannedIgnored = anLieferungenPlanned.filter((lg) =>
     // check if more recent anLieferungenDone exists
     anLieferungenDone.some((lu) => lu.datum >= lg.datum),
@@ -222,17 +220,16 @@ const buildData = async ({ row }) => {
     'datum',
   )
 
-  let ausLieferungenDone = []
-  try {
-    ausLieferungenDone = await row.auslieferungs
-      .extend(
-        Q.where('geplant', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('datum', Q.lte(format(new Date(), 'yyyy-mm-dd'))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const ausLieferungenDone = await dexie.lieferungs
+    .filter(
+      (l) =>
+        l._deleted === false &&
+        l.von_kultur_id === row.id &&
+        l.geplant === false &&
+        !!l.datum &&
+        let.datum <= format(new Date(), 'yyyy-mm-dd'),
+    )
+    .toArray()
   let ausLieferungenPlanned = []
   try {
     ausLieferungenPlanned = await row.auslieferungs
