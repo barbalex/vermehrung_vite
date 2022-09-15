@@ -5,6 +5,8 @@ import { combineLatest } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
 
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
+import { dexie } from '../../../../../../dexieClient'
+import totalFilter from '../../../../../../utils/totalFilter'
 
 const useData = ({ showFilter, row, herkunft, db, filter }) => {
   const [dataState, setDataState] = useState({ nachKulturWerte: [] })

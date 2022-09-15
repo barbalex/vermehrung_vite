@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
@@ -44,7 +42,7 @@ const LierferungForm = ({
   const existsSammelLieferung = !!row?.sammel_lieferung_id
   const store = useContext(StoreContext)
 
-  const { errors, filter, unsetError, user, db } = store
+  const { errors, filter, unsetError, user } = store
 
   const data = useLiveQuery(async () => {
     const [person, sammelLieferung, vonSammlung] = await Promise.all([

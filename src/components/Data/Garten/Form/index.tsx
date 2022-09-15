@@ -17,7 +17,7 @@ import Coordinates from '../../../shared/Coordinates'
 import Personen from './Personen'
 import ConflictList from '../../../shared/ConflictList'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
+import totalFilter from '../../../../utils/totalFilter' 
 
 const FieldsContainer = styled.div`
   padding: 10px;

@@ -49,7 +49,7 @@ const StyledSplitPane = styled(SplitPane)`
   }
 `
 
-const Lieferung = ({ id, showFilter, row, rawRow }) => {
+const Lieferung = ({ id, showFilter, row }) => {
   const store = useContext(StoreContext)
   const { filter, online } = store
 
@@ -85,7 +85,6 @@ const Lieferung = ({ id, showFilter, row, rawRow }) => {
       <Container showfilter={showFilter}>
         <FormTitle
           row={row}
-          rawRow={rawRow}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
@@ -97,16 +96,14 @@ const Lieferung = ({ id, showFilter, row, rawRow }) => {
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            {/* <Form
+            <Form
               showFilter={showFilter}
               id={id}
               row={row}
-              rawRow={rawRow}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            /> */}
-            <p>Form</p>
+            />
             <>
               {online && (
                 <>
@@ -115,7 +112,6 @@ const Lieferung = ({ id, showFilter, row, rawRow }) => {
                       rev={activeConflict}
                       id={id}
                       row={row}
-                      rawRow={rawRow}
                       conflictDisposalCallback={conflictDisposalCallback}
                       conflictSelectionCallback={conflictSelectionCallback}
                       setActiveConflict={setActiveConflict}
@@ -123,7 +119,6 @@ const Lieferung = ({ id, showFilter, row, rawRow }) => {
                   ) : showHistory ? (
                     <History
                       row={row}
-                      rawRow={rawRow}
                       historyTakeoverCallback={historyTakeoverCallback}
                     />
                   ) : null}

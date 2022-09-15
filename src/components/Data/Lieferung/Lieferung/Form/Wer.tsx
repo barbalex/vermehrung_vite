@@ -1,9 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Select from '../../../../shared/Select'
@@ -12,6 +11,8 @@ import Files from '../../../Files'
 import ConflictList from '../../../../shared/ConflictList'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import personSort from '../../../../../utils/personSort'
+import { dexie } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const Title = styled.div`
   font-weight: bold;
@@ -47,76 +48,37 @@ const LieferungWer = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { errors, online, db, filter } = store
-
-  const [dataState, setDataState] = useState({ personWerte: [], row })
-  useEffect(() => {
-    const rowObservable = showFilter
-      ? $of(filter.lieferung)
-      : db.get('lieferung').findAndObserve(id)
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['name', 'vorname'])
-    const combinedObservables = combineLatest([
-      personsObservable,
-      rowObservable,
+  const { errors, online, filter } = store
+  const data = useLiveQuery(async () => {
+    const [row] = await Promise.all([
+      dexie.lieferungs.get(id ?? '99999999-9999-9999-9999-999999999999'),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([persons, row]) => {
-        // need to show a choosen kultur even if inactive but not if deleted
-        let person
-        try {
-          person = await row.person.fetch()
-        } catch {}
-        const personsIncludingChoosen = uniqBy(
-          [...persons, ...(person && !showFilter ? [person] : [])],
-          'id',
-        )
-        const personWerte = personsIncludingChoosen
-          .sort(personSort)
-          .map((el) => ({
-            value: el.id,
-            label: personLabelFromPerson({ person: el }),
-          }))
 
-        setDataState({ personWerte, row })
-      },
+    const person = await dexie.persons.get(
+      row.person_id ?? '99999999-9999-9999-9999-999999999999',
     )
+    const persons = await dexie.persons
+      .filter((value) => totalFilter({ value, store, table: 'person' }))
+      .toArray()
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen.sort(personSort).map((el) => ({
+      value: el.id,
+      label: personLabelFromPerson({ person: el }),
+    }))
 
-    return () => subscription?.unsubscribe?.()
+    return { row: showFilter ? filter.lieferung : row, personWerte }
   }, [
-    db,
     filter.lieferung,
     filter.person._deleted,
     filter.person.aktiv,
     id,
-    row,
-    row?.person_id,
     showFilter,
   ])
-  const { row, personWerte } = dataState
+  const row = data?.row
+  const personWerte = data?.personWerte ?? []
 
   if (!row) return null
 

@@ -36,9 +36,9 @@ const TitleRow = styled.div`
 
 const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
   const store = useContext(StoreContext)
-  const { errors, db, filter } = store
+  const { errors, filter } = store
 
-  const { nachKulturWerte } = useData({ showFilter, row, herkunft, db, filter })
+  const { nachKulturWerte } = useData({ showFilter, row, herkunft, filter })
 
   return (
     <>
