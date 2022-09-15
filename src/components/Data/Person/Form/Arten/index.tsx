@@ -4,9 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { motion, useAnimation } from 'framer-motion'
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
-import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Art from './Art'
@@ -15,6 +13,7 @@ import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import artsSortedFromArts from '../../../../../utils/artsSortedFromArts'
 import avsSortByArt from '../../../../../utils/avsSortByArt'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -46,13 +45,13 @@ const Avs = styled.div`
 
 const PersonArten = ({ person }) => {
   const store = useContext(StoreContext)
-  const { db, insertAvRev, filter } = store
+  const { insertAvRev } = store
 
   const [errors, setErrors] = useState({})
   useEffect(() => setErrors({}), [person])
 
   const [open, setOpen] = useState(false)
-  let anim = useAnimation()
+  const anim = useAnimation()
   const onClickToggle = useCallback(
     async (e) => {
       e.stopPropagation()
@@ -72,52 +71,32 @@ const PersonArten = ({ person }) => {
     [anim, open],
   )
 
-  const [dataState, setDataState] = useState({ avs: [], artWerte: [] })
-  const { avs, artWerte } = dataState
-  const avArtIds = avs.map((v) => v.art_id)
-  useEffect(() => {
-    const avsObservable = person.avs
-      .extend(Q.where('_deleted', false))
-      .observe()
-    const artsObservable = db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('id', Q.notIn(avArtIds)),
-      )
-      .observe()
-    const combinedObservables = combineLatest([avsObservable, artsObservable])
-    const subscription = combinedObservables.subscribe(async ([avs, arts]) => {
-      const avsSorted = await avsSortByArt(avs)
-      const artsSorted = await artsSortedFromArts(arts)
-      const artWerte = await Promise.all(
-        artsSorted.map(async (art) => {
-          let label
-          try {
-            label = await art.label.pipe(first$()).toPromise()
-          } catch {}
+  const data = useLiveQuery(async () => {
+    const avs = await dexie.avs.filter((a) => a._deleted === false).toArray()
+    const avsSorted = await avsSortByArt(avs)
+    const avArtIds = avs.map((v) => v.art_id)
+    const arts = await dexie.arts
+      .where('id')
+      .noneOf(avArtIds)
+      .filter((a) => a._deleted === false)
+      .toArray()
+    const artsSorted = await artsSortedFromArts(arts)
+    const artWerte = await Promise.all(
+      artsSorted.map(async (art) => {
+        const label = await art.label()
 
-          return {
-            value: art.id,
-            label,
-          }
-        }),
-      )
-      setDataState({ avs: avsSorted, artWerte })
-    })
+        return {
+          value: art.id,
+          label,
+        }
+      }),
+    )
 
-    return () => subscription?.unsubscribe?.()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [person.avs, avArtIds.length, db])
+    return { avs: avsSorted, artWerte }
+  }, [person])
+
+  const avs = data?.avs ?? []
+  const artWerte = data?.artWerte ?? []
 
   const saveToDb = useCallback(
     async (event) => {

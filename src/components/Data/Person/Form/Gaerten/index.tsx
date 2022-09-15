@@ -7,6 +7,7 @@ import { motion, useAnimation } from 'framer-motion'
 import { Q } from '@nozbe/watermelondb'
 import { first as first$ } from 'rxjs/operators'
 import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Garten from './Garten'
@@ -15,6 +16,7 @@ import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import gartensSortedFromGartens from '../../../../../utils/gartensSortedFromGartens'
 import gvsSortByGarten from '../../../../../utils/gvsSortByGarten'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -52,7 +54,7 @@ const PersonArten = ({ person }) => {
   useEffect(() => setErrors({}), [person.id])
 
   const [open, setOpen] = useState(false)
-  let anim = useAnimation()
+  const anim = useAnimation()
   const onClickToggle = useCallback(
     async (e) => {
       e.stopPropagation()
