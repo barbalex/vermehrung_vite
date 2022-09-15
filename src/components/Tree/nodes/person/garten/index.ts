@@ -1,10 +1,5 @@
-import { first as first$ } from 'rxjs/operators'
-
 const personGartenNodes = async ({ garten, index, personId, personIndex }) => {
-  let label = ''
-  try {
-    label = await garten.label.pipe(first$()).toPromise()
-  } catch {}
+  const label = await garten.label()
 
   return {
     nodeType: 'table',
