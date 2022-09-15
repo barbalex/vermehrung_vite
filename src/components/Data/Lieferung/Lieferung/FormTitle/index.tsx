@@ -1,13 +1,10 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import tableFilter from '../../../../../utils/tableFilter'
 import { dexie } from '../../../../../dexieClient'
 import totalFilter from '../../../../../utils/totalFilter'
 
@@ -24,8 +21,6 @@ const LieferungTitleChooser = ({
     personIdInActiveNodeArray,
     sammelLieferungIdInActiveNodeArray,
     sammlungIdInActiveNodeArray,
-    db,
-    filter,
   } = store
   const { activeNodeArray } = store.tree
 
@@ -51,96 +46,28 @@ const LieferungTitleChooser = ({
     conditionAdder = async (collection) =>
       collection.and('person_id').equals(personIdInActiveNodeArray)
   }
+  if (sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('von_sammlung_id').equals(sammlungIdInActiveNodeArray)
+  }
 
   const totalCount = useLiveQuery(
     async () =>
-      await dexie.gartens
+      await dexie.lieferungs
         .filter((value) =>
-          totalFilter({ value, store, table: 'garten', conditionAdder }),
+          totalFilter({ value, store, table: 'lieferung', conditionAdder }),
         )
         .count(),
-    [store.filter.garten, store.garten_initially_queried],
+    [
+      store.filter.lieferung,
+      // need to rerender if any of the values of lieferungFilter changes
+      ...Object.values(store.filter.lieferung),
+      store.lieferung_initially_queried,
+      conditionAdder,
+    ],
   )
 
-  const filteredCount = store.gartensFilteredCount ?? '...'
-
-  const [countState, setCountState] = useState({
-    totalCount: 0,
-    filteredCount: 0,
-  })
-  useEffect(() => {
-    const hierarchyQuery =
-      sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray
-        ? [
-            Q.experimentalJoinTables(['sammlung']),
-            Q.on('sammlung', 'id', sammlungIdInActiveNodeArray),
-          ]
-        : []
-    const collection = db.get('lieferung')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.lieferung._deleted === false
-              ? [false]
-              : filter.lieferung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        ...hierarchyQuery,
-      )
-      .observeCount()
-    const filteredCountObservable = collection
-      .query(...tableFilter({ store, table: 'lieferung' }), ...hierarchyQuery)
-      .observeCount()
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      filteredCountObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, filteredCount]) =>
-        setCountState({ totalCount, filteredCount }),
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    kulturIdInActiveNodeArray,
-    sammelLieferungIdInActiveNodeArray,
-    personIdInActiveNodeArray,
-    sammlungIdInActiveNodeArray,
-    // need to rerender if any of the values of lieferungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(store.filter.lieferung),
-    store,
-    activeNodeArray,
-    filter.lieferung._deleted,
-  ])
-
-  const { totalCount, filteredCount } = countState
-
-  /*const hierarchyFilter = (e) => {
-    if (kulturIdInActiveNodeArray) {
-      if (activeNodeArray.includes('Aus-Lieferungen')) {
-        return e.von_kultur_id === kulturIdInActiveNodeArray
-      }
-      if (activeNodeArray.includes('An-Lieferungen')) {
-        return e.nach_kultur_id === kulturIdInActiveNodeArray
-      }
-    }
-    if (sammelLieferungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-      return e.sammel_lieferung_id === sammelLieferungIdInActiveNodeArray
-    }
-    if (personIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-      return e.person_id === personIdInActiveNodeArray
-    }
-    if (sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-      return e.von_sammlung_id === sammlungIdInActiveNodeArray
-    }
-    return true
-  }*/
+  const filteredCount = store.lieferungsFilteredCount ?? '...'
 
   if (showFilter) {
     return (
