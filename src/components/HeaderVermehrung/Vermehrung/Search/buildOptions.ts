@@ -110,11 +110,7 @@ const buildOptions = async ({ store, cb, val }) => {
   const options = []
   const searchArtSuggestions = await Promise.all(
     artsSorted.map(async (a) => {
-      let label = ''
-      try {
-        // label = await a.label.pipe(first$()).toPromise()
-        label = 'TODO: dexie'
-      } catch {}
+      const label = await a.label()
 
       return {
         value: a.id,
@@ -137,11 +133,7 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchGartenSuggestions = await Promise.all(
     gartensSorted.map(async (g) => {
-      let label
-      try {
-        // label = await g.label.pipe(first$()).toPromise()
-        label = 'TODO: dexie'
-      } catch {}
+      const label = await g.label()
       let person
       try {
         person = await g.person.fetch()
@@ -210,11 +202,7 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchKulturSuggestions = await Promise.all(
     kultursSorted.map(async (k) => {
-      let label
-      try {
-        // label = await k.label.pipe(first$()).toPromise()
-        label = 'TODO: dexie'
-      } catch {}
+      const label = await k.label()
       let garten
       try {
         garten = await k.garten.fetch()
@@ -258,11 +246,7 @@ const buildOptions = async ({ store, cb, val }) => {
     })
   }
   const searchEventSuggestions = eventsSorted.map(async (e) => {
-    let label
-    try {
-      // label = await e.label.pipe(first$()).toPromise()
-      label = 'TODO: dexie'
-    } catch {}
+    const label = await e.label()
     let kultur
     try {
       kultur = await e.kultur?.fetch()
@@ -271,11 +255,7 @@ const buildOptions = async ({ store, cb, val }) => {
     try {
       art = await kultur?.art?.fetch()
     } catch {}
-    let artname = ''
-    try {
-      // artname = await art?.label?.pipe(first$()).toPromise()
-      artname = 'TODO: dexie'
-    } catch {}
+    const artname = await art?.label?.()
     let garten
     try {
       garten = await kultur?.garten?.fetch()
@@ -448,11 +428,7 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchSammlungSuggestions = await Promise.all(
     sammlungsSorted.map(async (s) => {
-      let label
-      try {
-        // label = await s.label.pipe(first$()).toPromise()
-        label = 'TODO: dexie'
-      } catch {}
+      const label = await s.label()
       let herkunft
       try {
         herkunft = await s.herkunft.fetch()

@@ -1,5 +1,3 @@
-import { first as first$ } from 'rxjs/operators'
-
 const artKulturZaehlungNodes = async ({
   zaehlung,
   zaehlungIndex,
@@ -8,10 +6,7 @@ const artKulturZaehlungNodes = async ({
   artId,
   artIndex,
 }) => {
-  let label = ''
-  try {
-    label = await zaehlung.label.pipe(first$()).toPromise()
-  } catch {}
+  const label = await zaehlung.label()
 
   return {
     nodeType: 'table',
@@ -19,7 +14,15 @@ const artKulturZaehlungNodes = async ({
     table: 'zaehlung',
     id: `${artId}${kulturId}${zaehlung.id}`,
     label,
-    url: ['Vermehrung', 'Arten', artId, 'Kulturen', kulturId, 'Zaehlungen', zaehlung.id],
+    url: [
+      'Vermehrung',
+      'Arten',
+      artId,
+      'Kulturen',
+      kulturId,
+      'Zaehlungen',
+      zaehlung.id,
+    ],
     sort: [1, 1, artIndex, 3, kulturIndex, 2, zaehlungIndex],
     hasChildren: false,
     mono: true,
