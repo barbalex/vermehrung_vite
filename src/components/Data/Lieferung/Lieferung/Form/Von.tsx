@@ -147,8 +147,6 @@ const LieferungVon = ({
   const vonKulturWerte = data?.vonKulturWerte ?? []
   const sammlungWerte = data?.sammlungWerte ?? []
 
-  console.log('Von', { herkunftLabel, vonKulturWerte, sammlungWerte, row })
-
   if (!row) return null
 
   return (

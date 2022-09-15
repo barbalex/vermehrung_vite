@@ -78,8 +78,6 @@ const LieferungWas = ({ showFilter, row, saveToDb, ifNeeded }) => {
     return artWerte
   }, [filter.art._deleted, row?.art_id, showFilter])
 
-  console.log('Was', { artWerte, row })
-
   const openGenVielfaldDocs = useCallback(() => {
     const url = `${constants?.getAppUri()}/Dokumentation/Genetische-Vielfalt`
     if (window.matchMedia('(display-mode: standalone)').matches) {

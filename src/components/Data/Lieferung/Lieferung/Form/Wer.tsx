@@ -77,8 +77,6 @@ const LieferungWer = ({
   ])
   const personWerte = data?.personWerte ?? []
 
-  console.log('Wer', { row, personWerte })
-
   if (!row) return null
 
   return (
