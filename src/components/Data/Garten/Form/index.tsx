@@ -38,7 +38,6 @@ const GartenForm = ({
   showFilter,
   id,
   row,
-  rawRow,
   activeConflict,
   setActiveConflict,
   showHistory,
@@ -206,7 +205,7 @@ const GartenForm = ({
         />
       )}
       {!showFilter && ga_geom_point && (
-        <Coordinates row={row} rawRow={rawRow} saveToDb={saveToDb} />
+        <Coordinates row={row} saveToDb={saveToDb} />
       )}
       {ga_aktiv && (
         <>

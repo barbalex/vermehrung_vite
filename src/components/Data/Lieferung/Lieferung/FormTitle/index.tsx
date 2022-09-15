@@ -2,15 +2,17 @@ import React, { useContext, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Q } from '@nozbe/watermelondb'
 import { combineLatest } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import tableFilter from '../../../../../utils/tableFilter'
+import { dexie } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const LieferungTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -27,28 +29,48 @@ const LieferungTitleChooser = ({
   } = store
   const { activeNodeArray } = store.tree
 
+  let conditionAdder
+  if (
+    kulturIdInActiveNodeArray &&
+    activeNodeArray.includes('Aus-Lieferungen')
+  ) {
+    conditionAdder = async (collection) =>
+      collection.and('von_kultur_id').equals(kulturIdInActiveNodeArray)
+  }
+  if (kulturIdInActiveNodeArray && activeNodeArray.includes('An-Lieferungen')) {
+    conditionAdder = async (collection) =>
+      collection.and('nach_kultur_id').equals(kulturIdInActiveNodeArray)
+  }
+  if (sammelLieferungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection
+        .and('sammel_lieferung_id')
+        .equals(sammelLieferungIdInActiveNodeArray)
+  }
+  if (personIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
+    conditionAdder = async (collection) =>
+      collection.and('person_id').equals(personIdInActiveNodeArray)
+  }
+
+  const totalCount = useLiveQuery(
+    async () =>
+      await dexie.gartens
+        .filter((value) =>
+          totalFilter({ value, store, table: 'garten', conditionAdder }),
+        )
+        .count(),
+    [store.filter.garten, store.garten_initially_queried],
+  )
+
+  const filteredCount = store.gartensFilteredCount ?? '...'
+
   const [countState, setCountState] = useState({
     totalCount: 0,
     filteredCount: 0,
   })
   useEffect(() => {
     const hierarchyQuery =
-      kulturIdInActiveNodeArray && activeNodeArray.includes('Aus-Lieferungen')
-        ? [Q.where('von_kultur_id', kulturIdInActiveNodeArray)]
-        : kulturIdInActiveNodeArray &&
-          activeNodeArray.includes('An-Lieferungen')
-        ? [Q.where('nach_kultur_id', kulturIdInActiveNodeArray)]
-        : sammelLieferungIdInActiveNodeArray && !kulturIdInActiveNodeArray
-        ? [
-            Q.experimentalJoinTables(['sammel_lieferung']),
-            Q.on('sammel_lieferung', 'id', sammelLieferungIdInActiveNodeArray),
-          ]
-        : personIdInActiveNodeArray && !kulturIdInActiveNodeArray
-        ? [
-            Q.experimentalJoinTables(['person']),
-            Q.on('person', 'id', personIdInActiveNodeArray),
-          ]
-        : sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray
+      sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray
         ? [
             Q.experimentalJoinTables(['sammlung']),
             Q.on('sammlung', 'id', sammlungIdInActiveNodeArray),
@@ -134,7 +156,6 @@ const LieferungTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}

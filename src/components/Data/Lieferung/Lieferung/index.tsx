@@ -83,14 +83,13 @@ const Lieferung = ({ id, showFilter, row, rawRow }) => {
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        {/* <FormTitle
+        <FormTitle
           row={row}
           rawRow={rawRow}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        /> */}
-        <div>Form title</div>
+        />
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
