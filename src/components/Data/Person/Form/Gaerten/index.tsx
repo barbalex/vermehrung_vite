@@ -4,9 +4,6 @@ import { observer } from 'mobx-react-lite'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import { motion, useAnimation } from 'framer-motion'
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
-import { combineLatest } from 'rxjs'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
@@ -17,6 +14,7 @@ import gartensSortedFromGartens from '../../../../../utils/gartensSortedFromGart
 import gvsSortByGarten from '../../../../../utils/gvsSortByGarten'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -48,7 +46,7 @@ const Gvs = styled.div`
 
 const PersonArten = ({ person }) => {
   const store = useContext(StoreContext)
-  const { insertGvRev, db, filter } = store
+  const { insertGvRev, filter } = store
 
   const [errors, setErrors] = useState({})
   useEffect(() => setErrors({}), [person.id])
@@ -74,70 +72,35 @@ const PersonArten = ({ person }) => {
     [anim, open],
   )
 
-  const [dataState, setDataState] = useState({ gvs: [], gartenWerte: [] })
-  const { gvs, gartenWerte } = dataState
-  const gvGartenIds = gvs.map((v) => v.garten_id)
-  useEffect(() => {
-    const gvsObservable = person.gvs
-      .extend(Q.where('_deleted', false))
-      .observe()
-    const gartensObservable = db
-      .get('garten')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.garten._deleted === false
-              ? [false]
-              : filter.garten._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.garten.aktiv === true
-              ? [true]
-              : filter.garten.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('id', Q.notIn(gvGartenIds)),
-      )
-      .observe()
-    const combinedObservables = combineLatest([
-      gvsObservable,
-      gartensObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      async ([gvs, gartens]) => {
-        const gvsSorted = await gvsSortByGarten(gvs)
-        const gartensSorted = await gartensSortedFromGartens(gartens)
-        const gartenWerte = await Promise.all(
-          gartensSorted.map(async (garten) => {
-            const label = await garten.label()
+  const data = useLiveQuery(async () => {
+    const gvs = await dexie.gvs
+      .filter((g) => g._deleted === false && g.person_id === person.id)
+      .toArray()
+    const gvsSorted = await gvsSortByGarten(gvs)
+    const gvGartenIds = gvs.map((v) => v.garten_id)
 
-            return {
-              value: garten.id,
-              label,
-            }
-          }),
-        )
-        setDataState({ gvs: gvsSorted, gartenWerte })
-      },
+    const gartens = await dexie.gartens
+      .where('id')
+      .noneOf(gvGartenIds)
+      .filter((value) => totalFilter({ value, store, table: 'garten' }))
+      .toArray()
+    const gartensSorted = await gartensSortedFromGartens(gartens)
+    const gartenWerte = await Promise.all(
+      gartensSorted.map(async (garten) => {
+        const label = await garten.label()
+
+        return {
+          value: garten.id,
+          label,
+        }
+      }),
     )
 
-    return () => subscription?.unsubscribe?.()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    person.gvs,
-    gvGartenIds.length,
-    db,
-    filter.garten._deleted,
-    filter.garten.aktiv,
-  ])
+    return { gvs: gvsSorted, gartenWerte }
+  }, [person, filter.garten._deleted, filter.garten.aktiv])
+
+  const gvs = data?.gvs ?? []
+  const gartenWerte = data?.gartenWerte ?? []
 
   const saveToDb = useCallback(
     async (event) => {

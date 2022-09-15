@@ -5,10 +5,10 @@ import { FaTimes } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { first as first$ } from 'rxjs/operators'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
+import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;
