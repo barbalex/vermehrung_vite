@@ -10,11 +10,7 @@ const kultursSortedFromKulturs = async (kulturs) => {
       try {
         art = await kultur?.art?.fetch()
       } catch {}
-      let artLabel
-      try {
-        // artLabel = await art?.label.pipe(first$()).toPromise()
-        artLabel = 'TODO: dexie'
-      } catch {}
+      const artLabel = await art?.label()
       let herkunft
       try {
         herkunft = await kultur?.herkunft?.fetch()

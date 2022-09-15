@@ -1,10 +1,5 @@
-import { first as first$ } from 'rxjs/operators'
-
 const zaehlungNodes = async ({ zaehlung, index }) => {
-  let label = ''
-  try {
-    label = await zaehlung.label.pipe(first$()).toPromise()
-  } catch {}
+  const label = await zaehlung.label()
 
   return {
     nodeType: 'table',
