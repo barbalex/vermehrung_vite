@@ -1,8 +1,6 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
@@ -15,10 +13,8 @@ import Files from '../../Files'
 import Arten from './Arten'
 import Gaerten from './Gaerten'
 import ConflictList from '../../../shared/ConflictList'
-import exists from '../../../../utils/exists'
 import userRoleSort from '../../../../utils/userRoleSort'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 
 const Container = styled.div`
   padding: 10px;
@@ -44,51 +40,42 @@ const Person = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, errors, unsetError, setError, db } = store
+  const { filter, online, errors, unsetError, setError } = store
 
-  const [dataState, setDataState] = useState({
-    userRoleWerte: [],
-    userRole: undefined,
-  })
-  useEffect(() => {
-    const personsNrCountObservable =
-      showFilter || !exists(row?.nr)
-        ? $of(0)
-        : db
-            .get('person')
-            .query(Q.where('_deleted', false), Q.where('nr', row.nr))
-            .observeCount()
-    const userRolesObservable = db.get('user_role').query().observe()
-    const userRoleObservable = row.user_role
-      ? row.user_role.observe()
-      : $of(null)
-    const combinedObservables = combineLatest([
-      userRolesObservable,
-      personsNrCountObservable,
-      userRoleObservable,
+  const data = useLiveQuery(async () => {
+    const [userRoles, userRole] = await Promise.all([
+      dexie.user_roles.toArray(),
+      dexie.user_roles.get(
+        row.user_role_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([userRoles, nrCount, userRole]) => {
-        const userRoleWerte = userRoles.sort(userRoleSort).map((el) => ({
-          value: el.id,
-          label: el.label,
-        }))
-        if (!showFilter && nrCount > 1) {
-          setError({
-            path: 'person.nr',
-            value: `Diese Nummer wird ${nrCount} mal verwendet. Sie sollte aber über alle Personen eindeutig sein`,
-          })
-        }
-        setDataState({
-          userRoleWerte,
-          userRole,
-        })
-      },
-    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, row.nr, row.user_role, setError, showFilter])
-  const { userRoleWerte, userRole } = dataState
+    const userRoleWerte = userRoles.sort(userRoleSort).map((el) => ({
+      value: el.id,
+      label: el.label,
+    }))
+
+    if (!showFilter && row.nr) {
+      const otherPersonsWithSameNr = await dexie.persons
+        .filter(
+          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
+        )
+        .toArray()
+      if (otherPersonsWithSameNr.length > 0) {
+        setError({
+          path: 'person.nr',
+          value: `Diese Nummer wird ${
+            otherPersonsWithSameNr.length + 1
+          } mal verwendet. Sie sollte aber über alle Personen eindeutig sein`,
+        })
+      }
+    }
+
+    return { userRoleWerte, userRole }
+  }, [row, setError, showFilter])
+
+  const userRoleWerte = data?.userRoleWerte ?? []
+  const userRole = data?.userRole
 
   useEffect(() => {
     unsetError('person')
@@ -337,10 +324,10 @@ const Person = ({
           setActiveConflict={setActiveConflict}
         />
       )}
-      {userRole?.name === 'artverantwortlich' && <Arten person={row} />}
+      {/* {userRole?.name === 'artverantwortlich' && <Arten person={row} />}
       {['gaertner', 'artverantwortlich'].includes(userRole?.name) && (
         <Gaerten person={row} />
-      )}
+      )} */}
       {!showFilter && row.id && <Files parentTable="person" parent={row} />}
     </Container>
   )

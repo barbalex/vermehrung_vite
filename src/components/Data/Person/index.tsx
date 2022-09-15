@@ -106,15 +106,14 @@ const Person = ({
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            {/* <Form
+            <Form
               showFilter={showFilter}
               id={id}
               row={row}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            /> */}
-            <p>Form</p>
+            />
             <>
               {online && (
                 <>

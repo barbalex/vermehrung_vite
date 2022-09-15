@@ -74,7 +74,9 @@ const Herkunft = ({
       if (otherHerkunftsWithSameNr.length > 0) {
         setError({
           path: 'herkunft.nr',
-          value: `Diese Nummer wird ${otherHerkunftsWithSameNr.length} mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
+          value: `Diese Nummer wird ${
+            otherHerkunftsWithSameNr.length + 1
+          } mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
         })
       }
     }
