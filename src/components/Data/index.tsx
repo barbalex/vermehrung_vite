@@ -27,6 +27,7 @@ import Teilkultur from './Teilkultur'
 import Teilkulturen from './Teilkulturen'
 import Root from './Root'
 import StoreContext from '../../storeContext'
+import ErrorBondary from '../shared/ErrorBoundary'
 
 const Data = () => {
   const store = useContext(StoreContext)
@@ -36,76 +37,169 @@ const Data = () => {
   const id = last(activeNodeArray.filter((e) => isUuid.v1(e)))
 
   // console.log('Data, activeForm:', activeForm)
+  // ERROR BOUNDARY
 
   switch (activeForm) {
     case 'root': {
-      return <Root />
+      return (
+        <ErrorBondary>
+          <Root />
+        </ErrorBondary>
+      )
     }
     case 'art': {
-      return <ArtForm id={id} />
+      return (
+        <ErrorBondary>
+          <ArtForm id={id} />
+        </ErrorBondary>
+      )
     }
     case 'arten': {
-      return <Arten />
+      return (
+        <ErrorBondary>
+          <Arten />
+        </ErrorBondary>
+      )
     }
     case 'event': {
-      return <EventComponent id={id} />
+      return (
+        <ErrorBondary>
+          <EventComponent id={id} />
+        </ErrorBondary>
+      )
     }
     case 'events': {
-      return <Events />
+      return (
+        <ErrorBondary>
+          <Events />
+        </ErrorBondary>
+      )
     }
     case 'garten': {
-      return <Garten id={id} />
+      return (
+        <ErrorBondary>
+          <Garten id={id} />
+        </ErrorBondary>
+      )
     }
     case 'gaerten': {
-      return <Gaerten />
+      return (
+        <ErrorBondary>
+          <Gaerten />
+        </ErrorBondary>
+      )
     }
     case 'herkunft': {
-      return <Herkunft id={id} />
+      return (
+        <ErrorBondary>
+          <Herkunft id={id} />
+        </ErrorBondary>
+      )
     }
     case 'herkuenfte': {
-      return <Herkuenfte />
+      return (
+        <ErrorBondary>
+          <Herkuenfte />
+        </ErrorBondary>
+      )
     }
     case 'kultur': {
-      return <Kultur id={id} />
+      return (
+        <ErrorBondary>
+          <Kultur id={id} />
+        </ErrorBondary>
+      )
     }
     case 'kulturen': {
-      return <Kulturen />
+      return (
+        <ErrorBondary>
+          <Kulturen />
+        </ErrorBondary>
+      )
     }
     case 'sammel_lieferung': {
-      return <SammelLieferung id={id} />
+      return (
+        <ErrorBondary>
+          <SammelLieferung id={id} />
+        </ErrorBondary>
+      )
     }
     case 'sammelLieferungen': {
-      return <SammelLieferungen />
+      return (
+        <ErrorBondary>
+          <SammelLieferungen />
+        </ErrorBondary>
+      )
     }
     case 'lieferung': {
-      return <Lieferung id={id} />
+      return (
+        <ErrorBondary>
+          <Lieferung id={id} />
+        </ErrorBondary>
+      )
     }
     case 'lieferungen': {
-      return <Lieferungen />
+      return (
+        <ErrorBondary>
+          <Lieferungen />
+        </ErrorBondary>
+      )
     }
     case 'person': {
-      return <Person id={id} />
+      return (
+        <ErrorBondary>
+          <Person id={id} />
+        </ErrorBondary>
+      )
     }
     case 'personen': {
-      return <Personen />
+      return (
+        <ErrorBondary>
+          <Personen />
+        </ErrorBondary>
+      )
     }
     case 'sammlung': {
-      return <Sammlung id={id} />
+      return (
+        <ErrorBondary>
+          <Sammlung id={id} />
+        </ErrorBondary>
+      )
     }
     case 'sammlungen': {
-      return <Sammlungen />
+      return (
+        <ErrorBondary>
+          <Sammlungen />
+        </ErrorBondary>
+      )
     }
     case 'teilkultur': {
-      return <Teilkultur id={id} />
+      return (
+        <ErrorBondary>
+          <Teilkultur id={id} />
+        </ErrorBondary>
+      )
     }
     case 'teilkulturen': {
-      return <Teilkulturen />
+      return (
+        <ErrorBondary>
+          <Teilkulturen />
+        </ErrorBondary>
+      )
     }
     case 'zaehlung': {
-      return <Zaehlung id={id} />
+      return (
+        <ErrorBondary>
+          <Zaehlung id={id} />
+        </ErrorBondary>
+      )
     }
     case 'zaehlungen': {
-      return <Zaehlungen />
+      return (
+        <ErrorBondary>
+          <Zaehlungen />
+        </ErrorBondary>
+      )
     }
     default:
       return null
