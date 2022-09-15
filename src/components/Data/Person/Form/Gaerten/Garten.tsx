@@ -63,10 +63,7 @@ const Garten = ({ gv }) => {
   const [gartenLabel, setGartenLabel] = useState(null)
   useEffect(() => {
     const gartenSubscription = gv.garten.observe().subscribe(async (garten) => {
-      let label
-      try {
-        label = await garten.label.pipe(first$()).toPromise()
-      } catch {}
+      const label = await garten.label()
 
       setGartenLabel(label)
     })

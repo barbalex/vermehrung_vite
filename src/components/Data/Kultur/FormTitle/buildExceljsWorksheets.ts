@@ -34,10 +34,7 @@ const buildExceljsWorksheets = async ({
     try {
       art = await kultur.art.fetch()
     } catch {}
-    let artName
-    try {
-      artName = await art.label.pipe(first$()).toPromise()
-    } catch {}
+    const artName = await art.label()
     let herkunft
     try {
       herkunft = await kultur.herkunft.fetch()
@@ -188,10 +185,7 @@ const buildExceljsWorksheets = async ({
       try {
         art = await l.art.fetch()
       } catch {}
-      let artName
-      try {
-        artName = await art.label.pipe(first$()).toPromise()
-      } catch {}
+      const artName = await art.label()
       let aeArt
       try {
         aeArt = await art.ae_art.fetch()
@@ -357,10 +351,7 @@ const buildExceljsWorksheets = async ({
       try {
         art = await l.art.fetch()
       } catch {}
-      let artName
-      try {
-        artName = await art.label.pipe(first$()).toPromise()
-      } catch {}
+      const artName = await art.label()
       let aeArt
       try {
         aeArt = await art.ae_art.fetch()

@@ -117,10 +117,7 @@ const PersonArten = ({ person }) => {
         const gartensSorted = await gartensSortedFromGartens(gartens)
         const gartenWerte = await Promise.all(
           gartensSorted.map(async (garten) => {
-            let label
-            try {
-              label = await garten.label.pipe(first$()).toPromise()
-            } catch {}
+            const label = await garten.label()
 
             return {
               value: garten.id,

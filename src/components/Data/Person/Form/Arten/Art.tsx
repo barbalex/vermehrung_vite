@@ -5,10 +5,10 @@ import { FaTimes } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { first as first$ } from 'rxjs/operators'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
+import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;
@@ -62,17 +62,10 @@ const Av = ({ av }) => {
 
   const [artLabel, setArtLabel] = useState(null)
   useEffect(() => {
-    const subscription = av.art.observe().subscribe(async (art) => {
-      let label
-      try {
-        label = await art.label.pipe(first$()).toPromise()
-      } catch {}
-
-      setArtLabel(label)
-    })
-
-    return () => subscription?.unsubscribe?.()
-  }, [av.art])
+    dexie.arts
+      .get(av.art_id ?? '99999999-9999-9999-9999-999999999999')
+      .then((art) => art?.label?.().then((label) => setArtLabel(label)))
+  }, [av.art_id])
 
   if (!av) return null
   if (!artLabel) return null

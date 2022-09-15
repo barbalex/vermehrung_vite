@@ -139,10 +139,7 @@ const SammelLieferungVon = ({
         )
         const vonKulturWerte = await Promise.all(
           kultursSorted.map(async (el) => {
-            let label
-            try {
-              label = await el.label.pipe(first$()).toPromise()
-            } catch {}
+            const label = await el.label()
 
             return {
               value: el.id,
@@ -163,10 +160,7 @@ const SammelLieferungVon = ({
         )
         const sammlungWerte = await Promise.all(
           sammlungsSorted.map(async (el) => {
-            let label
-            try {
-              label = await el.label.pipe(first$()).toPromise()
-            } catch {}
+            const label = await el.label()
 
             return {
               value: el.id,

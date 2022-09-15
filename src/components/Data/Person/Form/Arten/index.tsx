@@ -72,7 +72,9 @@ const PersonArten = ({ person }) => {
   )
 
   const data = useLiveQuery(async () => {
-    const avs = await dexie.avs.filter((a) => a._deleted === false).toArray()
+    const avs = await dexie.avs
+      .filter((a) => a._deleted === false && a.person_id === person.id)
+      .toArray()
     const avsSorted = await avsSortByArt(avs)
     const avArtIds = avs.map((v) => v.art_id)
     const arts = await dexie.arts

@@ -122,10 +122,7 @@ const SammelLieferungNach = ({
       )
       const nachKulturWerte = await Promise.all(
         kultursSorted.map(async (el) => {
-          let label
-          try {
-            label = await el.label.pipe(first$()).toPromise()
-          } catch {}
+          const label = await el.label()
 
           return {
             value: el.id,

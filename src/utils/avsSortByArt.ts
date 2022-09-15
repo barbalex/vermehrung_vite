@@ -4,11 +4,7 @@ import sortBy from 'lodash/sortBy'
 const avsSortByArt = async (avs) => {
   const avsIdLabel = await Promise.all(
     avs.map(async (av) => {
-      let label = ''
-      try {
-        label = 'TODO: dexie'
-        // await av.artLabel.pipe(first$()).toPromise()
-      } catch {}
+      const label = await av.artLabel()
 
       return {
         id: av.id,
