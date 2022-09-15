@@ -5,6 +5,7 @@ import { FaTimes } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
@@ -60,16 +61,14 @@ const Garten = ({ gv }) => {
     setDelMenuAnchorEl(null)
   }, [gv, store])
 
-  const [gartenLabel, setGartenLabel] = useState(null)
-  useEffect(() => {
-    const gartenSubscription = gv.garten.observe().subscribe(async (garten) => {
-      const label = await garten.label()
+  const gartenLabel = useLiveQuery(async () => {
+    const garten = await dexie.gartens.get(
+      gv.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const label = await garten.label()
 
-      setGartenLabel(label)
-    })
-
-    return () => gartenSubscription?.unsubscribe?.()
-  }, [gv.garten])
+    return label
+  }, [gv.garten_id])
 
   if (!gv) return null
   if (!gartenLabel) return null
