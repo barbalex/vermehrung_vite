@@ -1,11 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
 import isUuid from 'is-uuid'
 import last from 'lodash/last'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import Lieferung from './Lieferung'
@@ -42,7 +40,7 @@ const StyledSplitPane = styled(SplitPane)`
 
 const LieferungContainer = ({ filter: showFilter, id: idPassed }) => {
   const store = useContext(StoreContext)
-  const { filter, db, user } = store
+  const { filter, user } = store
   const { activeNodeArray } = store.tree
   let id = idPassed
   if (!idPassed) {
@@ -51,47 +49,28 @@ const LieferungContainer = ({ filter: showFilter, id: idPassed }) => {
       : last(activeNodeArray.filter((e) => isUuid.v1(e)))
   }
 
-  const [dataState, setDataState] = useState({
-    row: undefined,
-    // need raw row because observable does not provoke rerendering of components
-    rawRow: undefined,
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['li_show_sl'])
-      : $of({})
-    const lieferungObservable = showFilter
-      ? $of(filter.lieferung)
-      : db.get('lieferung').findAndObserve(id)
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      lieferungObservable,
+  const data = useLiveQuery(async () => {
+    const [person, row] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.lieferungs.get(id),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions, lieferung]) =>
-        setDataState({
-          row: lieferung,
-          rawRow: JSON.stringify(lieferung?._raw ?? lieferung),
-          userPersonOption: userPersonOptions?.[0],
-        }),
-    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.lieferung, id, row?.sammel_lieferung, showFilter, user])
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-  const { row, rawRow, userPersonOption } = dataState
-  const { li_show_sl } = userPersonOption ?? {}
+    return { personOption, row: showFilter ? filter.lieferung : row }
+  }, [user.uid, id, showFilter, filter.lieferung])
+
+  const personOption = data?.personOption ?? {}
+  const row = data?.row
+
+  const { li_show_sl } = personOption ?? {}
 
   if (row?.sammel_lieferung_id && li_show_sl) {
     // this lieferung is part of a sammel_lieferung
     // show that too
     return (
       <StyledSplitPane split="vertical" size="50%" maxSize={-10}>
-        <Lieferung showFilter={showFilter} row={row} rawRow={rawRow} id={id} />
+        <Lieferung showFilter={showFilter} row={row} id={id} />
         <SammelLieferung
           showFilter={showFilter}
           id={row?.sammel_lieferung_id}
@@ -101,7 +80,7 @@ const LieferungContainer = ({ filter: showFilter, id: idPassed }) => {
     )
   }
 
-  return <Lieferung id={id} row={row} rawRow={rawRow} showFilter={showFilter} />
+  return <Lieferung id={id} row={row} showFilter={showFilter} />
 }
 
 export default observer(LieferungContainer)

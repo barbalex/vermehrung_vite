@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { combineLatest, of as $of } from 'rxjs'
 import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Checkbox2States from '../../../../shared/Checkbox2States'
@@ -15,6 +16,7 @@ import Von from './Von'
 import Nach from './Nach'
 import Wann from './Wann'
 import Wer from './Wer'
+import { dexie } from '../../../../../dexieClient'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -35,7 +37,6 @@ const LierferungForm = ({
   showFilter,
   id,
   row,
-  rawRow,
   activeConflict,
   setActiveConflict,
   showHistory,
@@ -45,96 +46,67 @@ const LierferungForm = ({
 
   const { errors, filter, unsetError, user, db } = store
 
-  const [dataState, setDataState] = useState({
-    herkunft: undefined,
-    herkunftQuelle: undefined,
-    userPersonOption: undefined,
-    sammelLieferung: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['li_show_sl_felder'])
-      : $of({})
-    const sLObservable = row.sammel_lieferung
-      ? row.sammel_lieferung.observe()
-      : $of({})
-    const combinedObservables = combineLatest([
-      userPersonOptionsObservable,
-      sLObservable,
+  const data = useLiveQuery(async () => {
+    const [person, sammelLieferung, vonSammlung] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.sammel_lieferungs.get(
+        row.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.sammlungs.get(
+        row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions, sammelLieferung]) => {
-        let vonSammlung
-        try {
-          vonSammlung = await row.sammlung.fetch()
-        } catch {}
-        let vonSammlungHerkunft
-        try {
-          vonSammlungHerkunft = await vonSammlung.herkunft.fetch()
-        } catch {}
 
-        if (vonSammlungHerkunft) {
-          return setDataState({
-            herkunft: vonSammlungHerkunft,
-            herkunftQuelle: 'Sammlung',
-            userPersonOption: userPersonOptions?.[0],
-            sammelLieferung,
-          })
-        }
-
-        if (row.von_kultur_id) {
-          let vonKultur
-          try {
-            vonKultur = await db.get('kultur').find(row.von_kultur_id)
-          } catch {}
-          let herkunftByVonKultur
-          try {
-            herkunftByVonKultur = await vonKultur.herkunft.fetch()
-          } catch {}
-          if (herkunftByVonKultur) {
-            return setDataState({
-              herkunft: herkunftByVonKultur,
-              herkunftQuelle: 'von-Kultur',
-              userPersonOption: userPersonOptions?.[0],
-              sammelLieferung,
-            })
-          }
-        }
-        let nachKultur
-        try {
-          nachKultur = await db.get('kultur').find(row.nach_kultur_id)
-        } catch {}
-        let herkunftByNachKultur
-        try {
-          herkunftByNachKultur = await nachKultur.herkunft.fetch()
-        } catch {}
-
-        setDataState({
-          herkunft: herkunftByNachKultur,
-          herkunftQuelle: herkunftByNachKultur ? 'nach-Kultur' : 'keine',
-          userPersonOption: userPersonOptions?.[0],
-          sammelLieferung,
-        })
-      },
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
+    const vonSammlungHerkunft = await dexie.herkunfts.get(
+      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    row.nach_kultur_id,
-    row.sammel_lieferung,
-    row.sammlung,
-    row.von_kultur_id,
-    row.von_sammlung_id,
-    user.uid,
-  ])
-  const { herkunft, herkunftQuelle, userPersonOption, sammelLieferung } =
-    dataState
+    if (vonSammlungHerkunft) {
+      return {
+        herkunft: vonSammlungHerkunft,
+        personOption,
+        herkunftQuelle: 'Sammlung',
+        sammelLieferung,
+      }
+    }
 
-  const { li_show_sl_felder } = userPersonOption ?? {}
+    if (row.von_kultur_id) {
+      const vonKultur = await dexie.kulturs.get(row.von_kultur_id)
+      const herkunftByVonKultur = await dexie.herkunfts.get(
+        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      if (herkunftByVonKultur) {
+        return {
+          herkunft: herkunftByVonKultur,
+          herkunftQuelle: 'von-Kultur',
+          personOption,
+          sammelLieferung,
+        }
+      }
+    }
+
+    const nachKultur = await dexie.kulturs.get(
+      row?.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunftByNachKultur = await dexie.herkunfts.get(
+      nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+
+    return {
+      herkunft: herkunftByNachKultur,
+      herkunftQuelle: herkunftByNachKultur ? 'nach-Kultur' : 'keine',
+      personOption,
+      sammelLieferung,
+    }
+  }, [user.uid, row])
+
+  const personOption = data?.personOption ?? {}
+  const sammelLieferung = data?.sammelLieferung
+  const herkunft = data?.herkunft
+  const herkunftQuelle = data?.herkunftQuelle
+
+  const { li_show_sl_felder } = personOption ?? {}
 
   const ifNeeded = useCallback(
     (field) => {
@@ -226,7 +198,6 @@ const LierferungForm = ({
             showFilter={showFilter}
             id={id}
             row={row}
-            rawRow={rawRow}
             saveToDb={saveToDb}
             ifNeeded={ifNeeded}
           />
@@ -235,7 +206,6 @@ const LierferungForm = ({
           showFilter={showFilter}
           id={id}
           row={row}
-          rawRow={rawRow}
           saveToDb={saveToDb}
           ifNeeded={ifNeeded}
           herkunft={herkunft}
@@ -245,7 +215,6 @@ const LierferungForm = ({
           showFilter={showFilter}
           id={id}
           row={row}
-          rawRow={rawRow}
           saveToDb={saveToDb}
           ifNeeded={ifNeeded}
           herkunft={herkunft}
@@ -255,7 +224,6 @@ const LierferungForm = ({
             showFilter={showFilter}
             id={id}
             row={row}
-            rawRow={rawRow}
             saveToDb={saveToDb}
             ifNeeded={ifNeeded}
           />

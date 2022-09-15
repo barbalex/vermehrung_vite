@@ -61,14 +61,8 @@ const SammelLieferungForm = ({
     const combinedObservables = combineLatest([userPersonOptionsObservable])
     const subscription = combinedObservables.subscribe(
       async ([userPersonOptions]) => {
-        let vonSammlung
-        try {
-          vonSammlung = await row.sammlung.fetch()
-        } catch {}
-        let vonSammlungHerkunft
-        try {
-          vonSammlungHerkunft = await vonSammlung.herkunft.fetch()
-        } catch {}
+        const vonSammlung = await row.sammlung.fetch()
+        const vonSammlungHerkunft = await vonSammlung.herkunft.fetch()
 
         if (vonSammlungHerkunft) {
           return setDataState({
