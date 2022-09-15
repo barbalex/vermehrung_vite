@@ -2,7 +2,7 @@ import React, { useContext, useState, useCallback, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import ErrorBoundary from '../../shared/ErrorBoundary'
@@ -11,6 +11,7 @@ import Conflict from './Conflict'
 import FormTitle from './FormTitle'
 import Form from './Form'
 import History from './History'
+import { dexie } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -55,26 +56,12 @@ const Person = ({
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db } = store
-  const [dataState, setDataState] = useState({
-    row: undefined,
-    // need raw row because observable does not provoke rerendering of components
-    rawRow: undefined,
-  })
-  useEffect(() => {
-    const personObservable = showFilter
-      ? $of(filter.person)
-      : db.get('person').findAndObserve(id)
-    const subscription = personObservable.subscribe((newRow) => {
-      setDataState({
-        row: newRow,
-        rawRow: JSON.stringify(newRow?._raw ?? newRow),
-      })
-    })
+  const { filter, online } = store
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.person, id, showFilter])
-  const { row, rawRow } = dataState
+  const row = useLiveQuery(
+    async () => await dexie.persons.get(id),
+    [filter.person, id, showFilter],
+  )
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -106,13 +93,14 @@ const Person = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        <FormTitle
+        {/* <FormTitle
           showFilter={showFilter}
           row={row}
           rawRow={rawRow}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        />
+        /> */}
+        <div>Title</div>
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
@@ -120,7 +108,7 @@ const Person = ({
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            <Form
+            {/* <Form
               showFilter={showFilter}
               id={id}
               row={row}
@@ -128,7 +116,8 @@ const Person = ({
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            />
+            /> */}
+            <p>Form</p>
             <>
               {online && (
                 <>
