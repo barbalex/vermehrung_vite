@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { withResizeDetector } from 'react-resize-detector'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import AddButton from './AddButton'
@@ -13,6 +13,7 @@ import HistoryButton from '../../../shared/HistoryButton'
 import KontoMenu from './KontoMenu'
 import NavButtons from './NavButtons'
 import constants from '../../../../utils/constants'
+import { dexie } from '../../../../dexieClient'
 
 const TitleContainer = styled.div`
   background-color: rgba(74, 20, 140, 0.1);
@@ -45,20 +46,13 @@ const PersonFormTitle = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [userRole, setUserRole] = useState(undefined)
-  useEffect(() => {
-    const userRoleObservable = db
-      .get('user_role')
-      .query(Q.on('person', Q.where('account_id', user.uid)))
-      .observeWithColumns(['name'])
-    const subscription = userRoleObservable.subscribe(([userRole]) =>
-      setUserRole(userRole),
-    )
+  const userRole = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user])
+    return person.user_role
+  }, [user.uid])
 
   if (width < 568) {
     return (

@@ -93,14 +93,12 @@ const Person = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        {/* <FormTitle
+        <FormTitle
           showFilter={showFilter}
           row={row}
-          rawRow={rawRow}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        /> */}
-        <div>Title</div>
+        />
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
@@ -112,7 +110,6 @@ const Person = ({
               showFilter={showFilter}
               id={id}
               row={row}
-              rawRow={rawRow}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
@@ -126,7 +123,6 @@ const Person = ({
                       rev={activeConflict}
                       id={id}
                       row={row}
-                      rawRow={rawRow}
                       conflictDisposalCallback={conflictDisposalCallback}
                       conflictSelectionCallback={conflictSelectionCallback}
                       setActiveConflict={setActiveConflict}
@@ -134,7 +130,6 @@ const Person = ({
                   ) : showHistory ? (
                     <History
                       row={row}
-                      rawRow={rawRow}
                       historyTakeoverCallback={historyTakeoverCallback}
                     />
                   ) : null}
