@@ -230,6 +230,7 @@ const LierferungForm = ({
           <Wer
             showFilter={showFilter}
             id={id}
+            row={row}
             saveToDb={saveToDb}
             ifNeeded={ifNeeded}
             activeConflict={activeConflict}

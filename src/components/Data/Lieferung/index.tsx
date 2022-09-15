@@ -61,7 +61,7 @@ const LieferungContainer = ({ filter: showFilter, id: idPassed }) => {
   }, [user.uid, id, showFilter, filter.lieferung])
 
   const personOption = data?.personOption ?? {}
-  const row = data?.row
+  const row = showFilter ? filter.lieferung : data?.row
 
   const { li_show_sl } = personOption ?? {}
 

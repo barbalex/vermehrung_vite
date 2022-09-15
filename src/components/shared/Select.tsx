@@ -112,6 +112,7 @@ const SharedSelect = ({
   // show ... whyle options are loading
   const loadingOptions = [{ value: stateValue, label: '...' }]
   const optionsToUse = loading && valuePassed ? loadingOptions : options
+  console.log('Select', { valuePassed, optionsToUse, loading, options })
   const selectValue =
     optionsToUse.find((o) => o.value === valuePassed) || emptyValue
 

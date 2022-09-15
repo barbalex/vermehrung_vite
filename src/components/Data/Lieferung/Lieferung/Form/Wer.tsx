@@ -42,6 +42,7 @@ const TitleRow = styled.div`
 const LieferungWer = ({
   showFilter,
   id,
+  row,
   saveToDb,
   ifNeeded,
   activeConflict,
@@ -50,16 +51,13 @@ const LieferungWer = ({
   const store = useContext(StoreContext)
   const { errors, online, filter } = store
   const data = useLiveQuery(async () => {
-    const [row] = await Promise.all([
-      dexie.lieferungs.get(id ?? '99999999-9999-9999-9999-999999999999'),
-    ])
+    const persons = await dexie.persons
+      .filter((value) => totalFilter({ value, store, table: 'person' }))
+      .toArray()
 
     const person = await dexie.persons.get(
       row.person_id ?? '99999999-9999-9999-9999-999999999999',
     )
-    const persons = await dexie.persons
-      .filter((value) => totalFilter({ value, store, table: 'person' }))
-      .toArray()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
@@ -77,8 +75,9 @@ const LieferungWer = ({
     id,
     showFilter,
   ])
-  const row = data?.row
   const personWerte = data?.personWerte ?? []
+
+  console.log('Wer', { row, personWerte })
 
   if (!row) return null
 
