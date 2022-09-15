@@ -38,11 +38,7 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         try {
           vonSammlung = await l.sammlung.fetch()
         } catch {}
-        let von_sammlung_label
-        try {
-          // von_sammlung_label = vonSammlung?.label.pipe(first$()).toPromise()
-          von_sammlung_label = 'TODO: dexie'
-        } catch {}
+        const von_sammlung_label = await vonSammlung?.label()
         let vonSammlungPerson
         try {
           vonSammlungPerson = await vonSammlung?.person?.fetch()
@@ -56,22 +52,12 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
           // vonKultur = await l.von_kultur.pipe(first$()).toPromise()
           vonKultur = 'TODO: dexie'
         } catch {}
-        let von_kultur_label
-        try {
-          // von_kultur_label = await vonKultur?.label.pipe(first$()).toPromise()
-          von_kultur_label = 'TODO: dexie'
-        } catch {}
+        const von_kultur_label = await vonKultur?.label()
         let vonKulturGarten
         try {
           vonKulturGarten = await vonKultur?.garten?.fetch()
         } catch {}
-        let von_kultur_garten_label
-        try {
-          von_kultur_garten_label = 'TODO: dexie'
-          // await vonKulturGarten?.label
-          //   .pipe(first$())
-          //   .toPromise()
-        } catch {}
+        const von_kultur_garten_label = await vonKulturGarten?.label()
         let vonKulturHerkunft
         try {
           vonKulturHerkunft = await vonKultur?.herkunft?.fetch()
@@ -81,11 +67,7 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
           // nachKultur = await l.nach_kultur.pipe(first$()).toPromise()
           nachKultur = 'TODO: dexie'
         } catch {}
-        let nach_kultur_label
-        try {
-          // nach_kultur_label = nachKultur?.label.pipe(first$()).toPromise()
-          nach_kultur_label = 'TODO: dexie'
-        } catch {}
+        const nach_kultur_label = await nachKultur?.label()
         let nachKulturGarten
         try {
           nachKulturGarten = await nachKultur?.garten?.fetch()
@@ -105,11 +87,7 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         try {
           art = await l.art?.fetch()
         } catch {}
-        let art_label
-        try {
-          // art_label = await art?.label.pipe(first$()).toPromise()
-          art_label = 'TODO: dexie'
-        } catch {}
+        const art_label = await art?.label()
 
         return {
           id: l.id,

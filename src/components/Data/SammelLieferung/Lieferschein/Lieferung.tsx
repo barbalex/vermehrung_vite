@@ -3,7 +3,6 @@ import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import styled from 'styled-components'
 import { combineLatest, of as $of } from 'rxjs'
-import { first as first$ } from 'rxjs/operators'
 import { Q } from '@nozbe/watermelondb'
 
 import StoreContext from '../../../../storeContext'
@@ -46,10 +45,7 @@ const LieferungForLieferschein = ({ lieferung: row }) => {
     ])
     const subscription = combinedObservables.subscribe(
       async ([art, [vonKulturHerkunft], [vonSammlungHerkunft]]) => {
-        let artLabel
-        try {
-          artLabel = await art.label.pipe(first$()).toPromise()
-        } catch {}
+        const artLabel = await art.label()
         const herkunftLabel = vonKulturHerkunft
           ? herkunftLabelFromHerkunft({
               herkunft: vonKulturHerkunft,

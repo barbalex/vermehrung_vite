@@ -197,10 +197,7 @@ const SammlungForm = ({
         const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
         const artWerte = await Promise.all(
           artsSorted.map(async (art) => {
-            let label = ''
-            try {
-              label = await art.label.pipe(first$()).toPromise()
-            } catch {}
+            const label = await art.label()
 
             return {
               value: art.id,

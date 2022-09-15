@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
 import { combineLatest } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
 
@@ -106,10 +105,7 @@ const ZaehlungForm = ({
             return true
           })
           .map(async (el) => {
-            let label = ''
-            try {
-              label = await el.label.pipe(first$()).toPromise()
-            } catch {}
+            const label = await el.label()
 
             return {
               value: el.id,

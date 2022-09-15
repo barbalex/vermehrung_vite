@@ -83,10 +83,7 @@ const SammelLieferungWas = ({ showFilter, row, ifNeeded, saveToDb }) => {
       const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
       const artWerte = await Promise.all(
         artsSorted.map(async (el) => {
-          let label
-          try {
-            label = await el.label.pipe(first$()).toPromise()
-          } catch {}
+          const label = await el.label()
 
           return {
             value: el.id,
