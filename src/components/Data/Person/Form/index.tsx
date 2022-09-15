@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { combineLatest, of as $of } from 'rxjs'
 import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import TextField from '../../../shared/TextField'
@@ -16,6 +17,8 @@ import Gaerten from './Gaerten'
 import ConflictList from '../../../shared/ConflictList'
 import exists from '../../../../utils/exists'
 import userRoleSort from '../../../../utils/userRoleSort'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const Container = styled.div`
   padding: 10px;
