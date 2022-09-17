@@ -10,7 +10,6 @@ import tableFilter from '../../../../utils/tableFilter'
 
 const ZaehlungFormTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -84,7 +83,6 @@ const ZaehlungFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}
