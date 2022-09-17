@@ -40,7 +40,9 @@ const TkEvents = ({ teilkultur }) => {
   const events = useLiveQuery(
     async () =>
       await dexie.events
-        .filter((value) => totalFilter({ value, store, table: 'event' }))
+        .filter(
+          (e) => e._deleted === false && e.teilkultur_id === teilkultur._id,
+        )
         .toArray(),
     [filter.event._deleted, teilkultur],
   )
