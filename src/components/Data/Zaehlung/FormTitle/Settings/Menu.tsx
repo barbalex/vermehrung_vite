@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -7,9 +7,11 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   display: flex;
@@ -31,17 +33,12 @@ const Info = styled.div`
 
 const SettingsZaehlungenMenu = ({ anchorEl, setAnchorEl, kulturId }) => {
   const store = useContext(StoreContext)
-  const { db } = store
 
-  const [kulturOption, setKulturOption] = useState()
-  useEffect(() => {
-    const kOObservable = db.get('kultur_option').findAndObserve(kulturId)
-    const subscription = kOObservable.subscribe((kulturOption) =>
-      setKulturOption(kulturOption),
-    )
+  const kulturOption = useLiveQuery(
+    async () => await dexie.kultur_options.get(kulturId),
+    [kulturId],
+  )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, kulturId])
   const { z_bemerkungen } = kulturOption ?? {}
 
   const saveToDb = useCallback(
