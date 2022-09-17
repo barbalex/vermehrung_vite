@@ -238,7 +238,7 @@ const buildNodes = async ({ store, userPersonOption, userRole }) => {
   const sammelLieferungLieferungNodes = []
 
   // 1 art
-  if (showArt) {
+  if (showArt) { 
     const artQuery = db
       .get('art')
       .query(...tableFilter({ store, table: 'art' }))

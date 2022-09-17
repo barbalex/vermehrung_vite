@@ -11,7 +11,6 @@ import AutoSizer from 'react-virtualized-auto-sizer'
 import StoreContext from '../../storeContext'
 import Settings from './Settings'
 import List from './List'
-import ErrorBoundary from '../shared/ErrorBoundary'
 import tableFilter from '../../utils/tableFilter'
 import notDeletedQuery from '../../utils/notDeletedQuery'
 import buildNodes from './nodes'
@@ -208,7 +207,6 @@ const Tree = () => {
   //console.log('Tree rendering', { openNodes, nodes })
 
   return (
-    <ErrorBoundary>
       <Container>
         <Settings />
         <AutoSizer
@@ -227,7 +225,6 @@ const Tree = () => {
           )}
         </AutoSizer>
       </Container>
-    </ErrorBoundary>
   )
 }
 
