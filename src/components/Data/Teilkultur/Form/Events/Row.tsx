@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import format from 'date-fns/format'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import personFullname from '../../../../../utils/personFullname'
+import { dexie } from '../../../../../dexieClient'
 
 const Row = styled.div`
   ${(props) =>
@@ -42,24 +44,13 @@ const Geplant = styled.div`
 `
 
 const TkEventRow = ({ event, last }) => {
-  const [personName, setPersonName] = useState()
-  useEffect(() => {
-    let isActive = true
-    const run = async () => {
-      let person
-      try {
-        person = event.person.fetch()
-      } catch {}
-      if (!isActive) return
+  const personName = useLiveQuery(async () => {
+    const person = await dexie.persons.get(
+      event.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
-      setPersonName(personFullname(person))
-    }
-    run()
-
-    return () => {
-      isActive = false
-    }
-  }, [event.person])
+    return personFullname(person)
+  }, [])
 
   const datum = event.datum
     ? format(new Date(event.datum), 'yyyy.MM.dd')

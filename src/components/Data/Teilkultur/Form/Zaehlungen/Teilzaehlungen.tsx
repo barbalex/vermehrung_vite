@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import format from 'date-fns/format'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import exists from '../../../../../utils/exists'
+import { dexie } from '../../../../../dexieClient'
+import Spinner from '../../../../shared/Spinner'
 
 const Row = styled.div`
   ${(props) =>
@@ -48,16 +51,15 @@ const Other = styled.div`
 `
 
 const TkTeilzaehlung = ({ tz, last }) => {
-  const [zaehlung, setZaehlung] = useState([])
+  const zaehlung = useLiveQuery(
+    async () =>
+      await dexie.zaehlungs.get(
+        tz.zaehlung_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    [tz.zaehlung_id],
+  )
 
-  useEffect(() => {
-    const zaehlungObservable = tz.zaehlung.observe()
-    const subscription = zaehlungObservable.subscribe((zaehlung) =>
-      setZaehlung(zaehlung),
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [tz.zaehlung])
+  if (!zaehlung) return <Spinner />
 
   const datum = zaehlung?.datum
     ? format(new Date(zaehlung?.datum), 'yyyy.MM.dd')

@@ -9,14 +9,21 @@ const SpinnerContainer = styled.div`
   justify-content: center;
   align-items: center;
 `
+const InnerContainer = styled.div`
+  min-height: 50px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+`
 const SpinnerText = styled.div`
   padding: 10px;
 `
 
 const SpinnerComponent = ({ message }) => (
   <SpinnerContainer>
-    <CircularProgress />
-    {!!message && <SpinnerText>{message}</SpinnerText>}
+    <InnerContainer>
+      <CircularProgress />
+      {!!message && <SpinnerText>{message}</SpinnerText>}
+    </InnerContainer>
   </SpinnerContainer>
 )
 

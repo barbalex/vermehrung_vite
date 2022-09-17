@@ -1,12 +1,13 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
-import StoreContext from '../../../../../storeContext'
 import teilzaehlungsSortByZaehlungTk from '../../../../../utils/teilzaehlungsSortByZaehlungTk'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import Teilzaehlungen from './Teilzaehlungen'
 import constants from '../../../../../utils/constants'
+import Spinner from '../../../../shared/Spinner'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -31,43 +32,34 @@ const Title = styled.div`
 const Rows = styled.div``
 
 const TkZaehlungen = ({ teilkultur }) => {
-  const store = useContext(StoreContext)
-  const { db } = store
-
-  const [teilzaehlungs, setTeilzaehlungs] = useState([])
-  useEffect(() => {
-    const teilzaehlungsObservable = db
-      .get('teilzaehlung')
-      .query(
-        Q.where('_deleted', false),
-        Q.on('zaehlung', Q.where('kultur_id', teilkultur.kultur_id)),
-      )
-      .observeWithColumns(['datum', 'beschreibung', 'geplant'])
-    const subscription = teilzaehlungsObservable.subscribe(
-      async (teilzaehlungs) => {
-        const teilzaehlungsSorted = await teilzaehlungsSortByZaehlungTk(
-          teilzaehlungs,
-        )
-        setTeilzaehlungs(teilzaehlungsSorted)
-      },
+  const teilzaehlungs = useLiveQuery(async () => {
+    const teilzaehlungs = await dexie.teilzaehlungs
+      .filter((t) => t._deleted === false && t.teilkultur_id === teilkultur.id)
+      .toArray()
+    const teilzaehlungsSorted = await teilzaehlungsSortByZaehlungTk(
+      teilzaehlungs,
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, teilkultur.kultur_id, teilkultur.zaehlung])
+    return teilzaehlungsSorted
+  }, [teilkultur.kultur_id])
 
   return (
     <ErrorBoundary>
-      <TitleRow data-has-data={!!teilzaehlungs.length}>
+      <TitleRow data-has-data={!!(teilzaehlungs ?? []).length}>
         <Title>Zählungen</Title>
       </TitleRow>
       <Rows>
-        {teilzaehlungs.map((tz, i) => (
-          <Teilzaehlungen
-            key={tz.id}
-            tz={tz}
-            last={i === teilzaehlungs.length - 1}
-          />
-        ))}
+        {teilzaehlungs ? (
+          teilzaehlungs.map((tz, i) => (
+            <Teilzaehlungen
+              key={tz.id}
+              tz={tz}
+              last={i === (teilzaehlungs ?? []).length - 1}
+            />
+          ))
+        ) : (
+          <Spinner />
+        )}
       </Rows>
     </ErrorBoundary>
   )

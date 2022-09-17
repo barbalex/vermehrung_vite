@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -16,6 +15,8 @@ import Events from './Events'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -41,86 +42,55 @@ const TeilkulturForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db, errors, unsetError } = store
+  const { filter, online, errors, unsetError } = store
 
   useEffect(() => {
     unsetError('teilkultur')
   }, [id, unsetError])
 
-  const [dataState, setDataState] = useState({
-    kulturWerte: [],
-    kulturOption: undefined,
-  })
-  useEffect(() => {
-    const kultursObservable = db
-      .get('kultur')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.kultur._deleted === false
-              ? [false]
-              : filter.kultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.kultur.aktiv === true
-              ? [true]
-              : filter.kultur.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const kulturObservable = row.kultur ? row.kultur.observe() : $of({})
-    const kulturOptionObservable = row.kultur_id
-      ? db.get('kultur_option').findAndObserve(row.kultur_id)
-      : $of(null)
-    const combinedObservables = combineLatest([
-      kultursObservable,
-      kulturObservable,
-      kulturOptionObservable,
+  const data = useLiveQuery(async () => {
+    const [kulturs, kultur, kulturOption] = await Promise.all([
+      dexie.kulturs
+        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+        .toArray(),
+      dexie.kulturs.get(
+        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.kultur_options.get(
+        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([kulturs, kultur, kulturOption]) => {
-        // need to show a choosen kultur even if inactive but not if deleted
-        const kultursIncludingChoosen = uniqBy(
-          [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
-          'id',
-        )
-        const kultursSorted = await kultursSortedFromKulturs(
-          kultursIncludingChoosen,
-        )
-        const kulturWerte = await Promise.all(
-          kultursSorted.map(async (el) => {
-            const label = await el.label()
 
-            return {
-              value: el.id,
-              label,
-            }
-          }),
-        )
+    // need to show a choosen kultur even if inactive but not if deleted
+    const kultursIncludingChoosen = uniqBy(
+      [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
+      'id',
+    )
+    const kultursSorted = await kultursSortedFromKulturs(
+      kultursIncludingChoosen,
+    )
+    const kulturWerte = await Promise.all(
+      kultursSorted.map(async (el) => {
+        const label = await el.label()
 
-        setDataState({ kulturWerte, kulturOption })
-      },
+        return {
+          value: el.id,
+          label,
+        }
+      }),
     )
 
-    return () => subscription?.unsubscribe?.()
+    return { kulturWerte, kulturOption }
   }, [
-    db,
     filter.kultur._deleted,
     filter.kultur.aktiv,
     row.kultur,
     row.kultur_id,
     showFilter,
   ])
-  const { kulturWerte, kulturOption } = dataState
+
+  const kulturWerte = data?.kulturWerte ?? []
+  const kulturOption = data?.kulturOption
 
   const { tk_bemerkungen } = kulturOption ?? {}
 
