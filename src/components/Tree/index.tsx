@@ -15,6 +15,7 @@ import ErrorBoundary from '../shared/ErrorBoundary'
 import tableFilter from '../../utils/tableFilter'
 import notDeletedQuery from '../../utils/notDeletedQuery'
 import buildNodes from './nodes'
+import { dexie } from '../../dexieClient'
 
 const Container = styled.div`
   width: 100%;

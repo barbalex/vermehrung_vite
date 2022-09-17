@@ -225,10 +225,13 @@ const Vermehrung = () => {
           maxSize={-10}
           resizerStyle={resizerStyle}
         >
-          <p>Tree</p>
-          <Data />
-          {/* <Tree />
-          {showFilter ? <Filter /> : <Data />} */}
+          <ErrorBoundary>
+            <Tree />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <Data />
+          </ErrorBoundary>
+          {/* {showFilter ? <Filter /> : <Data />} */}
         </StyledSplitPane>
       </Container>
       <ApiDetector />

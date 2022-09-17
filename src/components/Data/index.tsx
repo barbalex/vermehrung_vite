@@ -41,165 +41,73 @@ const Data = () => {
 
   switch (activeForm) {
     case 'root': {
-      return (
-        <ErrorBondary>
-          <Root />
-        </ErrorBondary>
-      )
+      return <Root />
     }
     case 'art': {
-      return (
-        <ErrorBondary>
-          <ArtForm id={id} />
-        </ErrorBondary>
-      )
+      return <ArtForm id={id} />
     }
     case 'arten': {
-      return (
-        <ErrorBondary>
-          <Arten />
-        </ErrorBondary>
-      )
+      return <Arten />
     }
     case 'event': {
-      return (
-        <ErrorBondary>
-          <EventComponent id={id} />
-        </ErrorBondary>
-      )
+      return <EventComponent id={id} />
     }
     case 'events': {
-      return (
-        <ErrorBondary>
-          <Events />
-        </ErrorBondary>
-      )
+      return <Events />
     }
     case 'garten': {
-      return (
-        <ErrorBondary>
-          <Garten id={id} />
-        </ErrorBondary>
-      )
+      return <Garten id={id} />
     }
     case 'gaerten': {
-      return (
-        <ErrorBondary>
-          <Gaerten />
-        </ErrorBondary>
-      )
+      return <Gaerten />
     }
     case 'herkunft': {
-      return (
-        <ErrorBondary>
-          <Herkunft id={id} />
-        </ErrorBondary>
-      )
+      return <Herkunft id={id} />
     }
     case 'herkuenfte': {
-      return (
-        <ErrorBondary>
-          <Herkuenfte />
-        </ErrorBondary>
-      )
+      return <Herkuenfte />
     }
     case 'kultur': {
-      return (
-        <ErrorBondary>
-          <Kultur id={id} />
-        </ErrorBondary>
-      )
+      return <Kultur id={id} />
     }
     case 'kulturen': {
-      return (
-        <ErrorBondary>
-          <Kulturen />
-        </ErrorBondary>
-      )
+      return <Kulturen />
     }
     case 'sammel_lieferung': {
-      return (
-        <ErrorBondary>
-          <SammelLieferung id={id} />
-        </ErrorBondary>
-      )
+      return <SammelLieferung id={id} />
     }
     case 'sammelLieferungen': {
-      return (
-        <ErrorBondary>
-          <SammelLieferungen />
-        </ErrorBondary>
-      )
+      return <SammelLieferungen />
     }
     case 'lieferung': {
-      return (
-        <ErrorBondary>
-          <Lieferung id={id} />
-        </ErrorBondary>
-      )
+      return <Lieferung id={id} />
     }
     case 'lieferungen': {
-      return (
-        <ErrorBondary>
-          <Lieferungen />
-        </ErrorBondary>
-      )
+      return <Lieferungen />
     }
     case 'person': {
-      return (
-        <ErrorBondary>
-          <Person id={id} />
-        </ErrorBondary>
-      )
+      return <Person id={id} />
     }
     case 'personen': {
-      return (
-        <ErrorBondary>
-          <Personen />
-        </ErrorBondary>
-      )
+      return <Personen />
     }
     case 'sammlung': {
-      return (
-        <ErrorBondary>
-          <Sammlung id={id} />
-        </ErrorBondary>
-      )
+      return <Sammlung id={id} />
     }
     case 'sammlungen': {
-      return (
-        <ErrorBondary>
-          <Sammlungen />
-        </ErrorBondary>
-      )
+      return <Sammlungen />
     }
     case 'teilkultur': {
-      return (
-        <ErrorBondary>
-          <Teilkultur id={id} />
-        </ErrorBondary>
-      )
+      return <Teilkultur id={id} />
     }
     case 'teilkulturen': {
-      return (
-        <ErrorBondary>
-          <Teilkulturen />
-        </ErrorBondary>
-      )
+      return <Teilkulturen />
     }
     case 'zaehlung': {
-      return (
-        <ErrorBondary>
-          <Zaehlung id={id} />
-        </ErrorBondary>
-      )
+      return <Zaehlung id={id} />
     }
     case 'zaehlungen': {
-      return (
-        <ErrorBondary>
-          <Zaehlungen />
-        </ErrorBondary>
-      )
+      return <Zaehlungen />
     }
     default:
       return null
