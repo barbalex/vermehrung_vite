@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import Lieferschein from './Lieferschein'
@@ -12,6 +12,7 @@ import Conflict from './Conflict'
 import FormTitle from './FormTitle'
 import Form from './Form'
 import History from './History'
+import { dexie } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -58,27 +59,10 @@ const SammelLieferung = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const { filter, isPrint, online, db } = store
+  const { filter, isPrint, online } = store
 
-  const [dataState, setDataState] = useState({
-    row: undefined,
-    // need raw row because observable does not provoke rerendering of components
-    rawRow: undefined,
-  })
-  useEffect(() => {
-    const observable = showFilter
-      ? $of(filter.sammel_lieferung)
-      : db.get('sammel_lieferung').findAndObserve(id)
-    const subscription = observable.subscribe((newRow) => {
-      setDataState({
-        row: newRow,
-        rawRow: JSON.stringify(newRow?._raw ?? newRow),
-      })
-    })
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.sammel_lieferung, id, showFilter])
-  const { row, rawRow } = dataState
+  let row = useLiveQuery(async () => await dexie.sammel_lieferungs.get(id), [])
+  if (showFilter) row = filter.sammel_lieferung
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -114,18 +98,18 @@ const SammelLieferung = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        <FormTitle
+        {/* <FormTitle
           showFilter={showFilter}
           row={row}
-          rawRow={rawRow}
           lieferung={lieferung}
           printPreview={printPreview}
           setPrintPreview={setPrintPreview}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        />
+        /> */}
+        <div>Title</div>
         {printPreview ? (
-          <Lieferschein row={row} rawRow={rawRow} />
+          <Lieferschein row={row} />
         ) : (
           <SplitPaneContainer>
             <StyledSplitPane
@@ -134,22 +118,21 @@ const SammelLieferung = ({
               maxSize={-10}
               resizerStyle={resizerStyle}
             >
-              <Form
+              {/* <Form
                 showFilter={showFilter}
                 id={id}
                 row={row}
-                rawRow={rawRow}
                 activeConflict={activeConflict}
                 setActiveConflict={setActiveConflict}
                 showHistory={showHistory}
-              />
+              /> */}
+              <div>Form</div>
               <>
                 {activeConflict ? (
                   <Conflict
                     rev={activeConflict}
                     id={id}
                     row={row}
-                    rawRow={rawRow}
                     conflictDisposalCallback={conflictDisposalCallback}
                     conflictSelectionCallback={conflictSelectionCallback}
                     setActiveConflict={setActiveConflict}
@@ -157,7 +140,6 @@ const SammelLieferung = ({
                 ) : showHistory ? (
                   <History
                     row={row}
-                    rawRow={rawRow}
                     historyTakeoverCallback={historyTakeoverCallback}
                   />
                 ) : null}
