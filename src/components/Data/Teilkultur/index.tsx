@@ -91,13 +91,12 @@ const Teilkultur = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        {/* <FormTitle
+        <FormTitle
           row={row}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        /> */}
-        <div>Title</div>
+        />
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
