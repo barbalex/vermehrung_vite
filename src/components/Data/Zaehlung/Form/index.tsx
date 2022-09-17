@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -19,6 +18,8 @@ import constants from '../../../../utils/constants'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -51,86 +52,52 @@ const ZaehlungForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db, errors, unsetError } = store
+  const { filter, online, errors, unsetError } = store
 
-  const [dataState, setDataState] = useState({
-    kulturWerte: [],
-    kulturOption: undefined,
-  })
-  useEffect(() => {
-    const kultursObservable = db
-      .get('kultur')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.kultur._deleted === false
-              ? [false]
-              : filter.kultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.kultur.aktiv === true
-              ? [true]
-              : filter.kultur.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const combinedObservables = combineLatest([kultursObservable])
-    const subscription = combinedObservables.subscribe(async ([kulturs]) => {
-      // need to show a choosen kultur even if inactive but not if deleted
-      let kultur
-      try {
-        kultur = await row.kultur.fetch()
-      } catch {}
-      const kultursIncludingChoosen = uniqBy(
-        [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
-        'id',
-      )
-      const kultursSorted = await kultursSortedFromKulturs(
-        kultursIncludingChoosen,
-      )
-      const kulturWerte = await Promise.all(
-        kultursSorted
-          .filter((k) => {
-            if (row.art_id) return k.art_id === row.art_id
-            return true
-          })
-          .map(async (el) => {
-            const label = await el.label()
+  const data = useLiveQuery(async () => {
+    const [kulturs, kultur, kulturOption] = await Promise.all([
+      dexie.kulturs
+        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+        .toArray(),
+      dexie.kulturs.get(
+        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.kultur_options.get(row.id),
+    ])
+    const kultursIncludingChoosen = uniqBy(
+      [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
+      'id',
+    )
+    const kultursSorted = await kultursSortedFromKulturs(
+      kultursIncludingChoosen,
+    )
+    const kulturWerte = await Promise.all(
+      kultursSorted
+        .filter((k) => {
+          if (row.art_id) return k.art_id === row.art_id
+          return true
+        })
+        .map(async (el) => {
+          const label = await el.label()
 
-            return {
-              value: el.id,
-              label,
-            }
-          }),
-      )
-      let kulturOption
-      try {
-        kulturOption = await row.kultur_option.fetch()
-      } catch {}
+          return {
+            value: el.id,
+            label,
+          }
+        }),
+    )
 
-      setDataState({ kulturWerte, kulturOption })
-    })
-
-    return () => subscription?.unsubscribe?.()
+    return { kulturWerte, kulturOption }
   }, [
-    db,
     filter.kultur._deleted,
     filter.kultur.aktiv,
     row.art_id,
-    row.kultur,
-    row.kultur_option,
+    row.kultur_id,
     showFilter,
   ])
-  const { kulturWerte, kulturOption } = dataState
+
+  const kulturWerte = data?.personWerte ?? []
+  const kulturOption = data?.kulturOption ?? {}
 
   const z_bemerkungen = kulturOption?.z_bemerkungen ?? true
 
@@ -267,9 +234,7 @@ const ZaehlungForm = ({
             setActiveConflict={setActiveConflict}
           />
         )}
-        {!showFilter && (
-          <Teilzaehlungen zaehlungId={id} zaehlung={row} />
-        )}
+        {!showFilter && <Teilzaehlungen zaehlungId={id} zaehlung={row} />}
       </FieldsContainer>
     </ErrorBoundary>
   )

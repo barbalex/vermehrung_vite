@@ -16,7 +16,7 @@ import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import Personen from './Personen'
 import ConflictList from '../../../shared/ConflictList'
-import { dexie } from '../../../../dexieClient'
+import { dexie } from '../../../../dexieClient' 
 import totalFilter from '../../../../utils/totalFilter' 
 
 const FieldsContainer = styled.div`
