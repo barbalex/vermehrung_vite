@@ -27,7 +27,7 @@ const TitleRow = styled.div`
   justify-content: space-between;
   margin-left: -10px;
   margin-right: -10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   padding: 0 10px;
   position: sticky;
   top: 0;
