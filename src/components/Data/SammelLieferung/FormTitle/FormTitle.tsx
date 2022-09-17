@@ -56,14 +56,14 @@ const SammelLieferungFormTitle = ({
   const { filter, user } = store
   const { activeNodeArray } = store.tree
 
-  const data = useLiveQuery(async () => {
+  const personOption = useLiveQuery(async () => {
     const person = await dexie.persons.get({ account_id: user.uid })
     const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return { personOption }
+    return personOption
   }, [user])
 
-  const sl_auto_copy_edits = data?.personOption?.sl_auto_copy_edits
+  const sl_auto_copy_edits = personOption?.sl_auto_copy_edits
 
   const shownAsSammelLieferung =
     activeNodeArray.length === 3 && activeNodeArray[1] === 'Sammel-Lieferungen'

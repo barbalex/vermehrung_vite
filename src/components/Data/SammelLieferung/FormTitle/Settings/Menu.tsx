@@ -1,14 +1,14 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
+import { dexie, PersonOption } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   display: flex;
@@ -25,35 +25,17 @@ const Title = styled.div`
 
 const SettingsSammelLieferungMenu = ({ anchorEl, setAnchorEl }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    userPersonOption: {},
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns([
-            'sl_show_empty_when_next_to_li',
-            'sl_auto_copy_edits',
-          ])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(
-      ([userPersonOptions]) => {
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-        })
-      },
-    )
+  const data = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption } = dataState
+    return { personOption }
+  }, [user])
+
   const { sl_show_empty_when_next_to_li, sl_auto_copy_edits } =
-    userPersonOption ?? {}
+    data?.personOption ?? {}
 
   const saveToDb = useCallback(
     async (event) => {
@@ -61,7 +43,8 @@ const SettingsSammelLieferungMenu = ({ anchorEl, setAnchorEl }) => {
       const value = event.target.value === 'false'
       userPersonOption.edit({ field, value, store })
     },
-    [store, userPersonOption],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [store, user],
   )
 
   const onClose = useCallback(() => setAnchorEl(null), [setAnchorEl])

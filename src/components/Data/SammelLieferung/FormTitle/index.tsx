@@ -36,7 +36,7 @@ const SammelLieferungFormTitleChooser = ({
     ],
   )
 
-  const filteredCount = store.lieferungsFilteredCount ?? '...'
+  const filteredCount = store.sammelLieferungsFilteredCount ?? '...'
 
   if (!row || (!showFilter && filter.show)) return null
 
