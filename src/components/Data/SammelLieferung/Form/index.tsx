@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Checkbox2States from '../../../shared/Checkbox2States'
@@ -16,6 +15,7 @@ import Von from './Von'
 import Nach from './Nach'
 import Wann from './Wann'
 import Wer from './Wer'
+import { dexie } from '../../../../dexieClient'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -42,81 +42,62 @@ const SammelLieferungForm = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const { filter, online, user, db, errors, unsetError } = store
+  const { filter, online, user, errors, unsetError } = store
   const { setWidthInPercentOfScreen, activeNodeArray } = store.tree
 
-  const [dataState, setDataState] = useState({
-    herkunft: undefined,
-    herkunftQuelle: undefined,
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['sl_show_empty_when_next_to_li'])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(
-      async ([userPersonOptions]) => {
-        const vonSammlung = await row.sammlung.fetch()
-        const vonSammlungHerkunft = await vonSammlung.herkunft.fetch()
+  const data = useLiveQuery(async () => {
+    const [person, vonSammlung] = await Promise.all([
+      dexie.persons.get({ account_id: user.uid }),
+      dexie.sammlungs.get(
+        row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
 
-        if (vonSammlungHerkunft) {
-          return setDataState({
-            herkunft: vonSammlungHerkunft,
-            herkunftQuelle: 'Sammlung',
-            userPersonOption: userPersonOptions?.[0],
-          })
-        }
-
-        if (row.von_kultur_id) {
-          let vonKultur
-          try {
-            vonKultur = await db.get('kultur').find(row.von_kultur_id)
-          } catch {}
-          let herkunftByVonKultur
-          try {
-            herkunftByVonKultur = await vonKultur.herkunft.fetch()
-          } catch {}
-          if (herkunftByVonKultur) {
-            return setDataState({
-              herkunft: herkunftByVonKultur,
-              herkunftQuelle: 'von-Kultur',
-              userPersonOption: userPersonOptions?.[0],
-            })
-          }
-        }
-        let nachKultur
-        try {
-          nachKultur = await db.get('kultur').find(row.nach_kultur_id)
-        } catch {}
-        let herkunftByNachKultur
-        try {
-          herkunftByNachKultur = await nachKultur.herkunft.fetch()
-        } catch {}
-
-        setDataState({
-          herkunft: herkunftByNachKultur,
-          herkunftQuelle: herkunftByNachKultur ? 'nach-Kultur' : 'keine',
-          userPersonOption: userPersonOptions?.[0],
-        })
-      },
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
+    const vonSammlungHerkunft = await dexie.herkunfts.get(
+      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    row.nach_kultur_id,
-    row.sammel_lieferung,
-    row.sammlung,
-    row.von_kultur_id,
-    row.von_sammlung_id,
-    user.uid,
-  ])
-  const { herkunft, herkunftQuelle, userPersonOption } = dataState
-  const { sl_show_empty_when_next_to_li } = userPersonOption ?? {}
+    if (vonSammlungHerkunft) {
+      return {
+        herkunft: vonSammlungHerkunft,
+        personOption,
+        herkunftQuelle: 'Sammlung',
+      }
+    }
+
+    if (row.von_kultur_id) {
+      const vonKultur = await dexie.kulturs.get(row.von_kultur_id)
+      const herkunftByVonKultur = await dexie.herkunfts.get(
+        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      if (herkunftByVonKultur) {
+        return {
+          herkunft: herkunftByVonKultur,
+          herkunftQuelle: 'von-Kultur',
+          personOption,
+        }
+      }
+    }
+
+    const nachKultur = await dexie.kulturs.get(
+      row?.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunftByNachKultur = await dexie.herkunfts.get(
+      nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+
+    return {
+      herkunft: herkunftByNachKultur,
+      herkunftQuelle: herkunftByNachKultur ? 'nach-Kultur' : 'keine',
+      personOption,
+    }
+  }, [user.uid, row])
+
+  const userPersonOption = data?.personOption ?? {}
+  const herkunft = data?.herkunft
+  const herkunftQuelle = data?.herkunftQuelle
+  const { sl_show_empty_when_next_to_li } = userPersonOption
 
   useEffect(() => {
     unsetError('sammel_lieferung')
@@ -248,7 +229,7 @@ const SammelLieferungForm = ({
         {ifSomeNeeded(['person_id', 'bemerkungen']) && (
           <Wer
             showFilter={showFilter}
-            id={id}
+            row={row}
             ifNeeded={ifNeeded}
             saveToDb={saveToDb}
           />

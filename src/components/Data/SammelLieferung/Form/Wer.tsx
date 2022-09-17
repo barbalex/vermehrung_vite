@@ -1,15 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
 import TextField from '../../../shared/TextField'
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import personSort from '../../../../utils/personSort'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const Title = styled.div`
   font-weight: bold;
@@ -36,78 +37,36 @@ const TitleRow = styled.div`
   }
 `
 
-const SammelLieferungWer = ({ showFilter, ifNeeded, saveToDb, id }) => {
+const SammelLieferungWer = ({ showFilter, ifNeeded, saveToDb, row }) => {
   const store = useContext(StoreContext)
-  const { errors, db, filter } = store
+  const { errors, filter } = store
 
-  const [dataState, setDataState] = useState({ personWerte: [], row })
-  useEffect(() => {
-    const rowObservable = showFilter
-      ? $of(filter.sammel_lieferung)
-      : db.get('sammel_lieferung').findAndObserve(id)
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['name', 'vorname'])
-    const combinedObservables = combineLatest([
-      personsObservable,
-      rowObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      async ([persons, row]) => {
-        // need to show a choosen kultur even if inactive but not if deleted
-        let person
-        try {
-          person = await row.person.fetch()
-        } catch {}
-        const personsIncludingChoosen = uniqBy(
-          [...persons, ...(person && !showFilter ? [person] : [])],
-          'id',
-        )
-        const personWerte = personsIncludingChoosen
-          .sort(personSort)
-          .map((el) => ({
-            value: el.id,
-            label: personLabelFromPerson({ person: el }),
-          }))
+  const data = useLiveQuery(async () => {
+    const persons = await dexie.persons
+      .filter((value) => totalFilter({ value, store, table: 'person' }))
+      .toArray()
 
-        setDataState({ personWerte, row })
-      },
+    const person = await dexie.persons.get(
+      row.person_id ?? '99999999-9999-9999-9999-999999999999',
     )
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen.sort(personSort).map((el) => ({
+      value: el.id,
+      label: personLabelFromPerson({ person: el }),
+    }))
 
-    return () => subscription?.unsubscribe?.()
+    return { row: showFilter ? filter.lieferung : row, personWerte }
   }, [
-    db,
-    filter.sammel_lieferung,
+    filter.lieferung,
     filter.person._deleted,
     filter.person.aktiv,
-    id,
     row,
-    row?.person_id,
     showFilter,
   ])
-  const { row, personWerte } = dataState
+  const personWerte = data?.personWerte ?? []
 
   if (!row) return null
 

@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniqBy from 'lodash/uniqBy'
-import { useLiveQuery } from 'dexie-react-hooks'
+import { useLiveQuery } from 'dexie-react-hooks' 
 
 import StoreContext from '../../../../../storeContext'
 import Select from '../../../../shared/Select'
@@ -41,7 +41,6 @@ const TitleRow = styled.div`
 
 const LieferungWer = ({
   showFilter,
-  id,
   row,
   saveToDb,
   ifNeeded,
@@ -50,6 +49,7 @@ const LieferungWer = ({
 }) => {
   const store = useContext(StoreContext)
   const { errors, online, filter } = store
+
   const data = useLiveQuery(async () => {
     const persons = await dexie.persons
       .filter((value) => totalFilter({ value, store, table: 'person' }))
@@ -72,7 +72,7 @@ const LieferungWer = ({
     filter.lieferung,
     filter.person._deleted,
     filter.person.aktiv,
-    id,
+    row,
     showFilter,
   ])
   const personWerte = data?.personWerte ?? []

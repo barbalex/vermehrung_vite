@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { useLiveQuery } from 'dexie-react-hooks'
+import { useLiveQuery } from 'dexie-react-hooks' 
 
 import StoreContext from '../../../../../storeContext'
 import Checkbox2States from '../../../../shared/Checkbox2States'
@@ -104,7 +104,7 @@ const LierferungForm = ({
   const herkunft = data?.herkunft
   const herkunftQuelle = data?.herkunftQuelle
 
-  const { li_show_sl_felder } = personOption ?? {}
+  const { li_show_sl_felder } = personOption
 
   const ifNeeded = useCallback(
     (field) => {
@@ -229,7 +229,6 @@ const LierferungForm = ({
         {ifSomeNeeded(['person_id', 'bemerkungen']) && (
           <Wer
             showFilter={showFilter}
-            id={id}
             row={row}
             saveToDb={saveToDb}
             ifNeeded={ifNeeded}
