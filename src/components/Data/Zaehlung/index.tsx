@@ -92,13 +92,12 @@ const Zaehlung = ({
     <ErrorBoundary>
       <>
         <Container showfilter={showFilter}>
-          {/* <FormTitle
+          <FormTitle
             row={row}
             showFilter={showFilter}
             showHistory={showHistory}
             setShowHistory={setShowHistory}
-          /> */}
-          <p>title</p>
+          />
           <SplitPaneContainer>
             <StyledSplitPane
               split="vertical"
