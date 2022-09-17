@@ -98,7 +98,7 @@ const SammelLieferung = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        {/* <FormTitle
+        <FormTitle
           showFilter={showFilter}
           row={row}
           lieferung={lieferung}
@@ -106,8 +106,7 @@ const SammelLieferung = ({
           setPrintPreview={setPrintPreview}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        /> */}
-        <div>Title</div>
+        />
         {printPreview ? (
           <Lieferschein row={row} />
         ) : (

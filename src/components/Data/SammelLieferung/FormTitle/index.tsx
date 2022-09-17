@@ -12,7 +12,6 @@ const SammelLieferungFormTitleChooser = ({
   lieferung,
   printPreview,
   row,
-  rawRow,
   setPrintPreview,
   showFilter,
   showHistory,
@@ -82,7 +81,6 @@ const SammelLieferungFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showFilter={showFilter}
