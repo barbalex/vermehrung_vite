@@ -4,7 +4,6 @@ import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
 import { combineLatest, of as $of } from 'rxjs'
-import { first as first$ } from 'rxjs/operators'
 import { Q } from '@nozbe/watermelondb'
 import uniqBy from 'lodash/uniqBy'
 
@@ -56,7 +55,6 @@ const SammlungForm = ({
   showFilter,
   id,
   row,
-  rawRow,
   activeConflict,
   setActiveConflict,
   showHistory,
@@ -404,9 +402,7 @@ const SammlungForm = ({
             </IconButton>
           </div>
         </FieldRow>
-        {!showFilter && (
-          <Coordinates row={row} rawRow={rawRow} saveToDb={saveToDb} />
-        )}
+        {!showFilter && <Coordinates row={row} saveToDb={saveToDb} />}
         <FieldRow>
           {showFilter ? (
             <JesNo

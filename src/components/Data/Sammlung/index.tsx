@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import SplitPane from 'react-split-pane'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import FormTitle from './FormTitle'
@@ -11,6 +11,7 @@ import ErrorBoundary from '../../shared/ErrorBoundary'
 import Spinner from '../../shared/Spinner'
 import Conflict from './Conflict'
 import History from './History'
+import { dexie } from '../../../dexieClient'
 
 const Container = styled.div`
   height: 100%;
@@ -55,27 +56,10 @@ const Sammlung = ({
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, db } = store
+  const { filter, online } = store
 
-  const [dataState, setDataState] = useState({
-    row: undefined,
-    // need raw row because observable does not provoke rerendering of components
-    rawRow: undefined,
-  })
-  useEffect(() => {
-    const observable = showFilter
-      ? $of(filter.sammlung)
-      : db.get('sammlung').findAndObserve(id)
-    const subscription = observable.subscribe((newRow) => {
-      setDataState({
-        row: newRow,
-        rawRow: JSON.stringify(newRow?._raw ?? newRow),
-      })
-    })
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.sammlung, id, showFilter])
-  const { row, rawRow } = dataState
+  let row = useLiveQuery(async () => await dexie.sammlungs.get(id), [id])
+  if (showFilter) row = filter.sammlung
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
@@ -107,13 +91,13 @@ const Sammlung = ({
   return (
     <ErrorBoundary>
       <Container showfilter={showFilter}>
-        <FormTitle
+        {/* <FormTitle
           row={row}
-          rawRow={rawRow}
           showFilter={showFilter}
           showHistory={showHistory}
           setShowHistory={setShowHistory}
-        />
+        /> */}
+        <div>Title</div>
         <SplitPaneContainer>
           <StyledSplitPane
             split="vertical"
@@ -121,15 +105,15 @@ const Sammlung = ({
             maxSize={-10}
             resizerStyle={resizerStyle}
           >
-            <Form
+            {/* <Form
               showFilter={showFilter}
               id={id}
               row={row}
-              rawRow={rawRow}
               activeConflict={activeConflict}
               setActiveConflict={setActiveConflict}
               showHistory={showHistory}
-            />
+            /> */}
+            <div>Form</div>
             <>
               {online && (
                 <>
@@ -138,7 +122,6 @@ const Sammlung = ({
                       rev={activeConflict}
                       id={id}
                       row={row}
-                      rawRow={rawRow}
                       conflictDisposalCallback={conflictDisposalCallback}
                       conflictSelectionCallback={conflictSelectionCallback}
                       setActiveConflict={setActiveConflict}
@@ -146,7 +129,6 @@ const Sammlung = ({
                   ) : showHistory ? (
                     <History
                       row={row}
-                      rawRow={rawRow}
                       historyTakeoverCallback={historyTakeoverCallback}
                     />
                   ) : null}

@@ -10,7 +10,6 @@ import tableFilter from '../../../../utils/tableFilter'
 
 const SammlungFormTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -102,7 +101,6 @@ const SammlungFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}
