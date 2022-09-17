@@ -9,9 +9,8 @@ import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { FaRegTrashAlt, FaChartLine } from 'react-icons/fa'
-import { Q } from '@nozbe/watermelondb'
-import { combineLatest, of as $of } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../../../storeContext'
 import TextField from '../../../../../../shared/TextField'
@@ -26,6 +25,7 @@ import teilkulturLabelFromTeilkultur from '../../../../../../../utils/teilkultur
 import PrognoseMenu from './PrognoseMenu'
 import ErrorBoundary from '../../../../../../shared/ErrorBoundary'
 import exists from '../../../../../../../utils/exists'
+import { dexie } from '../../../../../../../dexieClient'
 
 const FieldContainer = styled.div`
   display: flex;
@@ -78,11 +78,10 @@ const DeletedContainer = styled.div`
   padding-right: 5px;
   position: relative;
   margin-top: -8px;
-}
 `
 
 const TeilzaehlungForm = ({
-  id,
+  row,
   kulturId,
   activeConflict,
   setActiveConflict,
@@ -90,69 +89,41 @@ const TeilzaehlungForm = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { insertTeilkulturRev, errors, unsetError, online, filter, db } = store
+  const { insertTeilkulturRev, errors, unsetError, online, filter } = store
 
-  const [dataState, setDataState] = useState({
-    teilkulturWerte: [],
-    kulturOption,
-    row,
-  })
-  useEffect(() => {
-    const teilkultursObservable = db
-      .get('teilkultur')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.teilkultur._deleted === false
-              ? [false]
-              : filter.teilkultur._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where('kultur_id', kulturId),
-      )
-      .observeWithColumns(['name'])
-    const kulturOptionObservable = kulturId
-      ? db.get('kultur_option').findAndObserve(kulturId)
-      : $of(null)
-    const tzObservable = db.get('teilzaehlung').findAndObserve(id)
-    const combinedObservables = combineLatest([
-      teilkultursObservable,
-      kulturOptionObservable,
-      tzObservable,
+  const data = useLiveQuery(async () => {
+    const [teilkulturs, teilkultur, kulturOption] = await Promise.all([
+      dexie.teilkulturs
+        .filter((t) => t._deleted === false && t.kultur_id === kulturId)
+        .toArray(),
+      dexie.teilkulturs.get(
+        row.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.kultur_options.get(
+        kulturId ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([teilkulturs, kulturOption, teilzaehlung]) => {
-        let teilkultur
-        try {
-          teilkultur = await row.teilkultur.fetch()
-        } catch {}
-        const teilkultursIncludingChoosen = uniqBy(
-          [...teilkulturs, ...(teilkultur ? [teilkultur] : [])],
-          'id',
-        )
-        const teilkulturWerte = teilkultursIncludingChoosen
-          .sort(teilkulturSort)
-          .map((tk) => ({
-            value: tk.id,
-            label: teilkulturLabelFromTeilkultur({ teilkultur: tk }),
-          }))
-        setDataState({ teilkulturWerte, kulturOption, row: teilzaehlung })
-      },
+    const teilkultursIncludingChoosen = uniqBy(
+      [...teilkulturs, ...(teilkultur ? [teilkultur] : [])],
+      'id',
     )
+    const teilkulturWerte = teilkultursIncludingChoosen
+      .sort(teilkulturSort)
+      .map((tk) => ({
+        value: tk.id,
+        label: teilkulturLabelFromTeilkultur({ teilkultur: tk }),
+      }))
 
-    return () => subscription?.unsubscribe?.()
+    return { teilkulturWerte, kulturOption }
   }, [
-    db,
     filter.teilkultur._deleted,
-    id,
     kulturId,
     row?.teilkultur,
     row?.teilkultur_id,
   ])
-  const { teilkulturWerte, kulturOption, row } = dataState
+
+  const teilkulturWerte = data?.teilkulturWerte ?? []
+  const kulturOption = data?.kulturOption ?? {}
 
   const [openPrognosis, setOpenPrognosis] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null)
@@ -172,7 +143,7 @@ const TeilzaehlungForm = ({
     tz_andere_menge,
     tz_auspflanzbereit_beschreibung,
     tz_bemerkungen,
-  } = kulturOption ?? {}
+  } = kulturOption
 
   const onCreateNewTeilkultur = useCallback(
     async ({ name }) => {
@@ -190,7 +161,7 @@ const TeilzaehlungForm = ({
 
   useEffect(() => {
     unsetError('teilzaehlung')
-  }, [id, unsetError])
+  }, [row, unsetError])
 
   const saveToDb = useCallback(
     (event) => {
@@ -354,7 +325,7 @@ const TeilzaehlungForm = ({
         )}
         <div>
           <HistoryButton
-            id={id}
+            id={row.id}
             table="teilzaehlung"
             showHistory={showHistory}
             setShowHistory={setShowHistory}

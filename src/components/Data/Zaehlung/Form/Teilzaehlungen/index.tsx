@@ -1,10 +1,9 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { FaPlus } from 'react-icons/fa'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import TeilzaehlungenRows from './TeilzaehlungenRows'
@@ -12,6 +11,8 @@ import Settings from './Settings'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import teilzaehlungsSortByTk from '../../../../../utils/teilzaehlungsSortByTk'
 import constants from '../../../../../utils/constants'
+import { dexie } from '../../../../../dexieClient'
+import Spinner from '../../../../shared/Spinner'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -36,43 +37,28 @@ const Title = styled.div`
 
 const Teilzaehlungen = ({ zaehlung }) => {
   const store = useContext(StoreContext)
-  const { insertTeilzaehlungRev, db } = store
+  const { insertTeilzaehlungRev } = store
 
   const kulturId = zaehlung.kultur_id
 
-  const [dataState, setDataState] = useState({
-    teilzaehlungs: [],
-    kulturOption: undefined,
-  })
-  useEffect(() => {
-    const teilzaehlungsObservable = zaehlung.teilzaehlungs
-      .extend(Q.where('_deleted', false))
-      .observe()
-    const kulturOptionObservable = kulturId
-      ? db.get('kultur_option').find(kulturId)
-      : $of({})
-    const combinedObservables = combineLatest([
-      teilzaehlungsObservable,
-      kulturOptionObservable,
+  const data = useLiveQuery(async () => {
+    const [tzs, kulturOption] = await Promise.all([
+      dexie.teilzaehlungs
+        .filter((t) => t._deleted === false && t.zaehlung_id === zaehlung.id)
+        .toArray(),
+      dexie.kultur_options.get(
+        zaehlung.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([tzs, kulturOption]) => {
-        const teilzaehlungs = await teilzaehlungsSortByTk(tzs)
-        setDataState({ teilzaehlungs, kulturOption })
-      },
-    )
+    const teilzaehlungs = await teilzaehlungsSortByTk(tzs)
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    kulturId,
-    zaehlung.kultur_option,
-    zaehlung.teilkulturs,
-    zaehlung.teilzaehlungs,
-  ])
-  const { teilzaehlungs, kulturOption } = dataState
+    return { teilzaehlungs, kulturOption }
+  }, [zaehlung])
 
-  const { tk } = kulturOption ?? {}
+  const teilzaehlungs = data?.teilzaehlungs ?? []
+  const kulturOption = data?.kulturOption ?? {}
+
+  const { tk } = kulturOption
 
   const onClickNew = useCallback(() => {
     insertTeilzaehlungRev()
@@ -99,7 +85,11 @@ const Teilzaehlungen = ({ zaehlung }) => {
           )}
         </div>
       </TitleRow>
-      <TeilzaehlungenRows kulturId={kulturId} teilzaehlungs={teilzaehlungs} />
+      {data?.teilzaehlungs ? (
+        <TeilzaehlungenRows kulturId={kulturId} teilzaehlungs={teilzaehlungs} />
+      ) : (
+        <Spinner />
+      )}
     </ErrorBoundary>
   )
 }

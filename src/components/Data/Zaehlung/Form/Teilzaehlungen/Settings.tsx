@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -8,11 +8,12 @@ import Checkbox from '@mui/material/Checkbox'
 import { FaCog } from 'react-icons/fa'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import constants from '../../../../../utils/constants'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
+import { dexie } from '../../../../../dexieClient'
 
 const TitleRow = styled.div`
   display: flex;
@@ -34,24 +35,11 @@ const Info = styled.div`
 
 const SettingsTeilzaehlungen = ({ kulturId }) => {
   const store = useContext(StoreContext)
-  const { db } = store
 
-  const [dataState, setDataState] = useState({
-    kulturOption: undefined,
-  })
-  useEffect(() => {
-    const kulturOptionObservable = kulturId
-      ? db.get('kultur_option').findAndObserve(kulturId)
-      : $of({})
-    const subscription = kulturOptionObservable.subscribe(
-      async (kulturOption) => {
-        setDataState({ kulturOption })
-      },
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, kulturId])
-  const { kulturOption } = dataState
+  const kulturOption = useLiveQuery(
+    async () => await dexie.kultur_options.get(kulturId),
+    [kulturId],
+  )
 
   const {
     tz_teilkultur_id,
