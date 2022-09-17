@@ -1,9 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { withResizeDetector } from 'react-resize-detector'
-import { of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Settings from './Settings'
@@ -17,6 +16,7 @@ import NavButtons from './NavButtons'
 import PrintButtons from './PrintButtons'
 import Anleitung from './Anleitung'
 import constants from '../../../../utils/constants'
+import { dexie, PersonOption } from '../../../../dexieClient'
 
 const TitleContainer = styled.div`
   background-color: rgba(74, 20, 140, 0.1);
@@ -53,24 +53,17 @@ const SammelLieferungFormTitle = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, user, db } = store
+  const { filter, user } = store
   const { activeNodeArray } = store.tree
 
-  const [userPersonOption, setUserPersonOption] = useState()
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['sl_auto_copy_edits'])
-      : $of({})
-    const subscription = userPersonOptionsObservable.subscribe(
-      ([userPersonOption]) => setUserPersonOption(userPersonOption),
-    )
+  const data = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user])
-  const { sl_auto_copy_edits } = userPersonOption ?? {}
+    return { personOption }
+  }, [user])
+
+  const sl_auto_copy_edits = data?.personOption?.sl_auto_copy_edits
 
   const shownAsSammelLieferung =
     activeNodeArray.length === 3 && activeNodeArray[1] === 'Sammel-Lieferungen'

@@ -6,7 +6,7 @@ import StoreContext from '../../../../../storeContext'
 import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
+import totalFilter from '../../../../../utils/totalFilter' 
 
 const LieferungTitleChooser = ({
   row,

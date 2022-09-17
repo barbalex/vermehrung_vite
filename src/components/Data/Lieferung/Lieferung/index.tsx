@@ -7,7 +7,7 @@ import StoreContext from '../../../../storeContext'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import Spinner from '../../../shared/Spinner'
 import Conflict from './Conflict'
-import FormTitle from './FormTitle'
+import FormTitle from './FormTitle' 
 import Form from './Form'
 import History from './History'
 

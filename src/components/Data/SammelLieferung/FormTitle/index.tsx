@@ -1,12 +1,12 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { combineLatest } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import tableFilter from '../../../../utils/tableFilter'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const SammelLieferungFormTitleChooser = ({
   lieferung,
@@ -19,51 +19,24 @@ const SammelLieferungFormTitleChooser = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const { filter, db } = store
+  const { filter } = store
 
-  const [countState, setCountState] = useState({
-    totalCount: 0,
-    filteredCount: 0,
-  })
-  useEffect(() => {
-    const collection = db.get('sammel_lieferung')
-    const totalCountObservable = collection
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.sammel_lieferung._deleted === false
-              ? [false]
-              : filter.sammel_lieferung._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeCount()
-    const filteredCountObservable = collection
-      .query(...tableFilter({ store, table: 'sammel_lieferung' }))
-      .observeCount()
-    const combinedObservables = combineLatest([
-      totalCountObservable,
-      filteredCountObservable,
-    ])
-    const subscription = combinedObservables.subscribe(
-      ([totalCount, filteredCount]) =>
-        setCountState({ totalCount, filteredCount }),
-    )
+  const totalCount = useLiveQuery(
+    async () =>
+      await dexie.sammel_lieferungs
+        .filter((value) =>
+          totalFilter({ value, store, table: 'sammel_lieferung' }),
+        )
+        .count(),
+    [
+      store.filter.sammel_lieferung,
+      // need to rerender if any of the values of lieferungFilter changes
+      ...Object.values(store.filter.sammel_lieferung),
+      store.sammel_lieferung_initially_queried,
+    ],
+  )
 
-    return () => subscription?.unsubscribe?.()
-  }, [
-    db,
-    // need to rerender if any of the values of sammel_lieferungFilter changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    ...Object.values(store.filter.sammel_lieferung),
-    store,
-    filter.sammel_lieferung._deleted,
-  ])
-
-  const { totalCount, filteredCount } = countState
+  const filteredCount = store.lieferungsFilteredCount ?? '...'
 
   if (!row || (!showFilter && filter.show)) return null
 

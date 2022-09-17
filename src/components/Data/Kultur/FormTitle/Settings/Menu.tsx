@@ -32,7 +32,7 @@ const SettingsKulturMenu = ({ anchorEl, setAnchorEl, kulturId }) => {
     const personOption: PersonOption = await dexie.person_options.get(person.id)
 
     return { kulturOption, personOption }
-  }, [store.filter.art, store.art_initially_queried])
+  }, [user, kulturId])
 
   const kulturOption = data?.kulturOption
   const userPersonOption = data?.personOption
