@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniqBy from 'lodash/uniqBy'
-import { useLiveQuery } from 'dexie-react-hooks' 
+import { useLiveQuery } from 'dexie-react-hooks'  
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'

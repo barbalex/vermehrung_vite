@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useCallback, useState } from 'react'
+import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
@@ -22,9 +21,10 @@ import ConflictList from '../../../shared/ConflictList'
 import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
-import exists from '../../../../utils/exists'
 import personSort from '../../../../utils/personSort'
 import herkunftSort from '../../../../utils/herkunftSort'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -60,161 +60,85 @@ const SammlungForm = ({
   showHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online, errors, unsetError, setError, db } = store
+  const { filter, online, errors, unsetError, setError } = store
 
-  const [dataState, setDataState] = useState({
-    personWerte: [],
-    herkunftWerte: [],
-    artWerte: [],
-  })
-  useEffect(() => {
-    const personsObservable = db
-      .get('person')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.person._deleted === false
-              ? [false]
-              : filter.person._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-        Q.where(
-          'aktiv',
-          Q.oneOf(
-            filter.person.aktiv === true
-              ? [true]
-              : filter.person.aktiv === false
-              ? [false]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['vorname', 'name'])
-    const herkunftsObservable = db
-      .get('herkunft')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.herkunft._deleted === false
-              ? [false]
-              : filter.herkunft._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
-    const artsObservable = db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observeWithColumns(['ae_id'])
-    const sammlungsNrCountObservable =
-      showFilter || !exists(row?.nr)
-        ? $of(0)
-        : db
-            .get('sammlung')
-            .query(
-              Q.where(
-                '_deleted',
-                Q.oneOf(
-                  filter.sammlung._deleted === false
-                    ? [false]
-                    : filter.sammlung._deleted === true
-                    ? [true]
-                    : [true, false, null],
-                ),
-              ),
-              Q.where('nr', row.nr),
-            )
-            .observeCount()
-    const combinedObservables = combineLatest([
-      sammlungsNrCountObservable,
-      personsObservable,
-      herkunftsObservable,
-      artsObservable,
+  const data = useLiveQuery(async () => {
+    const [persons, herkunfts, arts] = await Promise.all([
+      dexie.persons
+        .filter((value) => totalFilter({ value, store, table: 'person' }))
+        .toArray(),
+      dexie.herkunfts
+        .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+        .toArray(),
+      dexie.arts
+        .filter((value) => totalFilter({ value, store, table: 'art' }))
+        .toArray(),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([nrCount, persons, herkunfts, arts]) => {
-        if (!showFilter && nrCount > 1) {
-          setError({
-            path: 'sammlung.nr',
-            value: `Diese Nummer wird ${nrCount} mal verwendet. Sie sollte aber über alle Sammlungen eindeutig sein`,
-          })
+
+    // need to show a choosen person even if inactive but not if deleted
+    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    const personsIncludingChoosen = uniqBy(
+      [...persons, ...(person && !showFilter ? [person] : [])],
+      'id',
+    )
+    const personWerte = personsIncludingChoosen
+      .sort(personSort)
+      .map((person) => ({
+        value: person.id,
+        label: personLabelFromPerson({ person }),
+      }))
+
+    const herkunft = await dexie.herkunfts.get(
+      row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunftsIncludingChoosen = uniqBy(
+      [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
+      'id',
+    )
+    const herkunftWerte = herkunftsIncludingChoosen
+      .sort(herkunftSort)
+      .map((herkunft) => ({
+        value: herkunft.id,
+        label: herkunftLabelFromHerkunft({ herkunft }),
+      }))
+
+    const art = await dexie.arts.get(
+      row.art_id ?? '99999999-9999-9999-99999999',
+    )
+    const artsIncludingChoosen = uniqBy(
+      [...arts, ...(art && !showFilter ? [art] : [])],
+      'id',
+    )
+    const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
+    const artWerte = await Promise.all(
+      artsSorted.map(async (art) => {
+        const label = await art.label()
+
+        return {
+          value: art.id,
+          label,
         }
-        let person
-        try {
-          person = await row.person.fetch()
-        } catch {}
-        const personsIncludingChoosen = uniqBy(
-          [...persons, ...(person && !showFilter ? [person] : [])],
-          'id',
-        )
-        const personWerte = personsIncludingChoosen
-          .sort(personSort)
-          .map((person) => ({
-            value: person.id,
-            label: personLabelFromPerson({ person }),
-          }))
-        let herkunft
-        try {
-          herkunft = await row.herkunft.fetch()
-        } catch {}
-        const herkunftsIncludingChoosen = uniqBy(
-          [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
-          'id',
-        )
-        const herkunftWerte = herkunftsIncludingChoosen
-          .sort(herkunftSort)
-          .map((herkunft) => ({
-            value: herkunft.id,
-            label: herkunftLabelFromHerkunft({ herkunft }),
-          }))
-        let art
-        try {
-          art = await row.art.fetch()
-        } catch {}
-        const artsIncludingChoosen = uniqBy(
-          [...arts, ...(art && !showFilter ? [art] : [])],
-          'id',
-        )
-        const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
-        const artWerte = await Promise.all(
-          artsSorted.map(async (art) => {
-            const label = await art.label()
-
-            return {
-              value: art.id,
-              label,
-            }
-          }),
-        )
-
-        setDataState({
-          personWerte,
-          herkunftWerte,
-          artWerte,
-        })
-      },
+      }),
     )
 
-    return () => subscription?.unsubscribe?.()
+    if (!showFilter && row.nr) {
+      const otherHerkunftsWithSameNr = await dexie.herkunfts
+        .filter(
+          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
+        )
+        .toArray()
+      if (otherHerkunftsWithSameNr.length > 0) {
+        setError({
+          path: 'sammlung.nr',
+          value: `Diese Nummer wird ${
+            otherHerkunftsWithSameNr.length + 1
+          } mal verwendet. Sie sollte aber über alle Sammlungen eindeutig sein`,
+        })
+      }
+    }
+
+    return { personWerte, herkunftWerte, artWerte }
   }, [
-    db,
     filter.art._deleted,
     filter.herkunft,
     filter.person._deleted,
@@ -227,7 +151,10 @@ const SammlungForm = ({
     setError,
     showFilter,
   ])
-  const { personWerte, herkunftWerte, artWerte } = dataState
+
+  const personWerte = data?.personWerte ?? []
+  const herkunftWerte = data?.herkunftWerte ?? []
+  const artWerte = data?.artWerte ?? []
 
   // ensure that activeConflict is reset
   // when changing dataset
