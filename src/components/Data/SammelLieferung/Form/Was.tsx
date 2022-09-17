@@ -1,18 +1,17 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import IconButton from '@mui/material/IconButton'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
-import { combineLatest } from 'rxjs'
 import uniqBy from 'lodash/uniqBy'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../storeContext'
 import Select from '../../../shared/Select'
 import TextField from '../../../shared/TextField'
 import constants from '../../../../utils/constants'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
+import { dexie } from '../../../../dexieClient'
 
 const Title = styled.div`
   font-weight: bold;
@@ -51,52 +50,32 @@ const FieldRow = styled.div`
 
 const SammelLieferungWas = ({ showFilter, row, ifNeeded, saveToDb }) => {
   const store = useContext(StoreContext)
-  const { db, errors, filter } = store
+  const { errors, filter } = store
 
-  const [artWerte, setArtWerte] = useState([])
-  useEffect(() => {
-    const artsObservable = db
-      .get('art')
-      .query(
-        Q.where(
-          '_deleted',
-          Q.oneOf(
-            filter.art._deleted === false
-              ? [false]
-              : filter.art._deleted === true
-              ? [true]
-              : [true, false, null],
-          ),
-        ),
-      )
-      .observe()
-    const combinedObservables = combineLatest([artsObservable])
-    const subscription = combinedObservables.subscribe(async ([arts]) => {
-      let art
-      try {
-        art = await row.art.fetch()
-      } catch {}
-      const artsIncludingChoosen = uniqBy(
-        [...arts, ...(art && !showFilter ? [art] : [])],
-        'id',
-      )
-      const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
-      const artWerte = await Promise.all(
-        artsSorted.map(async (el) => {
-          const label = await el.label()
+  const artWerte = useLiveQuery(async () => {
+    const arts = await dexie.arts.filter((k) => k._deleted === false).toArray()
 
-          return {
-            value: el.id,
-            label,
-          }
-        }),
-      )
+    const art = await dexie.arts.get(
+      row?.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const artsIncludingChoosen = uniqBy(
+      [...arts, ...(art && !showFilter ? [art] : [])],
+      'id',
+    )
+    const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
+    const artWerte = await Promise.all(
+      artsSorted.map(async (el) => {
+        const label = await el.label()
 
-      setArtWerte(artWerte)
-    })
+        return {
+          value: el.id,
+          label,
+        }
+      }),
+    )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, filter.art._deleted, row.art, showFilter])
+    return artWerte
+  }, [filter.art._deleted, row?.art_id, showFilter])
 
   const openGenVielfaldDocs = useCallback(() => {
     const url = `${constants?.getAppUri()}/Dokumentation/Genetische-Vielfalt`

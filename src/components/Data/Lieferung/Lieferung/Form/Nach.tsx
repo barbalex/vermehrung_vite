@@ -10,7 +10,7 @@ import Checkbox2States from '../../../../shared/Checkbox2States'
 import JesNo from '../../../../shared/JesNo'
 import exists from '../../../../../utils/exists'
 import { dexie } from '../../../../../dexieClient'
-import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
+import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs' 
 
 const Title = styled.div`
   font-weight: bold;
@@ -114,7 +114,7 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
                 })`
               : ''
           }`}
-          options={nachKulturWerte ?? []}
+          options={nachKulturWerte}
           saveToDb={saveToDb}
           error={errors?.lieferung?.nach_kultur_id}
         />

@@ -82,7 +82,7 @@ const SharedSelect = ({
   name,
   error,
   helperText,
-  options,
+  options = [],
   loading = false,
   maxHeight = null,
   isClearable = true,
