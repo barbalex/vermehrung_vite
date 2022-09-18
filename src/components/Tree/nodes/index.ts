@@ -315,104 +315,96 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // // 1.2 art > sammlung
-        // const sammlungsQuery = art.sammlungs.extend(
-        //   ...tableFilter({
-        //     table: 'sammlung',
-        //     store,
-        //   }),
-        // )
-        // const sammlungCount = await sammlungsQuery.fetchCount()
-        // artSammlungFolderNodes.push(
-        //   buildArtSammlungFolder({
-        //     count: sammlungCount,
-        //     artIndex,
-        //     artId,
-        //   }),
-        // )
+        const sammlungCount = await sammlungsOfArt.length
+        artSammlungFolderNodes.push(
+          buildArtSammlungFolder({
+            count: sammlungCount,
+            artIndex,
+            artId,
+          }),
+        )
 
-        // const artSammlungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Arten' &&
-        //     n[2] === artId &&
-        //     n[3] === 'Sammlungen',
-        // )
-        // if (artSammlungFolderIsOpen) {
-        //   let sammlungs = []
-        //   try {
-        //     sammlungs = await sammlungsQuery.fetch()
-        //   } catch {}
-        //   const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
-        //   const newArtSammlungNodes = await Promise.all(
-        //     sammlungsSorted.map(
-        //       async (sammlung, sammlungIndex) =>
-        //         await buildArtSammlung({
-        //           sammlung,
-        //           sammlungIndex,
-        //           artId,
-        //           artIndex,
-        //         }),
-        //     ),
-        //   )
-        //   artSammlungNodes.push(...newArtSammlungNodes)
-        //   const openArtSammlungNodes = openNodes.filter(
-        //     (n) =>
-        //       n[1] === 'Arten' &&
-        //       n[2] === artId &&
-        //       n[3] === 'Sammlungen' &&
-        //       n.length === 5,
-        //   )
-        //   for (const artSammlungNode of openArtSammlungNodes) {
-        //     const sammlungId = artSammlungNode[4]
-        //     const sammlung = sammlungsSorted.find((s) => s.id === sammlungId)
-        //     if (!sammlung) break
-        //     const sammlungIndex = newArtSammlungNodes.findIndex(
-        //       (s) => s.id === `${artId}${sammlungId}`,
-        //     )
+        const artSammlungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Arten' &&
+            n[2] === artId &&
+            n[3] === 'Sammlungen',
+        )
+        if (artSammlungFolderIsOpen) {
+          const sammlungsSorted = await sammlungsSortedFromSammlungs(
+            sammlungsOfArt,
+          )
+          const newArtSammlungNodes = await Promise.all(
+            sammlungsSorted.map(
+              async (sammlung, sammlungIndex) =>
+                await buildArtSammlung({
+                  sammlung,
+                  sammlungIndex,
+                  artId,
+                  artIndex,
+                }),
+            ),
+          )
+          artSammlungNodes.push(...newArtSammlungNodes)
+          const openArtSammlungNodes = openNodes.filter(
+            (n) =>
+              n[1] === 'Arten' &&
+              n[2] === artId &&
+              n[3] === 'Sammlungen' &&
+              n.length === 5,
+          )
+          for (const artSammlungNode of openArtSammlungNodes) {
+            const sammlungId = artSammlungNode[4]
+            const sammlung = sammlungsSorted.find((s) => s.id === sammlungId)
+            if (!sammlung) break
+            const sammlungIndex = newArtSammlungNodes.findIndex(
+              (s) => s.id === `${artId}${sammlungId}`,
+            )
 
-        //     let lieferungs = []
-        //     try {
-        //       lieferungs = await sammlung.lieferungs
-        //         .extend(...tableFilter({ store, table: 'lieferung' }))
-        //         .fetch()
-        //     } catch {}
-        //     artSammlungAuslieferungFolderNodes.push(
-        //       buildArtSammlungAuslieferungFolder({
-        //         sammlungId,
-        //         sammlungIndex,
-        //         artId,
-        //         artIndex,
-        //         children: lieferungs,
-        //       }),
-        //     )
-        //     const artSammlungAuslieferungFolderIsOpen = openNodes.some(
-        //       (n) =>
-        //         n.length === 6 &&
-        //         n[1] === 'Arten' &&
-        //         n[2] === artId &&
-        //         n[3] === 'Sammlungen' &&
-        //         n[4] === sammlungId &&
-        //         n[5] === 'Aus-Lieferungen',
-        //     )
-        //     if (artSammlungAuslieferungFolderIsOpen) {
-        //       const lieferungsSorted = lieferungs.sort(lieferungSort)
-        //       const newArtSammlungAuslieferungNodes = lieferungsSorted.map(
-        //         (lieferung, lieferungIndex) =>
-        //           buildArtSammlungAuslieferung({
-        //             lieferung,
-        //             lieferungIndex,
-        //             sammlungId,
-        //             sammlungIndex,
-        //             artId,
-        //             artIndex,
-        //           }),
-        //       )
-        //       artSammlungAuslieferungNodes.push(
-        //         ...newArtSammlungAuslieferungNodes,
-        //       )
-        //     }
-        //   }
-        // }
+            //     let lieferungs = []
+            //     try {
+            //       lieferungs = await sammlung.lieferungs
+            //         .extend(...tableFilter({ store, table: 'lieferung' }))
+            //         .fetch()
+            //     } catch {}
+            //     artSammlungAuslieferungFolderNodes.push(
+            //       buildArtSammlungAuslieferungFolder({
+            //         sammlungId,
+            //         sammlungIndex,
+            //         artId,
+            //         artIndex,
+            //         children: lieferungs,
+            //       }),
+            //     )
+            //     const artSammlungAuslieferungFolderIsOpen = openNodes.some(
+            //       (n) =>
+            //         n.length === 6 &&
+            //         n[1] === 'Arten' &&
+            //         n[2] === artId &&
+            //         n[3] === 'Sammlungen' &&
+            //         n[4] === sammlungId &&
+            //         n[5] === 'Aus-Lieferungen',
+            //     )
+            //     if (artSammlungAuslieferungFolderIsOpen) {
+            //       const lieferungsSorted = lieferungs.sort(lieferungSort)
+            //       const newArtSammlungAuslieferungNodes = lieferungsSorted.map(
+            //         (lieferung, lieferungIndex) =>
+            //           buildArtSammlungAuslieferung({
+            //             lieferung,
+            //             lieferungIndex,
+            //             sammlungId,
+            //             sammlungIndex,
+            //             artId,
+            //             artIndex,
+            //           }),
+            //       )
+            //       artSammlungAuslieferungNodes.push(
+            //         ...newArtSammlungAuslieferungNodes,
+            //       )
+            //     }
+          }
+        }
 
         // // 1.3 art > kultur
         // const artKulturQuery = art.kulturs.extend(
