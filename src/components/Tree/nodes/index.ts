@@ -1463,25 +1463,20 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   }
 
   // 7 zaehlung
-  // if (showZaehlung) {
-  //   const zaehlungQuery = db
-  //     .get('zaehlung')
-  //     .query(...tableFilter({ store, table: 'zaehlung' }))
-  //   const zaehlungCount = await zaehlungQuery.fetchCount()
-  //   zaehlungFolderNodes = buildZaehlungFolder({ count: zaehlungCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Zaehlungen')) {
-  //     let zaehlungs = []
-  //     try {
-  //       zaehlungs = await zaehlungQuery.fetch()
-  //     } catch {}
-  //     const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-  //     zaehlungNodes = await Promise.all(
-  //       zaehlungsSorted.map(
-  //         async (zaehlung, index) => await buildZaehlung({ zaehlung, index }),
-  //       ),
-  //     )
-  //   }
-  // }
+  if (showZaehlung) {
+    const zaehlungCollection = dexie.zaehlungs.filter(value=>totalFilter({value,store,table:'zaehlung'}))
+    const zaehlungCount = await zaehlungCollection.count()
+    zaehlungFolderNodes = buildZaehlungFolder({ count: zaehlungCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Zaehlungen')) {
+      const zaehlungs = await zaehlungCollection.toArray()
+      const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+      zaehlungNodes = await Promise.all(
+        zaehlungsSorted.map(
+          async (zaehlung, index) => await buildZaehlung({ zaehlung, index }),
+        ),
+      )
+    }
+  }
 
   // 8 lieferung
   if (showLieferung) {
