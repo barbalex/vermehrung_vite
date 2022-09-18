@@ -1573,23 +1573,18 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   }
 
   // 10 event
-  // if (showEvent) {
-  //   const eventQuery = db
-  //     .get('event')
-  //     .query(...tableFilter({ store, table: 'event' }))
-  //   const eventCount = await eventQuery.fetchCount()
-  //   eventFolderNodes = buildEventFolder({ count: eventCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Events')) {
-  //     let events = []
-  //     try {
-  //       events = await eventQuery.fetch()
-  //     } catch {}
-  //     const eventsSorted = events.sort(eventSort)
-  //     eventNodes = eventsSorted.map((event, index) =>
-  //       buildEvent({ event, index }),
-  //     )
-  //   }
-  // }
+  if (showEvent) {
+    const eventCollection = dexie.events.filter(value=>totalFilter({value,store,table:'event'}))
+    const eventCount = await eventCollection.count()
+    eventFolderNodes = buildEventFolder({ count: eventCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Events')) {
+      const events = await eventCollection.toArray()
+      const eventsSorted = events.sort(eventSort)
+      eventNodes = eventsSorted.map((event, index) =>
+        buildEvent({ event, index }),
+      )
+    }
+  }
 
   // 11 person
   // if (showPerson) {
