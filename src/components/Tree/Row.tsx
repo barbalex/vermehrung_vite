@@ -9,7 +9,6 @@ import {
 import { observer } from 'mobx-react-lite'
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu'
 import last from 'lodash/last'
-import { of as $of } from 'rxjs'
 
 import StoreContext from '../../storeContext'
 import isNodeInActiveNodePath from './isNodeInActiveNodePath'
@@ -25,6 +24,7 @@ import deleteDataset from './delete'
 import signup from '../../utils/signup'
 import deleteAccount from '../../utils/deleteAccount'
 import setPassword from '../../utils/setPassword'
+import { dexie } from '../../dexieClient'
 // import {
 //   ContextMenuTrigger,
 //   ContextMenu,
@@ -251,17 +251,14 @@ const Row = ({ style, node, nodes, userRole }) => {
 
   const [person, setPerson] = useState()
   useEffect(() => {
-    const personObservable =
+    const personId =
       node?.nodeType === 'table' && node.table === 'person' && node.url
-        ? db.get('person').findAndObserve(last(node.url))
-        : $of({})
-
-    const subscription = personObservable.subscribe((person) =>
-      setPerson(person),
-    )
-
-    return () => subscription?.unsubscribe?.()
-  }, [db, node?.nodeType, node.table, node.url])
+        ? last(node.url)
+        : undefined
+    if (personId) {
+      dexie.persons.get(personId).then((person) => setPerson(person))
+    }
+  }, [node?.nodeType, node.table, node.url])
 
   const accountId = person?.account_id ?? null
 
