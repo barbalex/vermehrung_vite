@@ -1449,23 +1449,18 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   }
 
   // 6 teilkultur
-  // if (showTeilkultur) {
-  //   const teilkulturQuery = db
-  //     .get('teilkultur')
-  //     .query(...tableFilter({ store, table: 'teilkultur' }))
-  //   const teilkulturCount = await teilkulturQuery.fetchCount()
-  //   teilkulturFolderNodes = buildTeilkulturFolder({ count: teilkulturCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Teilkulturen')) {
-  //     let teilkulturs = []
-  //     try {
-  //       teilkulturs = await teilkulturQuery.fetch()
-  //     } catch {}
-  //     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-  //     teilkulturNodes = teilkultursSorted.map((teilkultur, index) =>
-  //       buildTeilkultur({ teilkultur, index }),
-  //     )
-  //   }
-  // }
+  if (showTeilkultur) {
+    const teilkulturCollection = dexie.teilkulturs.filter(value=>totalFilter({value,store,table:'teilkultur'}))
+    const teilkulturCount = await teilkulturCollection.count()
+    teilkulturFolderNodes = buildTeilkulturFolder({ count: teilkulturCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Teilkulturen')) {
+      const teilkulturs = await teilkulturCollection.toArray()
+      const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+      teilkulturNodes = teilkultursSorted.map((teilkultur, index) =>
+        buildTeilkultur({ teilkultur, index }),
+      )
+    }
+  }
 
   // 7 zaehlung
   // if (showZaehlung) {
