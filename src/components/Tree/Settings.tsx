@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -8,12 +8,12 @@ import Checkbox from '@mui/material/Checkbox'
 import { FaCog } from 'react-icons/fa'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
 import styled from 'styled-components'
-import { of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../storeContext'
 import constants from '../../utils/constants'
 import ErrorBoundary from '../shared/ErrorBoundary'
+import { dexie } from '../../dexieClient'
 
 const Container = styled.div`
   position: absolute;
@@ -41,34 +41,15 @@ const Info = styled.div`
 
 const SettingsTree = () => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    userPersonOption: undefined,
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          ?.get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns([
-            'tree_kultur',
-            'tree_teilkultur',
-            'tree_zaehlung',
-            'tree_lieferung',
-            'tree_event',
-          ])
-      : $of({})
-    const subscription = userPersonOptionsObservable.subscribe(
-      async (userPersonOptions) =>
-        setDataState({
-          userPersonOption: userPersonOptions?.[0],
-        }),
-    )
+  const userPersonOption = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption: PersonOption = await dexie.person_options.get(person.id)
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption } = dataState
+    return personOption
+  }, [user.uid])
+
   const {
     tree_kultur,
     tree_teilkultur,
