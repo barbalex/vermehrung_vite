@@ -361,31 +361,32 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-
-            //     let lieferungs = []
-            //     try {
-            //       lieferungs = await sammlung.lieferungs
-            //         .extend(...tableFilter({ store, table: 'lieferung' }))
-            //         .fetch()
-            //     } catch {}
-            //     artSammlungAuslieferungFolderNodes.push(
-            //       buildArtSammlungAuslieferungFolder({
-            //         sammlungId,
-            //         sammlungIndex,
-            //         artId,
-            //         artIndex,
-            //         children: lieferungs,
-            //       }),
-            //     )
-            //     const artSammlungAuslieferungFolderIsOpen = openNodes.some(
-            //       (n) =>
-            //         n.length === 6 &&
-            //         n[1] === 'Arten' &&
-            //         n[2] === artId &&
-            //         n[3] === 'Sammlungen' &&
-            //         n[4] === sammlungId &&
-            //         n[5] === 'Aus-Lieferungen',
-            //     )
+            const sammlungsOfArtIds = sammlungsOfArt.map((s) => s.id)
+            const lieferungs = await dexie.lieferungs
+              .where('von_sammlung_id')
+              .equals(sammlungId)
+              .filter((value) =>
+                totalFilter({ value, store, table: 'lieferung' }),
+              )
+              .toArray()
+            artSammlungAuslieferungFolderNodes.push(
+              buildArtSammlungAuslieferungFolder({
+                sammlungId,
+                sammlungIndex,
+                artId,
+                artIndex,
+                children: lieferungs,
+              }),
+            )
+            const artSammlungAuslieferungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Arten' &&
+                n[2] === artId &&
+                n[3] === 'Sammlungen' &&
+                n[4] === sammlungId &&
+                n[5] === 'Aus-Lieferungen',
+            )
             //     if (artSammlungAuslieferungFolderIsOpen) {
             //       const lieferungsSorted = lieferungs.sort(lieferungSort)
             //       const newArtSammlungAuslieferungNodes = lieferungsSorted.map(
