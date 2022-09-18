@@ -150,94 +150,94 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   let artFolderNodes = []
   let artNodes = []
-  const artHerkunftFolderNodes = []
-  const artHerkunftNodes = []
-  const artKulturFolderNodes = []
-  const artKulturNodes = []
-  const artKulturTeilkulturFolderNodes = []
-  const artKulturTeilkulturNodes = []
-  const artKulturZaehlungFolderNodes = []
-  const artKulturZaehlungNodes = []
-  const artKulturAnlieferungFolderNodes = []
-  const artKulturAnlieferungNodes = []
-  const artKulturAuslieferungFolderNodes = []
-  const artKulturAuslieferungNodes = []
-  const artKulturEventFolderNodes = []
-  const artKulturEventNodes = []
-  const artSammlungFolderNodes = []
-  const artSammlungNodes = []
-  const artSammlungAuslieferungFolderNodes = []
-  const artSammlungAuslieferungNodes = []
+  let artHerkunftFolderNodes = []
+  let artHerkunftNodes = []
+  let artKulturFolderNodes = []
+  let artKulturNodes = []
+  let artKulturTeilkulturFolderNodes = []
+  let artKulturTeilkulturNodes = []
+  let artKulturZaehlungFolderNodes = []
+  let artKulturZaehlungNodes = []
+  let artKulturAnlieferungFolderNodes = []
+  let artKulturAnlieferungNodes = []
+  let artKulturAuslieferungFolderNodes = []
+  let artKulturAuslieferungNodes = []
+  let artKulturEventFolderNodes = []
+  let artKulturEventNodes = []
+  let artSammlungFolderNodes = []
+  let artSammlungNodes = []
+  let artSammlungAuslieferungFolderNodes = []
+  let artSammlungAuslieferungNodes = []
   let herkunftFolderNodes = []
   let herkunftNodes = []
-  const herkunftSammlungFolderNodes = []
-  const herkunftSammlungNodes = []
-  const herkunftSammlungAuslieferungFolderNodes = []
-  const herkunftSammlungAuslieferungNodes = []
-  const sammlungFolderNodes = []
-  const sammlungNodes = []
-  const sammlungHerkunftFolderNodes = []
-  const sammlungHerkunftNodes = []
-  const sammlungAuslieferungFolderNodes = []
-  const sammlungAuslieferungNodes = []
-  const gartenFolderNodes = []
-  const gartenNodes = []
-  const gartenKulturFolderNodes = []
-  const gartenKulturNodes = []
-  const gartenKulturTeilkulturFolderNodes = []
-  const gartenKulturTeilkulturNodes = []
-  const gartenKulturZaehlungFolderNodes = []
-  const gartenKulturZaehlungNodes = []
-  const gartenKulturAnlieferungFolderNodes = []
-  const gartenKulturAnlieferungNodes = []
-  const gartenKulturAuslieferungFolderNodes = []
-  const gartenKulturAuslieferungNodes = []
-  const gartenKulturEventFolderNodes = []
-  const gartenKulturEventNodes = []
-  const kulturFolderNodes = []
-  const kulturNodes = []
-  const kulturTeilkulturFolderNodes = []
-  const kulturTeilkulturNodes = []
-  const kulturZaehlungFolderNodes = []
-  const kulturZaehlungNodes = []
-  const kulturAnlieferungFolderNodes = []
-  const kulturAnlieferungNodes = []
-  const kulturAuslieferungFolderNodes = []
-  const kulturAuslieferungNodes = []
-  const kulturEventFolderNodes = []
-  const kulturEventNodes = []
-  const teilkulturFolderNodes = []
-  const teilkulturNodes = []
-  const zaehlungFolderNodes = []
-  const zaehlungNodes = []
-  const lieferungFolderNodes = []
-  const lieferungNodes = []
-  const eventFolderNodes = []
-  const eventNodes = []
-  const personFolderNodes = []
-  const personNodes = []
-  const personGartenFolderNodes = []
-  const personGartenNodes = []
-  const personGartenKulturFolderNodes = []
-  const personGartenKulturNodes = []
-  const personGartenKulturAnlieferungFolderNodes = []
-  const personGartenKulturAnlieferungNodes = []
-  const personGartenKulturAuslieferungFolderNodes = []
-  const personGartenKulturAuslieferungNodes = []
-  const personGartenKulturEventFolderNodes = []
-  const personGartenKulturEventNodes = []
-  const personGartenKulturTeilkulturFolderNodes = []
-  const personGartenKulturTeilkulturNodes = []
-  const personGartenKulturZaehlungFolderNodes = []
-  const personGartenKulturZaehlungNodes = []
-  const personLieferungFolderNodes = []
-  const personLieferungNodes = []
-  const personSammlungFolderNodes = []
-  const personSammlungNodes = []
+  let herkunftSammlungFolderNodes = []
+  let herkunftSammlungNodes = []
+  let herkunftSammlungAuslieferungFolderNodes = []
+  let herkunftSammlungAuslieferungNodes = []
+  let sammlungFolderNodes = []
+  let sammlungNodes = []
+  let sammlungHerkunftFolderNodes = []
+  let sammlungHerkunftNodes = []
+  let sammlungAuslieferungFolderNodes = []
+  let sammlungAuslieferungNodes = []
+  let gartenFolderNodes = []
+  let gartenNodes = []
+  let gartenKulturFolderNodes = []
+  let gartenKulturNodes = []
+  let gartenKulturTeilkulturFolderNodes = []
+  let gartenKulturTeilkulturNodes = []
+  let gartenKulturZaehlungFolderNodes = []
+  let gartenKulturZaehlungNodes = []
+  let gartenKulturAnlieferungFolderNodes = []
+  let gartenKulturAnlieferungNodes = []
+  let gartenKulturAuslieferungFolderNodes = []
+  let gartenKulturAuslieferungNodes = []
+  let gartenKulturEventFolderNodes = []
+  let gartenKulturEventNodes = []
+  let kulturFolderNodes = []
+  let kulturNodes = []
+  let kulturTeilkulturFolderNodes = []
+  let kulturTeilkulturNodes = []
+  let kulturZaehlungFolderNodes = []
+  let kulturZaehlungNodes = []
+  let kulturAnlieferungFolderNodes = []
+  let kulturAnlieferungNodes = []
+  let kulturAuslieferungFolderNodes = []
+  let kulturAuslieferungNodes = []
+  let kulturEventFolderNodes = []
+  let kulturEventNodes = []
+  let teilkulturFolderNodes = []
+  let teilkulturNodes = []
+  let zaehlungFolderNodes = []
+  let zaehlungNodes = []
+  let lieferungFolderNodes = []
+  let lieferungNodes = []
+  let eventFolderNodes = []
+  let eventNodes = []
+  let personFolderNodes = []
+  let personNodes = []
+  let personGartenFolderNodes = []
+  let personGartenNodes = []
+  let personGartenKulturFolderNodes = []
+  let personGartenKulturNodes = []
+  let personGartenKulturAnlieferungFolderNodes = []
+  let personGartenKulturAnlieferungNodes = []
+  let personGartenKulturAuslieferungFolderNodes = []
+  let personGartenKulturAuslieferungNodes = []
+  let personGartenKulturEventFolderNodes = []
+  let personGartenKulturEventNodes = []
+  let personGartenKulturTeilkulturFolderNodes = []
+  let personGartenKulturTeilkulturNodes = []
+  let personGartenKulturZaehlungFolderNodes = []
+  let personGartenKulturZaehlungNodes = []
+  let personLieferungFolderNodes = []
+  let personLieferungNodes = []
+  let personSammlungFolderNodes = []
+  let personSammlungNodes = []
   let sammelLieferungFolderNodes = []
   let sammelLieferungNodes = []
-  const sammelLieferungLieferungFolderNodes = []
-  const sammelLieferungLieferungNodes = []
+  let sammelLieferungLieferungFolderNodes = []
+  let sammelLieferungLieferungNodes = []
 
   // 1 art
   if (showArt) {
@@ -698,7 +698,6 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
     herkunftFolderNodes = buildHerkunftFolder({ count: herkunftCount })
     if (openNodes.some((n) => n.length === 2 && n[1] === 'Herkuenfte')) {
       const herkunfts = await herkunftCollection.toArray()
-      console.log('buildNodes, herkunfts:', herkunfts)
       const herkunftsSorted = herkunfts.sort(herkunftSort)
       herkunftNodes = herkunftsSorted.map((herkunft, index) =>
         buildHerkunft({ herkunft, index }),
@@ -816,649 +815,638 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   }
 
   // 3 sammlung
-  // if (showSammlung) {
-  //   const sammlungQuery = db
-  //     .get('sammlung')
-  //     .query(...tableFilter({ store, table: 'sammlung' }))
-  //   const sammlungCount = await sammlungQuery.fetchCount()
-  //   sammlungFolderNodes = buildSammlungFolder({ count: sammlungCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Sammlungen')) {
-  //     let sammlungs = []
-  //     try {
-  //       sammlungs = await sammlungQuery.fetch()
-  //     } catch {}
-  //     const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
-  //     sammlungNodes = await Promise.all(
-  //       sammlungsSorted.map(
-  //         async (sammlung, index) => await buildSammlung({ sammlung, index }),
-  //       ),
-  //     )
+  if (showSammlung) {
+    const sammlungCollection = dexie.sammlungs.filter((value) =>
+      totalFilter({ value, store, table: 'sammlung' }),
+    )
+    const sammlungCount = await sammlungCollection.count()
+    sammlungFolderNodes = buildSammlungFolder({ count: sammlungCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Sammlungen')) {
+      const sammlungs = await sammlungCollection.toArray()
+      const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
+      sammlungNodes = await Promise.all(
+        sammlungsSorted.map(
+          async (sammlung, index) => await buildSammlung({ sammlung, index }),
+        ),
+      )
 
-  //     // on to child nodes
-  //     const openSammlungNodes = openNodes.filter(
-  //       (n) => n.length === 3 && n[1] === 'Sammlungen',
-  //     )
-  //     for (const sammlungNode of openSammlungNodes) {
-  //       const sammlungId = sammlungNode[2]
-  //       const sammlung = sammlungsSorted.find((a) => a.id === sammlungId)
-  //       if (!sammlung) break
-  //       const sammlungIndex = sammlungNodes.findIndex(
-  //         (a) => a.id === sammlungId,
-  //       )
+      // on to child nodes
+      const openSammlungNodes = openNodes.filter(
+        (n) => n.length === 3 && n[1] === 'Sammlungen',
+      )
+      for (const sammlungNode of openSammlungNodes) {
+        const sammlungId = sammlungNode[2]
+        const sammlung = sammlungsSorted.find((a) => a.id === sammlungId)
+        if (!sammlung) break
+        const sammlungIndex = sammlungNodes.findIndex(
+          (a) => a.id === sammlungId,
+        )
 
-  //       // 2.1 sammlung > herkunft
-  //       const sammlungHerkunftQuery = sammlung.herkunft
-  //       let herkunft
-  //       try {
-  //         herkunft = await sammlungHerkunftQuery.fetch()
-  //       } catch {}
-  //       sammlungHerkunftFolderNodes.push(
-  //         buildSammlungHerkunftFolder({
-  //           count: [herkunft].length,
-  //           sammlungIndex,
-  //           sammlungId,
-  //         }),
-  //       )
-  //       const sammlungHerkunftFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Sammlungen' &&
-  //           n[2] === sammlungId &&
-  //           n[3] === 'Herkuenfte',
-  //       )
-  //       if (sammlungHerkunftFolderIsOpen) {
-  //         sammlungHerkunftNodes.push(
-  //           buildSammlungHerkunft({
-  //             herkunft,
-  //             sammlungId,
-  //             sammlungIndex,
-  //           }),
-  //         )
-  //       }
+        // 2.1 sammlung > herkunft
+        // const sammlungHerkunftQuery = sammlung.herkunft
+        // let herkunft
+        // try {
+        //   herkunft = await sammlungHerkunftQuery.fetch()
+        // } catch {}
+        // sammlungHerkunftFolderNodes.push(
+        //   buildSammlungHerkunftFolder({
+        //     count: [herkunft].length,
+        //     sammlungIndex,
+        //     sammlungId,
+        //   }),
+        // )
+        // const sammlungHerkunftFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Sammlungen' &&
+        //     n[2] === sammlungId &&
+        //     n[3] === 'Herkuenfte',
+        // )
+        // if (sammlungHerkunftFolderIsOpen) {
+        //   sammlungHerkunftNodes.push(
+        //     buildSammlungHerkunft({
+        //       herkunft,
+        //       sammlungId,
+        //       sammlungIndex,
+        //     }),
+        //   )
+        // }
 
-  //       // 2.1 sammlung > auslieferung
-  //       const sammlungLieferungQuery = sammlung.lieferungs.extend(
-  //         ...tableFilter({ store, table: 'lieferung' }),
-  //       )
-  //       const sammlungLieferungCount = await sammlungLieferungQuery.fetchCount()
-  //       sammlungAuslieferungFolderNodes.push(
-  //         buildSammlungAuslieferungFolder({
-  //           count: sammlungLieferungCount,
-  //           sammlungIndex,
-  //           sammlungId,
-  //         }),
-  //       )
-  //       const sammlungAuslieferungFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Sammlungen' &&
-  //           n[2] === sammlungId &&
-  //           n[3] === 'Aus-Lieferungen',
-  //       )
-  //       if (sammlungAuslieferungFolderIsOpen) {
-  //         let lieferungs = []
-  //         try {
-  //           lieferungs = await sammlungLieferungQuery.fetch()
-  //         } catch {}
-  //         const lieferungsSorted = lieferungs.sort(lieferungSort)
-  //         const newSammlungAuslieferungNodes = lieferungsSorted.map(
-  //           (lieferung, lieferungIndex) =>
-  //             buildSammlungAuslieferung({
-  //               lieferung,
-  //               lieferungIndex,
-  //               sammlungId,
-  //               sammlungIndex,
-  //             }),
-  //         )
-  //         sammlungAuslieferungNodes.push(...newSammlungAuslieferungNodes)
-  //       }
-  //     }
-  //   }
-  // }
+        // // 2.1 sammlung > auslieferung
+        // const sammlungLieferungQuery = sammlung.lieferungs.extend(
+        //   ...tableFilter({ store, table: 'lieferung' }),
+        // )
+        // const sammlungLieferungCount = await sammlungLieferungQuery.fetchCount()
+        // sammlungAuslieferungFolderNodes.push(
+        //   buildSammlungAuslieferungFolder({
+        //     count: sammlungLieferungCount,
+        //     sammlungIndex,
+        //     sammlungId,
+        //   }),
+        // )
+        // const sammlungAuslieferungFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Sammlungen' &&
+        //     n[2] === sammlungId &&
+        //     n[3] === 'Aus-Lieferungen',
+        // )
+        // if (sammlungAuslieferungFolderIsOpen) {
+        //   let lieferungs = []
+        //   try {
+        //     lieferungs = await sammlungLieferungQuery.fetch()
+        //   } catch {}
+        //   const lieferungsSorted = lieferungs.sort(lieferungSort)
+        //   const newSammlungAuslieferungNodes = lieferungsSorted.map(
+        //     (lieferung, lieferungIndex) =>
+        //       buildSammlungAuslieferung({
+        //         lieferung,
+        //         lieferungIndex,
+        //         sammlungId,
+        //         sammlungIndex,
+        //       }),
+        //   )
+        //   sammlungAuslieferungNodes.push(...newSammlungAuslieferungNodes)
+        // }
+      }
+    }
+  }
 
   // 4 garten
-  // if (showGarten) {
-  //   const gartenQuery = db
-  //     .get('garten')
-  //     .query(...tableFilter({ store, table: 'garten' }))
-  //   const gartenCount = await gartenQuery.fetchCount()
-  //   gartenFolderNodes = buildGartenFolder({ count: gartenCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Gaerten')) {
-  //     let gartens = []
-  //     try {
-  //       gartens = await gartenQuery.fetch()
-  //     } catch {}
-  //     const gartensSorted = await gartensSortedFromGartens(gartens)
-  //     gartenNodes = await Promise.all(
-  //       gartensSorted.map(
-  //         async (garten, index) => await buildGarten({ garten, index }),
-  //       ),
-  //     )
+  if (showGarten) {
+    const gartenCollection = dexie.gartens.filter((value) =>
+      totalFilter({ value, store, table: 'garten' }),
+    )
+    const gartenCount = await gartenCollection.count()
+    gartenFolderNodes = buildGartenFolder({ count: gartenCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Gaerten')) {
+      const gartens = await gartenCollection.toArray()
+      const gartensSorted = await gartensSortedFromGartens(gartens)
+      gartenNodes = await Promise.all(
+        gartensSorted.map(
+          async (garten, index) => await buildGarten({ garten, index }),
+        ),
+      )
 
-  //     // on to child nodes
-  //     const openGartenNodes = openNodes.filter(
-  //       (n) => n[1] === 'Gaerten' && n.length === 3,
-  //     )
-  //     for (const gartenNode of openGartenNodes) {
-  //       const gartenId = gartenNode[2]
-  //       const garten = gartensSorted.find((a) => a.id === gartenId)
-  //       if (!garten) break
-  //       const gartenIndex = gartenNodes.findIndex((a) => a.id === gartenId)
+      // on to child nodes
+      const openGartenNodes = openNodes.filter(
+        (n) => n[1] === 'Gaerten' && n.length === 3,
+      )
+      for (const gartenNode of openGartenNodes) {
+        const gartenId = gartenNode[2]
+        const garten = gartensSorted.find((a) => a.id === gartenId)
+        if (!garten) break
+        const gartenIndex = gartenNodes.findIndex((a) => a.id === gartenId)
 
-  //       // 2.1 garten > kultur
-  //       const gartenKulturQuery = garten.kulturs.extend(
-  //         ...tableFilter({ store, table: 'kultur' }),
-  //       )
-  //       const gartenKulturCount = await gartenKulturQuery.fetchCount()
-  //       gartenKulturFolderNodes.push(
-  //         buildGartenKulturFolder({
-  //           count: gartenKulturCount,
-  //           gartenIndex,
-  //           gartenId,
-  //         }),
-  //       )
-  //       const gartenKulturFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Gaerten' &&
-  //           n[2] === gartenId &&
-  //           n[3] === 'Kulturen',
-  //       )
-  //       if (gartenKulturFolderIsOpen) {
-  //         let kulturs = []
-  //         try {
-  //           kulturs = await gartenKulturQuery.fetch()
-  //         } catch {}
-  //         const kultursSorted = await kultursSortedFromKulturs(kulturs)
-  //         const newGartenKulturNodes = await Promise.all(
-  //           kultursSorted.map(
-  //             async (kultur, kulturIndex) =>
-  //               await buildGartenKultur({
-  //                 kultur,
-  //                 kulturIndex,
-  //                 gartenId,
-  //                 gartenIndex,
-  //               }),
-  //           ),
-  //         )
-  //         gartenKulturNodes.push(...newGartenKulturNodes)
+        // 2.1 garten > kultur
+        // const gartenKulturQuery = garten.kulturs.extend(
+        //   ...tableFilter({ store, table: 'kultur' }),
+        // )
+        // const gartenKulturCount = await gartenKulturQuery.fetchCount()
+        // gartenKulturFolderNodes.push(
+        //   buildGartenKulturFolder({
+        //     count: gartenKulturCount,
+        //     gartenIndex,
+        //     gartenId,
+        //   }),
+        // )
+        // const gartenKulturFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Gaerten' &&
+        //     n[2] === gartenId &&
+        //     n[3] === 'Kulturen',
+        // )
+        // if (gartenKulturFolderIsOpen) {
+        //   let kulturs = []
+        //   try {
+        //     kulturs = await gartenKulturQuery.fetch()
+        //   } catch {}
+        //   const kultursSorted = await kultursSortedFromKulturs(kulturs)
+        //   const newGartenKulturNodes = await Promise.all(
+        //     kultursSorted.map(
+        //       async (kultur, kulturIndex) =>
+        //         await buildGartenKultur({
+        //           kultur,
+        //           kulturIndex,
+        //           gartenId,
+        //           gartenIndex,
+        //         }),
+        //     ),
+        //   )
+        //   gartenKulturNodes.push(...newGartenKulturNodes)
 
-  //         const openGartenKulturNodes = openNodes.filter(
-  //           (n) =>
-  //             n[1] === 'Gaerten' &&
-  //             n[2] === gartenId &&
-  //             n[3] === 'Kulturen' &&
-  //             n.length === 5,
-  //         )
-  //         for (const gartenKulturNode of openGartenKulturNodes) {
-  //           const kulturId = gartenKulturNode[4]
-  //           const kultur = kultursSorted.find((s) => s.id === kulturId)
-  //           if (!kultur) break
+        //   const openGartenKulturNodes = openNodes.filter(
+        //     (n) =>
+        //       n[1] === 'Gaerten' &&
+        //       n[2] === gartenId &&
+        //       n[3] === 'Kulturen' &&
+        //       n.length === 5,
+        //   )
+        //   for (const gartenKulturNode of openGartenKulturNodes) {
+        //     const kulturId = gartenKulturNode[4]
+        //     const kultur = kultursSorted.find((s) => s.id === kulturId)
+        //     if (!kultur) break
 
-  //           const kulturIndex = newGartenKulturNodes.findIndex(
-  //             (s) => s.id === `${gartenId}${kulturId}`,
-  //           )
+        //     const kulturIndex = newGartenKulturNodes.findIndex(
+        //       (s) => s.id === `${gartenId}${kulturId}`,
+        //     )
 
-  //           // garten > kultur > teilkultur
-  //           const kulturOption = await kultur.kultur_option.fetch()
-  //           if (kulturOption?.tk) {
-  //             let teilkulturs = []
-  //             try {
-  //               teilkulturs = await kultur.teilkulturs
-  //                 .extend(
-  //                   ...tableFilter({
-  //                     table: 'teilkultur',
-  //                     store,
-  //                   }),
-  //                 )
-  //                 .fetch()
-  //             } catch {}
-  //             gartenKulturTeilkulturFolderNodes.push(
-  //               buildGartenKulturTeilkulturFolder({
-  //                 kulturId,
-  //                 kulturIndex,
-  //                 gartenId,
-  //                 gartenIndex,
-  //                 children: teilkulturs,
-  //               }),
-  //             )
-  //             const gartenKulturTeilkulturFolderIsOpen = openNodes.some(
-  //               (n) =>
-  //                 n.length === 6 &&
-  //                 n[1] === 'Gaerten' &&
-  //                 n[2] === gartenId &&
-  //                 n[3] === 'Kulturen' &&
-  //                 n[4] === kulturId &&
-  //                 n[5] === 'Teilkulturen',
-  //             )
-  //             if (gartenKulturTeilkulturFolderIsOpen) {
-  //               const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-  //               const newGartenKulturTeilkulturNodes = teilkultursSorted.map(
-  //                 (teilkultur, teilkulturIndex) =>
-  //                   buildGartenKulturTeilkultur({
-  //                     teilkultur,
-  //                     teilkulturIndex,
-  //                     kulturId,
-  //                     kulturIndex,
-  //                     gartenId,
-  //                     gartenIndex,
-  //                   }),
-  //               )
-  //               gartenKulturTeilkulturNodes.push(
-  //                 ...newGartenKulturTeilkulturNodes,
-  //               )
-  //             }
-  //           }
+        //     // garten > kultur > teilkultur
+        //     const kulturOption = await kultur.kultur_option.fetch()
+        //     if (kulturOption?.tk) {
+        //       let teilkulturs = []
+        //       try {
+        //         teilkulturs = await kultur.teilkulturs
+        //           .extend(
+        //             ...tableFilter({
+        //               table: 'teilkultur',
+        //               store,
+        //             }),
+        //           )
+        //           .fetch()
+        //       } catch {}
+        //       gartenKulturTeilkulturFolderNodes.push(
+        //         buildGartenKulturTeilkulturFolder({
+        //           kulturId,
+        //           kulturIndex,
+        //           gartenId,
+        //           gartenIndex,
+        //           children: teilkulturs,
+        //         }),
+        //       )
+        //       const gartenKulturTeilkulturFolderIsOpen = openNodes.some(
+        //         (n) =>
+        //           n.length === 6 &&
+        //           n[1] === 'Gaerten' &&
+        //           n[2] === gartenId &&
+        //           n[3] === 'Kulturen' &&
+        //           n[4] === kulturId &&
+        //           n[5] === 'Teilkulturen',
+        //       )
+        //       if (gartenKulturTeilkulturFolderIsOpen) {
+        //         const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+        //         const newGartenKulturTeilkulturNodes = teilkultursSorted.map(
+        //           (teilkultur, teilkulturIndex) =>
+        //             buildGartenKulturTeilkultur({
+        //               teilkultur,
+        //               teilkulturIndex,
+        //               kulturId,
+        //               kulturIndex,
+        //               gartenId,
+        //               gartenIndex,
+        //             }),
+        //         )
+        //         gartenKulturTeilkulturNodes.push(
+        //           ...newGartenKulturTeilkulturNodes,
+        //         )
+        //       }
+        //     }
 
-  //           // garten > kultur > zaehlung
-  //           let zaehlungs = []
-  //           try {
-  //             zaehlungs = await kultur.zaehlungs
-  //               .extend(
-  //                 ...tableFilter({
-  //                   table: 'zaehlung',
-  //                   store,
-  //                 }),
-  //               )
-  //               .fetch()
-  //           } catch {}
-  //           gartenKulturZaehlungFolderNodes.push(
-  //             buildGartenKulturZaehlungFolder({
-  //               kulturId,
-  //               kulturIndex,
-  //               gartenId,
-  //               gartenIndex,
-  //               children: zaehlungs,
-  //             }),
-  //           )
-  //           const gartenKulturZaehlungFolderIsOpen = openNodes.some(
-  //             (n) =>
-  //               n.length === 6 &&
-  //               n[1] === 'Gaerten' &&
-  //               n[2] === gartenId &&
-  //               n[3] === 'Kulturen' &&
-  //               n[4] === kulturId &&
-  //               n[5] === 'Zaehlungen',
-  //           )
-  //           if (gartenKulturZaehlungFolderIsOpen) {
-  //             const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-  //             const newGartenKulturZaehlungNodes = await Promise.all(
-  //               zaehlungsSorted.map(
-  //                 async (zaehlung, zaehlungIndex) =>
-  //                   await buildGartenKulturZaehlung({
-  //                     zaehlung,
-  //                     zaehlungIndex,
-  //                     kulturId,
-  //                     kulturIndex,
-  //                     gartenId,
-  //                     gartenIndex,
-  //                   }),
-  //               ),
-  //             )
-  //             gartenKulturZaehlungNodes.push(...newGartenKulturZaehlungNodes)
-  //           }
+        //     // garten > kultur > zaehlung
+        //     let zaehlungs = []
+        //     try {
+        //       zaehlungs = await kultur.zaehlungs
+        //         .extend(
+        //           ...tableFilter({
+        //             table: 'zaehlung',
+        //             store,
+        //           }),
+        //         )
+        //         .fetch()
+        //     } catch {}
+        //     gartenKulturZaehlungFolderNodes.push(
+        //       buildGartenKulturZaehlungFolder({
+        //         kulturId,
+        //         kulturIndex,
+        //         gartenId,
+        //         gartenIndex,
+        //         children: zaehlungs,
+        //       }),
+        //     )
+        //     const gartenKulturZaehlungFolderIsOpen = openNodes.some(
+        //       (n) =>
+        //         n.length === 6 &&
+        //         n[1] === 'Gaerten' &&
+        //         n[2] === gartenId &&
+        //         n[3] === 'Kulturen' &&
+        //         n[4] === kulturId &&
+        //         n[5] === 'Zaehlungen',
+        //     )
+        //     if (gartenKulturZaehlungFolderIsOpen) {
+        //       const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+        //       const newGartenKulturZaehlungNodes = await Promise.all(
+        //         zaehlungsSorted.map(
+        //           async (zaehlung, zaehlungIndex) =>
+        //             await buildGartenKulturZaehlung({
+        //               zaehlung,
+        //               zaehlungIndex,
+        //               kulturId,
+        //               kulturIndex,
+        //               gartenId,
+        //               gartenIndex,
+        //             }),
+        //         ),
+        //       )
+        //       gartenKulturZaehlungNodes.push(...newGartenKulturZaehlungNodes)
+        //     }
 
-  //           // garten > kultur > anlieferung
-  //           let anlieferungs = []
-  //           try {
-  //             anlieferungs = await kultur.anlieferungs
-  //               .extend(...tableFilter({ store, table: 'lieferung' }))
-  //               .fetch()
-  //           } catch {}
-  //           gartenKulturAnlieferungFolderNodes.push(
-  //             buildGartenKulturAnlieferungFolder({
-  //               kulturId,
-  //               kulturIndex,
-  //               gartenId,
-  //               gartenIndex,
-  //               children: anlieferungs,
-  //             }),
-  //           )
-  //           const gartenKulturAnlieferungFolderIsOpen = openNodes.some(
-  //             (n) =>
-  //               n.length === 6 &&
-  //               n[1] === 'Gaerten' &&
-  //               n[2] === gartenId &&
-  //               n[3] === 'Kulturen' &&
-  //               n[4] === kulturId &&
-  //               n[5] === 'An-Lieferungen',
-  //           )
-  //           if (gartenKulturAnlieferungFolderIsOpen) {
-  //             const anlieferungsSorted = anlieferungs.sort(lieferungSort)
-  //             const newGartenKulturAnlieferungNodes = anlieferungsSorted.map(
-  //               (lieferung, lieferungIndex) =>
-  //                 buildGartenKulturAnlieferung({
-  //                   lieferung,
-  //                   lieferungIndex,
-  //                   kulturId,
-  //                   kulturIndex,
-  //                   gartenId,
-  //                   gartenIndex,
-  //                 }),
-  //             )
-  //             gartenKulturAnlieferungNodes.push(
-  //               ...newGartenKulturAnlieferungNodes,
-  //             )
-  //           }
+        //     // garten > kultur > anlieferung
+        //     let anlieferungs = []
+        //     try {
+        //       anlieferungs = await kultur.anlieferungs
+        //         .extend(...tableFilter({ store, table: 'lieferung' }))
+        //         .fetch()
+        //     } catch {}
+        //     gartenKulturAnlieferungFolderNodes.push(
+        //       buildGartenKulturAnlieferungFolder({
+        //         kulturId,
+        //         kulturIndex,
+        //         gartenId,
+        //         gartenIndex,
+        //         children: anlieferungs,
+        //       }),
+        //     )
+        //     const gartenKulturAnlieferungFolderIsOpen = openNodes.some(
+        //       (n) =>
+        //         n.length === 6 &&
+        //         n[1] === 'Gaerten' &&
+        //         n[2] === gartenId &&
+        //         n[3] === 'Kulturen' &&
+        //         n[4] === kulturId &&
+        //         n[5] === 'An-Lieferungen',
+        //     )
+        //     if (gartenKulturAnlieferungFolderIsOpen) {
+        //       const anlieferungsSorted = anlieferungs.sort(lieferungSort)
+        //       const newGartenKulturAnlieferungNodes = anlieferungsSorted.map(
+        //         (lieferung, lieferungIndex) =>
+        //           buildGartenKulturAnlieferung({
+        //             lieferung,
+        //             lieferungIndex,
+        //             kulturId,
+        //             kulturIndex,
+        //             gartenId,
+        //             gartenIndex,
+        //           }),
+        //       )
+        //       gartenKulturAnlieferungNodes.push(
+        //         ...newGartenKulturAnlieferungNodes,
+        //       )
+        //     }
 
-  //           // garten > kultur > auslieferung
-  //           let auslieferungs = []
-  //           try {
-  //             auslieferungs = await kultur.auslieferungs
-  //               .extend(...tableFilter({ store, table: 'lieferung' }))
-  //               .fetch()
-  //           } catch {}
-  //           gartenKulturAuslieferungFolderNodes.push(
-  //             buildGartenKulturAuslieferungFolder({
-  //               kulturId,
-  //               kulturIndex,
-  //               gartenId,
-  //               gartenIndex,
-  //               children: auslieferungs,
-  //             }),
-  //           )
-  //           const gartenKulturAuslieferungFolderIsOpen = openNodes.some(
-  //             (n) =>
-  //               n.length === 6 &&
-  //               n[1] === 'Gaerten' &&
-  //               n[2] === gartenId &&
-  //               n[3] === 'Kulturen' &&
-  //               n[4] === kulturId &&
-  //               n[5] === 'Aus-Lieferungen',
-  //           )
-  //           if (gartenKulturAuslieferungFolderIsOpen) {
-  //             const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-  //             const newGartenKulturAuslieferungNodes = auslieferungsSorted.map(
-  //               (lieferung, lieferungIndex) =>
-  //                 buildGartenKulturAuslieferung({
-  //                   lieferung,
-  //                   lieferungIndex,
-  //                   kulturId,
-  //                   kulturIndex,
-  //                   gartenId,
-  //                   gartenIndex,
-  //                 }),
-  //             )
-  //             gartenKulturAuslieferungNodes.push(
-  //               ...newGartenKulturAuslieferungNodes,
-  //             )
-  //           }
+        //     // garten > kultur > auslieferung
+        //     let auslieferungs = []
+        //     try {
+        //       auslieferungs = await kultur.auslieferungs
+        //         .extend(...tableFilter({ store, table: 'lieferung' }))
+        //         .fetch()
+        //     } catch {}
+        //     gartenKulturAuslieferungFolderNodes.push(
+        //       buildGartenKulturAuslieferungFolder({
+        //         kulturId,
+        //         kulturIndex,
+        //         gartenId,
+        //         gartenIndex,
+        //         children: auslieferungs,
+        //       }),
+        //     )
+        //     const gartenKulturAuslieferungFolderIsOpen = openNodes.some(
+        //       (n) =>
+        //         n.length === 6 &&
+        //         n[1] === 'Gaerten' &&
+        //         n[2] === gartenId &&
+        //         n[3] === 'Kulturen' &&
+        //         n[4] === kulturId &&
+        //         n[5] === 'Aus-Lieferungen',
+        //     )
+        //     if (gartenKulturAuslieferungFolderIsOpen) {
+        //       const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+        //       const newGartenKulturAuslieferungNodes = auslieferungsSorted.map(
+        //         (lieferung, lieferungIndex) =>
+        //           buildGartenKulturAuslieferung({
+        //             lieferung,
+        //             lieferungIndex,
+        //             kulturId,
+        //             kulturIndex,
+        //             gartenId,
+        //             gartenIndex,
+        //           }),
+        //       )
+        //       gartenKulturAuslieferungNodes.push(
+        //         ...newGartenKulturAuslieferungNodes,
+        //       )
+        //     }
 
-  //           // garten > kultur > event
-  //           const gartenKulturEventQuery = kultur.events.extend(
-  //             ...tableFilter({ store, table: 'event' }),
-  //           )
-  //           const gartenKulturEventCount =
-  //             await gartenKulturEventQuery.fetchCount()
-  //           gartenKulturEventFolderNodes.push(
-  //             buildGartenKulturEventFolder({
-  //               kulturId,
-  //               kulturIndex,
-  //               gartenId,
-  //               gartenIndex,
-  //               count: gartenKulturEventCount,
-  //             }),
-  //           )
-  //           const gartenKulturEventFolderIsOpen = openNodes.some(
-  //             (n) =>
-  //               n.length === 6 &&
-  //               n[1] === 'Gaerten' &&
-  //               n[2] === gartenId &&
-  //               n[3] === 'Kulturen' &&
-  //               n[4] === kulturId &&
-  //               n[5] === 'Events',
-  //           )
-  //           if (gartenKulturEventFolderIsOpen) {
-  //             let events = []
-  //             try {
-  //               events = await gartenKulturEventQuery.fetch()
-  //             } catch {}
-  //             const eventsSorted = events.sort(eventSort)
-  //             const newGartenKulturEventNodes = eventsSorted.map(
-  //               (event, eventIndex) =>
-  //                 buildGartenKulturEvent({
-  //                   event,
-  //                   eventIndex,
-  //                   kulturId,
-  //                   kulturIndex,
-  //                   gartenId,
-  //                   gartenIndex,
-  //                 }),
-  //             )
-  //             gartenKulturEventNodes.push(...newGartenKulturEventNodes)
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+        //     // garten > kultur > event
+        //     const gartenKulturEventQuery = kultur.events.extend(
+        //       ...tableFilter({ store, table: 'event' }),
+        //     )
+        //     const gartenKulturEventCount =
+        //       await gartenKulturEventQuery.fetchCount()
+        //     gartenKulturEventFolderNodes.push(
+        //       buildGartenKulturEventFolder({
+        //         kulturId,
+        //         kulturIndex,
+        //         gartenId,
+        //         gartenIndex,
+        //         count: gartenKulturEventCount,
+        //       }),
+        //     )
+        //     const gartenKulturEventFolderIsOpen = openNodes.some(
+        //       (n) =>
+        //         n.length === 6 &&
+        //         n[1] === 'Gaerten' &&
+        //         n[2] === gartenId &&
+        //         n[3] === 'Kulturen' &&
+        //         n[4] === kulturId &&
+        //         n[5] === 'Events',
+        //     )
+        //     if (gartenKulturEventFolderIsOpen) {
+        //       let events = []
+        //       try {
+        //         events = await gartenKulturEventQuery.fetch()
+        //       } catch {}
+        //       const eventsSorted = events.sort(eventSort)
+        //       const newGartenKulturEventNodes = eventsSorted.map(
+        //         (event, eventIndex) =>
+        //           buildGartenKulturEvent({
+        //             event,
+        //             eventIndex,
+        //             kulturId,
+        //             kulturIndex,
+        //             gartenId,
+        //             gartenIndex,
+        //           }),
+        //       )
+        //       gartenKulturEventNodes.push(...newGartenKulturEventNodes)
+        //     }
+        //   }
+        // }
+      }
+    }
+  }
 
   // 5 kultur
-  // if (showKultur) {
-  //   const kulturQuery = db
-  //     .get('kultur')
-  //     .query(...tableFilter({ store, table: 'kultur' }))
-  //   const kulturCount = await kulturQuery.fetchCount()
-  //   kulturFolderNodes = buildKulturFolder({ count: kulturCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Kulturen')) {
-  //     let kulturs = []
-  //     try {
-  //       kulturs = await kulturQuery.fetch()
-  //     } catch {}
-  //     const kultursSorted = await kultursSortedFromKulturs(kulturs)
-  //     kulturNodes = await Promise.all(
-  //       kultursSorted.map(
-  //         async (kultur, index) => await buildKultur({ kultur, index }),
-  //       ),
-  //     )
+  if (showKultur) {
+    const kulturCollection = dexie.kulturs.filter(value=>totalFilter({value,store,table:'kultur'}))
+    const kulturCount = await kulturCollection.count()
+    kulturFolderNodes = buildKulturFolder({ count: kulturCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Kulturen')) {
+      const kulturs = await kulturCollection.toArray()
+      const kultursSorted = await kultursSortedFromKulturs(kulturs)
+      kulturNodes = await Promise.all(
+        kultursSorted.map(
+          async (kultur, index) => await buildKultur({ kultur, index }),
+        ),
+      )
 
-  //     // on to child nodes
-  //     const openKulturNodes = openNodes.filter(
-  //       (n) => n[1] === 'Kulturen' && n.length === 3,
-  //     )
-  //     for (const kulturNode of openKulturNodes) {
-  //       const kulturId = kulturNode[2]
-  //       const kultur = kultursSorted.find((a) => a.id === kulturId)
-  //       if (!kultur) break
-  //       const kulturIndex = kulturNodes.findIndex((a) => a.id === kulturId)
+      // on to child nodes
+      const openKulturNodes = openNodes.filter(
+        (n) => n[1] === 'Kulturen' && n.length === 3,
+      )
+      for (const kulturNode of openKulturNodes) {
+        const kulturId = kulturNode[2]
+        const kultur = kultursSorted.find((a) => a.id === kulturId)
+        if (!kultur) break
+        const kulturIndex = kulturNodes.findIndex((a) => a.id === kulturId)
 
-  //       // 2.1 kultur > teilkultur
-  //       let kulturOption
-  //       try {
-  //         kulturOption = await kultur.kultur_option.fetch()
-  //       } catch {}
-  //       if (kulturOption?.tk) {
-  //         const kulturTeilkulturQuery = kultur.teilkulturs.extend(
-  //           ...tableFilter({ store, table: 'teilkultur' }),
-  //         )
-  //         const kulturTeilkulturCount = await kulturTeilkulturQuery.fetchCount()
-  //         kulturTeilkulturFolderNodes.push(
-  //           buildKulturTeilkulturFolder({
-  //             count: kulturTeilkulturCount,
-  //             kulturIndex,
-  //             kulturId,
-  //           }),
-  //         )
+        // 2.1 kultur > teilkultur
+        // let kulturOption
+        // try {
+        //   kulturOption = await kultur.kultur_option.fetch()
+        // } catch {}
+        // if (kulturOption?.tk) {
+        //   const kulturTeilkulturQuery = kultur.teilkulturs.extend(
+        //     ...tableFilter({ store, table: 'teilkultur' }),
+        //   )
+        //   const kulturTeilkulturCount = await kulturTeilkulturQuery.fetchCount()
+        //   kulturTeilkulturFolderNodes.push(
+        //     buildKulturTeilkulturFolder({
+        //       count: kulturTeilkulturCount,
+        //       kulturIndex,
+        //       kulturId,
+        //     }),
+        //   )
 
-  //         const kulturTeilkulturFolderIsOpen = openNodes.some(
-  //           (n) =>
-  //             n.length === 4 &&
-  //             n[1] === 'Kulturen' &&
-  //             n[2] === kulturId &&
-  //             n[3] === 'Teilkulturen',
-  //         )
-  //         if (kulturTeilkulturFolderIsOpen) {
-  //           let teilkulturs
-  //           try {
-  //             teilkulturs = await kulturTeilkulturQuery.fetch()
-  //           } catch {}
-  //           const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-  //           const newKulturTeilkulturNodes = teilkultursSorted.map(
-  //             (teilkultur, teilkulturIndex) =>
-  //               buildKulturTeilkultur({
-  //                 teilkultur,
-  //                 teilkulturIndex,
-  //                 kulturId,
-  //                 kulturIndex,
-  //               }),
-  //           )
-  //           kulturTeilkulturNodes.push(...newKulturTeilkulturNodes)
-  //         }
-  //       }
+        //   const kulturTeilkulturFolderIsOpen = openNodes.some(
+        //     (n) =>
+        //       n.length === 4 &&
+        //       n[1] === 'Kulturen' &&
+        //       n[2] === kulturId &&
+        //       n[3] === 'Teilkulturen',
+        //   )
+        //   if (kulturTeilkulturFolderIsOpen) {
+        //     let teilkulturs
+        //     try {
+        //       teilkulturs = await kulturTeilkulturQuery.fetch()
+        //     } catch {}
+        //     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+        //     const newKulturTeilkulturNodes = teilkultursSorted.map(
+        //       (teilkultur, teilkulturIndex) =>
+        //         buildKulturTeilkultur({
+        //           teilkultur,
+        //           teilkulturIndex,
+        //           kulturId,
+        //           kulturIndex,
+        //         }),
+        //     )
+        //     kulturTeilkulturNodes.push(...newKulturTeilkulturNodes)
+        //   }
+        // }
 
-  //       // 2.1 kultur > zaehlung
-  //       const kulturZaehlungQuery = kultur.zaehlungs.extend(
-  //         ...tableFilter({ store, table: 'zaehlung' }),
-  //       )
-  //       const kulturZaehlungCount = await kulturZaehlungQuery.fetchCount()
-  //       kulturZaehlungFolderNodes.push(
-  //         buildKulturZaehlungFolder({
-  //           count: kulturZaehlungCount,
-  //           kulturIndex,
-  //           kulturId,
-  //         }),
-  //       )
+        // // 2.1 kultur > zaehlung
+        // const kulturZaehlungQuery = kultur.zaehlungs.extend(
+        //   ...tableFilter({ store, table: 'zaehlung' }),
+        // )
+        // const kulturZaehlungCount = await kulturZaehlungQuery.fetchCount()
+        // kulturZaehlungFolderNodes.push(
+        //   buildKulturZaehlungFolder({
+        //     count: kulturZaehlungCount,
+        //     kulturIndex,
+        //     kulturId,
+        //   }),
+        // )
 
-  //       const kulturZaehlungFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Kulturen' &&
-  //           n[2] === kulturId &&
-  //           n[3] === 'Zaehlungen',
-  //       )
-  //       if (kulturZaehlungFolderIsOpen) {
-  //         let zaehlungs = []
-  //         try {
-  //           zaehlungs = await kulturZaehlungQuery.fetch()
-  //         } catch {}
-  //         const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-  //         const newKulturZaehlungNodes = await Promise.all(
-  //           zaehlungsSorted.map(
-  //             async (zaehlung, zaehlungIndex) =>
-  //               await buildKulturZaehlung({
-  //                 zaehlung,
-  //                 zaehlungIndex,
-  //                 kulturId,
-  //                 kulturIndex,
-  //               }),
-  //           ),
-  //         )
-  //         kulturZaehlungNodes.push(...newKulturZaehlungNodes)
-  //       }
+        // const kulturZaehlungFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Kulturen' &&
+        //     n[2] === kulturId &&
+        //     n[3] === 'Zaehlungen',
+        // )
+        // if (kulturZaehlungFolderIsOpen) {
+        //   let zaehlungs = []
+        //   try {
+        //     zaehlungs = await kulturZaehlungQuery.fetch()
+        //   } catch {}
+        //   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+        //   const newKulturZaehlungNodes = await Promise.all(
+        //     zaehlungsSorted.map(
+        //       async (zaehlung, zaehlungIndex) =>
+        //         await buildKulturZaehlung({
+        //           zaehlung,
+        //           zaehlungIndex,
+        //           kulturId,
+        //           kulturIndex,
+        //         }),
+        //     ),
+        //   )
+        //   kulturZaehlungNodes.push(...newKulturZaehlungNodes)
+        // }
 
-  //       // kultur > anlieferung
-  //       const kulturAnlieferungQuery = kultur.anlieferungs.extend(
-  //         ...tableFilter({ store, table: 'lieferung' }),
-  //       )
-  //       const kulturAnlieferungCount = await kulturAnlieferungQuery.fetchCount()
-  //       kulturAnlieferungFolderNodes.push(
-  //         buildKulturAnlieferungFolder({
-  //           count: kulturAnlieferungCount,
-  //           kulturIndex,
-  //           kulturId,
-  //         }),
-  //       )
-  //       const kulturAnlieferungFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Kulturen' &&
-  //           n[2] === kulturId &&
-  //           n[3] === 'An-Lieferungen',
-  //       )
-  //       if (kulturAnlieferungFolderIsOpen) {
-  //         let anlieferungs = []
-  //         try {
-  //           anlieferungs = await kulturAnlieferungQuery.fetch()
-  //         } catch {}
-  //         const anlieferungsSorted = anlieferungs.sort(lieferungSort)
-  //         const newKulturAnlieferungNodes = anlieferungsSorted.map(
-  //           (lieferung, lieferungIndex) =>
-  //             buildKulturAnlieferung({
-  //               lieferung,
-  //               lieferungIndex,
-  //               kulturId,
-  //               kulturIndex,
-  //             }),
-  //         )
-  //         kulturAnlieferungNodes.push(...newKulturAnlieferungNodes)
-  //       }
+        // // kultur > anlieferung
+        // const kulturAnlieferungQuery = kultur.anlieferungs.extend(
+        //   ...tableFilter({ store, table: 'lieferung' }),
+        // )
+        // const kulturAnlieferungCount = await kulturAnlieferungQuery.fetchCount()
+        // kulturAnlieferungFolderNodes.push(
+        //   buildKulturAnlieferungFolder({
+        //     count: kulturAnlieferungCount,
+        //     kulturIndex,
+        //     kulturId,
+        //   }),
+        // )
+        // const kulturAnlieferungFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Kulturen' &&
+        //     n[2] === kulturId &&
+        //     n[3] === 'An-Lieferungen',
+        // )
+        // if (kulturAnlieferungFolderIsOpen) {
+        //   let anlieferungs = []
+        //   try {
+        //     anlieferungs = await kulturAnlieferungQuery.fetch()
+        //   } catch {}
+        //   const anlieferungsSorted = anlieferungs.sort(lieferungSort)
+        //   const newKulturAnlieferungNodes = anlieferungsSorted.map(
+        //     (lieferung, lieferungIndex) =>
+        //       buildKulturAnlieferung({
+        //         lieferung,
+        //         lieferungIndex,
+        //         kulturId,
+        //         kulturIndex,
+        //       }),
+        //   )
+        //   kulturAnlieferungNodes.push(...newKulturAnlieferungNodes)
+        // }
 
-  //       // kultur > auslieferung
-  //       const kulturAuslieferungQuery = kultur.auslieferungs.extend(
-  //         ...tableFilter({ store, table: 'lieferung' }),
-  //       )
-  //       const kulturAuslieferungCount =
-  //         await kulturAuslieferungQuery.fetchCount()
-  //       kulturAuslieferungFolderNodes.push(
-  //         buildKulturAuslieferungFolder({
-  //           count: kulturAuslieferungCount,
-  //           kulturIndex,
-  //           kulturId,
-  //         }),
-  //       )
-  //       const kulturAuslieferungFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Kulturen' &&
-  //           n[2] === kulturId &&
-  //           n[3] === 'Aus-Lieferungen',
-  //       )
-  //       if (kulturAuslieferungFolderIsOpen) {
-  //         let auslieferungs = []
-  //         try {
-  //           auslieferungs = await kulturAuslieferungQuery.fetch()
-  //         } catch {}
-  //         const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-  //         const newKulturAuslieferungNodes = auslieferungsSorted.map(
-  //           (lieferung, lieferungIndex) =>
-  //             buildKulturAuslieferung({
-  //               lieferung,
-  //               lieferungIndex,
-  //               kulturId,
-  //               kulturIndex,
-  //             }),
-  //         )
-  //         kulturAuslieferungNodes.push(...newKulturAuslieferungNodes)
-  //       }
+        // // kultur > auslieferung
+        // const kulturAuslieferungQuery = kultur.auslieferungs.extend(
+        //   ...tableFilter({ store, table: 'lieferung' }),
+        // )
+        // const kulturAuslieferungCount =
+        //   await kulturAuslieferungQuery.fetchCount()
+        // kulturAuslieferungFolderNodes.push(
+        //   buildKulturAuslieferungFolder({
+        //     count: kulturAuslieferungCount,
+        //     kulturIndex,
+        //     kulturId,
+        //   }),
+        // )
+        // const kulturAuslieferungFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Kulturen' &&
+        //     n[2] === kulturId &&
+        //     n[3] === 'Aus-Lieferungen',
+        // )
+        // if (kulturAuslieferungFolderIsOpen) {
+        //   let auslieferungs = []
+        //   try {
+        //     auslieferungs = await kulturAuslieferungQuery.fetch()
+        //   } catch {}
+        //   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+        //   const newKulturAuslieferungNodes = auslieferungsSorted.map(
+        //     (lieferung, lieferungIndex) =>
+        //       buildKulturAuslieferung({
+        //         lieferung,
+        //         lieferungIndex,
+        //         kulturId,
+        //         kulturIndex,
+        //       }),
+        //   )
+        //   kulturAuslieferungNodes.push(...newKulturAuslieferungNodes)
+        // }
 
-  //       // kultur > event
-  //       const kulturEventQuery = kultur.events.extend(
-  //         ...tableFilter({ store, table: 'event' }),
-  //       )
-  //       const kulturEventCount = await kulturEventQuery.fetchCount()
-  //       kulturEventFolderNodes.push(
-  //         buildKulturEventFolder({
-  //           count: kulturEventCount,
-  //           kulturIndex,
-  //           kulturId,
-  //         }),
-  //       )
-  //       const kulturEventFolderIsOpen = openNodes.some(
-  //         (n) =>
-  //           n.length === 4 &&
-  //           n[1] === 'Kulturen' &&
-  //           n[2] === kulturId &&
-  //           n[3] === 'Events',
-  //       )
-  //       if (kulturEventFolderIsOpen) {
-  //         let events = []
-  //         try {
-  //           events = await kulturEventQuery.fetch()
-  //         } catch {}
-  //         const eventsSorted = events.sort(eventSort)
-  //         const newKulturEventNodes = eventsSorted.map((event, eventIndex) =>
-  //           buildKulturEvent({
-  //             event,
-  //             eventIndex,
-  //             kulturId,
-  //             kulturIndex,
-  //           }),
-  //         )
-  //         kulturEventNodes.push(...newKulturEventNodes)
-  //       }
-  //     }
-  //   }
-  // }
+        // // kultur > event
+        // const kulturEventQuery = kultur.events.extend(
+        //   ...tableFilter({ store, table: 'event' }),
+        // )
+        // const kulturEventCount = await kulturEventQuery.fetchCount()
+        // kulturEventFolderNodes.push(
+        //   buildKulturEventFolder({
+        //     count: kulturEventCount,
+        //     kulturIndex,
+        //     kulturId,
+        //   }),
+        // )
+        // const kulturEventFolderIsOpen = openNodes.some(
+        //   (n) =>
+        //     n.length === 4 &&
+        //     n[1] === 'Kulturen' &&
+        //     n[2] === kulturId &&
+        //     n[3] === 'Events',
+        // )
+        // if (kulturEventFolderIsOpen) {
+        //   let events = []
+        //   try {
+        //     events = await kulturEventQuery.fetch()
+        //   } catch {}
+        //   const eventsSorted = events.sort(eventSort)
+        //   const newKulturEventNodes = eventsSorted.map((event, eventIndex) =>
+        //     buildKulturEvent({
+        //       event,
+        //       eventIndex,
+        //       kulturId,
+        //       kulturIndex,
+        //     }),
+        //   )
+        //   kulturEventNodes.push(...newKulturEventNodes)
+        // }
+      }
+    }
+  }
 
   // 6 teilkultur
   // if (showTeilkultur) {
@@ -1501,23 +1489,20 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   // }
 
   // 8 lieferung
-  // if (showLieferung) {
-  //   const lieferungQuery = db
-  //     .get('lieferung')
-  //     .query(...tableFilter({ store, table: 'lieferung' }))
-  //   const lieferungCount = await lieferungQuery.fetchCount()
-  //   lieferungFolderNodes = buildLieferungFolder({ count: lieferungCount })
-  //   if (openNodes.some((n) => n.length === 2 && n[1] === 'Lieferungen')) {
-  //     let lieferungs = []
-  //     try {
-  //       lieferungs = await lieferungQuery.fetch()
-  //     } catch {}
-  //     const lieferungsSorted = lieferungs.sort(lieferungSort)
-  //     lieferungNodes = lieferungsSorted.map((lieferung, index) =>
-  //       buildLieferung({ lieferung, index }),
-  //     )
-  //   }
-  // }
+  if (showLieferung) {
+    const lieferungCollection = dexie.lieferungs.filter((value) =>
+      totalFilter({ value, store, table: 'lieferung' }),
+    )
+    const lieferungCount = await lieferungCollection.count()
+    lieferungFolderNodes = buildLieferungFolder({ count: lieferungCount })
+    if (openNodes.some((n) => n.length === 2 && n[1] === 'Lieferungen')) {
+      const lieferungs = await lieferungCollection.toArray()
+      const lieferungsSorted = lieferungs.sort(lieferungSort)
+      lieferungNodes = lieferungsSorted.map((lieferung, index) =>
+        buildLieferung({ lieferung, index }),
+      )
+    }
+  }
 
   // 9 sammelLieferung
   if (showSammelLieferung) {
