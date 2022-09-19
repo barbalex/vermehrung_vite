@@ -497,49 +497,47 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // zaehlung nodes
-            // const artKulturZaehlungQuery = kultur.zaehlungs.extend(
-            //   ...tableFilter({ store, table: 'zaehlung' }),
-            // )
-            // const zaehlungsCount = await artKulturZaehlungQuery.fetchCount()
-            // artKulturZaehlungFolderNodes.push(
-            //   buildArtKulturZaehlungFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     artId,
-            //     artIndex,
-            //     count: zaehlungsCount,
-            //   }),
-            // )
-            // const artKulturZaehlungFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Arten' &&
-            //     n[2] === artId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'Zaehlungen',
-            // )
-            // if (artKulturZaehlungFolderIsOpen) {
-            //   let zaehlungs = []
-            //   try {
-            //     zaehlungs = await artKulturZaehlungQuery.fetch()
-            //   } catch {}
-            //   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-            //   const newArtKulturZaehlungNodes = await Promise.all(
-            //     zaehlungsSorted.map(
-            //       async (zaehlung, zaehlungIndex) =>
-            //         await buildArtKulturZaehlung({
-            //           zaehlung,
-            //           zaehlungIndex,
-            //           kulturId,
-            //           kulturIndex,
-            //           artId,
-            //           artIndex,
-            //         }),
-            //     ),
-            //   )
-            //   artKulturZaehlungNodes.push(...newArtKulturZaehlungNodes)
-            // }
+            const artKulturZaehlungCollection = dexie.zaehlungs
+              .where('kultur_id')
+              .equals(kultur.id)
+              .and((value) => totalFilter({ value, store, table: 'zaehlung' }))
+            const zaehlungsCount = await artKulturZaehlungCollection.count()
+            artKulturZaehlungFolderNodes.push(
+              buildArtKulturZaehlungFolder({
+                kulturId,
+                kulturIndex,
+                artId,
+                artIndex,
+                count: zaehlungsCount,
+              }),
+            )
+            const artKulturZaehlungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Arten' &&
+                n[2] === artId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'Zaehlungen',
+            )
+            if (artKulturZaehlungFolderIsOpen) {
+              const zaehlungs = await artKulturZaehlungCollection.toArray()
+              const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+              const newArtKulturZaehlungNodes = await Promise.all(
+                zaehlungsSorted.map(
+                  async (zaehlung, zaehlungIndex) =>
+                    await buildArtKulturZaehlung({
+                      zaehlung,
+                      zaehlungIndex,
+                      kulturId,
+                      kulturIndex,
+                      artId,
+                      artIndex,
+                    }),
+                ),
+              )
+              artKulturZaehlungNodes.push(...newArtKulturZaehlungNodes)
+            }
 
             // // anlieferung nodes
             // let anlieferungs = []
