@@ -540,7 +540,11 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // anlieferung nodes
-            const anlieferungs = await dexie.lieferungs.where('von_kultur_id').equals(kultur.id).and(value=>totalFilter({value,store,table:'lieferung'})).toArray()
+            const anlieferungs = await dexie.lieferungs
+              .where('von_kultur_id')
+              .equals(kultur.id)
+              .and((value) => totalFilter({ value, store, table: 'lieferung' }))
+              .toArray()
             artKulturAnlieferungFolderNodes.push(
               buildArtKulturAnlieferungFolder({
                 kulturId,
@@ -576,50 +580,44 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // auslieferung nodes
-            // let auslieferungs = []
-            // try {
-            //   auslieferungs = await kultur.auslieferungs
-            //     .extend(
-            //       ...tableFilter({
-            //         table: 'lieferung',
-            //         store,
-            //       }),
-            //     )
-            //     .fetch()
-            // } catch {}
-            // artKulturAuslieferungFolderNodes.push(
-            //   buildArtKulturAuslieferungFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     artId,
-            //     artIndex,
-            //     children: auslieferungs,
-            //   }),
-            // )
-            // const artKulturAuslieferungFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Arten' &&
-            //     n[2] === artId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'Aus-Lieferungen',
-            // )
-            // if (artKulturAuslieferungFolderIsOpen) {
-            //   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-            //   const newArtKulturAuslieferungNodes = auslieferungsSorted.map(
-            //     (lieferung, lieferungIndex) =>
-            //       buildArtKulturAuslieferung({
-            //         lieferung,
-            //         lieferungIndex,
-            //         kulturId,
-            //         kulturIndex,
-            //         artId,
-            //         artIndex,
-            //       }),
-            //   )
-            //   artKulturAuslieferungNodes.push(...newArtKulturAuslieferungNodes)
-            // }
+            const auslieferungs = await dexie.lieferungs
+              .where('nach_kultur_id')
+              .equals(kultur.id)
+              .and((value) => totalFilter({ value, store, table: 'lieferung' }))
+              .toArray()
+            artKulturAuslieferungFolderNodes.push(
+              buildArtKulturAuslieferungFolder({
+                kulturId,
+                kulturIndex,
+                artId,
+                artIndex,
+                children: auslieferungs,
+              }),
+            )
+            const artKulturAuslieferungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Arten' &&
+                n[2] === artId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'Aus-Lieferungen',
+            )
+            if (artKulturAuslieferungFolderIsOpen) {
+              const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+              const newArtKulturAuslieferungNodes = auslieferungsSorted.map(
+                (lieferung, lieferungIndex) =>
+                  buildArtKulturAuslieferung({
+                    lieferung,
+                    lieferungIndex,
+                    kulturId,
+                    kulturIndex,
+                    artId,
+                    artIndex,
+                  }),
+              )
+              artKulturAuslieferungNodes.push(...newArtKulturAuslieferungNodes)
+            }
 
             // // event nodes
             // const eventsQuery = kultur.events.extend(
