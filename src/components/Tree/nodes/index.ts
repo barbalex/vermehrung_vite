@@ -387,23 +387,23 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 n[4] === sammlungId &&
                 n[5] === 'Aus-Lieferungen',
             )
-            //     if (artSammlungAuslieferungFolderIsOpen) {
-            //       const lieferungsSorted = lieferungs.sort(lieferungSort)
-            //       const newArtSammlungAuslieferungNodes = lieferungsSorted.map(
-            //         (lieferung, lieferungIndex) =>
-            //           buildArtSammlungAuslieferung({
-            //             lieferung,
-            //             lieferungIndex,
-            //             sammlungId,
-            //             sammlungIndex,
-            //             artId,
-            //             artIndex,
-            //           }),
-            //       )
-            //       artSammlungAuslieferungNodes.push(
-            //         ...newArtSammlungAuslieferungNodes,
-            //       )
-            //     }
+            if (artSammlungAuslieferungFolderIsOpen) {
+              const lieferungsSorted = lieferungs.sort(lieferungSort)
+              const newArtSammlungAuslieferungNodes = lieferungsSorted.map(
+                (lieferung, lieferungIndex) =>
+                  buildArtSammlungAuslieferung({
+                    lieferung,
+                    lieferungIndex,
+                    sammlungId,
+                    sammlungIndex,
+                    artId,
+                    artIndex,
+                  }),
+              )
+              artSammlungAuslieferungNodes.push(
+                ...newArtSammlungAuslieferungNodes,
+              )
+            }
           }
         }
 
