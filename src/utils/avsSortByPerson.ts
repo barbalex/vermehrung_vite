@@ -1,14 +1,9 @@
-// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const avsSortByPerson = async (avs) => {
   const avsIdLabel = await Promise.all(
     avs.map(async (av) => {
-      let label = ''
-      try {
-        label = 'TODO: dexie'
-        // await av.personLabel.pipe(first$()).toPromise()
-      } catch {}
+      const label = await av.personLabel?.()
 
       return {
         id: av.id,

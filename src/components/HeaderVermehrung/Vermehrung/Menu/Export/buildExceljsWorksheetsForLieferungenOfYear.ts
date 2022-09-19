@@ -47,11 +47,7 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         try {
           vonSammlungHerkunft = await vonSammlung?.herkunft?.fetch()
         } catch {}
-        let vonKultur
-        try {
-          // vonKultur = await l.von_kultur.pipe(first$()).toPromise()
-          vonKultur = 'TODO: dexie'
-        } catch {}
+        const vonKultur = await l.von_kultur()
         const von_kultur_label = await vonKultur?.label()
         let vonKulturGarten
         try {
@@ -64,21 +60,14 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
         } catch {}
         let nachKultur
         try {
-          // nachKultur = await l.nach_kultur.pipe(first$()).toPromise()
-          nachKultur = 'TODO: dexie'
+          nachKultur = await l.nach_kultur.pipe(first$()).toPromise()
         } catch {}
         const nach_kultur_label = await nachKultur?.label()
         let nachKulturGarten
         try {
           nachKulturGarten = await nachKultur?.garten?.fetch()
         } catch {}
-        let nach_kultur_garten_label
-        try {
-          nach_kultur_garten_label = 'TODO: dexie'
-          // nachKulturGarten?.label
-          //   .pipe(first$())
-          //   .toPromise()
-        } catch {}
+        const nach_kultur_garten_label = nachKulturGarten?.label()
         let nachKulturHerkunft
         try {
           nachKulturHerkunft = await nachKultur?.herkunft?.fetch()

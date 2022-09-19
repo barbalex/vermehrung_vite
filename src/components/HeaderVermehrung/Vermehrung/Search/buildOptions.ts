@@ -334,11 +334,7 @@ const buildOptions = async ({ store, cb, val }) => {
       try {
         art = await l?.art?.fetch()
       } catch {}
-      let artname
-      try {
-        // artname = (await art?.label?.pipe(first$()).toPromise()) ?? ''
-        artname = 'TODO: dexie'
-      } catch {}
+      const artname = (await art?.label?.()) ?? ''
 
       return {
         value: l.id,

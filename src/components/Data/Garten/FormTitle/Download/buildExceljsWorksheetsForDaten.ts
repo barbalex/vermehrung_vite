@@ -73,10 +73,7 @@ const buildExceljsWorksheetsForDaten = async ({
       try {
         art = await kultur.art?.fetch()
       } catch {}
-      let artLabel
-      try {
-        artLabel = await art?.label?.pipe(first$()).toPromise()
-      } catch {}
+      const artLabel = await art?.label()
       let aeArt
       try {
         aeArt = await art?.ae_art?.fetch()

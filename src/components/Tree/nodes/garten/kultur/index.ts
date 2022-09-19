@@ -1,15 +1,10 @@
-import { first as first$ } from 'rxjs/operators'
-
 const gartenKulturNodes = async ({
   kultur,
   kulturIndex,
   gartenId,
   gartenIndex,
 }) => {
-  let label = ''
-  try {
-    label = await kultur.labelUnderGarten.pipe(first$()).toPromise()
-  } catch {}
+  const label = await kultur.labelUnderGarten?.()
 
   return {
     nodeType: 'table',

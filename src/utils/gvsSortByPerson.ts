@@ -1,14 +1,9 @@
-// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const gvsSortByPerson = async (gvs) => {
   const gvsIdLabel = await Promise.all(
     gvs.map(async (gv) => {
-      let label = ''
-      try {
-        label = 'TODO: dexie'
-        // await gv.personLabel.pipe(first$()).toPromise()
-      } catch {}
+      const label = await gv.personLabel?.()
 
       return {
         id: gv.id,

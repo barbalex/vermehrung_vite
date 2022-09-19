@@ -1,15 +1,10 @@
-import { first as first$ } from 'rxjs/operators'
-
 const herkunftSammlungNodes = async ({
   sammlung,
   sammlungIndex,
   herkunftId,
   herkunftIndex,
 }) => {
-  let label = ''
-  try {
-    label = await sammlung.labelUnderHerkunft.pipe(first$()).toPromise()
-  } catch {}
+  const label = await sammlung.labelUnderHerkunft?.()
 
   return {
     nodeType: 'table',
