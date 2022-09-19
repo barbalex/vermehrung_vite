@@ -619,48 +619,45 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
               artKulturAuslieferungNodes.push(...newArtKulturAuslieferungNodes)
             }
 
-            // // event nodes
-            // const eventsQuery = kultur.events.extend(
-            //   ...tableFilter({ store, table: 'event' }),
-            // )
-            // const eventsCount = await eventsQuery.fetchCount()
-            // artKulturEventFolderNodes.push(
-            //   buildArtKulturEventFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     artId,
-            //     artIndex,
-            //     count: eventsCount,
-            //   }),
-            // )
-            // const artKulturEventFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Arten' &&
-            //     n[2] === artId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'Events',
-            // )
-            // if (artKulturEventFolderIsOpen) {
-            //   let events = []
-            //   try {
-            //     events = await eventsQuery.fetch()
-            //   } catch {}
-            //   const eventsSorted = events.sort(eventSort)
-            //   const newArtKulturEventNodes = eventsSorted.map(
-            //     (event, eventIndex) =>
-            //       buildArtKulturEvent({
-            //         event,
-            //         eventIndex,
-            //         kulturId,
-            //         kulturIndex,
-            //         artId,
-            //         artIndex,
-            //       }),
-            //   )
-            //   artKulturEventNodes.push(...newArtKulturEventNodes)
-            // }
+            // event nodes
+            const eventsCollection = dexie.events
+              .where({ kultur_id: kultur.id })
+              .and((value) => totalFilter({ value, store, table: 'event' }))
+            const eventsCount = await eventsCollection.count()
+            artKulturEventFolderNodes.push(
+              buildArtKulturEventFolder({
+                kulturId,
+                kulturIndex,
+                artId,
+                artIndex,
+                count: eventsCount,
+              }),
+            )
+            const artKulturEventFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Arten' &&
+                n[2] === artId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'Events',
+            )
+            if (artKulturEventFolderIsOpen) {
+              const events = await eventsCollection.toArray()
+              const eventsSorted = events.sort(eventSort)
+              const newArtKulturEventNodes = eventsSorted.map(
+                (event, eventIndex) =>
+                  buildArtKulturEvent({
+                    event,
+                    eventIndex,
+                    kulturId,
+                    kulturIndex,
+                    artId,
+                    artIndex,
+                  }),
+              )
+              artKulturEventNodes.push(...newArtKulturEventNodes)
+            }
           }
         }
       }
