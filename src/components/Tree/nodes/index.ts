@@ -540,45 +540,40 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // anlieferung nodes
-            // let anlieferungs = []
-            // try {
-            //   anlieferungs = await kultur.anlieferungs
-            //     .extend(...tableFilter({ store, table: 'lieferung' }))
-            //     .fetch()
-            // } catch {}
-            // artKulturAnlieferungFolderNodes.push(
-            //   buildArtKulturAnlieferungFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     artId,
-            //     artIndex,
-            //     children: anlieferungs,
-            //   }),
-            // )
-            // const artKulturAnlieferungFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Arten' &&
-            //     n[2] === artId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'An-Lieferungen',
-            // )
-            // if (artKulturAnlieferungFolderIsOpen) {
-            //   const anlieferungsSorted = anlieferungs.sort(lieferungSort)
-            //   const newArtKulturAnlieferungNodes = anlieferungsSorted.map(
-            //     (lieferung, lieferungIndex) =>
-            //       buildArtKulturAnlieferung({
-            //         lieferung,
-            //         lieferungIndex,
-            //         kulturId,
-            //         kulturIndex,
-            //         artId,
-            //         artIndex,
-            //       }),
-            //   )
-            //   artKulturAnlieferungNodes.push(...newArtKulturAnlieferungNodes)
-            // }
+            const anlieferungs = await dexie.lieferungs.where('von_kultur_id').equals(kultur.id).and(value=>totalFilter({value,store,table:'lieferung'})).toArray()
+            artKulturAnlieferungFolderNodes.push(
+              buildArtKulturAnlieferungFolder({
+                kulturId,
+                kulturIndex,
+                artId,
+                artIndex,
+                children: anlieferungs,
+              }),
+            )
+            const artKulturAnlieferungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Arten' &&
+                n[2] === artId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'An-Lieferungen',
+            )
+            if (artKulturAnlieferungFolderIsOpen) {
+              const anlieferungsSorted = anlieferungs.sort(lieferungSort)
+              const newArtKulturAnlieferungNodes = anlieferungsSorted.map(
+                (lieferung, lieferungIndex) =>
+                  buildArtKulturAnlieferung({
+                    lieferung,
+                    lieferungIndex,
+                    kulturId,
+                    kulturIndex,
+                    artId,
+                    artIndex,
+                  }),
+              )
+              artKulturAnlieferungNodes.push(...newArtKulturAnlieferungNodes)
+            }
 
             // // auslieferung nodes
             // let auslieferungs = []
