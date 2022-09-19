@@ -408,7 +408,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // // 1.3 art > kultur
-        const artKulturCollection = dexie.kulturs.where({art_id: artId}).filter(value=>totalFilter({value,store,table:'kultur'}))
+        const artKulturCollection = dexie.kulturs
+          .where({ art_id: artId })
+          .filter((value) => totalFilter({ value, store, table: 'kultur' }))
         const kulturCount = await artKulturCollection.count()
         artKulturFolderNodes.push(
           buildArtKulturFolder({
@@ -450,51 +452,49 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // teilkultur nodes
-            // let kulturOption
-            // try {
-            //   kulturOption = await kultur.kultur_option.fetch()
-            // } catch {}
-            // if (kulturOption?.tk) {
-            //   let teilkulturs = []
-            //   try {
-            //     teilkulturs = await kultur.teilkulturs
-            //       .extend(...tableFilter({ store, table: 'teilkultur' }))
-            //       .fetch()
-            //   } catch {}
-            //   artKulturTeilkulturFolderNodes.push(
-            //     buildArtKulturTeilkulturFolder({
-            //       kulturId,
-            //       kulturIndex,
-            //       artId,
-            //       artIndex,
-            //       children: teilkulturs,
-            //     }),
-            //   )
-            //   const artKulturTeilkulturFolderIsOpen = openNodes.some(
-            //     (n) =>
-            //       n.length === 6 &&
-            //       n[1] === 'Arten' &&
-            //       n[2] === artId &&
-            //       n[3] === 'Kulturen' &&
-            //       n[4] === kulturId &&
-            //       n[5] === 'Teilkulturen',
-            //   )
-            //   if (artKulturTeilkulturFolderIsOpen) {
-            //     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-            //     const newArtKulturTeilkulturNodes = teilkultursSorted.map(
-            //       (teilkultur, teilkulturIndex) =>
-            //         buildArtKulturTeilkultur({
-            //           teilkultur,
-            //           teilkulturIndex,
-            //           kulturId,
-            //           kulturIndex,
-            //           artId,
-            //           artIndex,
-            //         }),
-            //     )
-            //     artKulturTeilkulturNodes.push(...newArtKulturTeilkulturNodes)
-            //   }
-            // }
+            const kulturOption = await dexie.kultur_options.get(kultur.id)
+            if (kulturOption?.tk) {
+              const teilkulturs = await dexie.teilkulturs
+                .where('kultur_id')
+                .equals(kultur.id)
+                .and((value) =>
+                  totalFilter({ value, store, table: 'teilkultur' }),
+                )
+                .toArray()
+              artKulturTeilkulturFolderNodes.push(
+                buildArtKulturTeilkulturFolder({
+                  kulturId,
+                  kulturIndex,
+                  artId,
+                  artIndex,
+                  children: teilkulturs,
+                }),
+              )
+              const artKulturTeilkulturFolderIsOpen = openNodes.some(
+                (n) =>
+                  n.length === 6 &&
+                  n[1] === 'Arten' &&
+                  n[2] === artId &&
+                  n[3] === 'Kulturen' &&
+                  n[4] === kulturId &&
+                  n[5] === 'Teilkulturen',
+              )
+              if (artKulturTeilkulturFolderIsOpen) {
+                const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+                const newArtKulturTeilkulturNodes = teilkultursSorted.map(
+                  (teilkultur, teilkulturIndex) =>
+                    buildArtKulturTeilkultur({
+                      teilkultur,
+                      teilkulturIndex,
+                      kulturId,
+                      kulturIndex,
+                      artId,
+                      artIndex,
+                    }),
+                )
+                artKulturTeilkulturNodes.push(...newArtKulturTeilkulturNodes)
+              }
+            }
 
             // // zaehlung nodes
             // const artKulturZaehlungQuery = kultur.zaehlungs.extend(
