@@ -691,100 +691,97 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
           (a) => a.id === herkunftId,
         )
 
-        // // 2.1 herkunft > sammlung
-        // const herkunftSammlungQuery = herkunft.sammlungs.extend(
-        //   ...tableFilter({ store, table: 'sammlung' }),
-        // )
-        // const sammlungsCount = await herkunftSammlungQuery.fetchCount()
-        // herkunftSammlungFolderNodes.push(
-        //   buildHerkunftSammlungFolder({
-        //     count: sammlungsCount,
-        //     herkunftIndex,
-        //     herkunftId,
-        //   }),
-        // )
-        // const herkunftSammlungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Herkuenfte' &&
-        //     n[2] === herkunftId &&
-        //     n[3] === 'Sammlungen',
-        // )
-        // if (herkunftSammlungFolderIsOpen) {
-        //   let sammlungs = []
-        //   try {
-        //     sammlungs = await herkunftSammlungQuery.fetch()
-        //   } catch {}
-        //   const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
-        //   const newHerkunftSammlungNodes = await Promise.all(
-        //     sammlungsSorted.map(
-        //       async (sammlung, sammlungIndex) =>
-        //         await buildHerkunftSammlung({
-        //           sammlung,
-        //           sammlungIndex,
-        //           herkunftId,
-        //           herkunftIndex,
-        //         }),
-        //     ),
-        //   )
-        //   herkunftSammlungNodes.push(...newHerkunftSammlungNodes)
-        //   const openHerkunftSammlungNodes = openNodes.filter(
-        //     (n) =>
-        //       n[1] === 'Herkuenfte' &&
-        //       n[2] === herkunftId &&
-        //       n[3] === 'Sammlungen' &&
-        //       n.length === 5,
-        //   )
-        //   for (const herkunftSammlungNode of openHerkunftSammlungNodes) {
-        //     const sammlungId = herkunftSammlungNode[4]
-        //     const sammlung = sammlungsSorted.find((s) => s.id === sammlungId)
-        //     if (!sammlung) break
-        //     const sammlungIndex = newHerkunftSammlungNodes.findIndex(
-        //       (s) => s.id === `${herkunftId}${sammlungId}`,
-        //     )
-        //     let lieferungs = []
-        //     try {
-        //       lieferungs = await sammlung.lieferungs
-        //         .extend(...tableFilter({ store, table: 'lieferung' }))
-        //         .fetch()
-        //     } catch {}
-        //     herkunftSammlungAuslieferungFolderNodes.push(
-        //       buildHerkunftSammlungAuslieferungFolder({
-        //         sammlungId,
-        //         sammlungIndex,
-        //         herkunftId,
-        //         herkunftIndex,
-        //         children: lieferungs,
-        //       }),
-        //     )
-        //     const herkunftSammlungAuslieferungFolderIsOpen = openNodes.some(
-        //       (n) =>
-        //         n.length === 6 &&
-        //         n[1] === 'Herkuenfte' &&
-        //         n[2] === herkunftId &&
-        //         n[3] === 'Sammlungen' &&
-        //         n[4] === sammlungId &&
-        //         n[5] === 'Aus-Lieferungen',
-        //     )
-        //     if (herkunftSammlungAuslieferungFolderIsOpen) {
-        //       const lieferungsSorted = lieferungs.sort(lieferungSort)
-        //       const newHerkunftSammlungAuslieferungNodes = lieferungsSorted.map(
-        //         (lieferung, lieferungIndex) =>
-        //           buildHerkunftSammlungAuslieferung({
-        //             lieferung,
-        //             lieferungIndex,
-        //             sammlungId,
-        //             sammlungIndex,
-        //             herkunftId,
-        //             herkunftIndex,
-        //           }),
-        //       )
-        //       herkunftSammlungAuslieferungNodes.push(
-        //         ...newHerkunftSammlungAuslieferungNodes,
-        //       )
-        //     }
-        //   }
-        // }
+        // 2.1 herkunft > sammlung
+        const herkunftSammlungCollection = dexie.sammlungs
+          .where({ herkunft_id: herkunft.id })
+          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+        const sammlungsCount = await herkunftSammlungCollection.count()
+        herkunftSammlungFolderNodes.push(
+          buildHerkunftSammlungFolder({
+            count: sammlungsCount,
+            herkunftIndex,
+            herkunftId,
+          }),
+        )
+        const herkunftSammlungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Herkuenfte' &&
+            n[2] === herkunftId &&
+            n[3] === 'Sammlungen',
+        )
+        if (herkunftSammlungFolderIsOpen) {
+          const sammlungs = await herkunftSammlungCollection.toArray()
+          const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
+          const newHerkunftSammlungNodes = await Promise.all(
+            sammlungsSorted.map(
+              async (sammlung, sammlungIndex) =>
+                await buildHerkunftSammlung({
+                  sammlung,
+                  sammlungIndex,
+                  herkunftId,
+                  herkunftIndex,
+                }),
+            ),
+          )
+          herkunftSammlungNodes.push(...newHerkunftSammlungNodes)
+          const openHerkunftSammlungNodes = openNodes.filter(
+            (n) =>
+              n[1] === 'Herkuenfte' &&
+              n[2] === herkunftId &&
+              n[3] === 'Sammlungen' &&
+              n.length === 5,
+          )
+          for (const herkunftSammlungNode of openHerkunftSammlungNodes) {
+            const sammlungId = herkunftSammlungNode[4]
+            const sammlung = sammlungsSorted.find((s) => s.id === sammlungId)
+            if (!sammlung) break
+            const sammlungIndex = newHerkunftSammlungNodes.findIndex(
+              (s) => s.id === `${herkunftId}${sammlungId}`,
+            )
+            const lieferungs = await dexie.lieferungs
+              .where({ von_sammlung_id: sammlung.id })
+              .filter((value) =>
+                totalFilter({ value, store, table: 'lieferung' }),
+              )
+              .toArray()
+            herkunftSammlungAuslieferungFolderNodes.push(
+              buildHerkunftSammlungAuslieferungFolder({
+                sammlungId,
+                sammlungIndex,
+                herkunftId,
+                herkunftIndex,
+                children: lieferungs,
+              }),
+            )
+            const herkunftSammlungAuslieferungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Herkuenfte' &&
+                n[2] === herkunftId &&
+                n[3] === 'Sammlungen' &&
+                n[4] === sammlungId &&
+                n[5] === 'Aus-Lieferungen',
+            )
+            if (herkunftSammlungAuslieferungFolderIsOpen) {
+              const lieferungsSorted = lieferungs.sort(lieferungSort)
+              const newHerkunftSammlungAuslieferungNodes = lieferungsSorted.map(
+                (lieferung, lieferungIndex) =>
+                  buildHerkunftSammlungAuslieferung({
+                    lieferung,
+                    lieferungIndex,
+                    sammlungId,
+                    sammlungIndex,
+                    herkunftId,
+                    herkunftIndex,
+                  }),
+              )
+              herkunftSammlungAuslieferungNodes.push(
+                ...newHerkunftSammlungAuslieferungNodes,
+              )
+            }
+          }
+        }
       }
     }
   }
