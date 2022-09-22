@@ -1688,6 +1688,25 @@ const myTypes = types
     }
   })
   .views((self) => ({
+    get hierarchyConditionAdderForZaehlung() {
+      let conditionAdder = (collection) => collection
+      if (self.kulturIdInActiveNodeArray) {
+        conditionAdder = (collection) =>
+          collection.filter(
+            (c) => c.kultur_id === self.kulturIdInActiveNodeArray,
+          )
+      }
+
+      return conditionAdder
+    },
+    get hierarchyFilterForZaehlung() {
+      let filter = () => true
+      if (self.kulturIdInActiveNodeArray) {
+        filter = (c) => c.kultur_id === self.kulturIdInActiveNodeArray
+      }
+
+      return filter
+    },
     get initialDataQueried() {
       return (
         self.ae_art_initially_queried &&

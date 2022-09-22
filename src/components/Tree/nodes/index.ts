@@ -1754,58 +1754,57 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // // zaehlung nodes
-                // const zaehlungQuery = kultur.zaehlungs.extend(
-                //   ...tableFilter({ store, table: 'zaehlung' }),
-                // )
-                // const zaehlungCount = await zaehlungQuery.fetchCount()
-                // personGartenKulturZaehlungFolderNodes.push(
-                //   buildPersonGartenKulturZaehlungFolder({
-                //     kulturId,
-                //     kulturIndex,
-                //     gartenId,
-                //     gartenIndex,
-                //     personId,
-                //     personIndex,
-                //     count: zaehlungCount,
-                //   }),
-                // )
-                // const personGartenKulturZaehlungFolderIsOpen = openNodes.some(
-                //   (n) =>
-                //     n.length === 8 &&
-                //     n[1] === 'Personen' &&
-                //     n[2] === personId &&
-                //     n[3] === 'Gaerten' &&
-                //     n[4] === gartenId &&
-                //     n[5] === 'Kulturen' &&
-                //     n[6] === kulturId &&
-                //     n[7] === 'Zaehlungen',
-                // )
+                const zaehlungCollection = dexie.zaehlungs
+                  .where({ kultur_id: kultur.id })
+                  .filter((value) =>
+                    totalFilter({ value, store, table: 'zaehlung' }),
+                  )
+                const zaehlungCount = await zaehlungCollection.count()
+                personGartenKulturZaehlungFolderNodes.push(
+                  buildPersonGartenKulturZaehlungFolder({
+                    kulturId,
+                    kulturIndex,
+                    gartenId,
+                    gartenIndex,
+                    personId,
+                    personIndex,
+                    count: zaehlungCount,
+                  }),
+                )
+                const personGartenKulturZaehlungFolderIsOpen = openNodes.some(
+                  (n) =>
+                    n.length === 8 &&
+                    n[1] === 'Personen' &&
+                    n[2] === personId &&
+                    n[3] === 'Gaerten' &&
+                    n[4] === gartenId &&
+                    n[5] === 'Kulturen' &&
+                    n[6] === kulturId &&
+                    n[7] === 'Zaehlungen',
+                )
 
-                // if (personGartenKulturZaehlungFolderIsOpen) {
-                //   let zaehlungs
-                //   try {
-                //     zaehlungs = await zaehlungQuery.fetch()
-                //   } catch {}
-                //   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-                //   const newPersonGartenKulturZaehlungNodes = await Promise.all(
-                //     zaehlungsSorted.map(
-                //       async (zaehlung, zaehlungIndex) =>
-                //         await buildPersonGartenKulturZaehlung({
-                //           zaehlung,
-                //           zaehlungIndex,
-                //           kulturId,
-                //           kulturIndex,
-                //           gartenId,
-                //           gartenIndex,
-                //           personId,
-                //           personIndex,
-                //         }),
-                //     ),
-                //   )
-                //   personGartenKulturZaehlungNodes.push(
-                //     ...newPersonGartenKulturZaehlungNodes,
-                //   )
-                // }
+                if (personGartenKulturZaehlungFolderIsOpen) {
+                  const zaehlungs = await zaehlungCollection.toArray()
+                  const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+                  const newPersonGartenKulturZaehlungNodes = await Promise.all(
+                    zaehlungsSorted.map(
+                      async (zaehlung, zaehlungIndex) =>
+                        await buildPersonGartenKulturZaehlung({
+                          zaehlung,
+                          zaehlungIndex,
+                          kulturId,
+                          kulturIndex,
+                          gartenId,
+                          gartenIndex,
+                          personId,
+                          personIndex,
+                        }),
+                    ),
+                  )
+                  personGartenKulturZaehlungNodes.push(
+                    ...newPersonGartenKulturZaehlungNodes,
+                  )
+                }
 
                 // // anlieferung nodes
                 // const anlieferungQuery = kultur.anlieferungs.extend(

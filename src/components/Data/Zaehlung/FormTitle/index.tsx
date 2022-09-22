@@ -29,13 +29,7 @@ const ZaehlungFormTitleChooser = ({
           totalFilter({ value, store, table: 'zaehlung', conditionAdder }),
         )
         .count(),
-    [
-      kulturIdInActiveNodeArray,
-      // need to rerender if any of the values of sammlungFilter changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      ...Object.values(store.filter.zaehlung),
-      store,
-    ],
+    [kulturIdInActiveNodeArray, store],
   )
 
   const filteredCount = store.zaehlungsFilteredCount ?? '...'
