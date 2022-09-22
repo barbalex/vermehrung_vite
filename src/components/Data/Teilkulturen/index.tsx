@@ -58,13 +58,12 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
 
   let conditionAdder
   if (kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((c) => c.kultur_id === kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
   }
 
   const data = useLiveQuery(async () => {
     const [teilkulturs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'teilkultur', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'teilkultur' }),
       dexie.teilkulturs
         .filter((value) =>
           totalFilter({ value, store, table: 'teilkultur', conditionAdder }),

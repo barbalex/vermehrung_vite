@@ -23,14 +23,13 @@ const SammlungFormTitleChooser = ({
 
   let conditionAdder
   if (artIdInActiveNodeArray) {
-    conditionAdder = (value) => value.art_id === artIdInActiveNodeArray
+    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
   }
   if (herkunftIdInActiveNodeArray) {
-    conditionAdder = (value) =>
-      value.herkunft_id === herkunftIdInActiveNodeArray
+    conditionAdder = (c) => c.herkunft_id === herkunftIdInActiveNodeArray
   }
   if (personIdInActiveNodeArray) {
-    conditionAdder = (value) => value.person_id === personIdInActiveNodeArray
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(

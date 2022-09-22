@@ -19,8 +19,7 @@ const ZaehlungFormTitleChooser = ({
 
   let conditionAdder
   if (kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('kultur_id').equals(kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(

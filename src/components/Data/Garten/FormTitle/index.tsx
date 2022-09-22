@@ -14,8 +14,7 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
 
   let conditionAdder
   if (personIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('person_id').equals(personIdInActiveNodeArray)
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(

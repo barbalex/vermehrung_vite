@@ -66,6 +66,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const activeNodeArray = anaRaw.toJSON()
 
   let conditionAdder
+  // TODO: deal with async nature
   if (sammlungIdInActiveNodeArray) {
     conditionAdder = async (collection) => {
       const activeSammlung = await dexie.sammlungs.get(
@@ -90,7 +91,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [herkunfts, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'herkunft', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'herkunft' }),
       dexie.herkunfts
         .filter((value) =>
           totalFilter({ value, store, table: 'herkunft', conditionAdder }),

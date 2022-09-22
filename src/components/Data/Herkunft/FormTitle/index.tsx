@@ -20,6 +20,7 @@ const HerkunftFormTitleChooser = ({
   const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
   let conditionAdder
+  //  TODO: deal with async nature
   if (sammlungIdInActiveNodeArray) {
     conditionAdder = async (collection) => {
       const activeSammlung = await dexie.sammlungs.get(

@@ -63,21 +63,18 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
 
   let conditionAdder
   if (artIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((s) => s.art_id === artIdInActiveNodeArray)
+    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
   }
   if (herkunftIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((s) => s.herkunft_id === herkunftIdInActiveNodeArray)
+    conditionAdder = (c) => c.herkunft_id === herkunftIdInActiveNodeArray
   }
   if (personIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((s) => s.person_id === personIdInActiveNodeArray)
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
 
   const data = useLiveQuery(async () => {
     const [sammlungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'sammlung', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'sammlung' }),
       dexie.sammlungs
         .filter((value) =>
           totalFilter({ value, store, table: 'sammlung', conditionAdder }),

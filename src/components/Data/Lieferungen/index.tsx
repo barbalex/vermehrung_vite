@@ -73,29 +73,22 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
       const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
       if (lastAnAElement === 'An-Lieferungen') kulturOnField = 'nach_kultur_id'
     }
-    conditionAdder = (collection) =>
-      collection.filter((c) => c[kulturOnField] === kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c[kulturOnField] === kulturIdInActiveNodeArray
   }
   if (sammelLieferungIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter(
-        (c) => c.sammel_lieferung_id === sammelLieferungIdInActiveNodeArray,
-      )
+    conditionAdder = (c) =>
+      c.sammel_lieferung_id === sammelLieferungIdInActiveNodeArray
   }
   if (personIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((c) => c.person_id === personIdInActiveNodeArray)
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
   if (sammlungIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter(
-        (c) => c.von_sammlung_id === sammlungIdInActiveNodeArray,
-      )
+    conditionAdder = (c) => c.von_sammlung_id === sammlungIdInActiveNodeArray
   }
 
   const data = useLiveQuery(async () => {
     const [lieferungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'lieferung', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'lieferung' }),
       dexie.lieferungs
         .filter((value) =>
           totalFilter({ value, store, table: 'lieferung', conditionAdder }),

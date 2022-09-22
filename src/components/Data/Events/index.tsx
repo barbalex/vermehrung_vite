@@ -58,8 +58,7 @@ const Events = ({ filter: showFilter, width, height }) => {
 
   let conditionAdder
   if (kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((c) => c.kultur_id === kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
   }
 
   const data = useLiveQuery(async () => {

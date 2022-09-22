@@ -58,13 +58,12 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
 
   let conditionAdder
   if (personIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.filter((c) => c.person_id === personIdInActiveNodeArray)
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
 
   const data = useLiveQuery(async () => {
     const [gartens, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'garten', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'garten' }),
       dexie.gartens
         .filter((value) =>
           totalFilter({ value, store, table: 'garten', conditionAdder }),

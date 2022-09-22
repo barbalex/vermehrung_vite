@@ -19,12 +19,10 @@ const KulturFormTitleChooser = ({
 
   let conditionAdder
   if (gartenIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('garten_id').equals(gartenIdInActiveNodeArray)
+    conditionAdder = (c) => c.garten_id === gartenIdInActiveNodeArray
   }
   if (artIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('art_id').equals(artIdInActiveNodeArray)
+    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(

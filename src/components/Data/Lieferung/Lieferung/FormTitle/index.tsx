@@ -29,26 +29,20 @@ const LieferungTitleChooser = ({
     kulturIdInActiveNodeArray &&
     activeNodeArray.includes('Aus-Lieferungen')
   ) {
-    conditionAdder = (collection) =>
-      collection.and('von_kultur_id').equals(kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c.von_kultur_id === kulturIdInActiveNodeArray
   }
   if (kulturIdInActiveNodeArray && activeNodeArray.includes('An-Lieferungen')) {
-    conditionAdder = (collection) =>
-      collection.and('nach_kultur_id').equals(kulturIdInActiveNodeArray)
+    conditionAdder = (c) => c.nach_kultur_id === kulturIdInActiveNodeArray
   }
   if (sammelLieferungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection
-        .and('sammel_lieferung_id')
-        .equals(sammelLieferungIdInActiveNodeArray)
+    conditionAdder = (c) =>
+      c.sammel_lieferung_id === sammelLieferungIdInActiveNodeArray
   }
   if (personIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('person_id').equals(personIdInActiveNodeArray)
+    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
   }
   if (sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('von_sammlung_id').equals(sammlungIdInActiveNodeArray)
+    conditionAdder = (c) => c.von_sammlung_id === sammlungIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(

@@ -35,13 +35,13 @@ const buildData = async ({ row }) => {
     zaehlungenPlannedIncluded = [lastZaehlungDone, ...zaehlungenPlannedIncluded]
   }
 
-  console.log('Kultur buildData', {
-    zaehlungs,
-    zaehlungsDone,
-    lastZaehlungDone,
-    zaehlungsPlanned,
-    zaehlungenPlannedIgnored,
-  })
+  // console.log('Kultur buildData', {
+  //   zaehlungs,
+  //   zaehlungsDone,
+  //   lastZaehlungDone,
+  //   zaehlungsPlanned,
+  //   zaehlungenPlannedIgnored,
+  // })
 
   const zaehlungenForLine = sortBy(
     [...zaehlungsDone, ...zaehlungenPlannedIncluded],
