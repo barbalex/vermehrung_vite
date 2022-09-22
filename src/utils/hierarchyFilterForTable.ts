@@ -1,3 +1,6 @@
+import { dexie } from '../dexieClient'
+import totalFilter from './totalFilter'
+
 const hierarchyFilterForTable = async ({ store, table }) => {
   const {
     artIdInActiveNodeArray,
@@ -24,6 +27,7 @@ const hierarchyFilterForTable = async ({ store, table }) => {
           .where({
             art_id: artIdInActiveNodeArray,
           })
+          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
           .toArray()
         const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
 

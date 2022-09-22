@@ -1,3 +1,5 @@
+import { dexie } from '../dexieClient'
+
 const hierarchyConditionAdderForTable = async ({ store, table }) => {
   const {
     artIdInActiveNodeArray,
@@ -95,9 +97,9 @@ const hierarchyConditionAdderForTable = async ({ store, table }) => {
         // this should get kulturen connected by von_kultur_id or nach_kultur_id
         // depending on activeNodeArray[last] being 'An-Lieferung' or 'Aus-Lieferung'
         let kulturOnField = 'von_kultur_id'
-          const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
-          if (lastAnAElement === 'An-Lieferungen')
-            kulturOnField = 'nach_kultur_id'
+        const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
+        if (lastAnAElement === 'An-Lieferungen')
+          kulturOnField = 'nach_kultur_id'
         return (collection) =>
           collection.filter(
             (c) => c[kulturOnField] === kulturIdInActiveNodeArray,

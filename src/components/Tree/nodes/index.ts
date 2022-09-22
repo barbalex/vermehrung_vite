@@ -99,7 +99,6 @@ import artsSortedFromArts from '../../../utils/artsSortedFromArts'
 import kultursSortedFromKulturs from '../../../utils/kultursSortedFromKulturs'
 import gartensSortedFromGartens from '../../../utils/gartensSortedFromGartens'
 import sammlungsSortedFromSammlungs from '../../../utils/sammlungsSortedFromSammlungs'
-import tableFilter from '../../../utils/tableFilter'
 import getShowArt from '../../../utils/showArt'
 import getShowEvent from '../../../utils/showEvent'
 import getShowGarten from '../../../utils/showGarten'
@@ -271,7 +270,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         // 1.1 art > Herkunft
         const sammlungsOfArt = await dexie.sammlungs
           .where({ art_id: artId })
-          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+          .and((value) => totalFilter({ value, store, table: 'sammlung' }))
           .toArray()
         const sammlungsOfArtHerkunftIds = sammlungsOfArt.map(
           (s) => s.herkunft_id,
@@ -361,7 +360,6 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-            const sammlungsOfArtIds = sammlungsOfArt.map((s) => s.id)
             const lieferungs = await dexie.lieferungs
               .where('von_sammlung_id')
               .equals(sammlungId)
