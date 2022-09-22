@@ -277,10 +277,11 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const sammlungsOfArtHerkunftIds = sammlungsOfArt.map(
           (s) => s.herkunft_id,
         )
-        const herkunftsCollection = dexie.herkunfts
-          .where('id')
-          .anyOf(sammlungsOfArtHerkunftIds)
-          .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+        const herkunftsCollection = dexie.herkunfts.filter(
+          (value) =>
+            totalFilter({ value, store, table: 'herkunft' }) &&
+            sammlungsOfArtHerkunftIds.includes(value.id),
+        )
         const herkunftCount = await herkunftsCollection.count()
         artHerkunftFolderNodes.push(
           buildArtHerkunftFolder({

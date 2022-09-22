@@ -15,36 +15,21 @@ const SammlungFormTitleChooser = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const {
-    herkunftIdInActiveNodeArray,
-    personIdInActiveNodeArray,
-    artIdInActiveNodeArray,
-  } = store
-
-  let conditionAdder
-  if (artIdInActiveNodeArray) {
-    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
-  }
-  if (herkunftIdInActiveNodeArray) {
-    conditionAdder = (c) => c.herkunft_id === herkunftIdInActiveNodeArray
-  }
-  if (personIdInActiveNodeArray) {
-    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
-  }
+  const { hierarchyFilterForSammlung } = store
 
   const totalCount = useLiveQuery(
     async () =>
       await dexie.sammlungs
         .filter((value) =>
-          totalFilter({ value, store, table: 'sammlung', conditionAdder }),
+          totalFilter({
+            value,
+            store,
+            table: 'sammlung',
+            conditionAdder: hierarchyFilterForSammlung,
+          }),
         )
         .count(),
-    [
-      artIdInActiveNodeArray,
-      herkunftIdInActiveNodeArray,
-      personIdInActiveNodeArray,
-      store,
-    ],
+    [hierarchyFilterForSammlung, store],
   )
 
   const filteredCount = store.sammlungsFilteredCount ?? '...'

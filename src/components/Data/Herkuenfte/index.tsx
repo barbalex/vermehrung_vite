@@ -55,8 +55,8 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
   const {
     insertHerkunftRev,
-    sammlungIdInActiveNodeArray,
-    artIdInActiveNodeArray,
+    hierarchyConditionAdderForHerkunft,
+    hierarchyFilterForHerkunft,
   } = store
   const {
     activeNodeArray: anaRaw,
@@ -65,36 +65,21 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   } = store.tree
   const activeNodeArray = anaRaw.toJSON()
 
-  let conditionAdder
-  // TODO: deal with async nature
-  if (sammlungIdInActiveNodeArray) {
-    conditionAdder = async (collection) => {
-      const activeSammlung = await dexie.sammlungs.get(
-        sammlungIdInActiveNodeArray,
-      )
-
-      return collection.and('id').equals(activeSammlung.herkunft_id)
-    }
-  }
-  if (artIdInActiveNodeArray) {
-    conditionAdder = async (collection) => {
-      const sammlungsOfArt = await dexie.sammlungs
-        .where({
-          art_id: artIdInActiveNodeArray,
-        })
-        .toArray()
-      const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
-
-      return collection.and('id').anyOf(herkunftIds)
-    }
-  }
-
   const data = useLiveQuery(async () => {
     const [herkunfts, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'herkunft' }),
+      filteredObjectsFromTable({
+        store,
+        table: 'herkunft',
+        conditionAdder: hierarchyConditionAdderForHerkunft,
+      }),
       dexie.herkunfts
         .filter((value) =>
-          totalFilter({ value, store, table: 'herkunft', conditionAdder }),
+          totalFilter({
+            value,
+            store,
+            table: 'herkunft',
+            conditionAdder: hierarchyFilterForHerkunft,
+          }),
         )
         .count(),
     ])
@@ -102,7 +87,12 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     const herkunftsSorted = herkunfts.sort(herkunftSort)
 
     return { herkunfts: herkunftsSorted, totalCount }
-  }, [store.filter.herkunft, store.herkunft_initially_queried])
+  }, [
+    store.filter.herkunft,
+    store.herkunft_initially_queried,
+    hierarchyConditionAdderForHerkunft,
+    hierarchyFilterForHerkunft,
+  ])
 
   const herkunfts: Herkunft[] = data?.herkunfts ?? []
   const totalCount = data?.totalCount

@@ -55,29 +55,26 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
   const {
     insertSammlungRev,
-    artIdInActiveNodeArray,
-    herkunftIdInActiveNodeArray,
-    personIdInActiveNodeArray,
+    hierarchyConditionAdderForSammlung,
+    hierarchyFilterForSammlung,
   } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
-  let conditionAdder
-  if (artIdInActiveNodeArray) {
-    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
-  }
-  if (herkunftIdInActiveNodeArray) {
-    conditionAdder = (c) => c.herkunft_id === herkunftIdInActiveNodeArray
-  }
-  if (personIdInActiveNodeArray) {
-    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
-  }
-
   const data = useLiveQuery(async () => {
     const [sammlungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'sammlung' }),
+      filteredObjectsFromTable({
+        store,
+        table: 'sammlung',
+        conditionAdder: hierarchyConditionAdderForSammlung,
+      }),
       dexie.sammlungs
         .filter((value) =>
-          totalFilter({ value, store, table: 'sammlung', conditionAdder }),
+          totalFilter({
+            value,
+            store,
+            table: 'sammlung',
+            conditionAdder: hierarchyFilterForSammlung,
+          }),
         )
         .count(),
     ])
@@ -85,7 +82,12 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
     const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
 
     return { sammlungs: sammlungsSorted, totalCount }
-  }, [store.filter.sammlung, store.sammlung_initially_queried])
+  }, [
+    store.filter.sammlung,
+    store.sammlung_initially_queried,
+    hierarchyConditionAdderForSammlung,
+    hierarchyFilterForSammlung,
+  ])
 
   const sammlungs: Sammlung[] = data?.sammlungs ?? []
   const totalCount = data?.totalCount

@@ -15,18 +15,18 @@ const ZaehlungFormTitleChooser = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { kulturIdInActiveNodeArray } = store
-
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
-  }
+  const { kulturIdInActiveNodeArray, hierarchyFilterForZaehlung } = store
 
   const totalCount = useLiveQuery(
     async () =>
       await dexie.zaehlungs
         .filter((value) =>
-          totalFilter({ value, store, table: 'zaehlung', conditionAdder }),
+          totalFilter({
+            value,
+            store,
+            table: 'zaehlung',
+            conditionAdder: hierarchyFilterForZaehlung,
+          }),
         )
         .count(),
     [kulturIdInActiveNodeArray, store],

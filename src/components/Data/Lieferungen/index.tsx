@@ -54,44 +54,20 @@ const FieldsContainer = styled.div`
 
 const Lieferungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const {
-    db,
-    insertLieferungRev,
-    kulturIdInActiveNodeArray,
-    personIdInActiveNodeArray,
-    sammelLieferungIdInActiveNodeArray,
-    sammlungIdInActiveNodeArray,
-  } = store
+  const { db, insertLieferungRev, hierarchyFilterForLieferung } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
-
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    // this should get kulturen connected by von_kultur_id or nach_kultur_id
-    // depending on activeNodeArray[last] being 'An-Lieferung' or 'Aus-Lieferung'
-    let kulturOnField = 'von_kultur_id'
-    if (kulturIdInActiveNodeArray) {
-      const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
-      if (lastAnAElement === 'An-Lieferungen') kulturOnField = 'nach_kultur_id'
-    }
-    conditionAdder = (c) => c[kulturOnField] === kulturIdInActiveNodeArray
-  }
-  if (sammelLieferungIdInActiveNodeArray) {
-    conditionAdder = (c) =>
-      c.sammel_lieferung_id === sammelLieferungIdInActiveNodeArray
-  }
-  if (personIdInActiveNodeArray) {
-    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
-  }
-  if (sammlungIdInActiveNodeArray) {
-    conditionAdder = (c) => c.von_sammlung_id === sammlungIdInActiveNodeArray
-  }
 
   const data = useLiveQuery(async () => {
     const [lieferungs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'lieferung' }),
       dexie.lieferungs
         .filter((value) =>
-          totalFilter({ value, store, table: 'lieferung', conditionAdder }),
+          totalFilter({
+            value,
+            store,
+            table: 'lieferung',
+            conditionAdder: hierarchyFilterForLieferung,
+          }),
         )
         .count(),
     ])
@@ -99,11 +75,15 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
     const lieferungsSorted = lieferungs.sort(lieferungSort)
 
     return { lieferungs: lieferungsSorted, totalCount }
-  }, [store.filter.lieferung, store.lieferung_initially_queried])
+  }, [
+    store.filter.lieferung,
+    store.lieferung_initially_queried,
+    hierarchyFilterForLieferung,
+  ])
 
   const lieferungs: Lieferung[] = data?.lieferungs ?? []
   const totalCount = data?.totalCount
-  const filteredCount = lieferungs.length
+  const filteredCount = store.lieferungsFilteredCount ?? '...'
 
   const add = useCallback(async () => {
     const isSammelLieferung =
