@@ -1807,58 +1807,57 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                   )
                 }
 
-                // // anlieferung nodes
-                // const anlieferungQuery = kultur.anlieferungs.extend(
-                //   ...tableFilter({ store, table: 'lieferung' }),
-                // )
-                // const anlieferungCount = await anlieferungQuery.fetchCount()
-                // personGartenKulturAnlieferungFolderNodes.push(
-                //   buildPersonGartenKulturAnlieferungFolder({
-                //     kulturId,
-                //     kulturIndex,
-                //     gartenId,
-                //     gartenIndex,
-                //     personId,
-                //     personIndex,
-                //     count: anlieferungCount,
-                //   }),
-                // )
-                // const personGartenKulturAnlieferungFolderIsOpen =
-                //   openNodes.some(
-                //     (n) =>
-                //       n.length === 8 &&
-                //       n[1] === 'Personen' &&
-                //       n[2] === personId &&
-                //       n[3] === 'Gaerten' &&
-                //       n[4] === gartenId &&
-                //       n[5] === 'Kulturen' &&
-                //       n[6] === kulturId &&
-                //       n[7] === 'An-Lieferungen',
-                //   )
+                // anlieferung nodes
+                const anlieferungCollection = dexie.lieferungs
+                  .where({ nach_kultur_id: kultur.id })
+                  .filter((value) =>
+                    totalFilter({ value, store, table: 'lieferung' }),
+                  )
+                const anlieferungCount = await anlieferungCollection.count()
+                personGartenKulturAnlieferungFolderNodes.push(
+                  buildPersonGartenKulturAnlieferungFolder({
+                    kulturId,
+                    kulturIndex,
+                    gartenId,
+                    gartenIndex,
+                    personId,
+                    personIndex,
+                    count: anlieferungCount,
+                  }),
+                )
+                const personGartenKulturAnlieferungFolderIsOpen =
+                  openNodes.some(
+                    (n) =>
+                      n.length === 8 &&
+                      n[1] === 'Personen' &&
+                      n[2] === personId &&
+                      n[3] === 'Gaerten' &&
+                      n[4] === gartenId &&
+                      n[5] === 'Kulturen' &&
+                      n[6] === kulturId &&
+                      n[7] === 'An-Lieferungen',
+                  )
 
-                // if (personGartenKulturAnlieferungFolderIsOpen) {
-                //   let anlieferungs = []
-                //   try {
-                //     anlieferungs = await anlieferungQuery.fetch()
-                //   } catch {}
-                //   const anlieferungsSorted = anlieferungs.sort(lieferungSort)
-                //   const newPersonGartenKulturAnlieferungNodes =
-                //     anlieferungsSorted.map((lieferung, lieferungIndex) =>
-                //       buildPersonGartenKulturAnlieferung({
-                //         lieferung,
-                //         lieferungIndex,
-                //         kulturId,
-                //         kulturIndex,
-                //         gartenId,
-                //         gartenIndex,
-                //         personId,
-                //         personIndex,
-                //       }),
-                //     )
-                //   personGartenKulturAnlieferungNodes.push(
-                //     ...newPersonGartenKulturAnlieferungNodes,
-                //   )
-                // }
+                if (personGartenKulturAnlieferungFolderIsOpen) {
+                  const anlieferungs = await anlieferungCollection.toArray()
+                  const anlieferungsSorted = anlieferungs.sort(lieferungSort)
+                  const newPersonGartenKulturAnlieferungNodes =
+                    anlieferungsSorted.map((lieferung, lieferungIndex) =>
+                      buildPersonGartenKulturAnlieferung({
+                        lieferung,
+                        lieferungIndex,
+                        kulturId,
+                        kulturIndex,
+                        gartenId,
+                        gartenIndex,
+                        personId,
+                        personIndex,
+                      }),
+                    )
+                  personGartenKulturAnlieferungNodes.push(
+                    ...newPersonGartenKulturAnlieferungNodes,
+                  )
+                }
 
                 // // auslieferung nodes
                 // const auslieferungQuery = kultur.auslieferungs.extend(

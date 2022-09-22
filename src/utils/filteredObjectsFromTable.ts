@@ -57,12 +57,6 @@ const filteredObjectsFromTable = async ({
       ? collection.or('id').equals(tableIdInActiveNodeArray)
       : collection
   const filteredCollection3 = orIdInUrlAdder(filteredCollection2)
-  // console.log('filteredObjectsFromTable', {
-  //   filteredCollection3,
-  //   filteredCollection1,
-  //   filteredCollection2,
-  //   conditionAdder,
-  // })
 
   return count
     ? await filteredCollection3.count()
