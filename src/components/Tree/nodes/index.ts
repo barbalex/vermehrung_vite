@@ -959,55 +959,50 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // garten > kultur > teilkultur
-            // const kulturOption = await kultur.kultur_option.fetch()
-            // if (kulturOption?.tk) {
-            //   let teilkulturs = []
-            //   try {
-            //     teilkulturs = await kultur.teilkulturs
-            //       .extend(
-            //         ...tableFilter({
-            //           table: 'teilkultur',
-            //           store,
-            //         }),
-            //       )
-            //       .fetch()
-            //   } catch {}
-            //   gartenKulturTeilkulturFolderNodes.push(
-            //     buildGartenKulturTeilkulturFolder({
-            //       kulturId,
-            //       kulturIndex,
-            //       gartenId,
-            //       gartenIndex,
-            //       children: teilkulturs,
-            //     }),
-            //   )
-            //   const gartenKulturTeilkulturFolderIsOpen = openNodes.some(
-            //     (n) =>
-            //       n.length === 6 &&
-            //       n[1] === 'Gaerten' &&
-            //       n[2] === gartenId &&
-            //       n[3] === 'Kulturen' &&
-            //       n[4] === kulturId &&
-            //       n[5] === 'Teilkulturen',
-            //   )
-            //   if (gartenKulturTeilkulturFolderIsOpen) {
-            //     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-            //     const newGartenKulturTeilkulturNodes = teilkultursSorted.map(
-            //       (teilkultur, teilkulturIndex) =>
-            //         buildGartenKulturTeilkultur({
-            //           teilkultur,
-            //           teilkulturIndex,
-            //           kulturId,
-            //           kulturIndex,
-            //           gartenId,
-            //           gartenIndex,
-            //         }),
-            //     )
-            //     gartenKulturTeilkulturNodes.push(
-            //       ...newGartenKulturTeilkulturNodes,
-            //     )
-            //   }
-            // }
+            const kulturOption = await dexie.kultur_options.get(kultur.id)
+            if (kulturOption?.tk) {
+              const teilkulturs = await dexie.teilkulturs
+                .where({ kultur_id: kultur.id })
+                .filter((value) =>
+                  totalFilter({ value, store, table: 'teilkultur' }),
+                )
+                .toArray()
+              gartenKulturTeilkulturFolderNodes.push(
+                buildGartenKulturTeilkulturFolder({
+                  kulturId,
+                  kulturIndex,
+                  gartenId,
+                  gartenIndex,
+                  children: teilkulturs,
+                }),
+              )
+              const gartenKulturTeilkulturFolderIsOpen = openNodes.some(
+                (n) =>
+                  n.length === 6 &&
+                  n[1] === 'Gaerten' &&
+                  n[2] === gartenId &&
+                  n[3] === 'Kulturen' &&
+                  n[4] === kulturId &&
+                  n[5] === 'Teilkulturen',
+              )
+              if (gartenKulturTeilkulturFolderIsOpen) {
+                const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+                const newGartenKulturTeilkulturNodes = teilkultursSorted.map(
+                  (teilkultur, teilkulturIndex) =>
+                    buildGartenKulturTeilkultur({
+                      teilkultur,
+                      teilkulturIndex,
+                      kulturId,
+                      kulturIndex,
+                      gartenId,
+                      gartenIndex,
+                    }),
+                )
+                gartenKulturTeilkulturNodes.push(
+                  ...newGartenKulturTeilkulturNodes,
+                )
+              }
+            }
 
             // // garten > kultur > zaehlung
             // let zaehlungs = []
