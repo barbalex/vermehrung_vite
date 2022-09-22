@@ -7,31 +7,29 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
   const { personIdInActiveNodeArray } = store
 
-  let conditionAdder
-  if (personIdInActiveNodeArray) {
-    conditionAdder = (c) => c.person_id === personIdInActiveNodeArray
-  }
-
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.gartens
-        .filter((value) =>
-          totalFilter({ value, store, table: 'garten', conditionAdder }),
-        )
-        .count(),
-    [
-      personIdInActiveNodeArray,
-      // need to rerender if any of the values of sammlungFilter changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      ...Object.values(store.filter.garten),
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
       store,
-    ],
-  )
+      table: 'garten',
+    })
+    return await dexie.gartens
+      .filter((value) =>
+        totalFilter({ value, store, table: 'garten', conditionAdder }),
+      )
+      .count()
+  }, [
+    personIdInActiveNodeArray,
+    // need to rerender if any of the values of sammlungFilter changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ...Object.values(store.filter.garten),
+    store,
+  ])
 
   const filteredCount = store.gartensFilteredCount ?? '...'
 

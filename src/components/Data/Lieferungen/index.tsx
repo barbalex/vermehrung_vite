@@ -54,12 +54,21 @@ const FieldsContainer = styled.div`
 
 const Lieferungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const { db, insertLieferungRev, hierarchyFilterForLieferung } = store
+  const {
+    db,
+    insertLieferungRev,
+    hierarchyFilterForLieferung,
+    hierarchyConditionAdderForLieferung,
+  } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
     const [lieferungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'lieferung' }),
+      filteredObjectsFromTable({
+        store,
+        table: 'lieferung',
+        conditionAdder: hierarchyConditionAdderForLieferung,
+      }),
       dexie.lieferungs
         .filter((value) =>
           totalFilter({
@@ -78,6 +87,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   }, [
     store.filter.lieferung,
     store.lieferung_initially_queried,
+    hierarchyConditionAdderForLieferung,
     hierarchyFilterForLieferung,
   ])
 

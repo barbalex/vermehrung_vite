@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Event } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -56,14 +57,13 @@ const Events = ({ filter: showFilter, width, height }) => {
   const { insertEventRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
-  }
-
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'event',
+    })
     const [events, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'event', conditionAdder }),
+      filteredObjectsFromTable({ store, table: 'event' }),
       dexie.events
         .filter((value) =>
           totalFilter({ value, store, table: 'event', conditionAdder }),
@@ -74,7 +74,11 @@ const Events = ({ filter: showFilter, width, height }) => {
     const eventsSorted = events.sort(eventSort)
 
     return { events: eventsSorted, totalCount }
-  }, [store.filter.event, store.event_initially_queried])
+  }, [
+    store.filter.event,
+    store.event_initially_queried,
+    kulturIdInActiveNodeArray,
+  ])
 
   const events: Event[] = data?.events ?? []
   const totalCount = data?.totalCount

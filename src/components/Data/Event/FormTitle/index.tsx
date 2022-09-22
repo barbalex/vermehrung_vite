@@ -7,25 +7,28 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
   const { kulturIdInActiveNodeArray } = store
 
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
-  }
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'event',
+    })
 
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.events
-        .filter((value) =>
-          totalFilter({ value, store, table: 'event', conditionAdder }),
-        )
-        .count(),
-    [store.filter.event, store.event_initially_queried],
-  )
+    return await dexie.events
+      .filter((value) =>
+        totalFilter({ value, store, table: 'event', conditionAdder }),
+      )
+      .count()
+  }, [
+    store.filter.event,
+    store.event_initially_queried,
+    kulturIdInActiveNodeArray,
+  ])
 
   const filteredCount = store.eventsFilteredCount ?? '...'
 

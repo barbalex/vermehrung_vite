@@ -6,6 +6,7 @@ import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import totalFilter from '../../../../utils/totalFilter'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 import { dexie } from '../../../../dexieClient'
 
 const ArtFormTitleChooser = ({
@@ -17,15 +18,18 @@ const ArtFormTitleChooser = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const totalCount = useLiveQuery(
-    async () =>
+  const data = useLiveQuery(async () => {
+    const [totalCount, filteredCount] = await Promise.all([
       await dexie.arts
         .filter((value) => totalFilter({ value, store, table: 'art' }))
         .count(),
-    [store.filter.art, store.art_initially_queried],
-  )
+      filteredObjectsFromTable({ store, table: 'art', count: true }),
+    ])
+    return { totalCount, filteredCount }
+  }, [store.filter.art, store.art_initially_queried])
 
-  const filteredCount = store.artsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

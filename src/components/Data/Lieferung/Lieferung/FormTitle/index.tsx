@@ -18,8 +18,8 @@ const LieferungTitleChooser = ({
 
   const { hierarchyFilterForLieferung } = store
 
-  const totalCount = useLiveQuery(
-    async () =>
+  const data = useLiveQuery(async () => {
+    const [totalCount] = Promise.all([
       await dexie.lieferungs
         .filter((value) =>
           totalFilter({
@@ -30,9 +30,11 @@ const LieferungTitleChooser = ({
           }),
         )
         .count(),
-    [store.lieferung_initially_queried, hierarchyFilterForLieferung],
-  )
+    ])
+    return { totalCount }
+  }, [store.lieferung_initially_queried, hierarchyFilterForLieferung])
 
+  const totalCount = data?.totalCount
   const filteredCount = store.lieferungsFilteredCount ?? '...'
 
   if (showFilter) {

@@ -3,14 +3,19 @@ import camelCase from 'lodash/camelCase'
 import types from '../store/Filter/simpleTypes'
 import exists from './exists'
 import { dexie } from '../dexieClient'
+import hierarchyConditionAdderForTable from './hierarchyConditionAdderForTable'
 
 const filteredObjectsFromTable = async ({
   store,
   table,
   count,
-  conditionAdder,
+  filterByHierarchy = true,
 }) => {
   if (!table) throw `no table passed`
+
+  const conditionAdder = filterByHierarchy
+    ? await hierarchyConditionAdderForTable({ store, table })
+    : (c) => c
 
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
@@ -44,7 +49,7 @@ const filteredObjectsFromTable = async ({
   }
 
   const filteredCollection1 = dexie[`${table}s`].filter(filterFunction)
-  const filteredCollection2 = conditionAdder
+  const filteredCollection2 = filterByHierarchy
     ? conditionAdder(filteredCollection1)
     : filteredCollection1
 

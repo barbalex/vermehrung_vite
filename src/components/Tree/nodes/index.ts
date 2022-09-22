@@ -124,7 +124,6 @@ const compare = (a, b) => {
 }
 
 const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
-  const { db } = store
   const { openNodes: openNodesRaw, activeNodeArray: activeNodeArrayRaw } =
     store.tree
   const openNodes = getSnapshot(openNodesRaw)
@@ -1859,58 +1858,57 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                   )
                 }
 
-                // // auslieferung nodes
-                // const auslieferungQuery = kultur.auslieferungs.extend(
-                //   ...tableFilter({ store, table: 'lieferung' }),
-                // )
-                // const auslieferungCount = await auslieferungQuery.fetchCount()
-                // personGartenKulturAuslieferungFolderNodes.push(
-                //   buildPersonGartenKulturAuslieferungFolder({
-                //     kulturId,
-                //     kulturIndex,
-                //     gartenId,
-                //     gartenIndex,
-                //     personId,
-                //     personIndex,
-                //     count: auslieferungCount,
-                //   }),
-                // )
-                // const personGartenKulturAuslieferungFolderIsOpen =
-                //   openNodes.some(
-                //     (n) =>
-                //       n.length === 8 &&
-                //       n[1] === 'Personen' &&
-                //       n[2] === personId &&
-                //       n[3] === 'Gaerten' &&
-                //       n[4] === gartenId &&
-                //       n[5] === 'Kulturen' &&
-                //       n[6] === kulturId &&
-                //       n[7] === 'Aus-Lieferungen',
-                //   )
+                // auslieferung nodes
+                const auslieferungCollection = dexie.lieferungs
+                  .where({ von_kultur_id: kultur.id })
+                  .filter((value) =>
+                    totalFilter({ value, store, table: 'lieferung' }),
+                  )
+                const auslieferungCount = await auslieferungCollection.count()
+                personGartenKulturAuslieferungFolderNodes.push(
+                  buildPersonGartenKulturAuslieferungFolder({
+                    kulturId,
+                    kulturIndex,
+                    gartenId,
+                    gartenIndex,
+                    personId,
+                    personIndex,
+                    count: auslieferungCount,
+                  }),
+                )
+                const personGartenKulturAuslieferungFolderIsOpen =
+                  openNodes.some(
+                    (n) =>
+                      n.length === 8 &&
+                      n[1] === 'Personen' &&
+                      n[2] === personId &&
+                      n[3] === 'Gaerten' &&
+                      n[4] === gartenId &&
+                      n[5] === 'Kulturen' &&
+                      n[6] === kulturId &&
+                      n[7] === 'Aus-Lieferungen',
+                  )
 
-                // if (personGartenKulturAuslieferungFolderIsOpen) {
-                //   let auslieferungs = []
-                //   try {
-                //     auslieferungs = await auslieferungQuery.fetch()
-                //   } catch {}
-                //   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-                //   const newPersonGartenKulturAuslieferungNodes =
-                //     auslieferungsSorted.map((lieferung, lieferungIndex) =>
-                //       buildPersonGartenKulturAuslieferung({
-                //         lieferung,
-                //         lieferungIndex,
-                //         kulturId,
-                //         kulturIndex,
-                //         gartenId,
-                //         gartenIndex,
-                //         personId,
-                //         personIndex,
-                //       }),
-                //     )
-                //   personGartenKulturAuslieferungNodes.push(
-                //     ...newPersonGartenKulturAuslieferungNodes,
-                //   )
-                // }
+                if (personGartenKulturAuslieferungFolderIsOpen) {
+                  const auslieferungs = await auslieferungCollection.toArray()
+                  const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+                  const newPersonGartenKulturAuslieferungNodes =
+                    auslieferungsSorted.map((lieferung, lieferungIndex) =>
+                      buildPersonGartenKulturAuslieferung({
+                        lieferung,
+                        lieferungIndex,
+                        kulturId,
+                        kulturIndex,
+                        gartenId,
+                        gartenIndex,
+                        personId,
+                        personIndex,
+                      }),
+                    )
+                  personGartenKulturAuslieferungNodes.push(
+                    ...newPersonGartenKulturAuslieferungNodes,
+                  )
+                }
 
                 // // event nodes
                 // const eventQuery = kultur.events.extend(
