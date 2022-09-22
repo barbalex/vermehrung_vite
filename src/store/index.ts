@@ -129,8 +129,6 @@ const myTypes = types
     gqlWsClient: null,
     gqlClient: null,
     navigate: undefined,
-    hierarchyConditionAdderForHerkunft: (c) => c,
-    hierarchyFilterForHerkunft: () => true,
   }))
   .actions((self) => {
     /*

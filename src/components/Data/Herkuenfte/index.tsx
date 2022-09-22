@@ -56,8 +56,6 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
   const {
     insertHerkunftRev,
-    hierarchyConditionAdderForHerkunft,
-    hierarchyFilterForHerkunft,
     artIdInActiveNodeArray,
     sammlungIdInActiveNodeArray,
   } = store
@@ -96,8 +94,6 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   }, [
     store.filter.herkunft,
     store.herkunft_initially_queried,
-    hierarchyConditionAdderForHerkunft,
-    hierarchyFilterForHerkunft,
     sammlungIdInActiveNodeArray,
     artIdInActiveNodeArray,
   ])
