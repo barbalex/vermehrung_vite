@@ -1283,41 +1283,38 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // // kultur > anlieferung
-        // const kulturAnlieferungQuery = kultur.anlieferungs.extend(
-        //   ...tableFilter({ store, table: 'lieferung' }),
-        // )
-        // const kulturAnlieferungCount = await kulturAnlieferungQuery.fetchCount()
-        // kulturAnlieferungFolderNodes.push(
-        //   buildKulturAnlieferungFolder({
-        //     count: kulturAnlieferungCount,
-        //     kulturIndex,
-        //     kulturId,
-        //   }),
-        // )
-        // const kulturAnlieferungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Kulturen' &&
-        //     n[2] === kulturId &&
-        //     n[3] === 'An-Lieferungen',
-        // )
-        // if (kulturAnlieferungFolderIsOpen) {
-        //   let anlieferungs = []
-        //   try {
-        //     anlieferungs = await kulturAnlieferungQuery.fetch()
-        //   } catch {}
-        //   const anlieferungsSorted = anlieferungs.sort(lieferungSort)
-        //   const newKulturAnlieferungNodes = anlieferungsSorted.map(
-        //     (lieferung, lieferungIndex) =>
-        //       buildKulturAnlieferung({
-        //         lieferung,
-        //         lieferungIndex,
-        //         kulturId,
-        //         kulturIndex,
-        //       }),
-        //   )
-        //   kulturAnlieferungNodes.push(...newKulturAnlieferungNodes)
-        // }
+        const kulturAnlieferungCollection = dexie.lieferungs
+          .where({ nach_kultur_id: kultur.id })
+          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        const kulturAnlieferungCount = await kulturAnlieferungCollection.count()
+        kulturAnlieferungFolderNodes.push(
+          buildKulturAnlieferungFolder({
+            count: kulturAnlieferungCount,
+            kulturIndex,
+            kulturId,
+          }),
+        )
+        const kulturAnlieferungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Kulturen' &&
+            n[2] === kulturId &&
+            n[3] === 'An-Lieferungen',
+        )
+        if (kulturAnlieferungFolderIsOpen) {
+          const anlieferungs = await kulturAnlieferungCollection.toArray()
+          const anlieferungsSorted = anlieferungs.sort(lieferungSort)
+          const newKulturAnlieferungNodes = anlieferungsSorted.map(
+            (lieferung, lieferungIndex) =>
+              buildKulturAnlieferung({
+                lieferung,
+                lieferungIndex,
+                kulturId,
+                kulturIndex,
+              }),
+          )
+          kulturAnlieferungNodes.push(...newKulturAnlieferungNodes)
+        }
 
         // // kultur > auslieferung
         // const kulturAuslieferungQuery = kultur.auslieferungs.extend(
