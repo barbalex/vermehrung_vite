@@ -1134,48 +1134,45 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // garten > kultur > event
-            // const gartenKulturEventQuery = kultur.events.extend(
-            //   ...tableFilter({ store, table: 'event' }),
-            // )
-            // const gartenKulturEventCount =
-            //   await gartenKulturEventQuery.fetchCount()
-            // gartenKulturEventFolderNodes.push(
-            //   buildGartenKulturEventFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     gartenId,
-            //     gartenIndex,
-            //     count: gartenKulturEventCount,
-            //   }),
-            // )
-            // const gartenKulturEventFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Gaerten' &&
-            //     n[2] === gartenId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'Events',
-            // )
-            // if (gartenKulturEventFolderIsOpen) {
-            //   let events = []
-            //   try {
-            //     events = await gartenKulturEventQuery.fetch()
-            //   } catch {}
-            //   const eventsSorted = events.sort(eventSort)
-            //   const newGartenKulturEventNodes = eventsSorted.map(
-            //     (event, eventIndex) =>
-            //       buildGartenKulturEvent({
-            //         event,
-            //         eventIndex,
-            //         kulturId,
-            //         kulturIndex,
-            //         gartenId,
-            //         gartenIndex,
-            //       }),
-            //   )
-            //   gartenKulturEventNodes.push(...newGartenKulturEventNodes)
-            // }
+            const gartenKulturEventCollection = dexie.events
+              .where({ kultur_id: kultur.id })
+              .filter((value) => totalFilter({ value, store, table: 'event' }))
+            const gartenKulturEventCount =
+              await gartenKulturEventCollection.count()
+            gartenKulturEventFolderNodes.push(
+              buildGartenKulturEventFolder({
+                kulturId,
+                kulturIndex,
+                gartenId,
+                gartenIndex,
+                count: gartenKulturEventCount,
+              }),
+            )
+            const gartenKulturEventFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Gaerten' &&
+                n[2] === gartenId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'Events',
+            )
+            if (gartenKulturEventFolderIsOpen) {
+              const events = await gartenKulturEventCollection.toArray()
+              const eventsSorted = events.sort(eventSort)
+              const newGartenKulturEventNodes = eventsSorted.map(
+                (event, eventIndex) =>
+                  buildGartenKulturEvent({
+                    event,
+                    eventIndex,
+                    kulturId,
+                    kulturIndex,
+                    gartenId,
+                    gartenIndex,
+                  }),
+              )
+              gartenKulturEventNodes.push(...newGartenKulturEventNodes)
+            }
           }
         }
       }
