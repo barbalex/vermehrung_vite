@@ -7,6 +7,7 @@ import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../../dexieClient'
 import totalFilter from '../../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../../utils/hierarchyFilterForTable'
 
 const LieferungTitleChooser = ({
   row,
@@ -16,9 +17,18 @@ const LieferungTitleChooser = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const { hierarchyFilterForLieferung } = store
+  const {
+    kulturIdInActiveNodeArray,
+    sammelLieferungIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+    sammlungIdInActiveNodeArray,
+  } = store
 
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'lieferung',
+    })
     const [totalCount] = Promise.all([
       await dexie.lieferungs
         .filter((value) =>
@@ -26,13 +36,19 @@ const LieferungTitleChooser = ({
             value,
             store,
             table: 'lieferung',
-            conditionAdder: hierarchyFilterForLieferung,
+            conditionAdder,
           }),
         )
         .count(),
     ])
     return { totalCount }
-  }, [store.lieferung_initially_queried, hierarchyFilterForLieferung])
+  }, [
+    store.lieferung_initially_queried,
+    kulturIdInActiveNodeArray,
+    sammelLieferungIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+    sammlungIdInActiveNodeArray,
+  ])
 
   const totalCount = data?.totalCount
   const filteredCount = store.lieferungsFilteredCount ?? '...'

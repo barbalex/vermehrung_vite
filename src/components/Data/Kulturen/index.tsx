@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Kultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -57,15 +58,11 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
     store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
-  let conditionAdder
-  if (gartenIdInActiveNodeArray) {
-    conditionAdder = (c) => c.garten_id === gartenIdInActiveNodeArray
-  }
-  if (artIdInActiveNodeArray) {
-    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
-  }
-
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'kultur',
+    })
     const [kulturs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'kultur' }),
       dexie.kulturs
@@ -78,7 +75,12 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
     const kultursSorted = await kultursSortedFromKulturs(kulturs)
 
     return { kulturs: kultursSorted, totalCount }
-  }, [store.filter.kultur, store.kultur_initially_queried])
+  }, [
+    store.filter.kultur,
+    store.kultur_initially_queried,
+    artIdInActiveNodeArray,
+    gartenIdInActiveNodeArray,
+  ])
 
   const kulturs: Kultur[] = data?.kulturs ?? []
   const totalCount = data?.totalCount

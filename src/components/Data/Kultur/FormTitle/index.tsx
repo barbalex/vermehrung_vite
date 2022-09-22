@@ -7,6 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const KulturFormTitleChooser = ({
   row,
@@ -17,23 +18,22 @@ const KulturFormTitleChooser = ({
   const store = useContext(StoreContext)
   const { artIdInActiveNodeArray, gartenIdInActiveNodeArray } = store
 
-  let conditionAdder
-  if (gartenIdInActiveNodeArray) {
-    conditionAdder = (c) => c.garten_id === gartenIdInActiveNodeArray
-  }
-  if (artIdInActiveNodeArray) {
-    conditionAdder = (c) => c.art_id === artIdInActiveNodeArray
-  }
-
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.kulturs
-        .filter((value) =>
-          totalFilter({ value, store, table: 'kultur', conditionAdder }),
-        )
-        .count(),
-    [store.filter.kultur, store.kultur_initially_queried],
-  )
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'kultur',
+    })
+    return await dexie.kulturs
+      .filter((value) =>
+        totalFilter({ value, store, table: 'kultur', conditionAdder }),
+      )
+      .count()
+  }, [
+    store.filter.kultur,
+    store.kultur_initially_queried,
+    artIdInActiveNodeArray,
+    gartenIdInActiveNodeArray,
+  ])
 
   const filteredCount = store.kultursFilteredCount ?? '...'
 

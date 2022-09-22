@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Herkunft } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -57,6 +58,8 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     insertHerkunftRev,
     hierarchyConditionAdderForHerkunft,
     hierarchyFilterForHerkunft,
+    artIdInActiveNodeArray,
+    sammlungIdInActiveNodeArray,
   } = store
   const {
     activeNodeArray: anaRaw,
@@ -66,11 +69,14 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const activeNodeArray = anaRaw.toJSON()
 
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'herkunft',
+    })
     const [herkunfts, totalCount] = await Promise.all([
       filteredObjectsFromTable({
         store,
         table: 'herkunft',
-        conditionAdder: hierarchyConditionAdderForHerkunft,
       }),
       dexie.herkunfts
         .filter((value) =>
@@ -78,7 +84,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
             value,
             store,
             table: 'herkunft',
-            conditionAdder: hierarchyFilterForHerkunft,
+            conditionAdder,
           }),
         )
         .count(),
@@ -92,6 +98,8 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     store.herkunft_initially_queried,
     hierarchyConditionAdderForHerkunft,
     hierarchyFilterForHerkunft,
+    sammlungIdInActiveNodeArray,
+    artIdInActiveNodeArray,
   ])
 
   const herkunfts: Herkunft[] = data?.herkunfts ?? []

@@ -7,6 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const HerkunftFormTitleChooser = ({
   row,
@@ -19,39 +20,23 @@ const HerkunftFormTitleChooser = ({
   const store = useContext(StoreContext)
   const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
-  let conditionAdder
-  //  TODO: deal with async nature
-  if (sammlungIdInActiveNodeArray) {
-    conditionAdder = async (collection) => {
-      const activeSammlung = await dexie.sammlungs.get(
-        sammlungIdInActiveNodeArray,
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'herkunft',
+    })
+
+    return await dexie.herkunfts
+      .filter((value) =>
+        totalFilter({ value, store, table: 'herkunft', conditionAdder }),
       )
-
-      return collection.and('id').equals(activeSammlung.herkunft_id)
-    }
-  }
-  if (artIdInActiveNodeArray) {
-    conditionAdder = async (collection) => {
-      const sammlungsOfArt = await dexie.sammlungs
-        .where({
-          art_id: artIdInActiveNodeArray,
-        })
-        .toArray()
-      const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
-
-      return collection.and('id').anyOf(herkunftIds)
-    }
-  }
-
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.herkunfts
-        .filter((value) =>
-          totalFilter({ value, store, table: 'herkunft', conditionAdder }),
-        )
-        .count(),
-    [store.filter.herkunft, store.herkunft_initially_queried],
-  )
+      .count()
+  }, [
+    store.filter.herkunft,
+    store.herkunft_initially_queried,
+    sammlungIdInActiveNodeArray,
+    artIdInActiveNodeArray,
+  ])
 
   const filteredCount = store.herkunftsFilteredCount ?? '...'
 
