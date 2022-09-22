@@ -43,7 +43,10 @@ const filteredObjectsFromTable = async ({
     return returnValue
   }
 
-  const filteredColection1 = dexie[`${table}s`].filter(filterFunction)
+  const filteredCollection1 = dexie[`${table}s`].filter(filterFunction)
+  const filteredCollection2 = conditionAdder
+    ? conditionAdder(filteredCollection1)
+    : filteredCollection1
 
   // if a url is opened, a dataset should always show
   // even if it was filtered away
@@ -53,11 +56,13 @@ const filteredObjectsFromTable = async ({
     tableIdInActiveNodeArray
       ? collection.or('id').equals(tableIdInActiveNodeArray)
       : collection
-  const filteredCollection2 = orIdInUrlAdder(filteredColection1)
-
-  const filteredCollection3 = conditionAdder
-    ? await conditionAdder(filteredCollection2)
-    : filteredCollection2
+  const filteredCollection3 = orIdInUrlAdder(filteredCollection2)
+  // console.log('filteredObjectsFromTable', {
+  //   filteredCollection3,
+  //   filteredCollection1,
+  //   filteredCollection2,
+  //   conditionAdder,
+  // })
 
   return count
     ? await filteredCollection3.count()

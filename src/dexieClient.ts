@@ -345,7 +345,9 @@ export class Sammlung implements ISammlung {
 
   async labelUnderHerkunft() {
     const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-    const ae_art = art ? await dexie.ae_arts.get(art.ae_art_id) : undefined
+    const ae_art = art?.ae_art_id
+      ? await dexie.ae_arts.get(art.ae_art_id)
+      : undefined
     const person = this.person_id
       ? await dexie.persons.get(this.person_id)
       : undefined
