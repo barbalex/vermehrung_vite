@@ -1206,50 +1206,46 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const kulturIndex = kulturNodes.findIndex((a) => a.id === kulturId)
 
         // 2.1 kultur > teilkultur
-        // let kulturOption
-        // try {
-        //   kulturOption = await kultur.kultur_option.fetch()
-        // } catch {}
-        // if (kulturOption?.tk) {
-        //   const kulturTeilkulturQuery = kultur.teilkulturs.extend(
-        //     ...tableFilter({ store, table: 'teilkultur' }),
-        //   )
-        //   const kulturTeilkulturCount = await kulturTeilkulturQuery.fetchCount()
-        //   kulturTeilkulturFolderNodes.push(
-        //     buildKulturTeilkulturFolder({
-        //       count: kulturTeilkulturCount,
-        //       kulturIndex,
-        //       kulturId,
-        //     }),
-        //   )
+        const kulturOption = await dexie.kultur_options.get(kultur.id)
+        if (kulturOption?.tk) {
+          const kulturTeilkulturCollection = dexie.teilkulturs
+            .where({ kultur_id: kultur.id })
+            .filter((value) =>
+              totalFilter({ value, store, table: 'teilkultur' }),
+            )
+          const kulturTeilkulturCount = await kulturTeilkulturCollection.count()
+          kulturTeilkulturFolderNodes.push(
+            buildKulturTeilkulturFolder({
+              count: kulturTeilkulturCount,
+              kulturIndex,
+              kulturId,
+            }),
+          )
 
-        //   const kulturTeilkulturFolderIsOpen = openNodes.some(
-        //     (n) =>
-        //       n.length === 4 &&
-        //       n[1] === 'Kulturen' &&
-        //       n[2] === kulturId &&
-        //       n[3] === 'Teilkulturen',
-        //   )
-        //   if (kulturTeilkulturFolderIsOpen) {
-        //     let teilkulturs
-        //     try {
-        //       teilkulturs = await kulturTeilkulturQuery.fetch()
-        //     } catch {}
-        //     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
-        //     const newKulturTeilkulturNodes = teilkultursSorted.map(
-        //       (teilkultur, teilkulturIndex) =>
-        //         buildKulturTeilkultur({
-        //           teilkultur,
-        //           teilkulturIndex,
-        //           kulturId,
-        //           kulturIndex,
-        //         }),
-        //     )
-        //     kulturTeilkulturNodes.push(...newKulturTeilkulturNodes)
-        //   }
-        // }
+          const kulturTeilkulturFolderIsOpen = openNodes.some(
+            (n) =>
+              n.length === 4 &&
+              n[1] === 'Kulturen' &&
+              n[2] === kulturId &&
+              n[3] === 'Teilkulturen',
+          )
+          if (kulturTeilkulturFolderIsOpen) {
+            const teilkulturs = await kulturTeilkulturCollection.toArray()
+            const teilkultursSorted = teilkulturs.sort(teilkulturSort)
+            const newKulturTeilkulturNodes = teilkultursSorted.map(
+              (teilkultur, teilkulturIndex) =>
+                buildKulturTeilkultur({
+                  teilkultur,
+                  teilkulturIndex,
+                  kulturId,
+                  kulturIndex,
+                }),
+            )
+            kulturTeilkulturNodes.push(...newKulturTeilkulturNodes)
+          }
+        }
 
-        // // 2.1 kultur > zaehlung
+        // 2.1 kultur > zaehlung
         // const kulturZaehlungQuery = kultur.zaehlungs.extend(
         //   ...tableFilter({ store, table: 'zaehlung' }),
         // )
