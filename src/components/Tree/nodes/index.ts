@@ -1351,41 +1351,38 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
           kulturAuslieferungNodes.push(...newKulturAuslieferungNodes)
         }
 
-        // // kultur > event
-        // const kulturEventQuery = kultur.events.extend(
-        //   ...tableFilter({ store, table: 'event' }),
-        // )
-        // const kulturEventCount = await kulturEventQuery.fetchCount()
-        // kulturEventFolderNodes.push(
-        //   buildKulturEventFolder({
-        //     count: kulturEventCount,
-        //     kulturIndex,
-        //     kulturId,
-        //   }),
-        // )
-        // const kulturEventFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Kulturen' &&
-        //     n[2] === kulturId &&
-        //     n[3] === 'Events',
-        // )
-        // if (kulturEventFolderIsOpen) {
-        //   let events = []
-        //   try {
-        //     events = await kulturEventQuery.fetch()
-        //   } catch {}
-        //   const eventsSorted = events.sort(eventSort)
-        //   const newKulturEventNodes = eventsSorted.map((event, eventIndex) =>
-        //     buildKulturEvent({
-        //       event,
-        //       eventIndex,
-        //       kulturId,
-        //       kulturIndex,
-        //     }),
-        //   )
-        //   kulturEventNodes.push(...newKulturEventNodes)
-        // }
+        // kultur > event
+        const kulturEventCollection = dexie.events
+          .where({ kultur_id: kultur.id })
+          .filter((value) => totalFilter({ value, store, table: 'event' }))
+        const kulturEventCount = await kulturEventCollection.count()
+        kulturEventFolderNodes.push(
+          buildKulturEventFolder({
+            count: kulturEventCount,
+            kulturIndex,
+            kulturId,
+          }),
+        )
+        const kulturEventFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Kulturen' &&
+            n[2] === kulturId &&
+            n[3] === 'Events',
+        )
+        if (kulturEventFolderIsOpen) {
+          const events = await kulturEventCollection.toArray()
+          const eventsSorted = events.sort(eventSort)
+          const newKulturEventNodes = eventsSorted.map((event, eventIndex) =>
+            buildKulturEvent({
+              event,
+              eventIndex,
+              kulturId,
+              kulturIndex,
+            }),
+          )
+          kulturEventNodes.push(...newKulturEventNodes)
+        }
       }
     }
   }
