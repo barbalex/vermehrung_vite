@@ -7,6 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const TeilkulturFormTitleChooser = ({
   row,
@@ -17,26 +18,24 @@ const TeilkulturFormTitleChooser = ({
   const store = useContext(StoreContext)
   const { kulturIdInActiveNodeArray } = store
 
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
-  }
-
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.teilkulturs
-        .filter((value) =>
-          totalFilter({ value, store, table: 'teilkultur', conditionAdder }),
-        )
-        .count(),
-    [
-      kulturIdInActiveNodeArray,
-      // need to rerender if any of the values of sammlungFilter changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      ...Object.values(store.filter.teilkultur),
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
       store,
-    ],
-  )
+      table: 'teilkultur',
+    })
+
+    return await dexie.teilkulturs
+      .filter((value) =>
+        totalFilter({ value, store, table: 'teilkultur', conditionAdder }),
+      )
+      .count()
+  }, [
+    kulturIdInActiveNodeArray,
+    // need to rerender if any of the values of sammlungFilter changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ...Object.values(store.filter.teilkultur),
+    store,
+  ])
 
   const filteredCount = store.teilkultursFilteredCount ?? '...'
 

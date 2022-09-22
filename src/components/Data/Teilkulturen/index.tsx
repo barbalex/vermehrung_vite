@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Teilkultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -56,12 +57,11 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
   const { insertTeilkulturRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
-  let conditionAdder
-  if (kulturIdInActiveNodeArray) {
-    conditionAdder = (c) => c.kultur_id === kulturIdInActiveNodeArray
-  }
-
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'teilkultur',
+    })
     const [teilkulturs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'teilkultur' }),
       dexie.teilkulturs
@@ -74,7 +74,11 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
     return { teilkulturs: teilkultursSorted, totalCount }
-  }, [store.filter.teilkultur, store.teilkultur_initially_queried])
+  }, [
+    store.filter.teilkultur,
+    store.teilkultur_initially_queried,
+    kulturIdInActiveNodeArray,
+  ])
 
   const teilkulturs: Teilkultur[] = data?.teilkulturs ?? []
   const totalCount = data?.totalCount

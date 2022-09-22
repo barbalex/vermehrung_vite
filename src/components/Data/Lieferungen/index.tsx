@@ -19,6 +19,7 @@ import constants from '../../../utils/constants'
 import { dexie, Lieferung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -57,17 +58,22 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   const {
     db,
     insertLieferungRev,
-    hierarchyFilterForLieferung,
-    hierarchyConditionAdderForLieferung,
+    sammlungIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+    sammelLieferungIdInActiveNodeArray,
+    kulturIdInActiveNodeArray,
   } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'lieferung',
+    })
     const [lieferungs, totalCount] = await Promise.all([
       filteredObjectsFromTable({
         store,
         table: 'lieferung',
-        conditionAdder: hierarchyConditionAdderForLieferung,
       }),
       dexie.lieferungs
         .filter((value) =>
@@ -75,7 +81,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
             value,
             store,
             table: 'lieferung',
-            conditionAdder: hierarchyFilterForLieferung,
+            conditionAdder,
           }),
         )
         .count(),
@@ -87,8 +93,10 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   }, [
     store.filter.lieferung,
     store.lieferung_initially_queried,
-    hierarchyConditionAdderForLieferung,
-    hierarchyFilterForLieferung,
+    sammlungIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+    sammelLieferungIdInActiveNodeArray,
+    kulturIdInActiveNodeArray,
   ])
 
   const lieferungs: Lieferung[] = data?.lieferungs ?? []

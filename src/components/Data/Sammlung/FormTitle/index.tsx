@@ -7,6 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const SammlungFormTitleChooser = ({
   row,
@@ -15,22 +16,34 @@ const SammlungFormTitleChooser = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { hierarchyFilterForSammlung } = store
+  const {
+    artIdInActiveNodeArray,
+    herkunftIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+  } = store
 
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.sammlungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'sammlung',
-            conditionAdder: hierarchyFilterForSammlung,
-          }),
-        )
-        .count(),
-    [hierarchyFilterForSammlung, store],
-  )
+  const totalCount = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'sammlung',
+    })
+
+    return await dexie.sammlungs
+      .filter((value) =>
+        totalFilter({
+          value,
+          store,
+          table: 'sammlung',
+          conditionAdder,
+        }),
+      )
+      .count()
+  }, [
+    store,
+    artIdInActiveNodeArray,
+    herkunftIdInActiveNodeArray,
+    personIdInActiveNodeArray,
+  ])
 
   const filteredCount = store.sammlungsFilteredCount ?? '...'
 

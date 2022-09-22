@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Zaehlung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -53,19 +54,18 @@ const FieldsContainer = styled.div`
 
 const Zaehlungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
-  const {
-    insertZaehlungRev,
-    hierarchyConditionAdderForZaehlung,
-    hierarchyFilterForZaehlung,
-  } = store
+  const { insertZaehlungRev, kulturIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyFilterForTable({
+      store,
+      table: 'zaehlung',
+    })
     const [zaehlungs, totalCount] = await Promise.all([
       filteredObjectsFromTable({
         store,
         table: 'zaehlung',
-        conditionAdder: hierarchyConditionAdderForZaehlung,
       }),
       dexie.zaehlungs
         .filter((value) =>
@@ -73,7 +73,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
             value,
             store,
             table: 'zaehlung',
-            conditionAdder: hierarchyFilterForZaehlung,
+            conditionAdder,
           }),
         )
         .count(),
@@ -85,8 +85,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   }, [
     store.filter.zaehlung,
     store.zaehlung_initially_queried,
-    hierarchyConditionAdderForZaehlung,
-    hierarchyFilterForZaehlung,
+    kulturIdInActiveNodeArray,
   ])
 
   const zaehlungs: Zaehlung[] = data?.zaehlungs ?? []
