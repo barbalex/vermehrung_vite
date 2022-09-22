@@ -1246,44 +1246,41 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 2.1 kultur > zaehlung
-        // const kulturZaehlungQuery = kultur.zaehlungs.extend(
-        //   ...tableFilter({ store, table: 'zaehlung' }),
-        // )
-        // const kulturZaehlungCount = await kulturZaehlungQuery.fetchCount()
-        // kulturZaehlungFolderNodes.push(
-        //   buildKulturZaehlungFolder({
-        //     count: kulturZaehlungCount,
-        //     kulturIndex,
-        //     kulturId,
-        //   }),
-        // )
+        const kulturZaehlungCollection = dexie.zaehlungs
+          .where({ kultur_id: kultur.id })
+          .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
+        const kulturZaehlungCount = await kulturZaehlungCollection.count()
+        kulturZaehlungFolderNodes.push(
+          buildKulturZaehlungFolder({
+            count: kulturZaehlungCount,
+            kulturIndex,
+            kulturId,
+          }),
+        )
 
-        // const kulturZaehlungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Kulturen' &&
-        //     n[2] === kulturId &&
-        //     n[3] === 'Zaehlungen',
-        // )
-        // if (kulturZaehlungFolderIsOpen) {
-        //   let zaehlungs = []
-        //   try {
-        //     zaehlungs = await kulturZaehlungQuery.fetch()
-        //   } catch {}
-        //   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-        //   const newKulturZaehlungNodes = await Promise.all(
-        //     zaehlungsSorted.map(
-        //       async (zaehlung, zaehlungIndex) =>
-        //         await buildKulturZaehlung({
-        //           zaehlung,
-        //           zaehlungIndex,
-        //           kulturId,
-        //           kulturIndex,
-        //         }),
-        //     ),
-        //   )
-        //   kulturZaehlungNodes.push(...newKulturZaehlungNodes)
-        // }
+        const kulturZaehlungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Kulturen' &&
+            n[2] === kulturId &&
+            n[3] === 'Zaehlungen',
+        )
+        if (kulturZaehlungFolderIsOpen) {
+          const zaehlungs = await kulturZaehlungCollection.toArray()
+          const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+          const newKulturZaehlungNodes = await Promise.all(
+            zaehlungsSorted.map(
+              async (zaehlung, zaehlungIndex) =>
+                await buildKulturZaehlung({
+                  zaehlung,
+                  zaehlungIndex,
+                  kulturId,
+                  kulturIndex,
+                }),
+            ),
+          )
+          kulturZaehlungNodes.push(...newKulturZaehlungNodes)
+        }
 
         // // kultur > anlieferung
         // const kulturAnlieferungQuery = kultur.anlieferungs.extend(
