@@ -162,74 +162,193 @@ const myTypes = types
       }),
     ),
       reaction(
-        () => `${self.filter.herkunft}/${self.herkunft_initially_queried}`,
+        () =>
+          `${self.filter.herkunft}/${self.herkunft_initially_queried}${self.sammlungIdInActiveNodeArray}${self.artIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.sammlungIdInActiveNodeArray) {
+            conditionAdder = async (collection) => {
+              const activeSammlung = await dexie.sammlungs.get(
+                self.sammlungIdInActiveNodeArray,
+              )
+
+              return collection.and('id').equals(activeSammlung.herkunft_id)
+            }
+          }
+          if (self.artIdInActiveNodeArray) {
+            conditionAdder = async (collection) => {
+              const sammlungsOfArt = await dexie.sammlungs
+                .where({
+                  art_id: self.artIdInActiveNodeArray,
+                })
+                .toArray()
+              const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
+
+              return collection.and('id').anyOf(herkunftIds)
+            }
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'herkunft',
             count: true,
+            conditionAdder,
           })
           self.setHerkunftsFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.sammlung}/${self.sammlung_initially_queried}`,
+        () =>
+          `${self.filter.sammlung}/${self.sammlung_initially_queried}/${self.artIdInActiveNodeArray}/${self.herkunftIdInActiveNodeArray}/${self.personIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.artIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter((s) => s.art_id === self.artIdInActiveNodeArray)
+          }
+          if (self.herkunftIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (s) => s.herkunft_id === self.herkunftIdInActiveNodeArray,
+              )
+          }
+          if (self.personIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (s) => s.person_id === self.personIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'sammlung',
             count: true,
+            conditionAdder,
           })
           self.setSammlungsFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.garten}/${self.garten_initially_queried}`,
+        () =>
+          `${self.filter.garten}/${self.garten_initially_queried}/${self.personIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.personIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.person_id === self.personIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'garten',
             count: true,
+            conditionAdder,
           })
           self.setGartensFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.kultur}/${self.kultur_initially_queried}`,
+        () =>
+          `${self.filter.kultur}/${self.kultur_initially_queried}/${self.gartenIdInActiveNodeArray}/${self.artIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.gartenIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.garten_id === self.gartenIdInActiveNodeArray,
+              )
+          }
+          if (self.artIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter((c) => c.art_id === self.artIdInActiveNodeArray)
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'kultur',
             count: true,
+            conditionAdder,
           })
           self.setKultursFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.teilkultur}/${self.teilkultur_initially_queried}`,
+        () =>
+          `${self.filter.teilkultur}/${self.teilkultur_initially_queried}${self.kulturIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.kulturIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.kultur_id === self.kulturIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'teilkultur',
             count: true,
+            conditionAdder,
           })
           self.setTeilkultursFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.zaehlung}/${self.zaehlung_initially_queried}`,
+        () =>
+          `${self.filter.zaehlung}/${self.zaehlung_initially_queried}/${self.kulturIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.kulturIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.kultur_id === self.kulturIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'zaehlung',
             count: true,
+            conditionAdder,
           })
           self.setZaehlungsFilteredCount(count)
         }),
       ),
       reaction(
-        () => `${self.filter.lieferung}/${self.lieferung_initially_queried}`,
+        () =>
+          `${self.filter.lieferung}/${self.lieferung_initially_queried}/${self.kulturIdInActiveNodeArray}/${self.sammelLieferungIdInActiveNodeArray}/${self.personIdInActiveNodeArray}/${self.sammlungIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.kulturIdInActiveNodeArray) {
+            // this should get kulturen connected by von_kultur_id or nach_kultur_id
+            // depending on activeNodeArray[last] being 'An-Lieferung' or 'Aus-Lieferung'
+            let kulturOnField = 'von_kultur_id'
+            if (self.kulturIdInActiveNodeArray) {
+              const lastAnAElement = activeNodeArray[activeNodeArray.length - 1]
+              if (lastAnAElement === 'An-Lieferungen')
+                kulturOnField = 'nach_kultur_id'
+            }
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c[kulturOnField] === self.kulturIdInActiveNodeArray,
+              )
+          }
+          if (self.sammelLieferungIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) =>
+                  c.sammel_lieferung_id ===
+                  self.sammelLieferungIdInActiveNodeArray,
+              )
+          }
+          if (self.personIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.person_id === self.personIdInActiveNodeArray,
+              )
+          }
+          if (self.sammlungIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.von_sammlung_id === self.sammlungIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'lieferung',
@@ -251,12 +370,21 @@ const myTypes = types
         }),
       ),
       reaction(
-        () => `${self.filter.event}/${self.event_initially_queried}`,
+        () =>
+          `${self.filter.event}/${self.event_initially_queried}/${self.kulturIdInActiveNodeArray}`,
         flow(function* () {
+          let conditionAdder
+          if (self.kulturIdInActiveNodeArray) {
+            conditionAdder = (collection) =>
+              collection.filter(
+                (c) => c.kultur_id === self.kulturIdInActiveNodeArray,
+              )
+          }
           const count = yield filteredObjectsFromTable({
             store: self,
             table: 'event',
             count: true,
+            conditionAdder,
           })
           self.setEventsFilteredCount(count)
         }),

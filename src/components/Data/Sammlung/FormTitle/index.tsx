@@ -23,16 +23,14 @@ const SammlungFormTitleChooser = ({
 
   let conditionAdder
   if (artIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('art_id').equals(artIdInActiveNodeArray)
+    conditionAdder = (value) => value.art_id === artIdInActiveNodeArray
   }
   if (herkunftIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('herkunft_id').equals(herkunftIdInActiveNodeArray)
+    conditionAdder = (value) =>
+      value.herkunft_id === herkunftIdInActiveNodeArray
   }
   if (personIdInActiveNodeArray) {
-    conditionAdder = (collection) =>
-      collection.and('person_id').equals(personIdInActiveNodeArray)
+    conditionAdder = (value) => value.person_id === personIdInActiveNodeArray
   }
 
   const totalCount = useLiveQuery(
@@ -46,9 +44,6 @@ const SammlungFormTitleChooser = ({
       artIdInActiveNodeArray,
       herkunftIdInActiveNodeArray,
       personIdInActiveNodeArray,
-      // need to rerender if any of the values of sammlungFilter changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      ...Object.values(store.filter.sammlung),
       store,
     ],
   )

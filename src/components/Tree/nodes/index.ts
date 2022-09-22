@@ -1554,46 +1554,43 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const personIndex = personNodes.findIndex((a) => a.id === personId)
 
         // person > sammlung
-        // const personSammlungQuery = person.sammlungs.extend(
-        //   ...tableFilter({ store, table: 'sammlung' }),
-        // )
-        // const personSammlungCount = await personSammlungQuery.fetchCount()
-        // personSammlungFolderNodes.push(
-        //   buildPersonSammlungFolder({
-        //     count: personSammlungCount,
-        //     personIndex,
-        //     personId,
-        //   }),
-        // )
+        const personSammlungCollection = dexie.sammlungs
+          .where({ person_id: person.id })
+          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+        const personSammlungCount = await personSammlungCollection.count()
+        personSammlungFolderNodes.push(
+          buildPersonSammlungFolder({
+            count: personSammlungCount,
+            personIndex,
+            personId,
+          }),
+        )
 
-        // const personSammlungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Personen' &&
-        //     n[2] === personId &&
-        //     n[3] === 'Sammlungen',
-        // )
-        // if (personSammlungFolderIsOpen) {
-        //   let sammlungs = []
-        //   try {
-        //     sammlungs = await personSammlungQuery.fetch()
-        //   } catch {}
-        //   const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
-        //   const newPersonSammlungNodes = await Promise.all(
-        //     sammlungsSorted.map(
-        //       async (sammlung, index) =>
-        //         await buildPersonSammlung({
-        //           sammlung,
-        //           index,
-        //           personId,
-        //           personIndex,
-        //         }),
-        //     ),
-        //   )
-        //   personSammlungNodes.push(...newPersonSammlungNodes)
-        // }
+        const personSammlungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Personen' &&
+            n[2] === personId &&
+            n[3] === 'Sammlungen',
+        )
+        if (personSammlungFolderIsOpen) {
+          const sammlungs = await personSammlungCollection.toArray()
+          const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
+          const newPersonSammlungNodes = await Promise.all(
+            sammlungsSorted.map(
+              async (sammlung, index) =>
+                await buildPersonSammlung({
+                  sammlung,
+                  index,
+                  personId,
+                  personIndex,
+                }),
+            ),
+          )
+          personSammlungNodes.push(...newPersonSammlungNodes)
+        }
 
-        // // person > garten
+        // person > garten
         // const personGartenQuery = person.gartens.extend(
         //   ...tableFilter({ store, table: 'garten' }),
         // )
