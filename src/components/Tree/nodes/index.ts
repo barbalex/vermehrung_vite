@@ -1965,42 +1965,39 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
           }
         }
 
-        // // person > lieferung
-        // const personLieferungQuery = person.lieferungs.extend(
-        //   ...tableFilter({ store, table: 'lieferung' }),
-        // )
-        // const personLieferungCount = await personLieferungQuery.fetchCount()
-        // personLieferungFolderNodes.push(
-        //   buildPersonLieferungFolder({
-        //     count: personLieferungCount,
-        //     personIndex,
-        //     personId,
-        //   }),
-        // )
-        // const personLieferungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Personen' &&
-        //     n[2] === personId &&
-        //     n[3] === 'Lieferungen',
-        // )
-        // if (personLieferungFolderIsOpen) {
-        //   let lieferungs = []
-        //   try {
-        //     lieferungs = await personLieferungQuery.fetch()
-        //   } catch {}
-        //   const lieferungsSorted = lieferungs.sort(lieferungSort)
-        //   const newPersonLieferungNodes = lieferungsSorted.map(
-        //     (lieferung, index) =>
-        //       buildPersonLieferung({
-        //         lieferung,
-        //         index,
-        //         personId,
-        //         personIndex,
-        //       }),
-        //   )
-        //   personLieferungNodes.push(...newPersonLieferungNodes)
-        // }
+        // person > lieferung
+        const personLieferungCollection = dexie.lieferungs
+          .where({ person_id: person.id })
+          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        const personLieferungCount = await personLieferungCollection.count()
+        personLieferungFolderNodes.push(
+          buildPersonLieferungFolder({
+            count: personLieferungCount,
+            personIndex,
+            personId,
+          }),
+        )
+        const personLieferungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Personen' &&
+            n[2] === personId &&
+            n[3] === 'Lieferungen',
+        )
+        if (personLieferungFolderIsOpen) {
+          const lieferungs = await personLieferungCollection.toArray()
+          const lieferungsSorted = lieferungs.sort(lieferungSort)
+          const newPersonLieferungNodes = lieferungsSorted.map(
+            (lieferung, index) =>
+              buildPersonLieferung({
+                lieferung,
+                index,
+                personId,
+                personIndex,
+              }),
+          )
+          personLieferungNodes.push(...newPersonLieferungNodes)
+        }
       }
     }
   }
