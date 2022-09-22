@@ -1910,57 +1910,56 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                   )
                 }
 
-                // // event nodes
-                // const eventQuery = kultur.events.extend(
-                //   ...tableFilter({ store, table: 'event' }),
-                // )
-                // const eventCount = await eventQuery.fetchCount()
-                // personGartenKulturEventFolderNodes.push(
-                //   buildPersonGartenKulturEventFolder({
-                //     kulturId,
-                //     kulturIndex,
-                //     gartenId,
-                //     gartenIndex,
-                //     personId,
-                //     personIndex,
-                //     count: eventCount,
-                //   }),
-                // )
-                // const personGartenKulturEventFolderIsOpen = openNodes.some(
-                //   (n) =>
-                //     n.length === 8 &&
-                //     n[1] === 'Personen' &&
-                //     n[2] === personId &&
-                //     n[3] === 'Gaerten' &&
-                //     n[4] === gartenId &&
-                //     n[5] === 'Kulturen' &&
-                //     n[6] === kulturId &&
-                //     n[7] === 'Events',
-                // )
+                // event nodes
+                const eventCollection = dexie.events
+                  .where({ kultur_id: kultur.id })
+                  .filter((value) =>
+                    totalFilter({ value, store, table: 'event' }),
+                  )
+                const eventCount = await eventCollection.count()
+                personGartenKulturEventFolderNodes.push(
+                  buildPersonGartenKulturEventFolder({
+                    kulturId,
+                    kulturIndex,
+                    gartenId,
+                    gartenIndex,
+                    personId,
+                    personIndex,
+                    count: eventCount,
+                  }),
+                )
+                const personGartenKulturEventFolderIsOpen = openNodes.some(
+                  (n) =>
+                    n.length === 8 &&
+                    n[1] === 'Personen' &&
+                    n[2] === personId &&
+                    n[3] === 'Gaerten' &&
+                    n[4] === gartenId &&
+                    n[5] === 'Kulturen' &&
+                    n[6] === kulturId &&
+                    n[7] === 'Events',
+                )
 
-                // if (personGartenKulturEventFolderIsOpen) {
-                //   let events = []
-                //   try {
-                //     events = await eventQuery.fetch()
-                //   } catch {}
-                //   const eventsSorted = events.sort(eventSort)
-                //   const newPersonGartenKulturEventNodes = eventsSorted.map(
-                //     (event, eventIndex) =>
-                //       buildPersonGartenKulturEvent({
-                //         event,
-                //         eventIndex,
-                //         kulturId,
-                //         kulturIndex,
-                //         gartenId,
-                //         gartenIndex,
-                //         personId,
-                //         personIndex,
-                //       }),
-                //   )
-                //   personGartenKulturEventNodes.push(
-                //     ...newPersonGartenKulturEventNodes,
-                //   )
-                // }
+                if (personGartenKulturEventFolderIsOpen) {
+                  const events = await eventCollection.toArray()
+                  const eventsSorted = events.sort(eventSort)
+                  const newPersonGartenKulturEventNodes = eventsSorted.map(
+                    (event, eventIndex) =>
+                      buildPersonGartenKulturEvent({
+                        event,
+                        eventIndex,
+                        kulturId,
+                        kulturIndex,
+                        gartenId,
+                        gartenIndex,
+                        personId,
+                        personIndex,
+                      }),
+                  )
+                  personGartenKulturEventNodes.push(
+                    ...newPersonGartenKulturEventNodes,
+                  )
+                }
               }
             }
           }
