@@ -815,71 +815,68 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammlung > herkunft
-        // const sammlungHerkunftQuery = sammlung.herkunft
-        // let herkunft
-        // try {
-        //   herkunft = await sammlungHerkunftQuery.fetch()
-        // } catch {}
-        // sammlungHerkunftFolderNodes.push(
-        //   buildSammlungHerkunftFolder({
-        //     count: [herkunft].length,
-        //     sammlungIndex,
-        //     sammlungId,
-        //   }),
-        // )
-        // const sammlungHerkunftFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Sammlungen' &&
-        //     n[2] === sammlungId &&
-        //     n[3] === 'Herkuenfte',
-        // )
-        // if (sammlungHerkunftFolderIsOpen) {
-        //   sammlungHerkunftNodes.push(
-        //     buildSammlungHerkunft({
-        //       herkunft,
-        //       sammlungId,
-        //       sammlungIndex,
-        //     }),
-        //   )
-        // }
+        const sammlungHerkunftQuery = sammlung.herkunft
+        let herkunft
+        try {
+          herkunft = await sammlungHerkunftQuery.fetch()
+        } catch {}
+        sammlungHerkunftFolderNodes.push(
+          buildSammlungHerkunftFolder({
+            count: [herkunft].length,
+            sammlungIndex,
+            sammlungId,
+          }),
+        )
+        const sammlungHerkunftFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Sammlungen' &&
+            n[2] === sammlungId &&
+            n[3] === 'Herkuenfte',
+        )
+        if (sammlungHerkunftFolderIsOpen) {
+          sammlungHerkunftNodes.push(
+            buildSammlungHerkunft({
+              herkunft,
+              sammlungId,
+              sammlungIndex,
+            }),
+          )
+        }
 
-        // // 2.1 sammlung > auslieferung
-        // const sammlungLieferungQuery = sammlung.lieferungs.extend(
-        //   ...tableFilter({ store, table: 'lieferung' }),
-        // )
-        // const sammlungLieferungCount = await sammlungLieferungQuery.fetchCount()
-        // sammlungAuslieferungFolderNodes.push(
-        //   buildSammlungAuslieferungFolder({
-        //     count: sammlungLieferungCount,
-        //     sammlungIndex,
-        //     sammlungId,
-        //   }),
-        // )
-        // const sammlungAuslieferungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Sammlungen' &&
-        //     n[2] === sammlungId &&
-        //     n[3] === 'Aus-Lieferungen',
-        // )
-        // if (sammlungAuslieferungFolderIsOpen) {
-        //   let lieferungs = []
-        //   try {
-        //     lieferungs = await sammlungLieferungQuery.fetch()
-        //   } catch {}
-        //   const lieferungsSorted = lieferungs.sort(lieferungSort)
-        //   const newSammlungAuslieferungNodes = lieferungsSorted.map(
-        //     (lieferung, lieferungIndex) =>
-        //       buildSammlungAuslieferung({
-        //         lieferung,
-        //         lieferungIndex,
-        //         sammlungId,
-        //         sammlungIndex,
-        //       }),
-        //   )
-        //   sammlungAuslieferungNodes.push(...newSammlungAuslieferungNodes)
-        // }
+        // 2.1 sammlung > auslieferung
+        const sammlungLieferungCollection = dexie.lieferungs
+          .where({ von_sammlung_id: sammlung.id })
+          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        const sammlungLieferungCount = await sammlungLieferungCollection.count()
+        sammlungAuslieferungFolderNodes.push(
+          buildSammlungAuslieferungFolder({
+            count: sammlungLieferungCount,
+            sammlungIndex,
+            sammlungId,
+          }),
+        )
+        const sammlungAuslieferungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Sammlungen' &&
+            n[2] === sammlungId &&
+            n[3] === 'Aus-Lieferungen',
+        )
+        if (sammlungAuslieferungFolderIsOpen) {
+          const lieferungs = await sammlungLieferungCollection.toArray()
+          const lieferungsSorted = lieferungs.sort(lieferungSort)
+          const newSammlungAuslieferungNodes = lieferungsSorted.map(
+            (lieferung, lieferungIndex) =>
+              buildSammlungAuslieferung({
+                lieferung,
+                lieferungIndex,
+                sammlungId,
+                sammlungIndex,
+              }),
+          )
+          sammlungAuslieferungNodes.push(...newSammlungAuslieferungNodes)
+        }
       }
     }
   }
