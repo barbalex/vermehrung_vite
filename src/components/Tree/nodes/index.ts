@@ -1317,42 +1317,39 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // // kultur > auslieferung
-        // const kulturAuslieferungQuery = kultur.auslieferungs.extend(
-        //   ...tableFilter({ store, table: 'lieferung' }),
-        // )
-        // const kulturAuslieferungCount =
-        //   await kulturAuslieferungQuery.fetchCount()
-        // kulturAuslieferungFolderNodes.push(
-        //   buildKulturAuslieferungFolder({
-        //     count: kulturAuslieferungCount,
-        //     kulturIndex,
-        //     kulturId,
-        //   }),
-        // )
-        // const kulturAuslieferungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Kulturen' &&
-        //     n[2] === kulturId &&
-        //     n[3] === 'Aus-Lieferungen',
-        // )
-        // if (kulturAuslieferungFolderIsOpen) {
-        //   let auslieferungs = []
-        //   try {
-        //     auslieferungs = await kulturAuslieferungQuery.fetch()
-        //   } catch {}
-        //   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-        //   const newKulturAuslieferungNodes = auslieferungsSorted.map(
-        //     (lieferung, lieferungIndex) =>
-        //       buildKulturAuslieferung({
-        //         lieferung,
-        //         lieferungIndex,
-        //         kulturId,
-        //         kulturIndex,
-        //       }),
-        //   )
-        //   kulturAuslieferungNodes.push(...newKulturAuslieferungNodes)
-        // }
+        const kulturAuslieferungCollection = dexie.lieferungs
+          .where({ von_kultur_id: kultur.id })
+          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        const kulturAuslieferungCount =
+          await kulturAuslieferungCollection.count()
+        kulturAuslieferungFolderNodes.push(
+          buildKulturAuslieferungFolder({
+            count: kulturAuslieferungCount,
+            kulturIndex,
+            kulturId,
+          }),
+        )
+        const kulturAuslieferungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Kulturen' &&
+            n[2] === kulturId &&
+            n[3] === 'Aus-Lieferungen',
+        )
+        if (kulturAuslieferungFolderIsOpen) {
+          const auslieferungs = await kulturAuslieferungCollection.toArray()
+          const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+          const newKulturAuslieferungNodes = auslieferungsSorted.map(
+            (lieferung, lieferungIndex) =>
+              buildKulturAuslieferung({
+                lieferung,
+                lieferungIndex,
+                kulturId,
+                kulturIndex,
+              }),
+          )
+          kulturAuslieferungNodes.push(...newKulturAuslieferungNodes)
+        }
 
         // // kultur > event
         // const kulturEventQuery = kultur.events.extend(
