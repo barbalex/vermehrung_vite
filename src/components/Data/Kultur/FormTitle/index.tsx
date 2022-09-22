@@ -19,11 +19,11 @@ const KulturFormTitleChooser = ({
 
   let conditionAdder
   if (gartenIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('garten_id').equals(gartenIdInActiveNodeArray)
   }
   if (artIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('art_id').equals(artIdInActiveNodeArray)
   }
 

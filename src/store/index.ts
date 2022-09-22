@@ -148,6 +148,7 @@ const myTypes = types
      * Reason: reduce computation
      * TODO: only re-calculate when data is shown according to person_options?
      * For instance: person_options.tree_lieferung
+     * TODO: conditionAdder?
      */
     reaction(
       () => `${self.filter.art}/${self.art_initially_queried}`,

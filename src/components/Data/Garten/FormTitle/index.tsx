@@ -6,7 +6,7 @@ import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'  
+import totalFilter from '../../../../utils/totalFilter'
 
 const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
@@ -14,7 +14,7 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
 
   let conditionAdder
   if (personIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('person_id').equals(personIdInActiveNodeArray)
   }
 

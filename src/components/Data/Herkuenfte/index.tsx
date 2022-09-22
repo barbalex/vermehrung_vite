@@ -71,6 +71,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
       const activeSammlung = await dexie.sammlungs.get(
         sammlungIdInActiveNodeArray,
       )
+
       return collection.and('id').equals(activeSammlung.herkunft_id)
     }
   }
@@ -82,6 +83,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
         })
         .toArray()
       const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
+
       return collection.and('id').anyOf(herkunftIds)
     }
   }
@@ -90,7 +92,9 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     const [herkunfts, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'herkunft', conditionAdder }),
       dexie.herkunfts
-        .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+        .filter((value) =>
+          totalFilter({ value, store, table: 'herkunft', conditionAdder }),
+        )
         .count(),
     ])
 

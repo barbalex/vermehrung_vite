@@ -59,17 +59,17 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
 
   let conditionAdder
   if (gartenIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
-      collection.and('garten_id').equals(gartenIdInActiveNodeArray)
+    conditionAdder = (collection) =>
+      collection.filter((c) => c.garten_id === gartenIdInActiveNodeArray)
   }
   if (artIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
-      collection.and('art_id').equals(artIdInActiveNodeArray)
+    conditionAdder = (collection) =>
+      collection.filter((c) => c.art_id === artIdInActiveNodeArray)
   }
 
   const data = useLiveQuery(async () => {
     const [kulturs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'kultur' }),
+      filteredObjectsFromTable({ store, table: 'kultur', conditionAdder }),
       dexie.kulturs
         .filter((value) =>
           totalFilter({ value, store, table: 'kultur', conditionAdder }),

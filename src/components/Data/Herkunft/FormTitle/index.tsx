@@ -25,6 +25,7 @@ const HerkunftFormTitleChooser = ({
       const activeSammlung = await dexie.sammlungs.get(
         sammlungIdInActiveNodeArray,
       )
+
       return collection.and('id').equals(activeSammlung.herkunft_id)
     }
   }
@@ -36,6 +37,7 @@ const HerkunftFormTitleChooser = ({
         })
         .toArray()
       const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
+
       return collection.and('id').anyOf(herkunftIds)
     }
   }

@@ -23,15 +23,15 @@ const SammlungFormTitleChooser = ({
 
   let conditionAdder
   if (artIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('art_id').equals(artIdInActiveNodeArray)
   }
   if (herkunftIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('herkunft_id').equals(herkunftIdInActiveNodeArray)
   }
   if (personIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('person_id').equals(personIdInActiveNodeArray)
   }
 

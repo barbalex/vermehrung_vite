@@ -6,7 +6,7 @@ import StoreContext from '../../../../../storeContext'
 import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter' 
+import totalFilter from '../../../../../utils/totalFilter'
 
 const LieferungTitleChooser = ({
   row,
@@ -29,25 +29,25 @@ const LieferungTitleChooser = ({
     kulturIdInActiveNodeArray &&
     activeNodeArray.includes('Aus-Lieferungen')
   ) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('von_kultur_id').equals(kulturIdInActiveNodeArray)
   }
   if (kulturIdInActiveNodeArray && activeNodeArray.includes('An-Lieferungen')) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('nach_kultur_id').equals(kulturIdInActiveNodeArray)
   }
   if (sammelLieferungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection
         .and('sammel_lieferung_id')
         .equals(sammelLieferungIdInActiveNodeArray)
   }
   if (personIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('person_id').equals(personIdInActiveNodeArray)
   }
   if (sammlungIdInActiveNodeArray && !kulturIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('von_sammlung_id').equals(sammlungIdInActiveNodeArray)
   }
 

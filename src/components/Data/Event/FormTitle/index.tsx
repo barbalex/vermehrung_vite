@@ -14,7 +14,7 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
 
   let conditionAdder
   if (kulturIdInActiveNodeArray) {
-    conditionAdder = async (collection) =>
+    conditionAdder = (collection) =>
       collection.and('kultur_id').equals(kulturIdInActiveNodeArray)
   }
 
