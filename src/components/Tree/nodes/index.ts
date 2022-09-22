@@ -1476,41 +1476,39 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammelLieferung > lieferung
-        // let lieferungs = []
-        // try {
-        //   lieferungs = await sammelLieferung.lieferungs
-        //     .extend(...tableFilter({ store, table: 'lieferung' }))
-        //     .fetch()
-        // } catch {}
-        // const lieferungsSorted = lieferungs.sort(lieferungSort)
-        // sammelLieferungLieferungFolderNodes.push(
-        //   buildSammelLieferungLieferungFolder({
-        //     children: lieferungsSorted,
-        //     sammelLieferungIndex,
-        //     sammelLieferungId,
-        //   }),
-        // )
-        // const sammelLieferungLieferungFolderIsOpen = openNodes.some(
-        //   (n) =>
-        //     n.length === 4 &&
-        //     n[1] === 'Sammel-Lieferungen' &&
-        //     n[2] === sammelLieferungId &&
-        //     n[3] === 'Lieferungen',
-        // )
-        // if (sammelLieferungLieferungFolderIsOpen) {
-        //   const newSammelLieferungLieferungNodes = lieferungsSorted.map(
-        //     (lieferung, lieferungIndex) =>
-        //       buildSammelLieferungLieferung({
-        //         lieferung,
-        //         lieferungIndex,
-        //         sammelLieferungId,
-        //         sammelLieferungIndex,
-        //       }),
-        //   )
-        //   sammelLieferungLieferungNodes.push(
-        //     ...newSammelLieferungLieferungNodes,
-        //   )
-        // }
+        const lieferungs = await dexie.lieferungs
+          .where({ sammel_lieferung_id: sammelLieferung.id })
+          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+          .toArray()
+        const lieferungsSorted = lieferungs.sort(lieferungSort)
+        sammelLieferungLieferungFolderNodes.push(
+          buildSammelLieferungLieferungFolder({
+            children: lieferungsSorted,
+            sammelLieferungIndex,
+            sammelLieferungId,
+          }),
+        )
+        const sammelLieferungLieferungFolderIsOpen = openNodes.some(
+          (n) =>
+            n.length === 4 &&
+            n[1] === 'Sammel-Lieferungen' &&
+            n[2] === sammelLieferungId &&
+            n[3] === 'Lieferungen',
+        )
+        if (sammelLieferungLieferungFolderIsOpen) {
+          const newSammelLieferungLieferungNodes = lieferungsSorted.map(
+            (lieferung, lieferungIndex) =>
+              buildSammelLieferungLieferung({
+                lieferung,
+                lieferungIndex,
+                sammelLieferungId,
+                sammelLieferungIndex,
+              }),
+          )
+          sammelLieferungLieferungNodes.push(
+            ...newSammelLieferungLieferungNodes,
+          )
+        }
       }
     }
   }
