@@ -1005,52 +1005,47 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // garten > kultur > zaehlung
-            // let zaehlungs = []
-            // try {
-            //   zaehlungs = await kultur.zaehlungs
-            //     .extend(
-            //       ...tableFilter({
-            //         table: 'zaehlung',
-            //         store,
-            //       }),
-            //     )
-            //     .fetch()
-            // } catch {}
-            // gartenKulturZaehlungFolderNodes.push(
-            //   buildGartenKulturZaehlungFolder({
-            //     kulturId,
-            //     kulturIndex,
-            //     gartenId,
-            //     gartenIndex,
-            //     children: zaehlungs,
-            //   }),
-            // )
-            // const gartenKulturZaehlungFolderIsOpen = openNodes.some(
-            //   (n) =>
-            //     n.length === 6 &&
-            //     n[1] === 'Gaerten' &&
-            //     n[2] === gartenId &&
-            //     n[3] === 'Kulturen' &&
-            //     n[4] === kulturId &&
-            //     n[5] === 'Zaehlungen',
-            // )
-            // if (gartenKulturZaehlungFolderIsOpen) {
-            //   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
-            //   const newGartenKulturZaehlungNodes = await Promise.all(
-            //     zaehlungsSorted.map(
-            //       async (zaehlung, zaehlungIndex) =>
-            //         await buildGartenKulturZaehlung({
-            //           zaehlung,
-            //           zaehlungIndex,
-            //           kulturId,
-            //           kulturIndex,
-            //           gartenId,
-            //           gartenIndex,
-            //         }),
-            //     ),
-            //   )
-            //   gartenKulturZaehlungNodes.push(...newGartenKulturZaehlungNodes)
-            // }
+            const zaehlungs = await dexie.zaehlungs
+              .where({ kultur_id: kultur.id })
+              .filter((value) =>
+                totalFilter({ value, store, table: 'zaehlung' }),
+              )
+              .toArray()
+            gartenKulturZaehlungFolderNodes.push(
+              buildGartenKulturZaehlungFolder({
+                kulturId,
+                kulturIndex,
+                gartenId,
+                gartenIndex,
+                children: zaehlungs,
+              }),
+            )
+            const gartenKulturZaehlungFolderIsOpen = openNodes.some(
+              (n) =>
+                n.length === 6 &&
+                n[1] === 'Gaerten' &&
+                n[2] === gartenId &&
+                n[3] === 'Kulturen' &&
+                n[4] === kulturId &&
+                n[5] === 'Zaehlungen',
+            )
+            if (gartenKulturZaehlungFolderIsOpen) {
+              const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+              const newGartenKulturZaehlungNodes = await Promise.all(
+                zaehlungsSorted.map(
+                  async (zaehlung, zaehlungIndex) =>
+                    await buildGartenKulturZaehlung({
+                      zaehlung,
+                      zaehlungIndex,
+                      kulturId,
+                      kulturIndex,
+                      gartenId,
+                      gartenIndex,
+                    }),
+                ),
+              )
+              gartenKulturZaehlungNodes.push(...newGartenKulturZaehlungNodes)
+            }
 
             // // garten > kultur > anlieferung
             // let anlieferungs = []
