@@ -83,13 +83,7 @@ const Vermehrung = () => {
     user,
     online,
   } = store
-  const {
-    setActiveNodeArray,
-    setLastTouchedNode,
-    setOpenNodes,
-    widthInPercentOfScreen,
-    wsReconnectCount,
-  } = store.tree
+  const { setOpenNodes, widthInPercentOfScreen, wsReconnectCount } = store.tree
 
   const existsUser = !!user?.uid
   const showFilter = store.filter.show
@@ -111,20 +105,7 @@ const Vermehrung = () => {
   // as openNodes is overwritten every time activeNodeArray changes
   useEffect(() => {
     setOpenNodes(openNodesFromActiveNodeArray(activeNodeArray))
-    // set last touched node in case project is directly opened on it
-    setLastTouchedNode(activeNodeArray)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // TODO: test if necessary
-  // useEffect(() => {
-  //   // user pushed back button > update activeNodeArray
-  //   console.log(
-  //     'Vermehrung, effect setting activeNodeArray with nonavigate (user pushed back button) to:',
-  //     activeNodeArray,
-  //   )
-
-  //   setActiveNodeArray(activeNodeArray, 'nonavigate')
-  // }, [activeNodeArray, pathname, setActiveNodeArray])
 
   useEffect(() => {
     // console.log('vermehrung, subscription effect: authorizing:', authorizing)
@@ -230,8 +211,8 @@ const Vermehrung = () => {
           </ErrorBoundary>
           <ErrorBoundary>
             <Data />
+            {/* {showFilter ? <Filter /> : <Data />} */}
           </ErrorBoundary>
-          {/* {showFilter ? <Filter /> : <Data />} */}
         </StyledSplitPane>
       </Container>
       <ApiDetector />

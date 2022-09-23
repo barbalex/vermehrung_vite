@@ -14,7 +14,13 @@ const NavigationSyncController = () => {
 
   const store = useContext(storeContext)
   const { setNavigate } = store
-  const { setActiveNodeArray, addNode, activeNodeArray } = store.tree
+  const {
+    setActiveNodeArray,
+    addNode,
+    activeNodeArray: aNARaw,
+    setLastTouchedNode,
+  } = store.tree
+  const aNA = aNARaw.slice()
 
   // enable navigating in store > set this as store value
   // (can't be passed when creating store yet)
@@ -23,15 +29,19 @@ const NavigationSyncController = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // when user clicks back or foward button, need to set lastTouchedNode
+  useEffect(() => {
+    window.onpopstate = () => {
+      setLastTouchedNode(getActiveNodeArrayFromUrl(pathname))
+    }
+    // do not need to remove, see: https://stackoverflow.com/a/47997544/712005
+  }, [pathname, setLastTouchedNode])
+
   // need to update activeNodeArray on every navigation
   useEffect(() => {
     const activeNodeArrayFromUrl = getActiveNodeArrayFromUrl(pathname)
-    // console.log('NavigationSyncController, setting activeNodeArray to', {
-    //   activeNodeArrayFromUrl: activeNodeArrayFromUrl,
-    //   activeNodeArrayFromStore: activeNodeArray?.slice(),
-    // })
 
-    if (!isEqual(activeNodeArrayFromUrl, activeNodeArray?.slice())) {
+    if (!isEqual(activeNodeArrayFromUrl, aNA)) {
       console.log(
         'NavigationSyncController, setting activeNodeArray to',
         activeNodeArrayFromUrl,
@@ -41,12 +51,12 @@ const NavigationSyncController = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [pathname, setActiveNodeArray, activeNodeArray])
 
-  // useEffect(() => {
-  //   console.log('NavigationSyncController, pathname changed to:', pathname)
-  // }, [pathname])
+  // setting last touched node on every change of activeNodeArray
+  // to ensure tree follows navigation in form lists
+  useEffect(() => {
+    setLastTouchedNode(aNA)
+  }, [aNA, setLastTouchedNode])
 
   return null
 }
