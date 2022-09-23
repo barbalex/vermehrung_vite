@@ -1,11 +1,11 @@
-import React, { useCallback, useContext, useState, useEffect } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
 import Checkbox from '@mui/material/Checkbox'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../../storeContext'
+import { dexie } from '../../../../../../dexieClient'
 
 const Row = styled.div`
   display: flex;
@@ -29,31 +29,23 @@ const Beschreibung = styled.div`
 
 const ChooseArtQkRow = ({ qk }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    userPersonOption,
-    artQkChoosen: [],
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['art_qk_choosen'])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(([userPersonOptions]) =>
-      setDataState({
-        userPersonOption: userPersonOptions?.[0],
-        artQkChoosen: userPersonOptions?.[0]?.art_qk_choosen ?? [],
-      }),
-    )
+  const data = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption = await dexie.person_options.get(person.id)
+    const artQks = await dexie.art_qks
+      .filter((q) => q._deleted === false)
+      .toArray()
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption, artQkChoosen } = dataState
+    return { personOption, artQkChoosen: artQks.map((q) => q.id) }
+  }, [user.uid])
 
+  const userPersonOption = data?.personOption
+  const artQkChoosen = useMemo(
+    () => data?.artQkChoosen ?? [],
+    [data?.artQkChoosen],
+  )
   const checked = artQkChoosen.includes(qk.id)
 
   const onChange = useCallback(
@@ -79,7 +71,7 @@ const ChooseArtQkRow = ({ qk }) => {
       <Titel>{qk?.titel}</Titel>
       {!!qk?.beschreibung && <Beschreibung>{qk?.beschreibung}</Beschreibung>}
     </Row>
-  )
+  ) 
 }
 
 export default observer(ChooseArtQkRow)
