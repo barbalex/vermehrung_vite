@@ -61,7 +61,6 @@ const Tree = () => {
 
   const buildMyNodesDebounced = useDebouncedCallback(buildMyNodes, 100)
 
-
   useEffect(() => {
     //console.log('Tree second useEffect ordering nodes build')
     buildMyNodesDebounced()
@@ -98,7 +97,7 @@ const Tree = () => {
     user.uid,
   ])
 
-  console.log('Tree rendering', { openNodes, nodes, aNA })
+  // console.log('Tree rendering', { openNodes, nodes, aNA })
 
   return (
     <Container>
