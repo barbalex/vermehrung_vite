@@ -310,7 +310,7 @@ const Row = ({ style, node, nodes, userRole }) => {
   if (!node?.url) return null
 
   const level =
-    node?.url[0] === 'Projekte' ? node?.url?.length - 1 : node?.url?.length
+    node?.url[0] === 'Projekte' ? node?.url?.length - 2 : node?.url?.length - 1
 
   return (
     <Container style={style}>

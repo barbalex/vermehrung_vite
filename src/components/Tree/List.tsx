@@ -12,7 +12,7 @@ import isEqual from 'lodash/isEqual'
 import { FixedSizeList as List } from 'react-window'
 
 import StoreContext from '../../storeContext'
-import Row from './Row'
+import Row from './Row' 
 
 const StyledList = styled(List)`
   margin-top: 5px;
