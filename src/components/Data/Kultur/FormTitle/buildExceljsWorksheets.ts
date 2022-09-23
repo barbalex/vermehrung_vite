@@ -354,18 +354,15 @@ const buildExceljsWorksheets = async ({
       const nachKultur = await dexie.kulturs.get(
         l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
       )
-      let nachKulturGarten
-      try {
-        nachKulturGarten = await nachKultur.garten.fetch()
-      } catch {}
-      let nachKulturHerkunft
-      try {
-        nachKulturHerkunft = await nachKultur.herkunft.fetch()
-      } catch {}
-      let sammelLieferung
-      try {
-        sammelLieferung = await l.sammel_lieferung.fetch()
-      } catch {}
+      const nachKulturGarten = await dexie.gartens.get(
+        nachKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const nachKulturHerkunft = await dexie.herkunfts.get(
+        nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const sammelLieferung = await dexie.sammel_lieferungs.get(
+        l.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       const newZ = {
         id: l.id,
@@ -463,24 +460,19 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 6. Get Events
-  let events = []
-  try {
-    events = await db
-      .get('event')
-      .query(Q.where('_deleted', false), Q.where('kultur_id', kultur_id))
-      .fetch()
-  } catch {}
+  const events = await dexie.events
+    .where({ kultur_id: kultur_id })
+    .filter((value) => totalFilter({ value, store, table: 'event' }))
+    .toArray()
   const eventsSorted = events.sort(eventSort)
   const eventsData = await Promise.all(
     eventsSorted.map(async (e) => {
-      let teilkultur
-      try {
-        teilkultur = await db.get('teilkultur').find(e.teilkultur_id)
-      } catch {}
-      let person
-      try {
-        person = await e.person.fetch()
-      } catch {}
+      const teilkultur = await dexie.teilkulturs.get(
+        e.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const person = await dexie.persons.get(
+        e.person_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       const newZ = {
         id: e.id,
