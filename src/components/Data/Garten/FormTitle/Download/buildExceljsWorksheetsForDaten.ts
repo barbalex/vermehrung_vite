@@ -1,10 +1,9 @@
-import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
-
 import addWorksheetToExceljsWorkbook from '../../../../../utils/addWorksheetToExceljsWorkbook'
 import buildExceljsWorksheetsForKultur from '../../../Kultur/FormTitle/buildExceljsWorksheets'
 import removeMetadataFromDataset from '../../../../../utils/removeMetadataFromDataset'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
+import { dexie } from '../../../../../dexieClient'
+import totalFilter from '../../../../../utils/totalFilter'
 
 /**
  * this function cann be used from higher up
@@ -16,24 +15,18 @@ const buildExceljsWorksheetsForDaten = async ({
   workbook,
   calledFromHigherUp,
 }) => {
-  const { db } = store
-
   // 1. Get Garten
-  let garten
-  try {
-    garten = await db.get('garten').find(garten_id)
-  } catch {}
-  let person
-  try {
-    person = await garten?.person?.fetch()
-  } catch {}
+  const garten = await dexie.gartens.get(garten_id)
+  const person = await dexie.persons.get(
+    garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
+  )
   const newGarten = {
     id: garten.id,
     name: garten.name,
     person_id: garten.person_id,
     person_name: person?.fullname ?? '',
     person_rohdaten: removeMetadataFromDataset({
-      dataset: person?._raw,
+      dataset: person,
       foreignKeys: [],
     }),
     strasse: garten.strasse,
@@ -55,37 +48,23 @@ const buildExceljsWorksheetsForDaten = async ({
     data: [newGarten],
   })
   // 2. Get Kulturen
-  let kultursOfGarten = []
-  try {
-    kultursOfGarten = await db
-      .get('kultur')
-      .query(
-        Q.where('_deleted', false),
-        Q.where('aktiv', true),
-        Q.where('garten_id', garten_id),
-      )
-      .fetch()
-  } catch {}
+  const kultursOfGarten = await dexie.kulturs
+    .where({ garten_id: garten_id })
+    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+    .toArray()
   const kultursOfGartenSorted = await kultursSortedFromKulturs(kultursOfGarten)
   const kulturData = await Promise.all(
     kultursOfGartenSorted.map(async (kultur) => {
-      let art
-      try {
-        art = await kultur.art?.fetch()
-      } catch {}
+      const art = await dexie.arts.get(
+        kultur.art_id ?? '99999999-9999-9999-9999-999999999999',
+      )
       const artLabel = await art?.label()
-      let aeArt
-      try {
-        aeArt = await art?.ae_art?.fetch()
-      } catch {}
-      let herkunft
-      try {
-        herkunft = await kultur.herkunft?.fetch()
-      } catch {}
-      let garten
-      try {
-        garten = await kultur.garten?.fetch()
-      } catch {}
+      const aeArt = await dexie.ae_arts.get(
+        art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const herkunft = await dexie.herkunfts.get(
+        kultur.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       const newK = {
         id: kultur.id,
@@ -95,13 +74,13 @@ const buildExceljsWorksheetsForDaten = async ({
         herkunft_id: kultur.herkunft_id,
         herkunft_nr: herkunft?.nr ?? '',
         herkunft_rohdaten: removeMetadataFromDataset({
-          dataset: herkunft?._raw,
+          dataset: herkunft,
           foreignKeys: ['sammlungs'],
         }),
         garten_id: kultur.garten_id,
         garten_name: garten?.name ?? '',
         garten_rohdaten: removeMetadataFromDataset({
-          dataset: garten?._raw,
+          dataset: garten,
           foreignKeys: ['kulturs', 'person'],
         }),
         zwischenlager: kultur.zwischenlager,

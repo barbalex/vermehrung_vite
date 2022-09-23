@@ -1,6 +1,5 @@
 import sum from 'lodash/sum'
 import { Q } from '@nozbe/watermelondb'
-import { first as first$ } from 'rxjs/operators'
 
 import addWorksheetToExceljsWorkbook from '../../../../utils/addWorksheetToExceljsWorkbook'
 import removeMetadataFromDataset from '../../../../utils/removeMetadataFromDataset'
@@ -10,6 +9,8 @@ import zaehlungSort from '../../../../utils/zaehlungSort'
 import lieferungSort from '../../../../utils/lieferungSort'
 import eventSort from '../../../../utils/eventSort'
 import personFullname from '../../../../utils/personFullname'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 /**
  * this function cann be used from higher up
@@ -26,23 +27,17 @@ const buildExceljsWorksheets = async ({
 
   // 1. Get Kultur
   if (!calledFromHigherUp) {
-    let kultur
-    try {
-      kultur = await db.get('kultur').find(kultur_id)
-    } catch {}
-    let art
-    try {
-      art = await kultur.art.fetch()
-    } catch {}
+    const kultur = await dexie.kulturs.get(kultur_id)
+    const art = await dexie.arts.get(
+      kultur?.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     const artName = await art.label()
-    let herkunft
-    try {
-      herkunft = await kultur.herkunft.fetch()
-    } catch {}
-    let garten
-    try {
-      garten = await kultur.garten.fetch()
-    } catch {}
+    const herkunft = await dexie.herkunfts.get(
+      kultur.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const garten = await dexie.gartens.get(
+      kultur.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     const newK = {
       id: kultur.id,
@@ -51,13 +46,13 @@ const buildExceljsWorksheets = async ({
       herkunft_id: kultur.herkunft_id,
       herkunft_nr: herkunft?.nr,
       herkunft_rohdaten: removeMetadataFromDataset({
-        dataset: herkunft?._raw,
+        dataset: herkunft,
         foreignKeys: ['sammlungs'],
       }),
       garten_id: kultur.garten_id,
       garten_name: garten?.name,
       garten_rohdaten: removeMetadataFromDataset({
-        dataset: garten?._raw,
+        dataset: garten,
         foreignKeys: ['kulturs', 'person'],
       }),
       zwischenlager: kultur.zwischenlager,
@@ -75,16 +70,16 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 2. Get Zählungen
-  const zaehlungs = await db
-    .get('zaehlung')
-    .query(Q.where('_deleted', false), Q.where('kultur_id', kultur_id))
-    .fetch()
+  const zaehlungs = await dexie.zaehlungs
+    .where({ kultur_id: kultur_id })
+    .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
+    .toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
   const zaehlungen = await Promise.all(
     zaehlungsSorted.map(async (z) => {
-      const tzs = await z.teilzaehlungs
-        .extend(Q.where('_deleted', false))
-        .fetch()
+      const tzs = await dexie.teilzaehlungs
+        .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+        .toArray()
       const tzsSorted = await teilzaehlungsSortByTk(tzs)
       const newZ = {
         id: z.id,
@@ -138,13 +133,10 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 3. Get Teil-Zählungen
-  const teilzaehlungs = await db
-    .get('teilzaehlung')
-    .query(
-      Q.where('_deleted', false),
-      Q.on('zaehlung', Q.where('kultur_id', kultur_id)),
-    )
-    .fetch()
+  const teilzaehlungs = await dexie.teilzaehlungs
+    .where({ kultur_id: kultur_id })
+    .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+    .toArray()
   const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
   const teilzaehlungData = await Promise.all(
     teilzaehlungsSorted.map(async (t) => {
@@ -174,50 +166,41 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 4. Get An-Lieferungen
-  const anlieferungs = await db
-    .get('lieferung')
-    .query(Q.where('_deleted', false), Q.where('nach_kultur_id', kultur_id))
-    .fetch()
+  const anlieferungs = await dexie.lieferungs
+    .where({ nach_kultur_id: kultur_id })
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
   const lieferungsSorted = anlieferungs.sort(lieferungSort)
   const anlieferungData = await Promise.all(
     lieferungsSorted.map(async (l) => {
-      let art
-      try {
-        art = await l.art.fetch()
-      } catch {}
+      const art = await dexie.arts.get(
+        l.art_id ?? '99999999-9999-9999-9999-999999999999',
+      )
       const artName = await art.label()
-      let aeArt
-      try {
-        aeArt = await art.ae_art.fetch()
-      } catch {}
-      let lieferungPerson
-      try {
-        lieferungPerson = await l.person.fetch()
-      } catch {}
-      let vonSammlung
-      try {
-        vonSammlung = await db.get('sammlung').find(l.von_sammlung_id)
-      } catch {}
-      let vonSammlungPerson
-      try {
-        vonSammlungPerson = await vonSammlung.person.fetch()
-      } catch {}
-      let vonSammlungHerkunft
-      try {
-        vonSammlungHerkunft = await vonSammlung.herkunft.fetch()
-      } catch {}
-      let vonKultur
-      try {
-        vonKultur = await db.get('kultur').find(l.von_kultur_id)
-      } catch {}
-      let vonKulturGarten
-      try {
-        vonKulturGarten = await vonKultur.garten.fetch()
-      } catch {}
-      let vonKulturHerkunft
-      try {
-        vonKulturHerkunft = await vonKultur.herkunft.fetch()
-      } catch {}
+      const aeArt = await dexie.ae_arts.get(
+        art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const lieferungPerson = await dexie.lieferungs.get(
+        l.person_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonSammlung = await dexie.sammlungs.get(
+        l.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonSammlungPerson = await dexie.persons.get(
+        vonSammlung?.person_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonSammlungHerkunft = await dexie.herkunfts.get(
+        vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonKultur = await dexie.kulturs.get(
+        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonKulturGarten = await dexie.gartens.get(
+        vonKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonKulturHerkunft = await dexie.herkunfts.get(
+        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
       let nachKultur
       try {
         nachKultur = await db.get('kultur').find(l.nach_kultur_id)
@@ -239,7 +222,7 @@ const buildExceljsWorksheets = async ({
         id: l.id,
         sammel_lieferung_id: l.sammel_lieferung_id,
         sammel_lieferung_rohdaten: removeMetadataFromDataset({
-          dataset: sammelLieferung?._raw,
+          dataset: sammelLieferung,
           foreignKeys: [
             'art',
             'garten',
@@ -257,7 +240,7 @@ const buildExceljsWorksheets = async ({
         person_id: l.person_id,
         person_name: personFullname(lieferungPerson),
         person_rohdaten: removeMetadataFromDataset({
-          dataset: lieferungPerson?._raw,
+          dataset: lieferungPerson,
           foreignKeys: [],
         }),
         von_sammlung_id: l.von_sammlung_id,
@@ -267,7 +250,7 @@ const buildExceljsWorksheets = async ({
         von_sammlung_person_id: vonSammlung?.person_id,
         von_sammlung_person_name: personFullname(vonSammlungPerson),
         von_sammlung_rohdaten: removeMetadataFromDataset({
-          dataset: vonSammlung?._raw,
+          dataset: vonSammlung,
           foreignKeys: [],
         }),
         von_kultur_id: l.von_kultur_id,
@@ -276,7 +259,7 @@ const buildExceljsWorksheets = async ({
         von_kultur_herkunft_id: vonKultur?.herkunft_id,
         von_kultur_herkunft_nr: vonKulturHerkunft?.nr,
         von_kultur_rohdaten: removeMetadataFromDataset({
-          dataset: vonKultur?._raw,
+          dataset: vonKultur,
           foreignKeys: [
             'art',
             'garten',
@@ -295,7 +278,7 @@ const buildExceljsWorksheets = async ({
         nach_kultur_herkunft_id: nachKultur?.herkunft_id,
         nach_kultur_herkunft_nr: nachKulturHerkunft?.nr,
         nach_kultur_rohdaten: removeMetadataFromDataset({
-          dataset: nachKultur?._raw,
+          dataset: nachKultur,
           foreignKeys: [
             'art',
             'garten',
@@ -405,7 +388,7 @@ const buildExceljsWorksheets = async ({
         id: l.id,
         sammel_lieferung_id: l.sammel_lieferung_id,
         sammel_lieferung_rohdaten: removeMetadataFromDataset({
-          dataset: sammelLieferung?._raw,
+          dataset: sammelLieferung,
           foreignKeys: [
             'art',
             'garten',
@@ -423,7 +406,7 @@ const buildExceljsWorksheets = async ({
         person_id: l.person_id,
         person_name: personFullname(lieferungPerson),
         person_rohdaten: removeMetadataFromDataset({
-          dataset: lieferungPerson?._raw,
+          dataset: lieferungPerson,
           foreignKeys: [],
         }),
         von_sammlung_id: l.von_sammlung_id,
@@ -433,7 +416,7 @@ const buildExceljsWorksheets = async ({
         von_sammlung_person_id: vonSammlung?.person_id,
         von_sammlung_person_name: personFullname(vonSammlungPerson),
         von_sammlung_rohdaten: removeMetadataFromDataset({
-          dataset: vonSammlung?._raw,
+          dataset: vonSammlung,
           foreignKeys: [],
         }),
         von_kultur_id: l.von_kultur_id,
@@ -442,7 +425,7 @@ const buildExceljsWorksheets = async ({
         von_kultur_herkunft_id: vonKultur?.herkunft_id,
         von_kultur_herkunft_nr: vonKulturHerkunft?.nr,
         von_kultur_rohdaten: removeMetadataFromDataset({
-          dataset: vonKultur?._raw,
+          dataset: vonKultur,
           foreignKeys: [
             'art',
             'garten',
@@ -461,7 +444,7 @@ const buildExceljsWorksheets = async ({
         nach_kultur_herkunft_id: nachKultur?.herkunft_id,
         nach_kultur_herkunft_nr: nachKulturHerkunft?.nr,
         nach_kultur_rohdaten: removeMetadataFromDataset({
-          dataset: nachKultur?._raw,
+          dataset: nachKultur,
           foreignKeys: [
             'art',
             'garten',
@@ -522,13 +505,13 @@ const buildExceljsWorksheets = async ({
         teilkultur_id: e.teilkultur_id,
         teilkultur_name: teilkultur?.name,
         teilkultur_rohdaten: removeMetadataFromDataset({
-          dataset: teilkultur?._raw,
+          dataset: teilkultur,
           foreignKeys: [],
         }),
         person_id: e.person_id,
         person_name: personFullname(person),
         person_rohdaten: removeMetadataFromDataset({
-          dataset: person?._raw,
+          dataset: person,
           foreignKeys: [],
         }),
         beschreibung: e.beschreibung,
