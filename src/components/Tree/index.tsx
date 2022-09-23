@@ -61,113 +61,6 @@ const Tree = () => {
 
   const buildMyNodesDebounced = useDebouncedCallback(buildMyNodes, 100)
 
-  // useEffect(() => {
-  // need to rebuild nodes when options change
-  // const userPersonOptionsObservable = db
-  //   .get('person_option')
-  //   .query(Q.on('person', Q.where('account_id', user.uid ?? 'none')))
-  //   .observeWithColumns([
-  //     'tree_kultur',
-  //     'tree_teilkultur',
-  //     'tree_zaehlung',
-  //     'tree_lieferung',
-  //     'tree_event',
-  //   ])
-  // const userRoleObservable = db
-  //   .get('user_role')
-  //   .query(Q.on('person', Q.where('account_id', user.uid)))
-  //   .observeWithColumns(['name'])
-  // // need subscription to all tables that provokes treeBuild on next
-  // const artsObservable = db
-  //   .get('art')
-  //   .query(...tableFilter({ store, table: 'art' }))
-  //   .observeWithColumns(['ae_id'])
-  // const herkunftsObservable = db
-  //   .get('herkunft')
-  //   .query(...tableFilter({ store, table: 'herkunft' }))
-  //   .observeWithColumns(['gemeinde', 'lokalname', 'nr'])
-  // const sammlungsObservable = db
-  //   .get('sammlung')
-  //   .query(...tableFilter({ store, table: 'sammlung' }))
-  //   .observeWithColumns([
-  //     'art_id',
-  //     'person_id',
-  //     'herkunft_id',
-  //     'datum',
-  //     'geplant',
-  //   ])
-  // const gartensObservable = db
-  //   .get('garten')
-  //   .query(...tableFilter({ store, table: 'garten' }))
-  //   .observeWithColumns(['name', 'person_id'])
-  // const kultursObservable = db
-  //   .get('kultur')
-  //   .query(...tableFilter({ store, table: 'kultur' }))
-  //   .observeWithColumns([
-  //     'art_id',
-  //     'herkunft_id',
-  //     'garten_id',
-  //     'zwischenlager',
-  //   ])
-  // const teilkultursObservable = db
-  //   .get('teilkultur')
-  //   .query(...tableFilter({ store, table: 'teilkultur' }))
-  //   .observeWithColumns(['name', 'ort1', 'ort2', 'ort3'])
-  // const zaehlungsObservable = db
-  //   .get('zaehlung')
-  //   .query(...tableFilter({ store, table: 'zaehlung' }))
-  //   .observeWithColumns(['datum', 'prognose'])
-  // const lieferungsObservable = db
-  //   .get('lieferung')
-  //   .query(...tableFilter({ store, table: 'lieferung' }))
-  //   .observeWithColumns([
-  //     'datum',
-  //     'anzahl_pflanzen',
-  //     'anzahl_auspflanzbereit',
-  //   ])
-  // const sammelLieferungsObservable = db
-  //   .get('sammel_lieferung')
-  //   .query(...tableFilter({ store, table: 'sammel_lieferung' }))
-  //   .observeWithColumns(['datum', 'anzahl_pflanzen'])
-  // const eventsObservable = db
-  //   .get('event')
-  //   .query(...tableFilter({ store, table: 'event' }))
-  //   .observeWithColumns(['datum', 'beschreibung'])
-  // const personsObservable = db
-  //   .get('person')
-  //   .query(...tableFilter({ store, table: 'person' }))
-  //   .observeWithColumns(['vorname', 'name'])
-  // const kulturOptionsObservable = db
-  //   .get('kultur_option')
-  //   .query(notDeletedQuery)
-  //   .observeWithColumns(['tk'])
-  // const combinedObservables = combineLatest([
-  //   userPersonOptionsObservable,
-  //   userRoleObservable,
-  //   artsObservable,
-  //   eventsObservable,
-  //   gartensObservable,
-  //   herkunftsObservable,
-  //   kultursObservable,
-  //   lieferungsObservable,
-  //   personsObservable,
-  //   sammelLieferungsObservable,
-  //   sammlungsObservable,
-  //   teilkultursObservable,
-  //   zaehlungsObservable,
-  //   kulturOptionsObservable,
-  // ]).pipe(throttle(() => interval(100)))
-  // const subscription = combinedObservables.subscribe(
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   ([[userPersonOption], [userRole], ...rest]) => {
-  //     //console.log('Tree data-useEffect ordering rebuild')
-  //     setDataState({ userPersonOption, userRole })
-  //     buildMyNodesDebounced()
-  //   },
-  // )
-
-  // return () => subscription?.unsubscribe?.()
-  // }, [buildMyNodesDebounced, db, store, user.uid])
 
   useEffect(() => {
     //console.log('Tree second useEffect ordering nodes build')
@@ -205,7 +98,7 @@ const Tree = () => {
     user.uid,
   ])
 
-  //console.log('Tree rendering', { openNodes, nodes })
+  console.log('Tree rendering', { openNodes, nodes, aNA })
 
   return (
     <Container>
