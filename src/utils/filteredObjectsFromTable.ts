@@ -28,30 +28,40 @@ const filteredObjectsFromTable = async ({
 
   const filterFunction = (object) => {
     let returnValue = true
-    Object.entries(whereObject).forEach(([key, value]) => {
-      // include if string, exact if else
+    for (const entry of Object.entries(whereObject)) {
+      const [key, value] = entry
       const type = types[table][key] ?? 'string'
       const objectValue = object[key]
       if (object[key] === undefined) {
         returnValue = false
-      } else if (object[key] === null) {
+        break
+      }
+      if (object[key] === null) {
         returnValue = false
-      } else if (
+        break
+      }
+      if (
         type === 'string' &&
         objectValue?.includes &&
-        value?.toString()?.toLowerCase()
+        value?.toString()?.toLowerCase() &&
+        !objectValue.includes(value?.toString()?.toLowerCase())
       ) {
-        if (!objectValue.includes(value?.toString()?.toLowerCase())) {
-          returnValue = false
-        }
-      } else if (type === 'string' && objectValue?.includes) {
-        if (!objectValue.includes(value)) {
-          returnValue = false
-        }
-      } else if (!objectValue === value) {
         returnValue = false
+        break
       }
-    })
+      if (
+        type === 'string' &&
+        objectValue?.includes &&
+        !objectValue.includes(value)
+      ) {
+        returnValue = false
+        break
+      }
+      if (!(objectValue === value)) {
+        returnValue = false
+        break
+      }
+    }
 
     return returnValue
   }
