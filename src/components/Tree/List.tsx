@@ -43,16 +43,9 @@ const Tree = ({
   const lastTouchedNode = getSnapshot(lastTouchedNodeProxy)
   // when loading on url, lastTouchedNode may not be set
   const urlToFocus = lastTouchedNode.length ? lastTouchedNode : aNA
-  // TODO: when back button is clicked, url thus aNA changes but lastTouchedNode not
-  // Thus lastTouchedNode is focused, not newly active from url
   const nodeIndex = findIndex(nodes, (node) => isEqual(node.url, urlToFocus))
   useEffect(() => {
-    console.log('List, effect running', {
-      nodeIndex,
-      aNA,
-    })
     if (nodeIndex > -1) {
-      console.log('List, effect, scrolling to item at index:', nodeIndex)
       listRef.current?.scrollToItem(nodeIndex)
     }
   }, [listRef, activeNode?.label, aNA, nodes, nodeIndex])
