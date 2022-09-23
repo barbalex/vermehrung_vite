@@ -201,22 +201,18 @@ const buildExceljsWorksheets = async ({
       const vonKulturHerkunft = await dexie.herkunfts.get(
         vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
       )
-      let nachKultur
-      try {
-        nachKultur = await db.get('kultur').find(l.nach_kultur_id)
-      } catch {}
-      let nachKulturGarten
-      try {
-        nachKulturGarten = await nachKultur.garten.fetch()
-      } catch {}
-      let nachKulturHerkunft
-      try {
-        nachKulturHerkunft = await nachKultur.herkunft.fetch()
-      } catch {}
-      let sammelLieferung
-      try {
-        sammelLieferung = await l.sammel_lieferung.fetch()
-      } catch {}
+      const nachKultur = await dexie.kulturs.get(
+        l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const nachKulturGarten = await dexie.gartens.get(
+        nachKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const nachKulturHerkunft = await dexie.herkunfts.get(
+        nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const sammelLieferung = await dexie.sammel_lieferungs_sorted.get(
+        l.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       const newZ = {
         id: l.id,
@@ -320,13 +316,10 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 5. Get Aus-Lieferungen
-  let auslieferungs = []
-  try {
-    auslieferungs = await db
-      .get('lieferung')
-      .query(Q.where('_deleted', false), Q.where('von_kultur_id', kultur_id))
-      .fetch()
-  } catch {}
+  const auslieferungs = await dexie.lieferungs
+    .where({ von_kultur_id: kultur_id })
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
   const auslieferungen = await Promise.all(
     auslieferungsSorted.map(async (l) => {
