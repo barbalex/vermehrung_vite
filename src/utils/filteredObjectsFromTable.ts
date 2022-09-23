@@ -32,11 +32,19 @@ const filteredObjectsFromTable = async ({
       // include if string, exact if else
       const type = types[table][key] ?? 'string'
       const objectValue = object[key]
-      if (type === 'string' && value?.toString()?.toLowerCase()) {
+      if (object[key] === undefined) {
+        returnValue = false
+      } else if (object[key] === null) {
+        returnValue = false
+      } else if (
+        type === 'string' &&
+        objectValue?.includes &&
+        value?.toString()?.toLowerCase()
+      ) {
         if (!objectValue.includes(value?.toString()?.toLowerCase())) {
           returnValue = false
         }
-      } else if (type === 'string') {
+      } else if (type === 'string' && objectValue?.includes) {
         if (!objectValue.includes(value)) {
           returnValue = false
         }
