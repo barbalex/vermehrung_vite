@@ -20,8 +20,8 @@ const filteredObjectsFromTable = async ({
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
 
+  // reduce filter to actually set criteria
   const whereObject = {}
-
   Object.entries(storeFilter).forEach(([key, value]) => {
     if (exists(value)) whereObject[key] = value
   })
