@@ -58,7 +58,7 @@ const EventComponent = ({
   const store = useContext(StoreContext)
   const { filter, online } = store
 
-  let row: Event = useLiveQuery(async () => dexie.events.get(id), [id])
+  let row: Event = useLiveQuery(async () => dexie.events.get(id??'99999999-9999-9999-9999-999999999999'), [id])
   if (showFilter) row = filter.event
 
   const [activeConflict, setActiveConflict] = useState(null)
