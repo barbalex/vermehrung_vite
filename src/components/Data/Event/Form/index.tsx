@@ -78,10 +78,14 @@ const EventForm = ({
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .toArray(),
-      dexie.kultur_options.get(row.kultur_id),
+      dexie.kultur_options.get(
+        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
     // need to show a choosen kultur even if inactive but not if deleted
-    const kultur = await dexie.kulturs.get(row.kultur_id)
+    const kultur = await dexie.kulturs.get(
+      row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     const kultursIncludingChoosen = uniqBy(
       [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
       'id',
@@ -100,9 +104,9 @@ const EventForm = ({
       }),
     )
 
-    const teilkultur = row.teilkultur_id
-      ? await dexie.teilkulturs.get(row.teilkultur_id)
-      : {}
+    const teilkultur = await dexie.teilkulturs.get(
+      row.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     const teilkultursIncludingChoosen = uniqBy(
       [...teilkulturs, ...(teilkultur && !showFilter ? [teilkultur] : [])],
       'id',
@@ -115,7 +119,9 @@ const EventForm = ({
       }))
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    const person = await dexie.persons.get(
+      row.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
