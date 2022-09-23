@@ -30,6 +30,7 @@ import {
   personFile as personFileFragment,
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
+import totalFilter from './utils/totalFilter'
 
 window.Dexie = Dexie
 
@@ -323,16 +324,18 @@ export class Sammlung implements ISammlung {
   }
 
   async label() {
-    const herkunft = this.herkunft_id
-      ? await dexie.herkunfts.get(this.herkunft_id)
-      : undefined
-    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-    const ae_art = art?.ae_art_id
-      ? await dexie.ae_arts.get(art.ae_art_id)
-      : undefined
-    const person = this.person_id
-      ? await dexie.persons.get(this.person_id)
-      : undefined
+    const herkunft = await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const art = await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const ae_art = await dexie.ae_arts.get(
+      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return sammlungLabelFromSammlung({
       sammlung: this,
@@ -344,13 +347,15 @@ export class Sammlung implements ISammlung {
   }
 
   async labelUnderHerkunft() {
-    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-    const ae_art = art?.ae_art_id
-      ? await dexie.ae_arts.get(art.ae_art_id)
-      : undefined
-    const person = this.person_id
-      ? await dexie.persons.get(this.person_id)
-      : undefined
+    const art = await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const ae_art = await dexie.ae_arts.get(
+      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return sammlungLabelFromSammlungUnderHerkunft({
       sammlung: this,
@@ -566,11 +571,15 @@ export class Lieferung {
   }
 
   async von_kultur() {
-    return await dexie.kulturs.get(this.von_kultur_id)
+    return await dexie.kulturs.get(
+      this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async nach_kultur() {
-    return await dexie.kulturs.get(this.nach_kultur_id)
+    return await dexie.kulturs.get(
+      this.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   label() {
@@ -727,15 +736,22 @@ export class Art implements IArt {
   }
 
   async label() {
-    const ae_art = this.ae_id ? await dexie.ae_arts.get(this.ae_id) : undefined
+    const ae_art = await dexie.ae_arts.get(
+      this.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+
     return artLabelFromAeArt({ ae_art })
   }
 
-  async herkunfts() {
-    const sammlungs = await dexie.sammlungs.where({ art_id: this.id }).toArray()
+  async herkunfts({ store }) {
+    const sammlungs = await dexie.sammlungs
+      .where({ art_id: this.id })
+      .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+      .toArray()
     const herkunftIds = sammlungs
       .filter((s) => !!s.herkunft_id)
       .map((s) => s.herkunft_id)
+
     return await dexie.herkunfts.bulkGet(herkunftIds)
   }
 
@@ -923,9 +939,9 @@ export class Garten implements IGarten {
   }
 
   async label() {
-    const person = this.person_id
-      ? dexie.persons.get(this.person_id)
-      : undefined
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return gartenLabelFromGarten({
       garten: this,
@@ -1104,25 +1120,35 @@ export class Kultur implements IKultur {
     this._conflicts = _conflicts ?? null
   }
 
-  async anlieferungs() {
-    return await dexie.lieferungs.where({ nach_kultur_id: this.id }).toArray()
+  async anlieferungs({ store }) {
+    return await dexie.lieferungs
+      .where({ nach_kultur_id: this.id })
+      .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+      .toArray()
   }
-  async auslieferungs() {
-    return await dexie.lieferungs.where({ von_kultur_id: this.id }).toArray()
+  async auslieferungs({ store }) {
+    return await dexie.lieferungs
+      .where({ von_kultur_id: this.id })
+      .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+      .toArray()
   }
 
   async label() {
-    const garten = this.garten_id
-      ? await dexie.gartens.get(this.garten_id)
-      : undefined
-    const gartenPerson = garten?.person_id
-      ? await dexie.persons.get(garten.person_id)
-      : undefined
-    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-    const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
-    const herkunft = this.herkunft_id
-      ? await dexie.herkunfts.get(this.herkunft_id)
-      : undefined
+    const garten = await dexie.gartens.get(
+      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const gartenPerson = await dexie.persons.get(
+      garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const art = await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const aeArt = await dexie.ae_arts.get(
+      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunft = await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return kulturLabelFromKultur({
       kultur: this,
@@ -1135,15 +1161,15 @@ export class Kultur implements IKultur {
   }
 
   async labelUnderArt() {
-    const garten = this.garten_id
-      ? await dexie.gartens.get(this.garten_id)
-      : undefined
-    const gartenPerson = garten?.person_id
-      ? await dexie.persons.get(garten.person_id)
-      : undefined
-    const herkunft = this.herkunft_id
-      ? await dexie.herkunfts.get(this.herkunft_id)
-      : undefined
+    const garten = await dexie.gartens.get(
+      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const gartenPerson = await dexie.persons.get(
+      garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunft = await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return kulturLabelFromKulturUnderArt({
       kultur: this,
@@ -1154,11 +1180,15 @@ export class Kultur implements IKultur {
   }
 
   async labelUnderGarten() {
-    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
-    const aeArt = art?.ae_id ? await dexie.ae_arts.get(art.ae_id) : undefined
-    const herkunft = this.herkunft_id
-      ? await dexie.herkunfts.get(this.herkunft_id)
-      : undefined
+    const art = await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const aeArt = await dexie.ae_arts.get(
+      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const herkunft = await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
 
     return kulturLabelFromKulturUnderGarten({
       kultur: this,
@@ -1467,9 +1497,10 @@ export class Zaehlung implements IZaehlung {
     this._conflicts = _conflicts ?? null
   }
 
-  async label() {
+  async label({ store }) {
     const teilzaehlungs = await dexie.teilzaehlungs
       .where({ zaehlung_id: this.id })
+      .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
       .toArray()
 
     return await zaehlungLabelFromZaehlung({
@@ -2093,16 +2124,16 @@ export class SammelLieferung implements ISammelLieferung {
   }
 
   async label() {
-    const vonKultur = this.von_kultur_id
-      ? await dexie.kulturs.get(this.von_kultur_id)
-      : undefined
-    const vonGarten = vonKultur?.garten_id
-      ? await dexie.gartens.get(vonKultur.garten_id)
-      : undefined
-    const gartenLabel = vonGarten ? await vonGarten.label() : undefined
-    const person = this.person_id
-      ? await dexie.persons.get(this.person_id)
-      : undefined
+    const vonKultur = await dexie.kulturs.get(
+      this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const vonGarten = await dexie.gartens.get(
+      vonKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const gartenLabel = await vonGarten?.label()
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     const personLabel = person ? personLabelFromPerson({ person }) : undefined
     const datumLabel = this.datum
       ? DateTime.fromSQL(this.datum).toFormat('yyyy.LL.dd')
@@ -2119,9 +2150,7 @@ export class SammelLieferung implements ISammelLieferung {
 
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
-    const userPerson: Person = await dexie.persons
-      .where({ account_id: user.uid })
-      .first()
+    const userPerson: Person = await dexie.persons.get({ account_id: user.uid })
     const userPersonOption = await dexie.person_options.get(userPerson.id)
 
     unsetError(`sammel_lieferung.${field}`)
@@ -2447,14 +2476,18 @@ export class Av implements IAv {
   }
 
   async personLabel() {
-    const person = this.person_id
-      ? await dexie.persons.get(this.person_id)
-      : undefined
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+
     return personLabelFromPerson({ person })
   }
 
   async artLabel() {
-    const art = this.art_id ? await dexie.arts.get(this.art_id) : undefined
+    const art = await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+
     return await art?.label()
   }
 
@@ -2587,16 +2620,16 @@ export class Gv implements IGv {
   }
 
   async personLabel() {
-    const person = this.person_id
-      ? await dexie.persons.get(this.person_id)
-      : undefined
+    const person = await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     return personLabelFromPerson({ person })
   }
 
   async gartenLabel() {
-    const garten = this.garten_id
-      ? await dexie.gartens.get(this.garten_id)
-      : undefined
+    const garten = await dexie.gartens.get(
+      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
     return gartenLabelFromGarten({ garten })
   }
 
