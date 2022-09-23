@@ -67,7 +67,11 @@ const Arten = ({ filter: showFilter, width, height }) => {
     const artsSorted = await artsSortedFromArts(arts)
 
     return { arts: artsSorted, totalCount }
-  }, [store.filter.art, store.art_initially_queried])
+  }, [
+    store.filter.art,
+    ...Object.values(store.filter.art),
+    store.art_initially_queried,
+  ])
 
   const arts: Art[] = data?.arts ?? []
   const totalCount = data?.totalCount

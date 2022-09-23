@@ -69,11 +69,7 @@ const Personen = ({ filter: showFilter, width, height }) => {
     const personsSorted = persons.sort(personSort)
 
     return { persons: personsSorted, totalCount, userRole }
-  }, [
-    store.filter.person,
-    ...Object.values(personFilter),
-    store.person_initially_queried,
-  ])
+  }, [...Object.values(personFilter), store.person_initially_queried, user.uid])
 
   const persons: Person[] = data?.persons ?? []
   const totalCount = data?.totalCount

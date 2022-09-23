@@ -84,6 +84,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
     return { zaehlungs: zaehlungsSorted, totalCount }
   }, [
     store.filter.zaehlung,
+    ...Object.values(store.filter.zaehlung),
     store.zaehlung_initially_queried,
     kulturIdInActiveNodeArray,
   ])

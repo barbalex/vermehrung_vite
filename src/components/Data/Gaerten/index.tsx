@@ -76,6 +76,7 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
     return { gartens: gartensSorted, totalCount }
   }, [
     store.filter.garten,
+    ...Object.values(store.filter.garten),
     store.garten_initially_queried,
     personIdInActiveNodeArray,
   ])

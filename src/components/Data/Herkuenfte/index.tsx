@@ -93,6 +93,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     return { herkunfts: herkunftsSorted, totalCount }
   }, [
     store.filter.herkunft,
+    ...Object.values(store.filter.herkunft),
     store.herkunft_initially_queried,
     sammlungIdInActiveNodeArray,
     artIdInActiveNodeArray,

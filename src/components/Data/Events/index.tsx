@@ -76,6 +76,7 @@ const Events = ({ filter: showFilter, width, height }) => {
     return { events: eventsSorted, totalCount }
   }, [
     store.filter.event,
+    ...Object.values(store.filter.event),
     store.event_initially_queried,
     kulturIdInActiveNodeArray,
   ])

@@ -76,6 +76,7 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
     return { teilkulturs: teilkultursSorted, totalCount }
   }, [
     store.filter.teilkultur,
+    ...Object.values(store.filter.teilkultur),
     store.teilkultur_initially_queried,
     kulturIdInActiveNodeArray,
   ])

@@ -90,6 +90,7 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
     return { sammlungs: sammlungsSorted, totalCount }
   }, [
     store.filter.sammlung,
+    ...Object.values(store.filter.sammlung),
     store.sammlung_initially_queried,
     artIdInActiveNodeArray,
     herkunftIdInActiveNodeArray,

@@ -210,8 +210,8 @@ const Vermehrung = () => {
             <Tree />
           </ErrorBoundary>
           <ErrorBoundary>
-            <Data />
-            {/* {showFilter ? <Filter /> : <Data />} */}
+            {/* <Data /> */}
+            {showFilter ? <Filter /> : <Data />}
           </ErrorBoundary>
         </StyledSplitPane>
       </Container>

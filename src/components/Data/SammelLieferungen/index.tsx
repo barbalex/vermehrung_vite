@@ -73,7 +73,11 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
     const sammelLieferungsSorted = sammelLieferungs.sort(lieferungSort)
 
     return { sammelLieferungs: sammelLieferungsSorted, totalCount }
-  }, [store.filter.sammel_lieferung, store.sammel_lieferung_initially_queried])
+  }, [
+    store.filter.sammel_lieferung,
+    ...Object.values(store.filter.sammel_lieferung),
+    store.sammel_lieferung_initially_queried,
+  ])
 
   const sammelLieferungs: SammelLieferung[] = data?.sammelLieferungs ?? []
   const totalCount = data?.totalCount

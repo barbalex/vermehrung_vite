@@ -77,6 +77,7 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
     return { kulturs: kultursSorted, totalCount }
   }, [
     store.filter.kultur,
+    ...Object.values(store.filter.kultur),
     store.kultur_initially_queried,
     artIdInActiveNodeArray,
     gartenIdInActiveNodeArray,

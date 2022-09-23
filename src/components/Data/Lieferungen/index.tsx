@@ -92,6 +92,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
     return { lieferungs: lieferungsSorted, totalCount }
   }, [
     store.filter.lieferung,
+    ...Object.values(store.filter.lieferung),
     store.lieferung_initially_queried,
     sammlungIdInActiveNodeArray,
     personIdInActiveNodeArray,
