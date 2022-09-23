@@ -19,6 +19,7 @@ import { dexie, Event } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -81,9 +82,8 @@ const Events = ({ filter: showFilter, width, height }) => {
     kulturIdInActiveNodeArray,
   ])
 
-  const events: Event[] = data?.events ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = events.length
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.events?.length ?? '...'
 
   const add = useCallback(() => {
     insertEventRev()
@@ -135,10 +135,11 @@ const Events = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.events && <Spinner />}
+          {!!width && data?.events && (
             <FixedSizeList
               height={height - 48}
-              itemCount={events.length}
+              itemCount={data.events.length}
               itemSize={constants.singleRowHeight}
               width={width}
             >
@@ -147,8 +148,8 @@ const Events = ({ filter: showFilter, width, height }) => {
                   key={index}
                   style={style}
                   index={index}
-                  row={events[index]}
-                  last={index === events.length - 1}
+                  row={data.events[index]}
+                  last={index === data.events.length - 1}
                 />
               )}
             </FixedSizeList>

@@ -19,6 +19,7 @@ import { dexie, Kultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -140,7 +141,8 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.kulturs && <Spinner />}
+          {!!width && data?.kulturs && (
             <FixedSizeList
               height={height - constants.titleRowHeight}
               itemCount={kulturs.length}

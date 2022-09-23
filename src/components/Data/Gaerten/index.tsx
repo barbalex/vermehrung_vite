@@ -19,6 +19,7 @@ import { dexie, Garten } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 import totalFilter from '../../../utils/totalFilter'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -135,7 +136,8 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.gartens && <Spinner />}
+          {!!width && data?.gartens && (
             <FixedSizeList
               height={height - 48}
               itemCount={gartens.length}

@@ -19,6 +19,7 @@ import { dexie, Sammlung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -154,7 +155,8 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.sammlungs && <Spinner />}
+          {!!width && data?.sammlungs && (
             <FixedSizeList
               height={height - constants.titleRowHeight}
               itemCount={sammlungs.length}

@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, SammelLieferung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -130,7 +131,8 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.sammelLieferungs && <Spinner />}
+          {!!width && data?.sammelLieferungs && (
             <FixedSizeList
               height={height - constants.titleRowHeight}
               itemCount={sammelLieferungs.length}

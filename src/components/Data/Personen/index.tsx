@@ -18,6 +18,7 @@ import constants from '../../../utils/constants'
 import { dexie, Person } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
+import Spinner from '../../shared/Spinner'
 
 const Container = styled.div`
   height: 100%;
@@ -125,7 +126,8 @@ const Personen = ({ filter: showFilter, width, height }) => {
           </TitleContainer>
         )}
         <FieldsContainer>
-          {!!width && (
+          {!data?.persons && <Spinner />}
+          {!!width && data?.persons && (
             <FixedSizeList
               height={height - constants.titleRowHeight}
               itemCount={persons.length}
