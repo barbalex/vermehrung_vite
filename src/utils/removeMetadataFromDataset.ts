@@ -10,28 +10,11 @@ const removeMetadata = (d) => {
   return d
 }
 
-const removeMetadataFromDataset = ({ dataset: d, foreignKeys }) => {
+const removeMetadataFromDataset = (d) => {
   if (!d) return null
+  console.log('removeMetadataFromDataset, d:', d)
   const datasetRaw = { ...d }
   const dataset = removeMetadata(datasetRaw)
-  if (foreignKeys.length) {
-    foreignKeys.forEach((key) => {
-      if (!dataset[key]) return null
-      if (!dataset[key].toJSON) return null
-      if (dataset[key].toJSON().map) {
-        return (dataset[key] = dataset[key].toJSON().map((val) => {
-          if (!val) return val
-          // somehow val.toJSON() is protected
-          // so need to copy it
-          return removeMetadata({ ...val.toJSON() })
-        }))
-      }
-      // somehow dataset[key].toJSON() is protected
-      // so need to copy it
-      const val = { ...dataset[key].toJSON() }
-      dataset[key] = removeMetadata(val)
-    })
-  }
   if (Object.keys(dataset).length) return dataset
   return null
 }
