@@ -16,8 +16,6 @@ const filteredObjectsFromTable = async ({ store, table, count }) => {
     if (exists(value)) whereObject[key] = value
   })
 
-  console.log('tableFilter', { table, whereObject })
-
   // if a url is opened, a dataset should always show
   // even if it was filtered away
   const tableIdInActiveNodeArray =
