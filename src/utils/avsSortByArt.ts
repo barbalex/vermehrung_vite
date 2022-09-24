@@ -1,4 +1,3 @@
-// import { first as first$ } from 'rxjs/operators'
 import sortBy from 'lodash/sortBy'
 
 const avsSortByArt = async (avs) => {

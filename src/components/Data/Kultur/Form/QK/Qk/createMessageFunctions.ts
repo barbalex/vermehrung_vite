@@ -1,9 +1,6 @@
 import format from 'date-fns/format'
-import { first as first$ } from 'rxjs/operators'
-import { Q } from '@nozbe/watermelondb'
 
 import exists from '../../../../../../utils/exists'
-import notDeletedQuery from '../../../../../../utils/notDeletedQuery'
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
 import eventSort from '../../../../../../utils/eventSort'
 import lieferungSort from '../../../../../../utils/lieferungSort'
@@ -12,8 +9,7 @@ import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
 
-const createMessageFunctions = async ({ kulturId, db, store }) => {
-  const { filter } = store
+const createMessageFunctions = async ({ kulturId, store }) => {
   const year = +format(new Date(), 'yyyy')
   const startYear = `${year}-01-01`
   const startNextYear = `${year + 1}-01-01`

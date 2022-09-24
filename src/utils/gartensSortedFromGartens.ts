@@ -1,5 +1,4 @@
 import sortBy from 'lodash/sortBy'
-// import { first as first$ } from 'rxjs/operators'
 
 const gartensSortedFromGartens = async (gartens) => {
   const gartenSorters = await Promise.all(

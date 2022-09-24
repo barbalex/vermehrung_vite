@@ -1,7 +1,6 @@
 import React, { useContext, useCallback, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { first as first$ } from 'rxjs/operators'
 
 import StoreContext from '../../../storeContext'
 import constants from '../../../utils/constants'
