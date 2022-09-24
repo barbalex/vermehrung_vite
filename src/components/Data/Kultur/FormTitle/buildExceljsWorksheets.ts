@@ -8,7 +8,13 @@ import zaehlungSort from '../../../../utils/zaehlungSort'
 import lieferungSort from '../../../../utils/lieferungSort'
 import eventSort from '../../../../utils/eventSort'
 import personFullname from '../../../../utils/personFullname'
-import { dexie } from '../../../../dexieClient'
+import {
+  dexie,
+  Lieferung,
+  Art,
+  Kultur,
+  Herkunft,
+} from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
 
 /**
@@ -24,17 +30,11 @@ const buildExceljsWorksheets = async ({
 }) => {
   // 1. Get Kultur
   if (!calledFromHigherUp) {
-    const kultur = await dexie.kulturs.get(kultur_id)
-    const art = await dexie.arts.get(
-      kultur?.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const artName = await art.label()
-    const herkunft = await dexie.herkunfts.get(
-      kultur.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const garten = await dexie.gartens.get(
-      kultur.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const kultur: Kultur = await dexie.kulturs.get(kultur_id)
+    const art: Art = await kultur.art()
+    const artName = await art?.label()
+    const herkunft: Herkunft = await kultur_id.herkunft()
+    const garten = await kultur.garten()
 
     const newK = {
       id: kultur.id,
@@ -163,47 +163,21 @@ const buildExceljsWorksheets = async ({
     .toArray()
   const lieferungsSorted = anlieferungs.sort(lieferungSort)
   const anlieferungData = await Promise.all(
-    lieferungsSorted.map(async (l) => {
-      const art = await dexie.arts.get(
-        l.art_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const artName = await art.label()
-      const aeArt = await dexie.ae_arts.get(
-        art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const lieferungPerson = await dexie.lieferungs.get(
-        l.person_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlung = await dexie.sammlungs.get(
-        l.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlungPerson = await dexie.persons.get(
-        vonSammlung?.person_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlungHerkunft = await dexie.herkunfts.get(
-        vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKultur = await dexie.kulturs.get(
-        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKulturGarten = await dexie.gartens.get(
-        vonKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKulturHerkunft = await dexie.herkunfts.get(
-        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKultur = await dexie.kulturs.get(
-        l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKulturGarten = await dexie.gartens.get(
-        nachKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKulturHerkunft = await dexie.herkunfts.get(
-        nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const sammelLieferung = await dexie.sammel_lieferungs_sorted.get(
-        l.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+    lieferungsSorted.map(async (l: Lieferung) => {
+      const art = await l.art()
+      const artName = await art?.label()
+      const aeArt = await art?.aeArt()
+      const lieferungPerson = await l.person()
+      const vonSammlung = await l.sammlung()
+      const vonSammlungPerson = await vonSammlung?.person()
+      const vonSammlungHerkunft = await vonSammlung?.herkunft()
+      const vonKultur = await l.vonKultur()
+      const vonKulturGarten = await vonKultur?.garten()
+      const vonKulturHerkunft = await vonKultur?.herkunft()
+      const nachKultur = await l.nachKultur()
+      const nachKulturGarten = await nachKultur?.garten()
+      const nachKulturHerkunft = await nachKultur?.herkunft()
+      const sammelLieferung = await l.sammelLieferung()
 
       const newZ = {
         id: l.id,
@@ -265,47 +239,21 @@ const buildExceljsWorksheets = async ({
     .toArray()
   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
   const auslieferungen = await Promise.all(
-    auslieferungsSorted.map(async (l) => {
-      const art = await dexie.arts.get(
-        l.art_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+    auslieferungsSorted.map(async (l: Lieferung) => {
+      const art: Art = await l.art()
       const artName = await art?.label()
-      const aeArt = await dexie.ae_arts.get(
-        art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const lieferungPerson = await dexie.persons.get(
-        l.person_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlung = await dexie.sammlungs.get(
-        l.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlungPerson = await dexie.persons.get(
-        vonSammlung?.person_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonSammlungHerkunft = await dexie.herkunfts.get(
-        vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKultur = await dexie.kulturs.get(
-        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKulturGarten = await dexie.gartens.get(
-        vonKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const vonKulturHerkunft = await dexie.herkunfts.get(
-        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKultur = await dexie.kulturs.get(
-        l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKulturGarten = await dexie.gartens.get(
-        nachKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const nachKulturHerkunft = await dexie.herkunfts.get(
-        nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const sammelLieferung = await dexie.sammel_lieferungs.get(
-        l.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const aeArt = await art?.aeArt()
+      const lieferungPerson = await l.person()
+      const vonSammlung = await l.sammlung()
+      const vonSammlungPerson = await vonSammlung?.person()
+      const vonSammlungHerkunft = await vonSammlung?.herkunft()
+      const vonKultur = await l.vonKultur()
+      const vonKulturGarten = await vonKultur?.garten()
+      const vonKulturHerkunft = await vonKultur?.herkunft()
+      const nachKultur = await l.nachKultur()
+      const nachKulturGarten = await nachKultur?.garten()
+      const nachKulturHerkunft = await nachKultur?.herkunft()
+      const sammelLieferung = await l.sammelLieferung()
 
       const newZ = {
         id: l.id,
@@ -368,12 +316,8 @@ const buildExceljsWorksheets = async ({
   const eventsSorted = events.sort(eventSort)
   const eventsData = await Promise.all(
     eventsSorted.map(async (e) => {
-      const teilkultur = await dexie.teilkulturs.get(
-        e.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const person = await dexie.persons.get(
-        e.person_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const teilkultur = await e.teilkultur()
+      const person = await e.person()
 
       const newZ = {
         id: e.id,

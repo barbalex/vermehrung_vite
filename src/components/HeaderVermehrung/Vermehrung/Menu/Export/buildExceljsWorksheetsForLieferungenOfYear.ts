@@ -24,7 +24,7 @@ const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
   const lieferungsdata = await Promise.all(
     lieferungsSorted.map(async (l) => {
       const lieferungPerson = await l.person()
-      const vonSammlung: Sammlung = await l.vonSammlung()
+      const vonSammlung: Sammlung = await l.sammlung()
       const von_sammlung_label = await vonSammlung?.label()
       const vonSammlungPerson = await vonSammlung?.person()
       const vonSammlungHerkunft = await vonSammlung?.herkunft()

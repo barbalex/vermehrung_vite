@@ -617,7 +617,7 @@ export class Lieferung {
     )
   }
 
-  async vonSammlung() {
+  async sammlung() {
     return await dexie.sammlungs.get(
       this.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
     )

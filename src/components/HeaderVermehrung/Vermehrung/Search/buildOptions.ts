@@ -1,6 +1,5 @@
 import Fuse from 'fuse.js'
 import { DateTime } from 'luxon'
-// import { first as first$ } from 'rxjs/operators'
 
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import lieferungLabelFromLieferung from '../../../../utils/lieferungLabelFromLieferung'
@@ -15,15 +14,7 @@ import herkunftSort from '../../../../utils/herkunftSort'
 import lieferungSort from '../../../../utils/lieferungSort'
 import personSort from '../../../../utils/personSort'
 import zaehlungSort from '../../../../utils/zaehlungSort'
-import {
-  dexie,
-  Kultur,
-  Garten,
-  Herkunft,
-  Art,
-  Event,
-  Person,
-} from '../../../../dexieClient'
+import { dexie, Kultur, Garten, Art, Event } from '../../../../dexieClient'
 
 const threshold = 0.2
 const distance = 1000 // ensure text in long labels is found
@@ -242,35 +233,21 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchLieferungSuggestions = await Promise.all(
     lieferungsSorted.map(async (l) => {
-      const person=await l.person()
+      const person = await l.person()
       const sammlung = await l.sammlung()
-      const sammlungPerson=await sammlung?.person()
-      let sammlungHerkunft
-      try {
-        sammlungHerkunft = await sammlung?.herkunft?.fetch()
-      } catch {}
-      const vonKultur = kulturs.find((k) => k.id === l.von_kultur_id)
-      let vonKulturGarten
-      try {
-        vonKulturGarten = await vonKultur?.garten?.fetch()
-      } catch {}
-      let vonKulturGartenPerson
-      try {
-        vonKulturGartenPerson = await vonKulturGarten?.person?.fetch()
-      } catch {}
-      const nachKultur = kulturs.find((k) => k.id === l.nach_kultur_id)
-      let nachKulturGarten
-      try {
-        nachKulturGarten = await nachKultur?.garten?.fetch()
-      } catch {}
-      let nachKulturGartenPerson
-      try {
-        nachKulturGartenPerson = await nachKulturGarten?.person?.fetch()
-      } catch {}
-      let art
-      try {
-        art = await l?.art?.fetch()
-      } catch {}
+      const sammlungPerson = await sammlung?.person()
+      const sammlungHerkunft = await sammlung?.herkunft()
+      const vonKultur = await dexie.kulturs.get(
+        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const vonKulturGarten = await vonKultur?.garten()
+      const vonKulturGartenPerson = await vonKulturGarten?.person()
+      const nachKultur = await dexie.kulturs.get(
+        l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
+      const nachKulturGarten = await nachKultur?.garten()
+      const nachKulturGartenPerson = nachKulturGarten?.person()
+      const art = await l.art()
       const artname = (await art?.label?.()) ?? ''
 
       return {
@@ -362,10 +339,7 @@ const buildOptions = async ({ store, cb, val }) => {
   const searchSammlungSuggestions = await Promise.all(
     sammlungsSorted.map(async (s) => {
       const label = await s.label()
-      let herkunft
-      try {
-        herkunft = await s.herkunft.fetch()
-      } catch {}
+      const herkunft = await s.herkunft()
 
       return {
         value: s.id,
