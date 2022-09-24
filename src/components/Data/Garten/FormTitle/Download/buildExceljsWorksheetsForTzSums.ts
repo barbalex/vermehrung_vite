@@ -2,6 +2,7 @@ import { Q } from '@nozbe/watermelondb'
 
 import addWorksheetToExceljsWorkbook from '../../../../../utils/addWorksheetToExceljsWorkbook'
 import teilzaehlungsSortByTk from '../../../../../utils/teilzaehlungsSortByTk'
+import { dexie } from '../../../../../dexieClient'
 
 /**
  * this function cann be used from higher up
@@ -14,7 +15,10 @@ const buildExceljsWorksheetsForTzSums = async ({
 }) => {
   const { db } = store
 
-  let teilzaehlungs = []
+  const garten = await dexie.gartens.get(garten_id)
+  const kultur = await garten?.kulturs()
+
+  const teilzaehlungs = await dexie.teilzaehlungs.where({}).filter().toArray()
   try {
     teilzaehlungs = await db
       .get('teilzaehlung')

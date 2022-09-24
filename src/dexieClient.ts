@@ -1003,6 +1003,13 @@ export class Garten implements IGarten {
     )
   }
 
+  async kulturs() {
+    return await dexie.kulturs
+      .where({ garten_id: this.id })
+      .filter((k) => k.aktiv === true && k._deleted === false)
+      .toArray()
+  }
+
   async label() {
     const person = await dexie.persons.get(
       this.person_id ?? '99999999-9999-9999-9999-999999999999',
