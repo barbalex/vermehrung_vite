@@ -5,8 +5,7 @@ import Menu from '@mui/material/Menu'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import { IoMdInformationCircleOutline } from 'react-icons/io'
-import { Q } from '@nozbe/watermelondb'
-import { of as $of } from 'rxjs'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../../../storeContext'
 import TextField from '../../../../../../shared/TextField'
@@ -15,6 +14,7 @@ import exists from '../../../../../../../utils/exists'
 import constants from '../../../../../../../utils/constants'
 import zaehlungSort from '../../../../../../../utils/zaehlungSort'
 import ErrorBoundary from '../../../../../../shared/ErrorBoundary'
+import { dexie } from '../../../../../../../dexieClient'
 
 const TitleRow = styled.div`
   display: flex;
@@ -46,17 +46,14 @@ const PrognoseMenu = ({
   const store = useContext(StoreContext)
   const { addNotification, insertZaehlungRev, db } = store
 
-  const [zaehlung, setZaehlung] = useState(null)
-  useEffect(() => {
-    const zaehlungObservable = teilzaehlung.zaehlung_id
-      ? teilzaehlung.zaehlung.observe()
-      : $of({})
-    const subscription = zaehlungObservable.subscribe((zaehlung) =>
-      setZaehlung(zaehlung),
-    )
+  const zaehlung = useLiveQuery(
+    async () =>
+      await dexie.zaehlungs.get(
+        teilzaehlung?.zaehlung_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    [teilzaehlung?.zaehlung_id],
+  )
 
-    return () => subscription?.unsubscribe?.()
-  }, [teilzaehlung.zaehlung, teilzaehlung.zaehlung_id])
   const kulturId = zaehlung?.kultur_id
 
   const [jahr, setJahr] = useState(null)
@@ -91,18 +88,10 @@ const PrognoseMenu = ({
       // we have both values. Let's go on
       // check if zaehlung with date of 15.09. of year exist
       const dateOfZaehlung = `${yearToUse}-09-15`
-      let existingZaehlungData = []
-      try {
-        existingZaehlungData = await db
-          .get('zaehlung')
-          .query(
-            Q.where('_deleted', false),
-            Q.where('prognose', true),
-            Q.where('datum', dateOfZaehlung),
-            Q.where('kultur_id', kulturId),
-          )
-          .fetch()
-      } catch {}
+      const existingZaehlungData = await dexie.zaehlungs
+        .where({ kultur_id: kulturId, datum: dateOfZaehlung })
+        .filter((z) => z.prognose === true && z._deleted === false)
+        .toArray()
       const existingZaehlungDataSorted = existingZaehlungData.sort(zaehlungSort)
       const existingZaehlung = existingZaehlungDataSorted?.[0]
       // if not: create it first
@@ -121,9 +110,9 @@ const PrognoseMenu = ({
       // fetch teilzaehlungen with zaehlung_id === newZaehlungId, then update that
       // if inserting there will be two teilzaehlungs because of server trigger
       const interval = setInterval(async () => {
-        const newTzs = await db
-          .get('teilzaehlung')
-          .query(Q.where('zaehlung_id', zaehlungId))
+        const newTzs = await dexie.teilzaehlungs
+          .where({ zaehlung_id: zaehlungId })
+          .toArray()
         const newTz = newTzs?.[0]
         if (newTz) {
           clearInterval(interval)
@@ -149,7 +138,6 @@ const PrognoseMenu = ({
       kulturId,
       setAnchorEl,
       store,
-      db,
     ],
   )
   const onClickAbbrechen = useCallback(() => setAnchorEl(null), [setAnchorEl])

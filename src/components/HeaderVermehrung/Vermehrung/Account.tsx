@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react'
+import React, { useState, useCallback, useContext } from 'react'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Menu from '@mui/material/Menu'
@@ -11,15 +11,15 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { FaUserCircle as UserIcon, FaExclamationCircle } from 'react-icons/fa'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
-// import { of as $of } from 'rxjs'
-// import { Q } from '@nozbe/watermelondb'
 import { sendPasswordResetEmail } from 'firebase/auth'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import ErrorBoundary from '../../shared/ErrorBoundary'
 import logout from '../../../utils/logout'
 import constants from '../../../utils/constants'
 import personFullname from '../../../utils/personFullname'
+import { dexie } from '../../../dexieClient'
 
 const StyledUserIcon = styled(UserIcon)`
   color: white;
@@ -35,22 +35,12 @@ const RiskyButton = styled(Button)`
 
 const Account = () => {
   const store = useContext(StoreContext)
-  const { user, online, db, queuedQueries, firebaseAuth } = store
+  const { user, online, queuedQueries, firebaseAuth } = store
 
-  const [userPerson, setUserPerson] = useState(undefined)
-  // useEffect(() => {
-  //   const userPersonObservable = user.uid
-  //     ? db
-  //         .get('person')
-  //         .query(Q.where('account_id', user.uid))
-  //         .observeWithColumns(['vorname', 'name'])
-  //     : $of({})
-  //   const subscription = userPersonObservable.subscribe(([userPerson]) =>
-  //     setUserPerson(userPerson),
-  //   )
-
-  //   return () => subscription?.unsubscribe?.()
-  // }, [db, user])
+  const userPerson = useLiveQuery(
+    async () => await dexie.persons.get({ account_id: user.uid }),
+    [user.uid],
+  )
 
   const [anchorEl, setAnchorEl] = useState(null)
   const [resetTitle, setResetTitle] = useState('Passwort zurücksetzen')
