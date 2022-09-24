@@ -1,31 +1,19 @@
 import sortBy from 'lodash/sortBy'
-// import { first as first$ } from 'rxjs/operators'
 
 import gartenLabelFromGarten from './gartenLabelFromGarten'
+import { Kultur } from '../dexieClient'
 
 const kultursSortedFromKulturs = async (kulturs) => {
   const kulturSorters = await Promise.all(
-    kulturs.map(async (kultur) => {
-      let art
-      try {
-        art = await kultur?.art?.fetch()
-      } catch {}
+    kulturs.map(async (kultur: Kultur) => {
+      const art = await kultur.art()
       const artLabel = await art?.label()
-      let herkunft
-      try {
-        herkunft = await kultur?.herkunft?.fetch()
-      } catch {}
+      const herkunft = await kultur.herkunft()
       const herkunftNr = herkunft?.nr
       const herkunftGemeinde = herkunft?.gemeinde
       const herkunftLokalname = herkunft?.lokalname
-      let garten
-      try {
-        garten = await kultur?.garten?.fetch()
-      } catch {}
-      let gartenPerson
-      try {
-        gartenPerson = await garten?.person?.fetch()
-      } catch {}
+      const garten = await kultur.garten()
+      const gartenPerson = await kultur.gartenPerson()
       const gartenLabel = await gartenLabelFromGarten({
         garten,
         person: gartenPerson,

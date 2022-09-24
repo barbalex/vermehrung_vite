@@ -1133,6 +1133,38 @@ export class Kultur implements IKultur {
       .toArray()
   }
 
+  async art() {
+    return await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async garten() {
+    return await dexie.gartens.get(
+      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async gartenPerson() {
+    const garten = await this.garten()
+    return await dexie.persons.get(
+      garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async aeArt() {
+    const art = await this.art()
+    return await dexie.ae_arts.get(
+      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async herkunft() {
+    return await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
   async label() {
     const garten = await dexie.gartens.get(
       this.garten_id ?? '99999999-9999-9999-9999-999999999999',
@@ -2150,7 +2182,9 @@ export class SammelLieferung implements ISammelLieferung {
 
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
-    const userPerson: Person = await dexie.persons.get({ account_id: user.uid })
+    const userPerson: Person = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
     const userPersonOption = await dexie.person_options.get(userPerson.id)
 
     unsetError(`sammel_lieferung.${field}`)

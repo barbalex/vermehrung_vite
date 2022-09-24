@@ -1,7 +1,5 @@
 import format from 'date-fns/format'
 import sumBy from 'lodash/sumBy'
-// import { Q } from '@nozbe/watermelondb'
-// import { first as first$ } from 'rxjs/operators'
 
 import addWorksheetToExceljsWorkbook from '../../../../../utils/addWorksheetToExceljsWorkbook'
 import herkunftLabelFromHerkunft from '../../../../../utils/herkunftLabelFromHerkunft'
@@ -9,68 +7,59 @@ import exists from '../../../../../utils/exists'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
 import zaehlungSort from '../../../../../utils/zaehlungSort'
 import lieferungSort from '../../../../../utils/lieferungSort'
+import totalFilter from '../../../../../utils/totalFilter'
+import { dexie, Kultur } from '../../../../../dexieClient'
 
 const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
   store,
   workbook,
 }) => {
-  const { db } = store
-
-  let kulturs = []
-  try {
-    // kulturs =
-    //   (await db
-    //     .get('kultur')
-    //     .query(
-    //       Q.where('_deleted', false),
-    //       Q.where('aktiv', true),
-    //       Q.where('garten_id', Q.notEq(null)),
-    //       Q.on('garten', [Q.where('aktiv', true), Q.where('_deleted', false)]),
-    //     )
-    //     .fetch()) ?? []
-    kulturs = [] // TODO: dexie
-  } catch {}
+  const gartens = await dexie.gartens
+    .filter((value) => totalFilter({ value, store, table: 'garten' }))
+    .toArray()
+  const gartenIds = gartens.map((g) => g.id)
+  const kulturs = await dexie.kulturs
+    .where('garten_id')
+    .anyOf(gartenIds)
+    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+    .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
   const kultursData = await Promise.all(
-    kultursSorted.map(async (kultur) => {
+    kultursSorted.map(async (kultur: Kultur) => {
       const kulturLabel = await kultur.label()
-      let art
-      try {
-        art = await kultur.art.fetch()
-      } catch {}
-      const artname = await art.label()
-      let herkunft
-      try {
-        herkunft = await kultur.herkunft.fetch()
-      } catch {}
-      let garten
-      try {
-        garten = await kultur.garten.fetch()
-      } catch {}
+      const art = await kultur.art()
+      const artname = await art?.label()
+      const herkunft = await kultur.herkunft()
+      const garten = await kultur.garten()
       const garten_label = await garten.label()
-
-      let ownZaehlungen = []
-      try {
-        ownZaehlungen = [] // TODO: dexie
-        // (await db
-        //   .get('zaehlung')
-        //   .query(
-        //     Q.where('_deleted', false),
-        //     Q.where('kultur_id', kultur.id),
-        //     Q.where('datum', Q.notEq(null)),
-        //     Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-        //   )
-        //   .fetch()) ?? []
-      } catch {}
+      const zaehlungsOfKultur = await dexie.zaehlungs
+        .where({ kultur_id: kultur.id })
+        .filter((k) => k._deleted === false)
+        .toArray()
+      const idsOfZaehlungsOfKultur = zaehlungsOfKultur.map((z) => z.id)
+      const tzsWithAnzahlPflanzen = await dexie.teilzaehlungs
+        .where('zaehlung_id')
+        .anyOf(idsOfZaehlungsOfKultur)
+        .filter((t) => t._deleted === false && exists(t.anzahl_pflanzen))
+        .toArray()
+      const idsOfZaehlungsWithTzsWithAnzahlPflanzen = [
+        ...new Set(tzsWithAnzahlPflanzen.map((t) => t.zaehlung_id)),
+      ]
+      const ownZaehlungen = await dexie.zaehlungs
+        .where('id')
+        .anyOf(idsOfZaehlungsWithTzsWithAnzahlPflanzen)
+        .filter(
+          (z) => z._deleted === false && !!z.datum && z.kultur_id === kultur.id,
+        )
+        .toArray()
       const ownZaehlungenSorted = ownZaehlungen.sort(zaehlungSort)
       const lastZaehlung = ownZaehlungenSorted[ownZaehlungenSorted.length - 1]
-      let lZTeilzaehlungs = []
-      try {
-        lZTeilzaehlungs = [] // TODO: dexie
-        // (await lastZaehlung?.teilzaehlungs
-        //   .extend(Q.where('_deleted', false))
-        //   .fetch()) ?? []
-      } catch {}
+      const lZTeilzaehlungs = lastZaehlung
+        ? await dexie.teilzaehlungs
+            .where({ zaehlung_id: lastZaehlung.id })
+            .filter((t) => t._deleted === false)
+            .toArray()
+        : []
 
       // danger: sumBy returns 0 when field was undefined!
       const tzsToSumAnzahlPflanzen = lZTeilzaehlungs.filter((l) =>
@@ -99,42 +88,29 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
             (anzahl_mutterpflanzen ?? 0)
           : ''
 
-      let lieferungs = []
-      try {
-        lieferungs = [] // TODO: dexie
-        // (await db
-        //   .get('lieferung')
-        //   .query(
-        //     Q.where('_deleted', false),
-        //     Q.where('geplant', false),
-        //     Q.where('datum', Q.notEq(null)),
-        //     Q.where('anzahl_pflanzen', Q.notEq(null)),
-        //   )
-        //   .fetch()) ?? []
-      } catch {}
-      const lieferungsSorted = lieferungs.sort(lieferungSort)
+      const ownAusLieferungsGeplant = await dexie.lieferungs
+        .where({ von_kultur_id: kultur.id })
+        .filter(
+          (l) =>
+            l._deleted === false &&
+            l.geplant === true &&
+            !!l.datum &&
+            exists(l.anzahl_pflanzen),
+        )
+        .toArray()
 
-      let lieferungsGeplant = []
-      try {
-        lieferungsGeplant = [] // TODO: dexie
-        // (await db
-        //   .get('lieferung')
-        //   .query(
-        //     Q.where('_deleted', false),
-        //     Q.where('geplant', true),
-        //     Q.where('datum', Q.notEq(null)),
-        //     Q.where('anzahl_pflanzen', Q.notEq(null)),
-        //   )
-        //   .fetch()) ?? []
-      } catch {}
-      const lieferungsGeplantSorted = lieferungsGeplant.sort(lieferungSort)
-      const ownAusLieferungsGeplant = lieferungsGeplantSorted.filter(
-        (l) => l.von_kultur_id === kultur.id,
-      )
+      const ownAusLieferungenUnsorted = await dexie.lieferungs
+        .where({ von_kultur_id: kultur.id })
+        .filter(
+          (l) =>
+            l._deleted === false &&
+            l.geplant === false &&
+            !!l.datum &&
+            exists(l.anzahl_pflanzen),
+        )
+        .toArray()
 
-      const ownAusLieferungen = lieferungsSorted.filter(
-        (l) => l.von_kultur_id === kultur.id,
-      )
+      const ownAusLieferungen = ownAusLieferungenUnsorted.sort(lieferungSort)
       const lastAusLieferung = ownAusLieferungen[ownAusLieferungen.length - 1]
       const letzte_lieferung_anzahl_pflanzen =
         lastAusLieferung?.anzahl_pflanzen ?? ''
@@ -184,9 +160,17 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
             (auslSinceAnzahlMutterpflanzen ?? 0)
           : ''
 
-      const ownAnLieferungen = lieferungsSorted.filter(
-        (l) => l.nach_kultur_id === kultur.id,
-      )
+      const ownAnLieferungenUnsorted = await dexie.lieferungs
+        .where({ nach_kultur_id: kultur.id })
+        .filter(
+          (l) =>
+            l._deleted === false &&
+            l.geplant === false &&
+            !!l.datum &&
+            exists(l.anzahl_pflanzen),
+        )
+        .toArray()
+      const ownAnLieferungen = ownAnLieferungenUnsorted.sort(lieferungSort)
 
       const anlSinceLastZaehlung = ownAnLieferungen
         .filter(
@@ -298,6 +282,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
             (anlSinceAnzahlJungpflanzen || 0)
           : '',
         auslieferungen_geplant: ownAusLieferungsGeplant
+          .sort(lieferungSort)
           .map(
             (l) =>
               `${format(new Date(l.datum), 'yyyy.MM.dd')}: ${
