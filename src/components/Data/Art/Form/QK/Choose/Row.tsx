@@ -32,7 +32,9 @@ const ChooseArtQkRow = ({ qk }) => {
   const { user } = store
 
   const data = useLiveQuery(async () => {
-    const person = await dexie.persons.get({ account_id: user.uid })
+    const person = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
     const personOption = await dexie.person_options.get(person.id)
     const artQks = await dexie.art_qks
       .filter((q) => q._deleted === false)
@@ -71,7 +73,7 @@ const ChooseArtQkRow = ({ qk }) => {
       <Titel>{qk?.titel}</Titel>
       {!!qk?.beschreibung && <Beschreibung>{qk?.beschreibung}</Beschreibung>}
     </Row>
-  ) 
+  )
 }
 
 export default observer(ChooseArtQkRow)

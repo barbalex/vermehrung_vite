@@ -38,7 +38,7 @@ const Root = ({ filter: showFilter }) => {
   const activeNodeArray = activeNodeArrayRaw.toJSON()
 
   const data = useLiveQuery(async () => {
-    const person: Person = await dexie.persons.get({ account_id: user.uid })
+    const person: Person = await dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' })
     const userRole = await dexie.user_roles.get(person.user_role_id)
     const personOption = await dexie.person_options.get(person.id)
 

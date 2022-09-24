@@ -47,7 +47,7 @@ const SammelLieferungForm = ({
 
   const data = useLiveQuery(async () => {
     const [person, vonSammlung] = await Promise.all([
-      dexie.persons.get({ account_id: user.uid }),
+      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
       dexie.sammlungs.get(
         row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
       ),

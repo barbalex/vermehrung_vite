@@ -75,7 +75,7 @@ const Coordinates = ({ row, saveToDb: originalSaveToDb }) => {
   const { id, lv95_x, lv95_y, wgs84_lat, wgs84_long } = row
 
   const userPersonOption = useLiveQuery(async () => {
-    const userPerson = await dexie.persons.get({ account_id: user.uid })
+    const userPerson = await dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' })
     const userPersonOption = await dexie.person_options.get(userPerson.id)
 
     return userPersonOption

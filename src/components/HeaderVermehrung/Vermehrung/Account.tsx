@@ -37,8 +37,12 @@ const Account = () => {
   const store = useContext(StoreContext)
   const { user, online, queuedQueries, firebaseAuth } = store
 
+
   const userPerson = useLiveQuery(
-    async () => await dexie.persons.get({ account_id: user.uid }),
+    async () =>
+      await dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
     [user.uid],
   )
 

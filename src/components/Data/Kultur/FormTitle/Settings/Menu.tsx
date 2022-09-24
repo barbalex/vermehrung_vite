@@ -27,7 +27,7 @@ const SettingsKulturMenu = ({ anchorEl, setAnchorEl, kulturId }) => {
   const data = useLiveQuery(async () => {
     const [kulturOption, person] = await Promise.all([
       dexie.kultur_options.get(kulturId),
-      dexie.persons.get({ account_id: user.uid }),
+      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
     ])
     const personOption: PersonOption = await dexie.person_options.get(person.id)
 

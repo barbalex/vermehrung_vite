@@ -64,7 +64,7 @@ const Personen = ({ filter: showFilter, width, height }) => {
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .count(),
-      dexie.persons.get({ account_id: user.uid }),
+      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
     ])
 
     const personsSorted = persons.sort(personSort)
