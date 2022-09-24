@@ -323,6 +323,18 @@ export class Sammlung implements ISammlung {
     this._conflicts = _conflicts ?? null
   }
 
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async herkunft() {
+    return await dexie.herkunfts.get(
+      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
   async label() {
     const herkunft = await dexie.herkunfts.get(
       this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
@@ -570,15 +582,32 @@ export class Lieferung {
     this._conflicts = _conflicts ?? null
   }
 
-  async von_kultur() {
+  async art() {
+    return await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async vonKultur() {
     return await dexie.kulturs.get(
       this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
 
-  async nach_kultur() {
+  async nachKultur() {
     return await dexie.kulturs.get(
       this.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async vonSammlung() {
+    return await dexie.sammlungs.get(
+      this.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
 

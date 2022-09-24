@@ -5,6 +5,7 @@ import { DateTime } from 'luxon'
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import lieferungLabelFromLieferung from '../../../../utils/lieferungLabelFromLieferung'
 import tableFilter from '../../../../utils/tableFilter'
+import totalFilter from '../../../../utils/totalFilter'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import sammlungsSortedFromSammlungs from '../../../../utils/sammlungsSortedFromSammlungs'
@@ -16,6 +17,7 @@ import lieferungSort from '../../../../utils/lieferungSort'
 import personSort from '../../../../utils/personSort'
 import zaehlungSort from '../../../../utils/zaehlungSort'
 import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
+import { dexie } from '../../../../dexieClient'
 
 const threshold = 0.2
 const distance = 1000 // ensure text in long labels is found
@@ -26,67 +28,39 @@ const formatDateForSearch = (datum) =>
 const buildOptions = async ({ store, cb, val }) => {
   const { db } = store
 
-  let arts = []
-  try {
-    arts = await db
-      .get('art')
-      .query(...tableFilter({ store, table: 'art' }))
-      .fetch()
-  } catch {}
+  const arts = await dexie.arts
+    .filter((value) => totalFilter({ value, store, table: 'art' }))
+    .toArray()
   const artsSorted = await artsSortedFromArts(arts)
 
-  let events = []
-  try {
-    events = await db
-      .get('event')
-      .query(...tableFilter({ store, table: 'event' }))
-      .fetch()
-  } catch {}
+  const events = await dexie.events
+    .filter((value) => totalFilter({ value, store, table: 'event' }))
+    .toArray()
   const eventsSorted = events.sort(eventSort)
 
-  let gartens = []
-  try {
-    gartens = await db
-      .get('garten')
-      .query(...tableFilter({ store, table: 'garten' }))
-      .fetch()
-  } catch {}
+  const gartens = await dexie.gartens
+    .filter((value) => totalFilter({ value, store, table: 'garten' }))
+    .toArray()
   const gartensSorted = await gartensSortedFromGartens(gartens)
 
-  let herkunfts = []
-  try {
-    herkunfts = await db
-      .get('herkunft')
-      .query(...tableFilter({ store, table: 'herkunft' }))
-      .fetch()
-  } catch {}
+  const herkunfts = await dexie.herkunfts
+    .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
+    .toArray()
   const herkunftsSorted = herkunfts.sort(herkunftSort)
 
-  let kulturs = []
-  try {
-    kulturs = await db
-      .get('kultur')
-      .query(...tableFilter({ store, table: 'kultur' }))
-      .fetch()
-  } catch {}
+  const kulturs = await dexie.kulturs
+    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+    .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
 
-  let lieferungs = []
-  try {
-    lieferungs = await db
-      .get('lieferung')
-      .query(...tableFilter({ store, table: 'lieferung' }))
-      .fetch()
-  } catch {}
+  const lieferungs = await dexie.lieferungs
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
-  let persons = []
-  try {
-    persons = await db
-      .get('person')
-      .query(...tableFilter({ store, table: 'person' }))
-      .fetch()
-  } catch {}
+  const persons = await dexie.persons
+    .filter((value) => totalFilter({ value, store, table: 'person' }))
+    .toArray()
   const personsSorted = persons.sort(personSort)
 
   let sammlungs = []
