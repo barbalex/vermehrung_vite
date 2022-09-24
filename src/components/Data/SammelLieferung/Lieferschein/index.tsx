@@ -19,6 +19,8 @@ import personFullname from '../../../../utils/personFullname'
 import constants from '../../../../utils/constants'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import ProgressiveImg from '../../../shared/ProgressiveImg'
+import image from '../../../../images/toposLogo.png'
 
 const Container = styled.div`
   overflow: auto;
@@ -145,12 +147,12 @@ const Lieferschein = ({ row }) => {
   return (
     <Container>
       <PageContainer className="querformat printer-content">
-        <img
-          src="../../../../images/toposLogo.png"
+        <ProgressiveImg
+          src={image}
+          placeholderSrc={image}
           alt="topos Logo"
-          width={500}
-          height={87}
-          layout="fixed"
+          width="500px"
+          height="87px"
         />
         <Title>Lieferschein</Title>
         <HeaderRow>
