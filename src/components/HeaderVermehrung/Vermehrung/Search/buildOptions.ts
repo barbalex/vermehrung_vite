@@ -242,18 +242,9 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchLieferungSuggestions = await Promise.all(
     lieferungsSorted.map(async (l) => {
-      let person
-      try {
-        person = await l?.person?.fetch()
-      } catch {}
-      let sammlung
-      try {
-        sammlung = await l?.sammlung?.fetch()
-      } catch {}
-      let sammlungPerson
-      try {
-        sammlungPerson = await sammlung?.person?.fetch()
-      } catch {}
+      const person=await l.person()
+      const sammlung = await l.sammlung()
+      const sammlungPerson=await sammlung?.person()
       let sammlungHerkunft
       try {
         sammlungHerkunft = await sammlung?.herkunft?.fetch()

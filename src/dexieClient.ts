@@ -334,15 +334,21 @@ export class Sammlung implements ISammlung {
     this._conflicts = _conflicts ?? null
   }
 
-  async person() {
-    return await dexie.persons.get(
-      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+  async art() {
+    return await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
 
   async herkunft() {
     return await dexie.herkunfts.get(
       this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
 
@@ -616,9 +622,16 @@ export class Lieferung {
       this.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
+
   async person() {
     return await dexie.persons.get(
       this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async sammelLieferung() {
+    return await dexie.sammel_lieferungs.get(
+      this.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
 
@@ -773,6 +786,12 @@ export class Art implements IArt {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async aeArt() {
+    return await dexie.ae_arts.get(
+      this.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async label() {
@@ -1430,6 +1449,26 @@ export class Teilkultur implements ITeilkultur {
     this._conflicts = _conflicts ?? null
   }
 
+  async kultur() {
+    return await dexie.kulturs.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async events() {
+    return await dexie.events
+      .where({ teilkultur_id: this.id })
+      .filter((e) => e._deleted === false)
+      .toArray()
+  }
+
+  async teilzaehlungs() {
+    return await dexie.n
+      .where({ teilkultur_id: this.id })
+      .filter((e) => e._deleted === false)
+      .toArray()
+  }
+
   removeConflict(_rev: string) {
     this._conflicts = this._conflicts.filter((r) => r !== _rev)
   }
@@ -1573,6 +1612,19 @@ export class Zaehlung implements IZaehlung {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async kultur() {
+    return await dexie.kulturs.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async teilzaehlungs() {
+    return await dexie.teilzaehlungs
+      .where({ zaehlung_id: this.id })
+      .filter((t) => t._deleted === false)
+      .toArray()
   }
 
   async label({ store }) {
@@ -1744,6 +1796,18 @@ export class Teilzaehlung implements ITeilzaehlung {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async zaehlung() {
+    return await dexie.zaehlungs.get(
+      this.zaehlung_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async teilkultur() {
+    return await dexie.teilkultur.get(
+      this.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   label() {
@@ -1975,6 +2039,41 @@ export class Person implements IPerson {
     this._conflicts = _conflicts ?? null
   }
 
+  async sammelLieferungs() {
+    return await dexie.sammel_lieferungs
+      .where({ person_id: this.id })
+      .filter((s) => s._deleted === false)
+      .toArray()
+  }
+
+  async lieferungs() {
+    return await dexie.lieferungs
+      .where({ person_id: this.id })
+      .filter((s) => s._deleted === false)
+      .toArray()
+  }
+
+  async sammlungs() {
+    return await dexie.sammlungs
+      .where({ person_id: this.id })
+      .filter((s) => s._deleted === false)
+      .toArray()
+  }
+
+  async gartens() {
+    return await dexie.gartens
+      .where({ person_id: this.id })
+      .filter((s) => s._deleted === false && s.aktiv === true)
+      .toArray()
+  }
+
+  async events() {
+    return await dexie.events
+      .where({ person_id: this.id })
+      .filter((s) => s._deleted === false)
+      .toArray()
+  }
+
   fullname() {
     if (this.vorname && this.name) {
       return `${this.vorname} ${this.name}`
@@ -2199,6 +2298,36 @@ export class SammelLieferung implements ISammelLieferung {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async art() {
+    return await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async vonSammlung() {
+    return await dexie.sammlungs.get(
+      this.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async vonKultur() {
+    return await dexie.kulturs.get(
+      this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async nachKultur() {
+    return await dexie.kulturs.get(
+      this.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async label() {
@@ -2573,6 +2702,18 @@ export class Av implements IAv {
     this._conflicts = _conflicts ?? null
   }
 
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async art() {
+    return await dexie.arts.get(
+      this.art_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
   async personLabel() {
     const person = await dexie.persons.get(
       this.person_id ?? '99999999-9999-9999-9999-999999999999',
@@ -2715,6 +2856,18 @@ export class Gv implements IGv {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async garten() {
+    return await dexie.gartens.get(
+      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async personLabel() {
