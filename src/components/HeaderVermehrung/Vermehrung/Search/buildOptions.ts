@@ -4,7 +4,6 @@ import { DateTime } from 'luxon'
 
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import lieferungLabelFromLieferung from '../../../../utils/lieferungLabelFromLieferung'
-import tableFilter from '../../../../utils/tableFilter'
 import totalFilter from '../../../../utils/totalFilter'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
@@ -16,8 +15,15 @@ import herkunftSort from '../../../../utils/herkunftSort'
 import lieferungSort from '../../../../utils/lieferungSort'
 import personSort from '../../../../utils/personSort'
 import zaehlungSort from '../../../../utils/zaehlungSort'
-import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
-import { dexie } from '../../../../dexieClient'
+import {
+  dexie,
+  Kultur,
+  Garten,
+  Herkunft,
+  Art,
+  Event,
+  Person,
+} from '../../../../dexieClient'
 
 const threshold = 0.2
 const distance = 1000 // ensure text in long labels is found
@@ -26,8 +32,6 @@ const formatDateForSearch = (datum) =>
   datum ? DateTime.fromSQL(datum).toFormat('yyyy.LL.dd') : ''
 
 const buildOptions = async ({ store, cb, val }) => {
-  const { db } = store
-
   const arts = await dexie.arts
     .filter((value) => totalFilter({ value, store, table: 'art' }))
     .toArray()
@@ -63,22 +67,14 @@ const buildOptions = async ({ store, cb, val }) => {
     .toArray()
   const personsSorted = persons.sort(personSort)
 
-  let sammlungs = []
-  try {
-    sammlungs = await db
-      .get('sammlung')
-      .query(...tableFilter({ store, table: 'sammlung' }))
-      .fetch()
-  } catch {}
+  const sammlungs = await dexie.sammlungs
+    .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+    .toArray()
   const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
 
-  let zaehlungs = []
-  try {
-    zaehlungs = await db
-      .get('zaehlung')
-      .query(...tableFilter({ store, table: 'zaehlung' }))
-      .fetch()
-  } catch {}
+  const zaehlungs = await dexie.zaehlungs
+    .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
+    .toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
 
   const options = []
@@ -108,10 +104,7 @@ const buildOptions = async ({ store, cb, val }) => {
   const searchGartenSuggestions = await Promise.all(
     gartensSorted.map(async (g) => {
       const label = await g.label()
-      let person
-      try {
-        person = await g.person.fetch()
-      } catch {}
+      const person = await g.person()
 
       return {
         value: g.id,
@@ -149,7 +142,7 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchHerkunftSuggestions = herkunftsSorted.map((h) => ({
     value: h.id,
-    label: herkunftLabelFromHerkunft({ herkunft: h }),
+    label: h.label(),
     ...h,
     type: 'Herkuenfte',
   }))
@@ -177,18 +170,9 @@ const buildOptions = async ({ store, cb, val }) => {
   const searchKulturSuggestions = await Promise.all(
     kultursSorted.map(async (k) => {
       const label = await k.label()
-      let garten
-      try {
-        garten = await k.garten.fetch()
-      } catch {}
-      let gartenPerson
-      try {
-        gartenPerson = await garten.person.fetch()
-      } catch {}
-      let herkunft
-      try {
-        herkunft = await k.herkunft.fetch()
-      } catch {}
+      const garten = await k.garten()
+      const gartenPerson = await garten?.person()
+      const herkunft = await k.herkunft()
 
       return {
         value: k.id,
@@ -219,25 +203,13 @@ const buildOptions = async ({ store, cb, val }) => {
       options: kulturSuggestions,
     })
   }
-  const searchEventSuggestions = eventsSorted.map(async (e) => {
+  const searchEventSuggestions = eventsSorted.map(async (e: Event) => {
     const label = await e.label()
-    let kultur
-    try {
-      kultur = await e.kultur?.fetch()
-    } catch {}
-    let art
-    try {
-      art = await kultur?.art?.fetch()
-    } catch {}
+    const kultur: Kultur = await e.kultur()
+    const art: Art = await kultur?.art()
     const artname = await art?.label?.()
-    let garten
-    try {
-      garten = await kultur?.garten?.fetch()
-    } catch {}
-    let gartenPerson
-    try {
-      gartenPerson = await garten?.person?.fetch()
-    } catch {}
+    const garten: Garten = await kultur?.garten()
+    const gartenPerson = await garten?.person()
 
     return {
       value: e.id,

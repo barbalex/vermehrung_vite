@@ -127,6 +127,17 @@ export class Herkunft implements IHerkunft {
     this._conflicts = _conflicts ?? null
   }
 
+  label() {
+    // only show lokalname if exist
+    // does not exist if user does not have right to see it
+    const gemeinde = this.gemeinde ?? 'keine Gemeinde'
+    const lokalname = this.lokalname
+    const nr = this.nr ?? 'keine Nr.'
+    const label = [gemeinde, lokalname, nr].filter((e) => !!e).join('; ')
+
+    return label
+  }
+
   removeConflict(_rev: string) {
     this._conflicts = this._conflicts.filter((r) => r !== _rev)
   }
@@ -965,6 +976,12 @@ export class Garten implements IGarten {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async label() {
@@ -2395,6 +2412,24 @@ export class Event implements IEvent {
     this._deleted = _deleted ?? null
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async kultur() {
+    return await dexie.kulturs.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async teilkultur() {
+    return await dexie.teilkulturs.get(
+      this.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async person() {
+    return await dexie.persons.get(
+      this.person_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   label() {
