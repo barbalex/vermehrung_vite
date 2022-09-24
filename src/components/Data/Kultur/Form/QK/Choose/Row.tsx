@@ -1,11 +1,11 @@
-import React, { useCallback, useContext, useState, useEffect } from 'react'
+import React, { useCallback, useContext, useMemo } from 'react'
 import styled from 'styled-components'
 import { observer } from 'mobx-react-lite'
 import Checkbox from '@mui/material/Checkbox'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../../storeContext'
+import { dexie } from '../../../../../../dexieClient'
 
 const Row = styled.div`
   display: flex;
@@ -29,31 +29,23 @@ const Beschreibung = styled.div`
 
 const ChooseKulturQkRow = ({ qk }) => {
   const store = useContext(StoreContext)
-  const { user, db } = store
+  const { user } = store
 
-  const [dataState, setDataState] = useState({
-    userPersonOption,
-    kulturQkChoosen: [],
-  })
-  useEffect(() => {
-    const userPersonOptionsObservable = user.uid
-      ? db
-          .get('person_option')
-          .query(Q.on('person', Q.where('account_id', user.uid)))
-          .observeWithColumns(['kultur_qk_choosen'])
-      : $of({})
-    const combinedObservables = combineLatest([userPersonOptionsObservable])
-    const subscription = combinedObservables.subscribe(([userPersonOptions]) =>
-      setDataState({
-        userPersonOption: userPersonOptions?.[0],
-        kulturQkChoosen: userPersonOptions?.[0]?.kultur_qk_choosen ?? [],
-      }),
-    )
+  const data = useLiveQuery(async () => {
+    const person = await dexie.persons.get({ account_id: user.uid })
+    const personOption = await dexie.person_options.get(person.id)
+    const kulturQks = await dexie.kultur_qks
+      .filter((q) => q._deleted === false)
+      .toArray()
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, user.uid])
-  const { userPersonOption, kulturQkChoosen } = dataState
+    return { personOption, kulturQkChoosen: kulturQks.map((q) => q.id) }
+  }, [user.uid])
 
+  const userPersonOption = data?.personOption
+  const kulturQkChoosen = useMemo(
+    () => userPersonOption?.kultur_qk_choosen ?? [],
+    [userPersonOption?.kultur_qk_choosen],
+  )
   const checked = kulturQkChoosen.includes(qk.id)
 
   const onChange = useCallback(() => {
