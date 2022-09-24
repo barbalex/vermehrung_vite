@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 // TODO: work on image
@@ -10,14 +10,15 @@ import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import Lieferung from './Lieferung'
 import StoreContext from '../../../../storeContext'
 import lieferungSort from '../../../../utils/lieferungSort'
 import personFullname from '../../../../utils/personFullname'
 import constants from '../../../../utils/constants'
+import { dexie } from '../../../../dexieClient'
+import totalFilter from '../../../../utils/totalFilter'
 
 const Container = styled.div`
   overflow: auto;
@@ -96,42 +97,34 @@ const StyledTable = styled(Table)`
 
 const Lieferschein = ({ row }) => {
   const store = useContext(StoreContext)
-  const { db } = store
 
-  const [dataState, setDataState] = useState({
-    lieferungs: [],
-    vonKulturGarten: undefined,
-    person: undefined,
-  })
-  useEffect(() => {
-    const lieferungsObservable = row.lieferungs.observe()
-    const vonKulturGartenObservable = row.von_kultur_id
-      ? db
-          .get('garten')
-          .query(
-            Q.where('_deleted', false),
-            Q.on('kultur', Q.where('id', row.von_kultur_id)),
-          )
-          .observe()
-      : $of({})
-    const personObservable = row.person.observe()
-    const combinedObservables = combineLatest([
-      lieferungsObservable,
-      vonKulturGartenObservable,
-      personObservable,
+  const data = useLiveQuery(async () => {
+    const [lieferungs, kultur, person] = await Promise.all([
+      dexie.lieferungs
+        .where({ sammel_lieferung_id: row.id })
+        .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        .toArray(),
+      dexie.kulturs.get(
+        row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.persons.get(
+        row.person_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([lieferungs, vonKulturGarten, person]) =>
-        setDataState({
-          lieferungs: lieferungs.sort(lieferungSort),
-          vonKulturGarten,
-          person,
-        }),
+    const vonKulturGarten = await dexie.gartens.get(
+      kultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
     )
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, row.lieferungs, row.person, row.von_kultur_id])
-  const { lieferungs, vonKulturGarten, person } = dataState
+    return {
+      lieferungs: lieferungs.sort(lieferungSort),
+      vonKulturGarten,
+      person,
+    }
+  }, [row.id, row.von_kultur_id, row.person_id])
+
+  const lieferungs = data?.lieferungs ?? []
+  const vonKulturGarten = data?.vonKulturGarten
+  const person = data?.person
 
   const von = row.von_kultur_id
     ? `${vonKulturGarten?.name ?? '(kein Name)'} (${

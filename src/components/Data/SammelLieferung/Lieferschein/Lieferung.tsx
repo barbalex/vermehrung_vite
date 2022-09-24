@@ -1,12 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React from 'react'
 import TableCell from '@mui/material/TableCell'
 import TableRow from '@mui/material/TableRow'
 import styled from 'styled-components'
-import { combineLatest, of as $of } from 'rxjs'
-import { Q } from '@nozbe/watermelondb'
+import { useLiveQuery } from 'dexie-react-hooks'
 
-import StoreContext from '../../../../storeContext'
 import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
+import { dexie } from '../../../../dexieClient'
 
 const StyledTableCell = styled(TableCell)`
   vertical-align: top !important;
@@ -15,52 +14,36 @@ const StyledTableCell = styled(TableCell)`
 const Zeile = ({ value }) => <div>{value}</div>
 
 const LieferungForLieferschein = ({ lieferung: row }) => {
-  const store = useContext(StoreContext)
-  const { db } = store
-
-  const [dataState, setDataState] = useState({
-    artLabel: '',
-    herkunftLabel: '',
-  })
-  useEffect(() => {
-    const artObservable = row.art_id
-      ? db.get('art').findAndObserve(row.art_id)
-      : $of({})
-    const vonKulturHerkunftObservable = row.von_kultur_id
-      ? db
-          .get('herkunft')
-          .query(Q.on('kultur', Q.where('id', row.von_kultur_id)))
-          .observe()
-      : $of({})
-    const vonSammlungHerkunftObservable = row.von_sammlung_id
-      ? db
-          .get('herkunft')
-          .query(Q.on('sammlung', Q.where('id', row.von_sammlung_id)))
-          .observe()
-      : $of({})
-    const combinedObservables = combineLatest([
-      artObservable,
-      vonKulturHerkunftObservable,
-      vonSammlungHerkunftObservable,
+  const data = useLiveQuery(async () => {
+    const [art, kultur] = await Promise.all([
+      dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
+      dexie.kulturs.get(
+        row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
     ])
-    const subscription = combinedObservables.subscribe(
-      async ([art, [vonKulturHerkunft], [vonSammlungHerkunft]]) => {
-        const artLabel = await art.label()
-        const herkunftLabel = vonKulturHerkunft
-          ? herkunftLabelFromHerkunft({
-              herkunft: vonKulturHerkunft,
-            })
-          : vonSammlungHerkunft
-          ? herkunftLabelFromHerkunft({ herkunft: vonSammlungHerkunft })
-          : ''
-
-        setDataState({ artLabel, herkunftLabel })
-      },
+    const vonKulturHerkunft = await dexie.herkunfts.get(
+      kultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
     )
+    const vonSammlung = await dexie.sammlungs.get(
+      row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const vonSammlungHerkunft = await dexie.herkunfts.get(
+      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+    const artLabel = await art.label()
+    const herkunftLabel = vonKulturHerkunft
+      ? herkunftLabelFromHerkunft({
+          herkunft: vonKulturHerkunft,
+        })
+      : vonSammlungHerkunft
+      ? herkunftLabelFromHerkunft({ herkunft: vonSammlungHerkunft })
+      : ''
 
-    return () => subscription?.unsubscribe?.()
-  }, [db, row.art, row.art_id, row.von_kultur_id, row.von_sammlung_id])
-  const { artLabel, herkunftLabel } = dataState
+    return { artLabel, herkunftLabel }
+  }, [row.art_id, row.von_kultur_id, row.von_sammlung_id])
+
+  const artLabel = data?.artLabel ?? ''
+  const herkunftLabel = data?.herkunftLabel ?? ''
 
   const wasArray = []
   row.anzahl_pflanzen && wasArray.push(`${row.anzahl_pflanzen} Pflanzen`)
