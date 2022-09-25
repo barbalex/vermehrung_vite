@@ -8,16 +8,15 @@ const buildData = async ({ artId }) => {
   //    these are the basis for counting:
   //    at every date the last count is used
   const kulturs = await dexie.kulturs
-    .filter(
-      (k) => k.art_id === artId && k._deleted === false && k.aktiv === true,
-    )
+    .where({ art_id: artId })
+    .filter((k) => k._deleted === false && k.aktiv === true)
     .toArray()
   const kultursIds = kulturs.map((k) => k.id)
-  const zaehlungsObservableForZaehlungs = dexie.zaehlungs
+  const zaehlungs = await dexie.zaehlungs
     .where('kultur_id')
     .anyOf(kultursIds)
     .and((z) => z._deleted === false && !!z.datum)
-  const zaehlungs = await zaehlungsObservableForZaehlungs.toArray()
+    .toArray()
   const zaehlungsIds = zaehlungs.map((z) => z.id)
   const teilzaehlungsWithAnzahlPflanzen = await dexie.teilzaehlungs
     .where('zaehlung_id')
@@ -64,9 +63,9 @@ const buildData = async ({ artId }) => {
   )
 
   const sammlungsDone = await dexie.sammlungs
+    .where({ art_id: artId })
     .filter(
       (s) =>
-        s.art_id === artId &&
         s.geplant === false &&
         !!s.datum &&
         s.anzahl_pflanzen !== null &&
@@ -74,9 +73,9 @@ const buildData = async ({ artId }) => {
     )
     .toArray()
   const sammlungsPlannedAll = await dexie.sammlungs
+    .where({ art_id: artId })
     .filter(
       (s) =>
-        s.art_id === artId &&
         s.geplant === true &&
         !!s.datum &&
         s.anzahl_pflanzen !== null &&
@@ -92,9 +91,9 @@ const buildData = async ({ artId }) => {
   )
 
   const lieferungsDone = await dexie.lieferungs
+    .where({ art_id: artId })
     .filter(
       (s) =>
-        s.art_id === artId &&
         s.nach_ausgepflanzt === true &&
         s.geplant === false &&
         !!s.datum &&
@@ -103,9 +102,9 @@ const buildData = async ({ artId }) => {
     )
     .toArray()
   const lieferungsPlannedAll = await dexie.lieferungs
+    .where({ art_id: artId })
     .filter(
       (s) =>
-        s.art_id === artId &&
         s.nach_ausgepflanzt === true &&
         s.geplant === true &&
         !!s.datum &&
@@ -165,9 +164,9 @@ const buildData = async ({ artId }) => {
           // for every kultur return
           // last zaehlung and whether it is prognose
           const zaehlungs = await dexie.zaehlungs
+            .where({ kultur_id: k.id })
             .filter(
               (z) =>
-                z.kultur_id === k.id &&
                 z._deleted === false &&
                 !!z.datum &&
                 zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
