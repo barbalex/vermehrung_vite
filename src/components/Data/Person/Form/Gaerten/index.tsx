@@ -73,8 +73,8 @@ const PersonArten = ({ person }) => {
   )
 
   const data = useLiveQuery(async () => {
-    const gvs = await dexie.gvs
-      .filter((g) => g._deleted === false && g.person_id === person.id)
+    const gvs = await dexie.gvs.where({person_id: person.id})
+      .filter((g) => g._deleted === false )
       .toArray()
     const gvsSorted = await gvsSortByGarten(gvs)
     const gvGartenIds = gvs.map((v) => v.garten_id)

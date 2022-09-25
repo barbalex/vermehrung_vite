@@ -34,7 +34,8 @@ const Rows = styled.div``
 const TkZaehlungen = ({ teilkultur }) => {
   const teilzaehlungs = useLiveQuery(async () => {
     const teilzaehlungs = await dexie.teilzaehlungs
-      .filter((t) => t._deleted === false && t.teilkultur_id === teilkultur.id)
+      .where({ teilkultur_id: teilkultur.id })
+      .filter((t) => t._deleted === false)
       .toArray()
     const teilzaehlungsSorted = await teilzaehlungsSortByZaehlungTk(
       teilzaehlungs,
