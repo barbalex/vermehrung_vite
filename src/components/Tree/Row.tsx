@@ -216,7 +216,7 @@ const MenuExplainerItem = styled(MenuItem)`
 const Row = ({ style, node, nodes, userRole }) => {
   const store = useContext(StoreContext)
 
-  const { showTreeInSingleColumnView, singleColumnView, tree, db } = store
+  const { showTreeInSingleColumnView, singleColumnView, tree } = store
   const { activeNodeArray, singleRowHeight } = tree
 
   const isMobile = showTreeInSingleColumnView && singleColumnView
