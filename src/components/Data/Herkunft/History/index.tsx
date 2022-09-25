@@ -62,7 +62,7 @@ const sliderSettings = {
   infinite: false,
 }
 
-const HerkunftHistory = ({ row, rawRow, historyTakeoverCallback }) => {
+const HerkunftHistory = ({ row, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
 
   const priorRevisions = row?._revisions?.slice(1) ?? []
@@ -96,7 +96,6 @@ const HerkunftHistory = ({ row, rawRow, historyTakeoverCallback }) => {
             key={row._rev}
             revRow={r}
             row={row}
-            rawRow={rawRow}
             historyTakeoverCallback={historyTakeoverCallback}
           />
         ))}

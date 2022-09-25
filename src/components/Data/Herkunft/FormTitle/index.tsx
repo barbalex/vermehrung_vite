@@ -11,7 +11,6 @@ import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
 
 const HerkunftFormTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -54,7 +53,6 @@ const HerkunftFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}

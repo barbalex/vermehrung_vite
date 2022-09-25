@@ -11,7 +11,6 @@ import { dexie } from '../../../../dexieClient'
 
 const ArtFormTitleChooser = ({
   row,
-  rawRow,
   showFilter,
   showHistory,
   setShowHistory,
@@ -45,7 +44,6 @@ const ArtFormTitleChooser = ({
   return (
     <FormTitle
       row={row}
-      rawRow={rawRow}
       totalCount={totalCount}
       filteredCount={filteredCount}
       showHistory={showHistory}

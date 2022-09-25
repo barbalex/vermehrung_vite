@@ -62,7 +62,7 @@ const sliderSettings = {
   infinite: false,
 }
 
-const GartenHistory = ({ row, rawRow, historyTakeoverCallback }) => {
+const GartenHistory = ({ row, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
 
   const priorRevisions = row?._revisions?.slice(1) ?? []
@@ -96,7 +96,6 @@ const GartenHistory = ({ row, rawRow, historyTakeoverCallback }) => {
             key={row._rev}
             revRow={r}
             row={row}
-            rawRow={rawRow}
             historyTakeoverCallback={historyTakeoverCallback}
           />
         ))}
