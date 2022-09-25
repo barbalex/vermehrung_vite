@@ -63,7 +63,7 @@ const KulturTimeline = ({ row, width }) => {
 
   // TODO: calc runs on every render of kultur
   // need to only run when open
-  const [allData, setAllData] = useState([])
+  const [allData, setAllData] = useState()
   useEffect(() => {
     let isActive = true
     buildData({ row }).then((data) => {
@@ -116,13 +116,13 @@ const KulturTimeline = ({ row, width }) => {
 
   const showCategory = useCallback(
     (category) =>
-      !!allData.map((d) => d[category]).filter((d) => exists(d)).length,
+      !!(allData ?? []).map((d) => d[category]).filter((d) => exists(d)).length,
     [allData],
   )
 
   if (!allData) return null
 
-  if (!row || !allData.length) {
+  if (!row || (allData && !allData.length)) {
     return (
       <ErrorBoundary>
         <TitleRow data-active={false}>
