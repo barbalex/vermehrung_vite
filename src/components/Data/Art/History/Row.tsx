@@ -2,7 +2,6 @@ import React, { useCallback, useContext, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import md5 from 'blueimp-md5'
 import { v1 as uuidv1 } from 'uuid'
-import isEqual from 'lodash/isEqual'
 
 import History from '../../../shared/History'
 import StoreContext from '../../../../storeContext'
@@ -10,10 +9,11 @@ import checkForOnlineError from '../../../../utils/checkForOnlineError'
 import toPgArray from '../../../../utils/toPgArray'
 import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
+import { dexie } from '../../../../dexieClient'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, db, gqlClient } = store
+  const { user, addNotification, gqlClient } = store
 
   const dataArray = useMemo(
     () => createDataArrayForRevComparison({ row, revRow, store }),
@@ -63,17 +63,9 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     newObjectForStore._conflicts = row._conflicts
     // for store: convert rev to winner
     newObjectForStore.id = row.id
-    delete newObjectForStore.kultur_id
+    delete newObjectForStore.art_id
     // optimistically update store
-    await db.write(async () => {
-      await row.update((row) => {
-        Object.entries(newObjectForStore).forEach(([key, value]) => {
-          if (!isEqual(value, row[key])) {
-            row[key] = value
-          }
-        })
-      })
-    })
+    await dexie.arts.update(row.id, newObjectForStore)
   }, [
     row,
     revRow.art_id,
@@ -82,12 +74,9 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     user.email,
     gqlClient,
     historyTakeoverCallback,
-    db,
     store,
     addNotification,
   ])
-
-  console.log('Art History row', { revRow, row, dataArray })
 
   return (
     <History

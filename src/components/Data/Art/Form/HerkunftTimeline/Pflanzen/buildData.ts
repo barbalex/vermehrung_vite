@@ -6,7 +6,7 @@ import { Q } from '@nozbe/watermelondb'
 import { dexie } from '../../../../../../dexieClient'
 import exists from '../../../../../../utils/exists'
 
-const buildData = async ({ artId, herkunftId, db }) => {
+const buildData = async ({ artId, herkunftId }) => {
   const kultursOfArt = await dexie.kulturs
     .where({ art_id: artId, herkunft_id: herkunftId })
     .filter((k) => k._deleted === false && k.aktiv === true)

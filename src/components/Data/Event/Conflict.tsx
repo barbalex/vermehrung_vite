@@ -12,7 +12,7 @@ import checkForOnlineError from '../../../utils/checkForOnlineError'
 import toPgArray from '../../../utils/toPgArray'
 import mutations from '../../../utils/mutations'
 
-const eventRevQuery = gql` 
+const eventRevQuery = gql`
   query eventRevForConflictQuery($id: uuid!, $rev: String!) {
     event_rev(where: { event_id: { _eq: $id }, _rev: { _eq: $rev } }) {
       id
@@ -44,7 +44,7 @@ const EventConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   // need to use this query to ensure that the person's name is queried
   const [{ error, data, fetching }] = useQuery({
@@ -102,15 +102,12 @@ const EventConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('event').find(revRow.event_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     conflictDisposalCallback()
   }, [
+    row,
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -184,9 +181,10 @@ const EventConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   //console.log('Event Conflict', { dataArray, row, revRow })
 

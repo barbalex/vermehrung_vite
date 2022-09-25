@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ComposedChart,
   Bar,
@@ -22,7 +22,6 @@ import LabelLieferung from './LabelLieferung'
 import LabelZaehlung from './LabelZaehlung'
 import CustomAxisTick from './CustomAxisTick'
 import ErrorBoundary from '../../../../../shared/ErrorBoundary'
-import StoreContext from '../../../../../../storeContext'
 import buildData from './buildData'
 
 const NoData = styled.div`
@@ -30,8 +29,6 @@ const NoData = styled.div`
 `
 
 const ArtTimeline = ({ artId, width }) => {
-  const store = useContext(StoreContext)
-  const { db } = store
   const [narrow, setNarrow] = useState(false)
 
   const [data, setData] = useState(null)
@@ -45,7 +42,7 @@ const ArtTimeline = ({ artId, width }) => {
     return () => {
       isActive = false
     }
-  }, [artId, db])
+  }, [artId])
 
   useEffect(() => {
     if (width < 1100 && !narrow) {

@@ -39,7 +39,7 @@ const ArtConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   // need to use this query to ensure that the person's name is queried
   const [{ error, data, fetching }] = useQuery({
@@ -92,15 +92,12 @@ const ArtConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('art').find(revRow.art_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     conflictDisposalCallback()
   }, [
+    row,
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -159,9 +156,10 @@ const ArtConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   return (
     <Conflict
