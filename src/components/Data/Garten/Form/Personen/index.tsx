@@ -79,12 +79,13 @@ const GartenPersonen = ({ garten }) => {
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .toArray(),
       dexie.gvs
-        .filter((g) => g._deleted === false && g.garten_id === garten.id)
+        .where({ garten_id: garten.id })
+        .filter((g) => g._deleted === false)
         .toArray(),
     ])
 
     const gvsSorted = await gvsSortByPerson(gvs)
-    const gvPersonIds = gvsSorted.map((v) => v.person_id)
+    const gvPersonIds = [...new Set(gvsSorted.map((v) => v.person_id))]
     const personWerte = persons
       .filter((a) => !gvPersonIds.includes(a.id))
       .sort(personSort)

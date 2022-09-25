@@ -10,7 +10,8 @@ import Checkbox2States from '../../../../shared/Checkbox2States'
 import JesNo from '../../../../shared/JesNo'
 import exists from '../../../../../utils/exists'
 import { dexie } from '../../../../../dexieClient'
-import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs' 
+import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
+import totalFilter from '../../../../../utils/totalFilter'
 
 const Title = styled.div`
   font-weight: bold;
@@ -43,7 +44,7 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
 
   const nachKulturWerte = useLiveQuery(async () => {
     const kulturs = await dexie.kulturs
-      .filter((k) => k._deleted === false)
+      .filter((value) => totalFilter({ value, store, table: 'kultur' }))
       .toArray()
 
     const kultursFiltered = kulturs

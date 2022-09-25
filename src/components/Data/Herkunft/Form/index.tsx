@@ -48,7 +48,9 @@ const Herkunft = ({
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .toArray(),
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
     ])
 
     // need to show a choosen person even if inactive but not if deleted
