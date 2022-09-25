@@ -44,7 +44,8 @@ const Teilzaehlungen = ({ zaehlung }) => {
   const data = useLiveQuery(async () => {
     const [tzs, kulturOption] = await Promise.all([
       dexie.teilzaehlungs
-        .filter((t) => t._deleted === false && t.zaehlung_id === zaehlung.id)
+        .where({ zaehlung_id: zaehlung.id })
+        .filter((t) => t._deleted === false)
         .toArray(),
       dexie.kultur_options.get(
         zaehlung.kultur_id ?? '99999999-9999-9999-9999-999999999999',

@@ -94,7 +94,8 @@ const TeilzaehlungForm = ({
   const data = useLiveQuery(async () => {
     const [teilkulturs, teilkultur, kulturOption] = await Promise.all([
       dexie.teilkulturs
-        .filter((t) => t._deleted === false && t.kultur_id === kulturId)
+        .where({ kultur_id: kulturId })
+        .filter((t) => t._deleted === false)
         .toArray(),
       dexie.teilkulturs.get(
         row.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
