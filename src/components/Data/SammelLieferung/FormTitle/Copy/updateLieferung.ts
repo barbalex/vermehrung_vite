@@ -1,7 +1,6 @@
 import md5 from 'blueimp-md5'
 import { DateTime } from 'luxon'
 import { v1 as uuidv1 } from 'uuid'
-import isEqual from 'lodash/isEqual'
 
 import toPgArray from '../../../../../utils/toPgArray'
 import exists from '../../../../../utils/exists'
@@ -65,7 +64,7 @@ const updateLieferung = async ({
   store,
   field,
 }) => {
-  const { addQueuedQuery, db, user } = store
+  const { addQueuedQuery, user } = store
   console.log('updateLieferung, lieferung:', lieferung)
   // pass field to mark which field should be updated
   // even if it has value null
@@ -133,16 +132,9 @@ const updateLieferung = async ({
     : [rev]
   newObjectForStore._conflicts = lfLastVersion._conflicts
   newObjectForStore.id = lfLastVersion.id
-  delete newObjectForStore.lieferung_id
-  await db.write(async () => {
-    await lieferung.update((row) => {
-      Object.entries(newObjectForStore).forEach(([key, value]) => {
-        if (!isEqual(value, row[key])) {
-          row[key] = value
-        }
-      })
-    })
-  })
+  delete newObjectForStore.sammel_lieferung_id
+
+  await dexie.sammel_lieferungs.update(row.id, newObjectForStore)
 }
 
 export default updateLieferung
