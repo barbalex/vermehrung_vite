@@ -6,22 +6,13 @@ const sammlungsSortedFromSammlungs = async (sammlungs) => {
   const sammlungSorters = await Promise.all(
     sammlungs.map(async (sammlung) => {
       const datum = sammlung?.datum ?? ''
-      let herkunft
-      try {
-        herkunft = await sammlung?.herkunft?.fetch()
-      } catch {}
+      const herkunft = await sammlung.herkunft()
       const herkunftNr = herkunft?.nr
       const herkunftGemeinde = herkunft?.gemeinde
       const herkunftLokalname = herkunft?.lokalname
-      let person
-      try {
-        person = await sammlung?.person?.fetch()
-      } catch {}
+      const person = await sammlung.person()
       const fullname = personFullname(person)
-      let art
-      try {
-        art = await sammlung?.art?.fetch()
-      } catch {}
+      const art = await sammlung.art()
       const artLabel = await art?.label?.()
       const sort = [
         datum,
