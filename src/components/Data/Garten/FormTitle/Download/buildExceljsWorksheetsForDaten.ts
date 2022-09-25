@@ -24,7 +24,7 @@ const buildExceljsWorksheetsForDaten = async ({
     id: garten.id,
     name: garten.name,
     person_id: garten.person_id,
-    person_name: person?.fullname ?? '',
+    person_name: person?.fullname() ?? '',
     person_rohdaten: removeMetadataFromDataset(person),
     strasse: garten.strasse,
     plz: garten.plz,
@@ -96,10 +96,10 @@ const buildExceljsWorksheetsForDaten = async ({
     // need to pass index
     // as explained in https://stackoverflow.com/a/34349073/712005
     // because excel limits length of names and uuid is too long
-    for (const [index, kultur_id] of [myKulturIds].entries()) {
+    for (const [index, kultur_id] of myKulturIds.entries()) {
       await buildExceljsWorksheetsForKultur({
         store,
-        kultur_id: kultur_id[0],
+        kultur_id,
         kultur_name: index + 1,
         workbook,
         calledFromHigherUp: true,

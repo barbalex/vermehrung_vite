@@ -12,7 +12,6 @@ const removeMetadata = (d) => {
 
 const removeMetadataFromDataset = (d) => {
   if (!d) return null
-  console.log('removeMetadataFromDataset, d:', d)
   const datasetRaw = { ...d }
   const dataset = removeMetadata(datasetRaw)
   if (Object.keys(dataset).length) return dataset

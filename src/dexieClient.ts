@@ -1812,7 +1812,7 @@ export class Teilzaehlung implements ITeilzaehlung {
   }
 
   async teilkultur() {
-    return await dexie.teilkultur.get(
+    return await dexie.teilkulturs.get(
       this.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
@@ -4668,7 +4668,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(17).stores({
+    this.version(18).stores({
       // TODO: set indexes
       herkunfts: 'id, _deleted, _deleted_indexable',
       sammlungs:
@@ -4681,7 +4681,8 @@ export class MySubClassedDexie extends Dexie {
       kulturs: 'id, *garten_id, *art_id, _deleted, _deleted_indexable',
       teilkulturs: 'id, *kultur_id, _deleted, _deleted_indexable',
       zaehlungs: 'id, *kultur_id, datum, _deleted, _deleted_indexable',
-      teilzaehlungs: 'id, *zaehlung_id, _deleted, _deleted_indexable',
+      teilzaehlungs:
+        'id, *zaehlung_id, *teilkultur_id, _deleted, _deleted_indexable',
       persons: 'id, &account_id, aktiv, _deleted, _deleted_indexable',
       sammel_lieferungs: 'id, _deleted, _deleted_indexable',
       events: 'id, *kultur_id, _deleted, _deleted_indexable',

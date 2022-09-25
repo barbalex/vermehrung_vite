@@ -10,6 +10,7 @@ const downloadExceljsWorkbook = async ({ store, fileName, workbook }) => {
   try {
     buffer = await workbook.xlsx.writeBuffer()
   } catch (error) {
+    console.log('downloadExceljsWorkbook, error writing buffer:', error)
     return store.addNotification({
       message: error.message,
     })

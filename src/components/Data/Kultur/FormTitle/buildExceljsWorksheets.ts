@@ -33,7 +33,7 @@ const buildExceljsWorksheets = async ({
     const kultur: Kultur = await dexie.kulturs.get(kultur_id)
     const art: Art = await kultur.art()
     const artName = await art?.label()
-    const herkunft: Herkunft = await kultur_id.herkunft()
+    const herkunft: Herkunft = await kultur?.herkunft()
     const garten = await kultur.garten()
 
     const newK = {
@@ -62,15 +62,14 @@ const buildExceljsWorksheets = async ({
   }
   // 2. Get Zählungen
   const zaehlungs = await dexie.zaehlungs
-    .where({ kultur_id: kultur_id })
+    .where({ kultur_id })
     .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
     .toArray()
+  const idsOfZaehlungs = zaehlungs.map((z) => z.id)
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
   const zaehlungen = await Promise.all(
     zaehlungsSorted.map(async (z) => {
-      const tzs = await dexie.teilzaehlungs
-        .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
-        .toArray()
+      const tzs = await z.teilzaehlungs()
       const tzsSorted = await teilzaehlungsSortByTk(tzs)
       const newZ = {
         id: z.id,
@@ -122,39 +121,41 @@ const buildExceljsWorksheets = async ({
         : 'Zaehlungen',
       data: zaehlungen,
     })
-  }
-  // 3. Get Teil-Zählungen
-  const teilzaehlungs = await dexie.teilzaehlungs
-    .where({ kultur_id: kultur_id })
-    .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
-    .toArray()
-  const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
-  const teilzaehlungData = await Promise.all(
-    teilzaehlungsSorted.map(async (t) => {
-      const teilkultur = t.teilkultur_id ? await t.kultur.fetch() : {}
-      const newZ = {
-        id: t.id,
-        zaehlung_id: t.zaehlung_id,
-        teilkultur_id: t.teilkultur_id,
-        teilkultur_name: teilkultur?.name,
-        anzahl_pflanzen: t.anzahl_pflanzen,
-        anzahl_auspflanzbereit: t.anzahl_auspflanzbereit,
-        anzahl_mutterpflanzen: t.anzahl_mutterpflanzen,
-        andere_menge: t.andere_menge,
-        auspflanzbereit_beschreibung: t.auspflanzbereit_beschreibung,
-        bemerkungen: t.bemerkungen,
-      }
-      return newZ
-    }),
-  )
-  if (teilzaehlungData.length) {
-    addWorksheetToExceljsWorkbook({
-      workbook,
-      title: calledFromHigherUp
-        ? `Kultur_${kultur_name}_Teilzaehlungen`
-        : 'Teilzaehlungen',
-      data: teilzaehlungData,
-    })
+
+    // 3. Get Teil-Zählungen
+    const teilzaehlungs = await dexie.teilzaehlungs
+      .where('zaehlung_id')
+      .anyOf(idsOfZaehlungs)
+      .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+      .toArray()
+    const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
+    const teilzaehlungData = await Promise.all(
+      teilzaehlungsSorted.map(async (t) => {
+        const teilkultur = await t.teilkultur()
+        const newZ = {
+          id: t.id,
+          zaehlung_id: t.zaehlung_id,
+          teilkultur_id: t.teilkultur_id,
+          teilkultur_name: teilkultur?.name,
+          anzahl_pflanzen: t.anzahl_pflanzen,
+          anzahl_auspflanzbereit: t.anzahl_auspflanzbereit,
+          anzahl_mutterpflanzen: t.anzahl_mutterpflanzen,
+          andere_menge: t.andere_menge,
+          auspflanzbereit_beschreibung: t.auspflanzbereit_beschreibung,
+          bemerkungen: t.bemerkungen,
+        }
+        return newZ
+      }),
+    )
+    if (teilzaehlungData.length) {
+      addWorksheetToExceljsWorkbook({
+        workbook,
+        title: calledFromHigherUp
+          ? `Kultur_${kultur_name}_Teilzaehlungen`
+          : 'Teilzaehlungen',
+        data: teilzaehlungData,
+      })
+    }
   }
   // 4. Get An-Lieferungen
   const anlieferungs = await dexie.lieferungs
@@ -310,7 +311,7 @@ const buildExceljsWorksheets = async ({
   }
   // 6. Get Events
   const events = await dexie.events
-    .where({ kultur_id: kultur_id })
+    .where({ kultur_id })
     .filter((value) => totalFilter({ value, store, table: 'event' }))
     .toArray()
   const eventsSorted = events.sort(eventSort)
