@@ -47,7 +47,6 @@ const StyledFormControl = styled(FormControl)`
 
 const KulturQkQk = ({ kultur, qkChoosens }) => {
   const store = useContext(StoreContext)
-  const { db } = store
 
   const [filter, setFilter] = useState('')
   const onChangeFilter = useCallback(
@@ -60,7 +59,6 @@ const KulturQkQk = ({ kultur, qkChoosens }) => {
     let isActive = true
     createMessageFunctions({
       kulturId: kultur.id,
-      db,
       store,
     }).then(async (messageFunctions) => {
       const msgGroups = await Promise.all(
@@ -81,7 +79,7 @@ const KulturQkQk = ({ kultur, qkChoosens }) => {
     return () => {
       isActive = false
     }
-  }, [kultur.id, qkChoosens, db, store])
+  }, [kultur.id, qkChoosens, store])
 
   const messageGroupsFiltered = messageGroups
     ? messageGroups.filter((messageGroup) => {
