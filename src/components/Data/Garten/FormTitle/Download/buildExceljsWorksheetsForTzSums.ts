@@ -1,8 +1,13 @@
-import { Q } from '@nozbe/watermelondb'
-
 import addWorksheetToExceljsWorkbook from '../../../../../utils/addWorksheetToExceljsWorkbook'
 import teilzaehlungsSortByTk from '../../../../../utils/teilzaehlungsSortByTk'
-import { dexie } from '../../../../../dexieClient'
+import {
+  dexie,
+  Teilzaehlung,
+  Garten,
+  Kultur,
+  Zaehlung,
+} from '../../../../../dexieClient'
+// import exists from '../../../../../utils/exists'
 
 /**
  * this function cann be used from higher up
@@ -13,22 +18,21 @@ const buildExceljsWorksheetsForTzSums = async ({
   garten_id,
   workbook,
 }) => {
-  const { db } = store
+  const garten: Garten = await dexie.gartens.get(garten_id)
+  const allKulturs: Kultur[] = await garten?.kulturs()
+  const idsOfAllKulturs = allKulturs.map((k) => k.id)
+  const allZaehlungs: Zaehlung[] = await dexie?.zaehlungs
+    .where('kultur_id')
+    .anyOf(idsOfAllKulturs)
+    .filter((z) => z._deleted === false)
+    .toArray()
+  const idsOfAllZaehlungs = allZaehlungs.map((z) => z.id)
 
-  const garten = await dexie.gartens.get(garten_id)
-  const kultur = await garten?.kulturs()
-
-  const teilzaehlungs = await dexie.teilzaehlungs.where({}).filter().toArray()
-  try {
-    teilzaehlungs = await db
-      .get('teilzaehlung')
-      .query(
-        Q.experimentalNestedJoin('zaehlung', 'kultur'),
-        Q.on('zaehlung', Q.on('kultur', Q.where('garten_id', garten_id))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const teilzaehlungs: Teilzaehlung[] = await dexie.teilzaehlungs
+    .where('zaehlung_id')
+    .anyOf(idsOfAllZaehlungs)
+    .filter((tz) => tz._deleted === false /*&& exists(tz.anzahl_pflanzen)*/)
+    .toArray()
   const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
   const teilzaehlungsData = await Promise.all(
     teilzaehlungsSorted.map(async (z) => {
