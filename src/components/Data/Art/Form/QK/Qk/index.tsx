@@ -127,7 +127,7 @@ const ApQkQk = ({ artId, qkChoosens }) => {
           ))}
         </StyledPaper>
       ))}
-      {!messageGroups?.length && (
+      {messageGroups && !messageGroups?.length && (
         <div>Juhui. Offenbar gibt es nichts zu meckern!</div>
       )}
     </Container>

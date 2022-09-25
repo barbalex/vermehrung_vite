@@ -75,7 +75,8 @@ const ArtPersonen = ({ art }) => {
   const data = useLiveQuery(async () => {
     const [avs, persons] = await Promise.all([
       dexie.avs
-        .filter((val) => val._deleted === false && val.art_id === art.id)
+        .where({ art_id: art.id })
+        .filter((av) => av._deleted === false)
         .toArray(),
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))

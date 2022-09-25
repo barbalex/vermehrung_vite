@@ -37,11 +37,8 @@ const createMessageFunctions = async ({ artId, store }) => {
   const herkunftsSorted = herkunfts.sort(herkunftSort)
 
   const kulturs = await dexie.kulturs
-    .filter(
-      (value) =>
-        totalFilter({ value, store, table: 'kultur' }) &&
-        value.art_id === artId,
-    )
+    .where({ art_id: artId })
+    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
     .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
   const kulturIds = kultursSorted.map((k) => k.id)
@@ -57,11 +54,8 @@ const createMessageFunctions = async ({ artId, store }) => {
   const personsSorted = persons.sort(personSort)
 
   const sammlungsOfArt = await dexie.sammlungs
-    .filter(
-      (value) =>
-        totalFilter({ value, store, table: 'sammlung' }) &&
-        value.art_id === artId,
-    )
+    .where({ art_id: artId })
+    .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
     .toArray()
   const sammlungsOfArtSorted = await sammlungsSortedFromSammlungs(
     sammlungsOfArt,
