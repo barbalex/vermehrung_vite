@@ -73,9 +73,6 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
     )
   }
 
-  // need to disable animation or labels will not show on first render
-  // https://github.com/recharts/recharts/issues/806
-
   return (
     <ErrorBoundary>
       <h4>{herkunftLabel}</h4>
@@ -112,29 +109,21 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
             />
           )}
           <ReferenceLine y={0} stroke="#000" />
-          <Bar
-            dataKey="Sammlung"
-            fill="orange"
-            label={<LabelLieferung />}
-            isAnimationActive={false}
-          />
+          <Bar dataKey="Sammlung" fill="orange" label={<LabelLieferung />} />
           <Bar
             dataKey="Sammlung geplant"
             fill="yellow"
             label={<LabelLieferung />}
-            isAnimationActive={false}
           />
           <Bar
             dataKey="Auspflanzung"
             fill="#016526"
             label={<LabelLieferung />}
-            isAnimationActive={false}
           />
           <Bar
             dataKey="Auspflanzung geplant"
             fill="#9cffc0"
             label={<LabelLieferung />}
-            isAnimationActive={false}
           />
           <Line
             type="monotone"
@@ -143,7 +132,6 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
             stroke="#4a148c"
             strokeWidth={3}
             label={<LabelZaehlung />}
-            isAnimationActive={false}
             dot={false}
           />
           <Scatter
@@ -153,14 +141,12 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
             // fill white makes legend go completely white...
             //fill="white"
             strokeWidth={3}
-            isAnimationActive={false}
           ></Scatter>
           <Scatter
             dataKey="Prognose"
             stroke="#e0e0ff"
             fill="#e0e0ff"
             strokeWidth={3}
-            isAnimationActive={false}
           ></Scatter>
         </ComposedChart>
       </ResponsiveContainer>

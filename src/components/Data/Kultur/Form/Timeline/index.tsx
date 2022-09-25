@@ -21,7 +21,7 @@ import { motion, useAnimation } from 'framer-motion'
 
 import CustomTooltip from './Tooltip'
 import LabelLieferung from './LabelLieferung'
-import LabelZaehlung from './LabelZaehlung' 
+import LabelZaehlung from './LabelZaehlung'
 import CustomAxisTick from './CustomAxisTick'
 import constants from '../../../../../utils/constants'
 import exists from '../../../../../utils/exists'
@@ -133,9 +133,6 @@ const KulturTimeline = ({ row, width }) => {
     )
   }
 
-  // need to disable animation or labels will not show on first render
-  // https://github.com/recharts/recharts/issues/806
-
   return (
     <ErrorBoundary>
       <TitleRow
@@ -203,7 +200,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen"
                   fill="#4a148c"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Lieferung Pflanzen geplant') && (
@@ -211,7 +207,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen geplant"
                   fill="#ceceeb"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Lieferung Pflanzen geplant, ignoriert') && (
@@ -219,7 +214,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen geplant, ignoriert"
                   fill="#ebebf9"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Lieferung Pflanzen auspflanzbereit') && (
@@ -227,7 +221,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen auspflanzbereit"
                   fill="#016526"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Lieferung Pflanzen auspflanzbereit geplant') && (
@@ -235,7 +228,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen auspflanzbereit geplant"
                   fill="#9cffc0"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory(
@@ -245,7 +237,6 @@ const KulturTimeline = ({ row, width }) => {
                   dataKey="Lieferung Pflanzen auspflanzbereit geplant, ignoriert"
                   fill="#e6ffef"
                   label={<LabelLieferung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Pflanzen') && (
@@ -256,7 +247,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#4a148c"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Pflanzen Prognose') && (
@@ -267,7 +257,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#e0e0ff"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Pflanzen Prognose, ignoriert') && (
@@ -278,7 +267,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#ebebf9"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Pflanzen auspflanzbereit') && (
@@ -289,7 +277,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#016526"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Pflanzen auspflanzbereit Prognose') && (
@@ -300,7 +287,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#9cffc0"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory(
@@ -313,7 +299,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#e6ffef"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Mutterpflanzen') && (
@@ -324,7 +309,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#cc0000"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Mutterpflanzen Prognose') && (
@@ -335,7 +319,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#ffb3b3"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
               {showCategory('Zählung Mutterpflanzen Prognose, ignoriert') && (
@@ -346,7 +329,6 @@ const KulturTimeline = ({ row, width }) => {
                   stroke="#ffe6e6"
                   strokeWidth={3}
                   label={<LabelZaehlung />}
-                  isAnimationActive={false}
                 />
               )}
             </ComposedChart>
