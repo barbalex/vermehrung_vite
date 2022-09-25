@@ -8,7 +8,6 @@ import storeContext from '../../../../../storeContext'
 import Row from './Row'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
 import Spinner from '../../../../shared/Spinner'
 
 const TitleRow = styled.div`
@@ -40,9 +39,8 @@ const TkEvents = ({ teilkultur }) => {
   const events = useLiveQuery(
     async () =>
       await dexie.events
-        .filter(
-          (e) => e._deleted === false && e.teilkultur_id === teilkultur._id,
-        )
+        .where({ teilkultur_id: teilkultur.id })
+        .filter((e) => e._deleted === false)
         .toArray(),
     [filter.event._deleted, teilkultur],
   )

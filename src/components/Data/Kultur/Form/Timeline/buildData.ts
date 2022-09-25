@@ -8,9 +8,9 @@ import { dexie } from '../../../../../dexieClient'
 
 const buildData = async ({ row }) => {
   const zaehlungs = await dexie.zaehlungs
-    .orderBy('datum')
-    .filter((z) => z.kultur_id === row.id && z._deleted === false)
-    .toArray()
+    .where({ kultur_id: row.id })
+    .filter((z) => z._deleted === false)
+    .sortBy('datum')
   const zaehlungsDone = await zaehlungs.filter(
     (z) =>
       z.prognose === false &&
@@ -95,7 +95,8 @@ const buildData = async ({ row }) => {
     zaehlungenPlannedIncluded.map(async (z) => {
       const teilzaehlungs = z.teilzaehlungs
         ? await dexie.teilzaehlungs
-            .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
+            .where({ zaehlung_id: z.id })
+            .filter((t) => t._deleted === false)
             .toArray()
         : []
       const anzahlenPflanzen = teilzaehlungs
@@ -141,7 +142,8 @@ const buildData = async ({ row }) => {
   const zaehlungenPlannedIgnoredData = await Promise.all(
     zaehlungenPlannedIgnored.map(async (z) => {
       const teilzaehlungs = await dexie.teilzaehlungs
-        .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
+        .where({ zaehlung_id: z.id })
+        .filter((t) => t._deleted === false)
         .toArray()
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
@@ -194,23 +196,18 @@ const buildData = async ({ row }) => {
   ).map(([key, value]) => Object.assign({}, ...value))
 
   const anLieferungenDone = await dexie.lieferungs
+    .where({ nach_kultur_id: row.id })
     .filter(
       (l) =>
         l._deleted === false &&
-        l.nach_kultur_id === row.id &&
         l.geplant === false &&
         !!l.datum &&
         l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
   const anLieferungenPlanned = await dexie.lieferungs
-    .filter(
-      (l) =>
-        l._deleted === false &&
-        l.nach_kultur_id === row.id &&
-        l.geplant === false &&
-        !!l.datum,
-    )
+    .where({ nach_kultur_id: row.id })
+    .filter((l) => l._deleted === false && l.geplant === false && !!l.datum)
     .toArray()
   const anLieferungenPlannedIgnored = anLieferungenPlanned.filter((lg) =>
     // check if more recent anLieferungenDone exists
@@ -225,23 +222,18 @@ const buildData = async ({ row }) => {
   )
 
   const ausLieferungenDone = await dexie.lieferungs
+    .where({ von_kultur_id: row.id })
     .filter(
       (l) =>
         l._deleted === false &&
-        l.von_kultur_id === row.id &&
         l.geplant === false &&
         !!l.datum &&
         l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
   const ausLieferungenPlanned = await dexie.lieferungs
-    .filter(
-      (l) =>
-        l._deleted === false &&
-        l.von_kultur_id === row.id &&
-        l.geplant === true &&
-        !!l.datum,
-    )
+    .where({ von_kultur_id: row.id })
+    .filter((l) => l._deleted === false && l.geplant === true && !!l.datum)
     .toArray()
   const ausLieferungenPlannedIgnored = ausLieferungenPlanned.filter((lg) =>
     // check if more recent ausLieferungenDone exists
@@ -273,14 +265,12 @@ const buildData = async ({ row }) => {
           a.datum < l.datum,
       )
 
-      const previousZaehlungTzs = await dexie.teilzaehlungs
-        .filter(
-          (t) =>
-            t._deleted === false &&
-            !!previousZaehlung &&
-            t.zaehlung_id === previousZaehlung?.id,
-        )
-        .toArray()
+      const previousZaehlungTzs = previousZaehlung
+        ? await dexie.teilzaehlungs
+            .where({ zaehlung_id: previousZaehlung?.id })
+            .filter((t) => t._deleted === false)
+            .toArray()
+        : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -336,14 +326,12 @@ const buildData = async ({ row }) => {
           a.datum > (previousZaehlung?.datum ?? '1900.01.01') &&
           a.datum < l.datum,
       )
-      const previousZaehlungTzs = await dexie.teilzaehlungs
-        .filter(
-          (t) =>
-            t._deleted === false &&
-            !!previousZaehlung &&
-            t.zaehlung_id === previousZaehlung.id,
-        )
-        .toArray()
+      const previousZaehlungTzs = previousZaehlung
+        ? await dexie.teilzaehlungs
+            .where({ zaehlung_id: previousZaehlung.id })
+            .filter((t) => t._deleted === false)
+            .toArray()
+        : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -400,14 +388,12 @@ const buildData = async ({ row }) => {
           a.datum < l.datum,
       )
 
-      const previousZaehlungTzs = await dexie.teilzaehlungs
-        .filter(
-          (t) =>
-            t._deleted === false &&
-            !!previousZaehlung &&
-            t.zaehlung_id === previousZaehlung.id,
-        )
-        .toArray()
+      const previousZaehlungTzs = previousZaehlung
+        ? await dexie.teilzaehlungs
+            .where({ zaehlung_id: previousZaehlung.id })
+            .filter((t) => t._deleted === false)
+            .toArray()
+        : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -486,14 +472,12 @@ const buildData = async ({ row }) => {
           a.datum < l.datum,
       )
 
-      const previousZaehlungTzs = await dexie.teilzaehlungs
-        .filter(
-          (t) =>
-            t._deleted === false &&
-            !!previousZaehlung &&
-            t.zaehlung_id === previousZaehlung.id,
-        )
-        .toArray()
+      const previousZaehlungTzs = previousZaehlung
+        ? await dexie.teilzaehlungs
+            .where({ zaehlung_id: previousZaehlung.id })
+            .filter((t) => t._deleted === false)
+            .toArray()
+        : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))

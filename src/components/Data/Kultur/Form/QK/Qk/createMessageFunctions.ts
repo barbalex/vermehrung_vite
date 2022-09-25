@@ -16,39 +16,47 @@ const createMessageFunctions = async ({ kulturId, store }) => {
   const now = new Date()
 
   const events = await dexie.events
+    .where({ kultur_id: kulturId })
     .filter((value) => totalFilter({ value, store, table: 'event' }))
     .toArray()
   const eventsSorted = events.sort(eventSort)
 
-  const kulturs = await dexie.kulturs
-    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-    .toArray()
-  const kultursSorted = await kultursSortedFromKulturs(kulturs)
+  const kultur = await dexie.kulturs.get(kulturId)
 
-  const lieferungs = await dexie.lieferungs
+  const auslieferungs = await dexie.lieferungs
+    .where({ von_kultur_id: kulturId })
     .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
     .toArray()
-  const lieferungsSorted = lieferungs.sort(lieferungSort)
+  const auslieferungsSorted = auslieferungs.sort(lieferungSort)
+  const anlieferungs = await dexie.lieferungs
+    .where({ nach_kultur_id: kulturId })
+    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+    .toArray()
+  const anlieferungsSorted = anlieferungs.sort(lieferungSort)
 
   const teilkulturs = await dexie.teilkulturs
+    .where({ kultur_id: kulturId })
     .filter((value) => totalFilter({ value, store, table: 'teilkultur' }))
     .toArray()
   const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
   const zaehlungs = await dexie.zaehlungs
+    .where({ kultur_id: kulturId })
     .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
     .toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
+  const idsOfZaehlungs = zaehlungs.map((z) => z.id)
 
   const teilzaehlungs = await dexie.teilzaehlungs
+    .where('zaehlung_id')
+    .anyOf(idsOfZaehlungs)
     .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
     .toArray()
 
   return {
     kultursWithoutVonAnzahlIndividuen: async () =>
       await Promise.all(
-        kultursSorted
-          .filter((k) => k.id === kulturId)
+        [kultur]
           .filter((k) => !exists(k.von_anzahl_individuen))
           .map(async (k) => {
             const text = await k.label()
@@ -61,8 +69,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
       ),
     kultursWithoutGarten: async () =>
       await Promise.all(
-        kultursSorted
-          .filter((k) => k.id === kulturId)
+        [kultur]
           .filter((k) => !k.garten_id)
           .map(async (k) => {
             const text = await k.label()
@@ -75,8 +82,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
       ),
     kultursWithoutHerkunft: async () =>
       await Promise.all(
-        kultursSorted
-          .filter((k) => k.id === kulturId)
+        [kultur]
           .filter((k) => !k.herkunft_id)
           .map(async (k) => {
             const text = await k.label()
@@ -89,8 +95,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
       ),
     kultursWithoutZaehlungThisYear: async () =>
       await Promise.all(
-        kultursSorted
-          .filter((k) => k.id === kulturId)
+        [kultur]
           .filter(
             (k) =>
               zaehlungs
@@ -113,13 +118,10 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     teilkultursWithoutName: async () =>
       await Promise.all(
         teilkultursSorted
-          .filter((tk) => tk.kultur_id === kulturId)
           .filter((tk) => !tk.name)
           .map(async (tk) => {
-            const kultur = await dexie.kulturs.get(
-              tk.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await tk.kultur()
+            const kulturLabel = await kultur?.label()
 
             return {
               url: ['Vermehrung', 'Kulturen', kulturId, 'Teilkulturen', tk.id],
@@ -132,14 +134,11 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     zaehlungsInFutureNotPrognose: async () =>
       await Promise.all(
         zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
           .filter((z) => !!z.datum)
           .filter((z) => new Date(z.datum).getTime() > now)
           .map(async (z) => {
-            const kultur = await dexie.kulturs.get(
-              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await z.kultur()
+            const kulturLabel = await kultur?.label()
 
             return {
               url: [
@@ -158,13 +157,10 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     zaehlungsWithoutDatum: async () =>
       await Promise.all(
         zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
           .filter((z) => !z.datum)
           .map(async (z) => {
-            const kultur = await dexie.kulturs.get(
-              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await z.kultur()
+            const kulturLabel = await kultur?.label()
 
             return {
               url: [
@@ -183,7 +179,6 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     zaehlungsWithoutAnzahlPflanzen: async () =>
       await Promise.all(
         zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
           .filter(
             (z) =>
               teilzaehlungs
@@ -192,10 +187,8 @@ const createMessageFunctions = async ({ kulturId, store }) => {
                 .filter((tz) => !exists(tz.anzahl_pflanzen)).length,
           )
           .map(async (z) => {
-            const kultur = await dexie.kulturs.get(
-              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await z.kultur()
+            const kulturLabel = await kultur?.label()
 
             const zaehlungLabel = z.datum
               ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
@@ -225,7 +218,6 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     zaehlungsWithoutAnzahlAuspflanzbereit: async () =>
       await Promise.all(
         zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
           .filter(
             (z) =>
               teilzaehlungs
@@ -234,10 +226,8 @@ const createMessageFunctions = async ({ kulturId, store }) => {
                 .filter((tz) => !exists(tz.anzahl_auspflanzbereit)).length,
           )
           .map(async (z) => {
-            const kultur = await dexie.kulturs.get(
-              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await z.kultur()
+            const kulturLabel = await kultur?.label()
 
             const zaehlung = z.datum
               ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
@@ -266,7 +256,6 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     zaehlungsWithoutAnzahlMutterpflanzen: async () =>
       await Promise.all(
         zaehlungsSorted
-          .filter((z) => z.kultur_id === kulturId)
           .filter(
             (z) =>
               teilzaehlungs
@@ -275,10 +264,8 @@ const createMessageFunctions = async ({ kulturId, store }) => {
                 .filter((tz) => !exists(tz.anzahl_mutterpflanzen)).length,
           )
           .map(async (z) => {
-            const kultur = await dexie.kulturs.get(
-              z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await z.kultur()
+            const kulturLabel = await kultur?.label()
 
             const zaehlung = z.datum
               ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
@@ -309,7 +296,6 @@ const createMessageFunctions = async ({ kulturId, store }) => {
       async () =>
         await Promise.all(
           zaehlungsSorted
-            .filter((z) => z.kultur_id === kulturId)
             .filter(async (z) => {
               const kulturOption = await z.kulturOption()
 
@@ -322,10 +308,8 @@ const createMessageFunctions = async ({ kulturId, store }) => {
               return tzs.length && tzs.filter((tz) => !tz.teilkultur_id).length
             })
             .map(async (z) => {
-              const kultur = await dexie.kulturs.get(
-                z.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-              )
-              const kulturLabel = await kultur.label()
+              const kultur = await z.kultur()
+              const kulturLabel = await kultur?.label()
 
               const zaehlung = z.datum
                 ? `Zählung am ${format(new Date(z.datum), 'yyyy.MM.dd')}`
@@ -352,8 +336,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
             }),
         ),
     lieferungsWithMultipleVon: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !!l.von_sammlung_id)
         .map((l) => {
           const datum = l.datum
@@ -368,8 +351,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     lieferungsWithMultipleNach: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => l.nach_ausgepflanzt)
         .map((l) => {
           const datum = l.datum
@@ -384,8 +366,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutAnzahlPflanzen: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !exists(l.anzahl_pflanzen))
         .map((l) => {
           const datum = l.datum
@@ -400,8 +381,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutAnzahlPflanzen: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !exists(l.anzahl_pflanzen))
         .map((l) => {
           const datum = l.datum
@@ -416,8 +396,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutAnzahlAuspflanzbereit: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !exists(l.anzahl_auspflanzbereit))
         .map((l) => {
           const datum = l.datum
@@ -432,8 +411,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutAnzahlAuspflanzbereit: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !exists(l.anzahl_auspflanzbereit))
         .map((l) => {
           const datum = l.datum
@@ -448,8 +426,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutVonAnzahlIndividuen: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !exists(l.von_anzahl_individuen))
         .map((l) => {
           const datum = l.datum
@@ -464,8 +441,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutVonAnzahlIndividuen: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !exists(l.von_anzahl_individuen))
         .map((l) => {
           const datum = l.datum
@@ -480,8 +456,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutVon: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !l.von_kultur_id)
         .filter((l) => !l.von_sammlung_id)
         .map((l) => {
@@ -497,8 +472,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutNach: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !l.nach_kultur_id)
         .filter((l) => !l.nach_ausgepflanzt)
         .map((l) => {
@@ -514,8 +488,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutDatum: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !l.datum)
         .map((l) => {
           const datum = l.datum
@@ -530,8 +503,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutDatum: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !l.datum)
         .map((l) => {
           const datum = l.datum
@@ -546,8 +518,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     anLieferungsWithoutPerson: async () =>
-      lieferungsSorted
-        .filter((l) => l.nach_kultur_id === kulturId)
+      anlieferungsSorted
         .filter((l) => !l.person_id)
         .map((l) => {
           const datum = l.datum
@@ -562,8 +533,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           }
         }),
     ausLieferungsWithoutPerson: async () =>
-      lieferungsSorted
-        .filter((l) => l.von_kultur_id === kulturId)
+      auslieferungsSorted
         .filter((l) => !l.person_id)
         .map((l) => {
           const datum = l.datum
@@ -580,13 +550,10 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     eventsWithoutBeschreibung: async () =>
       await Promise.all(
         eventsSorted
-          .filter((e) => e.kultur_id === kulturId)
           .filter((e) => !e.beschreibung)
           .map(async (ev) => {
-            const kultur = await dexie.kulturs.get(
-              ev.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await ev.kultur()
+            const kulturLabel = await kultur?.label()
 
             return {
               url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
@@ -597,13 +564,10 @@ const createMessageFunctions = async ({ kulturId, store }) => {
     eventsWithoutDatum: async () =>
       await Promise.all(
         eventsSorted
-          .filter((e) => e.kultur_id === kulturId)
           .filter((e) => !e.datum)
           .map(async (ev) => {
-            const kultur = await dexie.kulturs.get(
-              ev.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-            )
-            const kulturLabel = await kultur.label()
+            const kultur = await ev.kultur()
+            const kulturLabel = await kultur?.label()
 
             return {
               url: ['Vermehrung', 'Kulturen', kulturId, 'Events', ev.id],
