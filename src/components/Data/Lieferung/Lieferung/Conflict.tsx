@@ -53,7 +53,7 @@ const LieferungConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   // need to use this query to ensure that the person's name is queried
   const [{ error, data, fetching }] = useQuery({
@@ -65,9 +65,10 @@ const LieferungConflict = ({
   })
   error && checkForOnlineError({ error, store })
 
-  const revRow = useMemo(() => data?.lieferung_rev?.[0] ?? {}, [
-    data?.lieferung_rev,
-  ])
+  const revRow = useMemo(
+    () => data?.lieferung_rev?.[0] ?? {},
+    [data?.lieferung_rev],
+  )
 
   const dataArray = useMemo(
     () => createDataArrayForRevComparison({ row, revRow }),
@@ -122,15 +123,12 @@ const LieferungConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('lieferung').find(revRow.lieferung_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     conflictDisposalCallback()
   }, [
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
+    row,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -231,9 +229,10 @@ const LieferungConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   //console.log('Lieferung Conflict', { dataArray, row, revRow })
 

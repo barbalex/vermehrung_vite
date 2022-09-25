@@ -57,7 +57,6 @@ const FieldsContainer = styled.div`
 const Lieferungen = ({ filter: showFilter, width, height }) => {
   const store = useContext(StoreContext)
   const {
-    db,
     insertLieferungRev,
     sammlungIdInActiveNodeArray,
     personIdInActiveNodeArray,
@@ -110,10 +109,9 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
       activeNodeArray.length >= 2 && activeNodeArray[1] === 'Sammel-Lieferungen'
     if (isSammelLieferung) {
       const slId = activeNodeArray[2]
-      let sl
-      try {
-        sl = await db.get('sammel_lieferung').find(slId)
-      } catch {}
+      const sl = await dexie.sammel_lieferungs.get(
+        slId ?? '99999999-9999-9999-9999-999999999999',
+      )
       const additionalValuesToSet = {}
 
       const entries = Object.entries(sl)
@@ -141,7 +139,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
       })
     }
     insertLieferungRev()
-  }, [activeNodeArray, db, insertLieferungRev])
+  }, [activeNodeArray, insertLieferungRev])
 
   const onClickUp = useCallback(() => {
     removeOpenNode(activeNodeArray)
