@@ -399,15 +399,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('art')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.arts.put(newObjectForStore)
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
