@@ -116,27 +116,23 @@ const buildData = async ({ artId, herkunftId, db }) => {
     (p, i) => allLieferungsDonePromises[i],
   )
 
-  let allLieferungsPlanned = []
-  try {
-    allLieferungsPlanned = await db
-      .get('lieferung')
-      .query(
-        Q.where('art_id', artId),
-        Q.where('nach_ausgepflanzt', true),
-        Q.where('geplant', true),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('anzahl_pflanzen', Q.notEq(null)),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const allLieferungsPlanned = await dexie.lieferungs
+    .where({ art_id: artId })
+    .filter(
+      (l) =>
+        l._deleted === false &&
+        l.nach_ausgepflanzt === true &&
+        l.geplant === true &&
+        !!l.datum &&
+        exists(l.anzahl_pflanzen),
+    )
+    .toArray()
   // can't use Q.on here because there are two associations to kultur
   const allLieferungsPlannedPromises = await Promise.all(
     allLieferungsPlanned.map(async (l) => {
-      let vonKultur
-      try {
-        vonKultur = await db.get('kultur').find(l?.von_kultur_id)
-      } catch {}
+      const vonKultur = await dexie.kulturs.get(
+        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       return vonKultur?.herkunft_id === herkunftId
     }),
