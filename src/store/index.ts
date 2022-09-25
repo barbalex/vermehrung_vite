@@ -311,37 +311,13 @@ const myTypes = types
       setGqlWsClient(val) {
         self.gqlWsClient = val
       },
+      // used to revert offline operations if they fail
       async updateModelValue({ table, id, field, value }) {
-        // used to revert offline operations if they fail
-        const { db } = self
-        // find model = row
-        let row
-        try {
-          row = db.get(table).find(id).fetch()
-        } catch {}
-        if (row) {
-          await db.write(async () => {
-            await row.update((row) => {
-              row[field] = value
-            })
-          })
-        }
+        dexie[`${table}s`]?.update?.(id, { [field]: value })
       },
+      // used to revert offline operations if they fail
       async updateModelValues({ table, id, values }) {
-        // used to revert offline operations if they fail
-        const { db } = self
-        // find model = row
-        let row
-        try {
-          row = db.get(table).find(id).fetch()
-        } catch {}
-        await db.write(async () => {
-          await row.update((row) => {
-            Object.entries(values).forEach(([key, value]) => {
-              row[key] = value
-            })
-          })
-        })
+        dexie[`${table}s`]?.update?.(id, values)
       },
       removeQueuedQueryById(id) {
         self.queuedQueries.delete(id)

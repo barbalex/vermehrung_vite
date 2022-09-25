@@ -813,11 +813,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammlung > herkunft
-        const sammlungHerkunftQuery = sammlung.herkunft
-        let herkunft
-        try {
-          herkunft = await sammlungHerkunftQuery.fetch()
-        } catch {}
+        const herkunft = await sammlung?.herkunft()
         sammlungHerkunftFolderNodes.push(
           buildSammlungHerkunftFolder({
             count: [herkunft].length,
