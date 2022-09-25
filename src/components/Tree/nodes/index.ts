@@ -275,6 +275,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const sammlungsOfArtHerkunftIds = sammlungsOfArt.map(
           (s) => s.herkunft_id,
         )
+        // somehow using where('id')anyOf(sammlungsOfArtHerkunftIds) gives to few results ???!!!
         const herkunftsCollection = dexie.herkunfts.filter(
           (value) =>
             totalFilter({ value, store, table: 'herkunft' }) &&
@@ -360,9 +361,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-            const lieferungs = await dexie.lieferungs
-              .where('von_sammlung_id')
-              .equals(sammlungId)
+            const lieferungs = await dexie.lieferungs.where({von_sammlung_id:sammlungId})
               .filter((value) =>
                 totalFilter({ value, store, table: 'lieferung' }),
               )
