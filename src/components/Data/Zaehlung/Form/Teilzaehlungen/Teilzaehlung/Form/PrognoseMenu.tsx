@@ -44,7 +44,7 @@ const PrognoseMenu = ({
   teilzaehlung,
 }) => {
   const store = useContext(StoreContext)
-  const { addNotification, insertZaehlungRev, db } = store
+  const { addNotification, insertZaehlungRev } = store
 
   const zaehlung = useLiveQuery(
     async () =>

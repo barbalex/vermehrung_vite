@@ -42,7 +42,7 @@ const ZaehlungConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   // need to use this query to ensure that the person's name is queried
   const [{ error, data, fetching }] = useQuery({
@@ -54,9 +54,10 @@ const ZaehlungConflict = ({
   })
   error && checkForOnlineError({ error, store })
 
-  const revRow = useMemo(() => data?.zaehlung_rev?.[0] ?? {}, [
-    data?.zaehlung_rev,
-  ])
+  const revRow = useMemo(
+    () => data?.zaehlung_rev?.[0] ?? {},
+    [data?.zaehlung_rev],
+  )
 
   const dataArray = useMemo(
     () => createDataArrayForRevComparison({ row, revRow }),
@@ -100,15 +101,12 @@ const ZaehlungConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('zaehlung').find(revRow.zaehlung_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     conflictDisposalCallback()
   }, [
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
+    row,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -176,9 +174,10 @@ const ZaehlungConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   //console.log('Zaehlung Conflict', { dataArray, row, revRow })
 
