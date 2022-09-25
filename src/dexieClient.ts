@@ -1237,6 +1237,10 @@ export class Kultur implements IKultur {
     )
   }
 
+  async kulturOption() {
+    return await dexie.kultur_options.get(this.id)
+  }
+
   async label() {
     const garten = await dexie.gartens.get(
       this.garten_id ?? '99999999-9999-9999-9999-999999999999',
@@ -1632,6 +1636,12 @@ export class Zaehlung implements IZaehlung {
       .where({ zaehlung_id: this.id })
       .filter((t) => t._deleted === false)
       .toArray()
+  }
+
+  async kulturOption() {
+    return await dexie.kultur_options.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
   }
 
   async label({ store }) {

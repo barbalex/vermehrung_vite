@@ -311,10 +311,8 @@ const createMessageFunctions = async ({ kulturId, store }) => {
           zaehlungsSorted
             .filter((z) => z.kultur_id === kulturId)
             .filter(async (z) => {
-              let kulturOption
-              try {
-                kulturOption = await z.kultur_option.fetch()
-              } catch {}
+              const kulturOption = await z.kulturOption()
+
               return !!kulturOption?.tk
             })
             .filter((z) => {

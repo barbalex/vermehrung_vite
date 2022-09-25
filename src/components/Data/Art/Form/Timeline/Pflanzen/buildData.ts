@@ -178,7 +178,7 @@ const buildData = async ({ artId }) => {
               (z) =>
                 z.kultur_id === k.id &&
                 z._deleted === false &&
-                !!zaehlungs.datum &&
+                !!z.datum &&
                 zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
             )
             .toArray()
@@ -190,10 +190,7 @@ const buildData = async ({ artId }) => {
           )
           const lastTzAnzahls = await Promise.all(
             lastZaehlungsOfKultur.map(async (z) => {
-              let tzs = []
-              try {
-                tzs = (await z.teilzaehlungs?.fetch()) ?? []
-              } catch {}
+              const tzs = await z.teilzaehlungs()
 
               return sum(tzs.map((tz) => tz.anzahl_pflanzen))
             }),
