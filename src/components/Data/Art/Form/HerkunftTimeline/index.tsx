@@ -40,19 +40,17 @@ const Title = styled.div`
 
 const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
   const herkunfts = useLiveQuery(async () => {
-    const [sammlungs, herkunfts] = await Promise.all([
-      dexie.sammlungs
-        .filter(
-          (s) => s._deleted === false && s.art_id === artId && !!s.herkunft_id,
-        )
-        .toArray(),
-      dexie.herkunfts.filter((h) => h._deleted === false).toArray(),
-    ])
-
-    const herkunftIds = uniq(sammlungs.map((s) => s.herkunft_id))
-    const herkunftsSorted = herkunfts
-      .filter((h) => herkunftIds.includes(h.id))
-      .sort(herkunftSort)
+    const sammlungs = await dexie.sammlungs
+      .where({ art_id: artId })
+      .filter((s) => s._deleted === false && !!s.herkunft_id)
+      .toArray()
+    const herkunftIds = [...new Set(sammlungs.map((s) => s.herkunft_id))]
+    const herkunfts = await dexie.herkunfts
+      .where('id')
+      .anyOf(herkunftIds)
+      .filter((h) => h._deleted === false)
+      .toArray()
+    const herkunftsSorted = herkunfts.sort(herkunftSort)
     return herkunftsSorted
   }, [artId])
 
