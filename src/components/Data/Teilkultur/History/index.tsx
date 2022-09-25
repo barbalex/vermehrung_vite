@@ -61,7 +61,7 @@ const sliderSettings = {
   infinite: false,
 }
 
-const TeilkulturHistory = ({ row, rawRow, historyTakeoverCallback }) => {
+const TeilkulturHistory = ({ row, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
 
   const priorRevisions = row?._revisions?.slice(1) ?? []
@@ -95,7 +95,6 @@ const TeilkulturHistory = ({ row, rawRow, historyTakeoverCallback }) => {
             key={row._rev}
             revRow={r}
             row={row}
-            rawRow={rawRow}
             historyTakeoverCallback={historyTakeoverCallback}
           />
         ))}

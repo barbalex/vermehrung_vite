@@ -63,7 +63,7 @@ const sliderSettings = {
   infinite: false,
 }
 
-const TeilzaehlungHistory = ({ row, rawRow, historyTakeoverCallback }) => {
+const TeilzaehlungHistory = ({ row, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
 
   const priorRevisions = row?._revisions?.slice(1) ?? []
@@ -75,9 +75,10 @@ const TeilzaehlungHistory = ({ row, rawRow, historyTakeoverCallback }) => {
   })
   error && checkForOnlineError({ error, store })
 
-  const revRowsUnsorted = useMemo(() => data?.teilzaehlung_rev ?? [], [
-    data?.teilzaehlung_rev,
-  ])
+  const revRowsUnsorted = useMemo(
+    () => data?.teilzaehlung_rev ?? [],
+    [data?.teilzaehlung_rev],
+  )
   const revRows = revRowsUnsorted.sort((a, b) => b._depth - a._depth)
 
   if (fetching) {
@@ -96,7 +97,6 @@ const TeilzaehlungHistory = ({ row, rawRow, historyTakeoverCallback }) => {
             key={row._rev}
             revRow={r}
             row={row}
-            rawRow={rawRow}
             historyTakeoverCallback={historyTakeoverCallback}
           />
         ))}
