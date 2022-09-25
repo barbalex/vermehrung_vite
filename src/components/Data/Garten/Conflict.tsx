@@ -46,7 +46,7 @@ const GartenConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   const [{ error, data, fetching }] = useQuery({
     query: gartenRevQuery,
@@ -105,15 +105,12 @@ const GartenConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('garten').find(revRow.garten_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     conflictDisposalCallback()
   }, [
+    row,
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -194,9 +191,10 @@ const GartenConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   //console.log('Garten Conflict', { dataArray, row, revRow })
 

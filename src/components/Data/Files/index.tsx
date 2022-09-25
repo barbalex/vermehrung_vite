@@ -12,7 +12,6 @@ import FileComponent from './File'
 import 'react-image-lightbox/style.css'
 import isImageFile from './isImageFile'
 import ErrorBoundary from '../../shared/ErrorBoundary'
-import fileSort from '../../../utils/fileSort'
 import mutations from '../../../utils/mutations'
 import constants from '../../../utils/constants'
 import { dexie, File } from '../../../dexieClient'
@@ -78,12 +77,7 @@ const Files = ({ parentTable, parent }) => {
             [`${parentTable}_id`]: parent.id,
             name: info.name,
           }
-          // await db.write(async () => {
-          //   const collection = db.get(`${parentTable}_file`)
-          //   // using batch because can create from raw
-          //   // which enables overriding watermelons own id
-          //   await db.batch([collection.prepareCreateFromDirtyRaw(newObject)])
-          // })
+          await dexie[`${parentTable}_file`].put(newObject)
           // TODO: need to add mutations for all file-tables
           const mutation = mutations[`mutateInsert_${parentTable}_file_one`]
           const variables = {

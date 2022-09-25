@@ -44,7 +44,7 @@ const HerkunftConflict = ({
   setActiveConflict,
 }) => {
   const store = useContext(StoreContext)
-  const { user, addNotification, addQueuedQuery, db, gqlClient } = store
+  const { user, addNotification, addQueuedQuery, gqlClient } = store
 
   const [{ error, data, fetching }] = useQuery({
     query: herkunftRevQuery,
@@ -55,9 +55,10 @@ const HerkunftConflict = ({
   })
   error && checkForOnlineError({ error, store })
 
-  const revRow = useMemo(() => data?.herkunft_rev?.[0] ?? {}, [
-    data?.herkunft_rev,
-  ])
+  const revRow = useMemo(
+    () => data?.herkunft_rev?.[0] ?? {},
+    [data?.herkunft_rev],
+  )
 
   const dataArray = useMemo(
     () => createDataArrayForRevComparison({ row, revRow, store }),
@@ -104,15 +105,12 @@ const HerkunftConflict = ({
       revertValue: false,
     })
     // update model: remove this conflict
-    try {
-      const model = await db.get('herkunft').find(revRow.herkunft_id)
-      await model.removeConflict(revRow._rev)
-    } catch {}
+    row.removeConflict(revRow._rev)
     setTimeout(() => conflictDisposalCallback())
   }, [
+    row,
     addQueuedQuery,
     conflictDisposalCallback,
-    db,
     revRow._depth,
     revRow._rev,
     revRow._revisions,
@@ -189,9 +187,10 @@ const HerkunftConflict = ({
     store,
     user.email,
   ])
-  const onClickSchliessen = useCallback(() => setActiveConflict(null), [
-    setActiveConflict,
-  ])
+  const onClickSchliessen = useCallback(
+    () => setActiveConflict(null),
+    [setActiveConflict],
+  )
 
   return (
     <Conflict
