@@ -743,6 +743,7 @@ const myTypes = types
         })
         // optimistically update store
         await dexie.kulturs.put(newObjectForStore)
+        await dexie.kultur_options.put({ id })
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
@@ -895,17 +896,8 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const personCollection = db.get('person')
-          const personOptionCollection = db.get('person_option')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            personCollection.prepareCreateFromDirtyRaw(newObjectForStore),
-            personOptionCollection.prepareCreateFromDirtyRaw({ id }),
-          ])
-        })
+        await dexie.persons.put(newObjectForStore)
+        await dexie.person_options.put({ id })
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
@@ -979,15 +971,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('sammel_lieferung')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.sammel_lieferungs.put(newObjectForStore)
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
@@ -1057,15 +1041,7 @@ const myTypes = types
           revertValue: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('sammlung')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.sammlungs.put(newObjectForStore)
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
