@@ -2,45 +2,60 @@ import uniq from 'lodash/uniq'
 import sum from 'lodash/sum'
 import max from 'lodash/max'
 import { Q } from '@nozbe/watermelondb'
+
 import { dexie } from '../../../../../../dexieClient'
+import exists from '../../../../../../utils/exists'
 
 const buildData = async ({ artId, herkunftId, db }) => {
-  let zaehlungsDone = []
-  try {
-    zaehlungsDone = await db
-      .get('zaehlung')
-      .query(
-        Q.experimentalJoinTables(['kultur']),
-        Q.experimentalJoinTables(['teilzaehlung']),
-        Q.on('kultur', [
-          Q.where('art_id', artId),
-          Q.where('herkunft_id', herkunftId),
-        ]),
-        Q.where('prognose', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
-  let zaehlungsPlannedAll = []
-  try {
-    zaehlungsPlannedAll = await db
-      .get('zaehlung')
-      .query(
-        Q.experimentalJoinTables(['kultur']),
-        Q.experimentalJoinTables(['teilzaehlung']),
-        Q.where('prognose', true),
-        Q.where('datum', Q.notEq(null)),
-        Q.on('kultur', [
-          Q.where('art_id', artId),
-          Q.where('herkunft_id', herkunftId),
-        ]),
-        Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const kultursOfArt = await dexie.kulturs
+    .where({ art_id: artId, herkunft_id: herkunftId })
+    .filter((k) => k._deleted === false && k.aktiv === true)
+    .toArray()
+  const zaehlungsDoneAll = await dexie.zaehlungs
+    .where('kultur_id')
+    .anyOf(kultursOfArt)
+    .filter((z) => z._deleted === false && z.prognose === false && !!z.datum)
+    .toArray()
+  const teilzaehlungsOfZaehlungsDoneWithAnzahlPflanzen =
+    await dexie.teilzaehlungs
+      .where('zaehlung_id')
+      .anyOf(zaehlungsDoneAll)
+      .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
+      .toArray()
+  const zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen = [
+    ...new Set(
+      teilzaehlungsOfZaehlungsDoneWithAnzahlPflanzen.map(
+        (tz) => tz.zaehlung_id,
+      ),
+    ),
+  ]
+  const zaehlungsDone = await dexie.zaehlungs
+    .where('id')
+    .anyOf(zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen)
+    .toArray()
+  // same for planned
+  const zaehlungsPlannedAll1 = await dexie.zaehlungs
+    .where('kultur_id')
+    .anyOf(kultursOfArt)
+    .filter((z) => z._deleted === false && z.prognose === true && !!z.datum)
+    .toArray()
+  const teilzaehlungsOfZaehlungsPlannedWithAnzahlPflanzen =
+    await dexie.teilzaehlungs
+      .where('zaehlung_id')
+      .anyOf(zaehlungsPlannedAll1)
+      .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
+      .toArray()
+  const zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen = [
+    ...new Set(
+      teilzaehlungsOfZaehlungsPlannedWithAnzahlPflanzen.map(
+        (tz) => tz.zaehlung_id,
+      ),
+    ),
+  ]
+  const zaehlungsPlannedAll = await dexie.zaehlungs
+    .where('id')
+    .anyOf(zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen)
+    .toArray()
   const zaehlungsPlannedIgnored = zaehlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
     zaehlungsDone.some((z) => z.datum >= zg.datum),
@@ -49,34 +64,26 @@ const buildData = async ({ artId, herkunftId, db }) => {
     (lg) => !zaehlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  let sammlungsDone = []
-  try {
-    sammlungsDone = await db
-      .get('sammlung')
-      .query(
-        Q.where('art_id', artId),
-        Q.where('herkunft_id', herkunftId),
-        Q.where('geplant', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('anzahl_pflanzen', Q.notEq(null)),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
-  let sammlungsPlannedAll = []
-  try {
-    sammlungsPlannedAll = await db
-      .get('sammlung')
-      .query(
-        Q.where('art_id', artId),
-        Q.where('herkunft_id', herkunftId),
-        Q.where('geplant', true),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('anzahl_pflanzen', Q.notEq(null)),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
+  const sammlungsDone = await dexie.sammlungs
+    .where({ art_id: artId, herkunft_id: herkunftId })
+    .filter(
+      (s) =>
+        s._deleted === false &&
+        s.geplant === false &&
+        !!s.datum &&
+        exists(s.anzahl_pflanzen),
+    )
+    .toArray()
+  const sammlungsPlannedAll = await dexie.sammlungs
+    .where({ art_id: artId, herkunft_id: herkunftId })
+    .filter(
+      (s) =>
+        s._deleted === false &&
+        s.geplant === true &&
+        !!s.datum &&
+        exists(s.anzahl_pflanzen),
+    )
+    .toArray()
   const sammlungsPlannedIgnored = sammlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
     sammlungsDone.some((z) => z.datum >= zg.datum),
@@ -85,27 +92,22 @@ const buildData = async ({ artId, herkunftId, db }) => {
     (lg) => !sammlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  let allLieferungsDone = []
-  try {
-    allLieferungsDone = await db
-      .get('lieferung')
-      .query(
-        Q.where('art_id', artId),
-        Q.where('nach_ausgepflanzt', true),
-        Q.where('geplant', false),
-        Q.where('datum', Q.notEq(null)),
-        Q.where('anzahl_pflanzen', Q.notEq(null)),
-        Q.where('_deleted', false),
-      )
-      .fetch()
-  } catch {}
-  // can't use Q.on here because there are two associations to kultur
+  const allLieferungsDone = await dexie.lieferungs
+    .where({ art_id: artId })
+    .filter(
+      (l) =>
+        l._deleted === false &&
+        l.nach_ausgepflanzt === true &&
+        l.geplant === false &&
+        !!l.datum &&
+        exists(l.anzahl_pflanzen),
+    )
+    .toArray()
   const allLieferungsDonePromises = await Promise.all(
     allLieferungsDone.map(async (l) => {
-      let vonKultur
-      try {
-        vonKultur = await db.get('kultur').find(l.von_kultur_id)
-      } catch {}
+      const vonKultur = await dexie.kulturs.get(
+        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      )
 
       return vonKultur?.herkunft_id === herkunftId
     }),
@@ -165,18 +167,7 @@ const buildData = async ({ artId, herkunftId, db }) => {
   // 2. get list of all non deleted kulturs
   //    these are the basis for counting:
   //    at every date the last count is used
-  let kultursOfArt = []
-  try {
-    kultursOfArt = await db
-      .get('kultur')
-      .query(
-        Q.where('_deleted', false),
-        Q.where('aktiv', true),
-        Q.where('herkunft_id', herkunftId),
-        Q.where('art_id', artId),
-      )
-      .fetch()
-  } catch {}
+  // is: kultursOfArt
   // 3. for every date get:
   //    - sum of last zaehlung
   //    - whether last zahlung includes prognose
