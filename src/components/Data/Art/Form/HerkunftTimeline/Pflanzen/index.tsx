@@ -24,6 +24,7 @@ import CustomAxisTick from './CustomAxisTick'
 import ErrorBoundary from '../../../../../shared/ErrorBoundary'
 import herkunftLabelFromHerkunft from '../../../../../../utils/herkunftLabelFromHerkunft'
 import buildData from './buildData'
+import Spinner from '../../../../../shared/Spinner'
 
 const H4 = styled.h4`
   margin-bottom: 5px;
@@ -61,7 +62,7 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
 
   const herkunftLabel = herkunftLabelFromHerkunft({ herkunft })
 
-  if (!data) return null
+  if (!data) return <Spinner />
 
   if (data && !data.length) {
     return (

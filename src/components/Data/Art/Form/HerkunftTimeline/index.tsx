@@ -11,6 +11,7 @@ import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import herkunftSort from '../../../../../utils/herkunftSort'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
+import Spinner from '../../../../shared/Spinner'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -38,8 +39,7 @@ const Title = styled.div`
 `
 
 const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
-  const [herkunfts, setHerkunfts] = useState([])
-  useLiveQuery(async () => {
+  const herkunfts = useLiveQuery(async () => {
     const [sammlungs, herkunfts] = await Promise.all([
       dexie.sammlungs
         .filter(
@@ -53,7 +53,7 @@ const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
     const herkunftsSorted = herkunfts
       .filter((h) => herkunftIds.includes(h.id))
       .sort(herkunftSort)
-    setHerkunfts(herkunftsSorted)
+    return herkunftsSorted
   }, [artId])
 
   const [open, setOpen] = useState(false)
@@ -80,7 +80,7 @@ const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
   return (
     <ErrorBoundary>
       <TitleRow onClick={onClickToggle} title={open ? 'schliessen' : 'öffnen'}>
-        <Title>{`Zeit-Achsen ${herkunfts.length} Herkünfte`}</Title>
+        <Title>{`Zeit-Achsen ${(herkunfts ?? []).length} Herkünfte`}</Title>
         <div>
           <IconButton
             aria-label={open ? 'schliessen' : 'öffnen'}
@@ -93,10 +93,17 @@ const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
         </div>
       </TitleRow>
       <motion.div animate={anim} transition={{ type: 'just', duration: 0.2 }}>
-        {open &&
-          herkunfts.map((herkunft) => (
-            <Pflanzen key={herkunft.id} artId={artId} herkunft={herkunft} />
-          ))}
+        {open && (
+          <>
+            {herkunfts ? (
+              herkunfts.map((herkunft) => (
+                <Pflanzen key={herkunft.id} artId={artId} herkunft={herkunft} />
+              ))
+            ) : (
+              <Spinner />
+            )}
+          </>
+        )}
       </motion.div>
     </ErrorBoundary>
   )

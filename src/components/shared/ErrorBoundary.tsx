@@ -31,42 +31,30 @@ const Pre = styled.pre`
 
 const onReload = () => window.location.reload(true)
 
-const ErrorFallback = ({ error, componentStack, resetErrorBoundary }) => {
-  // ISSUE:
-  // watermelondb throws error when record not found
-  // this can happen when data is loaded first time and url is direct link to a dataset
-  // turned off as using own ErrorBoundary to catch this
-  /*const lcMessage = error.message.toLowerCase()
-  if (lcMessage.includes('record') && lcMessage.includes('not found')) {
-    console.log('ErrorBoundary', error.message)
-    return null
-  }*/
-
-  return (
-    <Container>
-      <p>Sorry, ein Fehler ist aufgetreten:</p>
-      <PreWrapping>{error.message}</PreWrapping>
-      <Details>
-        <Summary>Mehr Informationen</Summary>
-        <Pre>{componentStack}</Pre>
-      </Details>
-      <ButtonContainer>
-        <StyledButton variant="outlined" onClick={onReload} color="inherit">
-          neu starten
-        </StyledButton>
-      </ButtonContainer>
-      <ButtonContainer>
-        <StyledButton
-          variant="outlined"
-          onClick={resetErrorBoundary}
-          color="inherit"
-        >
-          Cache leeren und neu starten (neue Anmeldung nötig)
-        </StyledButton>
-      </ButtonContainer>
-    </Container>
-  )
-}
+const ErrorFallback = ({ error, componentStack, resetErrorBoundary }) => (
+  <Container>
+    <p>Sorry, ein Fehler ist aufgetreten:</p>
+    <PreWrapping>{error.message}</PreWrapping>
+    <Details>
+      <Summary>Mehr Informationen</Summary>
+      <Pre>{componentStack}</Pre>
+    </Details>
+    <ButtonContainer>
+      <StyledButton variant="outlined" onClick={onReload} color="inherit">
+        neu starten
+      </StyledButton>
+    </ButtonContainer>
+    <ButtonContainer>
+      <StyledButton
+        variant="outlined"
+        onClick={resetErrorBoundary}
+        color="inherit"
+      >
+        Cache leeren und neu starten (neue Anmeldung nötig)
+      </StyledButton>
+    </ButtonContainer>
+  </Container>
+)
 
 const MyErrorBoundary = ({ children }) => (
   <ErrorBoundary FallbackComponent={ErrorFallback} onReset={onReload}>

@@ -23,6 +23,7 @@ import LabelZaehlung from './LabelZaehlung'
 import CustomAxisTick from './CustomAxisTick'
 import ErrorBoundary from '../../../../../shared/ErrorBoundary'
 import buildData from './buildData'
+import Spinner from '../../../../../shared/Spinner'
 
 const NoData = styled.div`
   padding: 0 10px 10px 10px;
@@ -53,7 +54,7 @@ const ArtTimeline = ({ artId, width }) => {
     }
   }, [narrow, width])
 
-  if (!data) return null
+  if (!data) return <Spinner />
 
   if (data && !data.length) {
     return <NoData>Keine Daten verfügbar für Anzahl Pflanzen</NoData>

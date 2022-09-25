@@ -1,7 +1,6 @@
 import uniq from 'lodash/uniq'
 import sum from 'lodash/sum'
 import max from 'lodash/max'
-import { Q } from '@nozbe/watermelondb'
 
 import { dexie } from '../../../../../../dexieClient'
 import exists from '../../../../../../utils/exists'
@@ -11,15 +10,17 @@ const buildData = async ({ artId, herkunftId }) => {
     .where({ art_id: artId, herkunft_id: herkunftId })
     .filter((k) => k._deleted === false && k.aktiv === true)
     .toArray()
+  const idsOfKultursOfArt = kultursOfArt.map((k) => k.id)
   const zaehlungsDoneAll = await dexie.zaehlungs
     .where('kultur_id')
-    .anyOf(kultursOfArt)
+    .anyOf(idsOfKultursOfArt)
     .filter((z) => z._deleted === false && z.prognose === false && !!z.datum)
     .toArray()
+  const idsOfZaehlungsDoneAll = zaehlungsDoneAll.map((z) => z.id)
   const teilzaehlungsOfZaehlungsDoneWithAnzahlPflanzen =
     await dexie.teilzaehlungs
       .where('zaehlung_id')
-      .anyOf(zaehlungsDoneAll)
+      .anyOf(idsOfZaehlungsDoneAll)
       .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
       .toArray()
   const zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen = [
@@ -36,13 +37,14 @@ const buildData = async ({ artId, herkunftId }) => {
   // same for planned
   const zaehlungsPlannedAll1 = await dexie.zaehlungs
     .where('kultur_id')
-    .anyOf(kultursOfArt)
+    .anyOf(idsOfKultursOfArt)
     .filter((z) => z._deleted === false && z.prognose === true && !!z.datum)
     .toArray()
+  const idsOfZaehlungsPlannedAll1 = zaehlungsPlannedAll1.map((z) => z.id)
   const teilzaehlungsOfZaehlungsPlannedWithAnzahlPflanzen =
     await dexie.teilzaehlungs
       .where('zaehlung_id')
-      .anyOf(zaehlungsPlannedAll1)
+      .anyOf(idsOfZaehlungsPlannedAll1)
       .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
       .toArray()
   const zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen = [
@@ -195,12 +197,23 @@ const buildData = async ({ artId, herkunftId }) => {
         kultursOfArt.map(async (k) => {
           // for every kultur return
           // last zaehlung and whether it is prognose
-          const zaehlungs = await k.zaehlungs.fetch(
-            Q.experimentalJoinTables(['teilzaehlung']),
-            Q.where('_deleted', false),
-            Q.where('datum', Q.notEq(null)),
-            Q.on('teilzaehlung', Q.where('anzahl_pflanzen', Q.notEq(null))),
-          )
+          const allZaehlungs = await dexie.zaehlungs
+            .where({ kultur_id: k.id })
+            .filter((z) => z._deleted === false && !!z.datum)
+            .toArray()
+          const idsOfAllZaehlungs = allZaehlungs.map((z) => z.id)
+          const tzsOfAllZaehlungs = await dexie.teilzaehlungs
+            .where('zaehlung_id')
+            .anyOf(idsOfAllZaehlungs)
+            .filter((tz) => tz._deleted === false && exists(tz.anzahl_pflanzen))
+            .toArray()
+          const zaehlungIdsOfTzsOfAllZaehlungs = [
+            ...new Set(tzsOfAllZaehlungs.map((tz) => tz.zaehlung_id)),
+          ]
+          const zaehlungs = await dexie.zaehlungs
+            .where('id')
+            .anyOf(zaehlungIdsOfTzsOfAllZaehlungs)
+            .toArray()
           const lastZaehlungDatum = max(
             zaehlungs.map((z) => z.datum).filter((d) => d <= date),
           )
@@ -209,10 +222,7 @@ const buildData = async ({ artId, herkunftId }) => {
           )
           const lastTzAnzahls = await Promise.all(
             lastZaehlungsOfKultur.map(async (z) => {
-              let tzs = []
-              try {
-                tzs = await z.teilzaehlungs?.fetch()
-              } catch {}
+              const tzs = await z.teilzaehlungs()
 
               return sum(tzs.map((tz) => tz.anzahl_pflanzen))
             }),

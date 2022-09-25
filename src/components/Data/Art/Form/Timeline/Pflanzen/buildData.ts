@@ -133,15 +133,6 @@ const buildData = async ({ artId }) => {
     ].map((z) => z.datum),
   ).sort()
 
-  console.log('Art Timeline buildData', {
-    sammlungsDone,
-    sammlungsPlanned,
-    lieferungsDone,
-    lieferungsPlanned,
-    zaehlungsDone,
-    zaehlungsPlanned,
-  })
-
   // 3. for every date get:
   //    - sum of last zaehlung
   //    - whether last zahlung includes prognose
