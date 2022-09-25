@@ -1102,15 +1102,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('teilkultur')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.teilkulturs.put(newObjectForStore)
         if (!noNavigateInTree) {
           setTimeout(() => {
             const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
@@ -1177,15 +1169,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('teilzaehlung')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.teilzaehlungs.put(newObjectForStore)
       },
       async insertZaehlungRev(args) {
         const { user, addQueuedQuery, kulturIdInActiveNodeArray } = self
@@ -1234,15 +1218,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        const { db } = self
-        await db.write(async () => {
-          const collection = db.get('zaehlung')
-          // using batch because can create from raw
-          // which enables overriding watermelons own id
-          await db.batch([
-            collection.prepareCreateFromDirtyRaw(newObjectForStore),
-          ])
-        })
+        await dexie.zaehlungs.put(newObjectForStore)
         setTimeout(() => {
           const newActiveNodeArray = isUuid.v1(last(activeNodeArray))
             ? // slice if last is uuid
