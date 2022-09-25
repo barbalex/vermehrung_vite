@@ -30,7 +30,6 @@
     "graphql-tag": "2.12.6",
     "graphql-ws": "5.11.2",
     "is-uuid": "1.0.2",
-    "jquery": "3.6.1",
     "localforage": "1.10.0",
     "lodash": "4.17.21",
     "luxon": "3.0.3",
@@ -98,7 +97,6 @@
     "graphql": "is needed by graphql_ws",
     "react-is": "is needed by styled-components",
     "prop-types": "is used by react-typography",
-    "jquery": "is peer",
     "simplebar": "is peer"
   }
 }
