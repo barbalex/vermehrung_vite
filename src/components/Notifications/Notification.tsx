@@ -70,18 +70,17 @@ const Notification = ({ notification: n }) => {
 
   const color = colorMap[type] ?? 'error'
 
-  const onClickClose = useCallback(() => removeNotificationById(n.id), [
-    n.id,
-    removeNotificationById,
-  ])
+  const onClickClose = useCallback(
+    () => removeNotificationById(n.id),
+    [n.id, removeNotificationById],
+  )
   const onClickAction = useCallback(() => {
     store?.[actionName]?.(actionArgument ?? undefined)
     if (revertTable && revertId && revertField) {
-      store.updateModelValue({
+      store.updateModelValues({
         table: revertTable,
         id: revertId,
-        field: revertField,
-        value: revertValue,
+        values: { [revertField]: revertValue },
       })
     } else if (revertTable && revertId && revertValues) {
       store.updateModelValues({

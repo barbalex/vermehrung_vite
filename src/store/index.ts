@@ -231,11 +231,10 @@ const myTypes = types
               })
             }
             // revert change
-            self.updateModelValue({
+            self.updateModelValues({
               table: revertTable,
               id: revertId,
-              field: revertField,
-              value: revertValue,
+              values: { [revertField]: revertValue },
             })
           }
           // remove operation from queue
@@ -310,10 +309,6 @@ const myTypes = types
       },
       setGqlWsClient(val) {
         self.gqlWsClient = val
-      },
-      // used to revert offline operations if they fail
-      async updateModelValue({ table, id, field, value }) {
-        dexie[`${table}s`]?.update?.(id, { [field]: value })
       },
       // used to revert offline operations if they fail
       async updateModelValues({ table, id, values }) {

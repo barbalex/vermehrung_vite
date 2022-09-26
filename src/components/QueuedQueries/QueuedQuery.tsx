@@ -74,11 +74,10 @@ const QueuedQuery = ({ qq, index }) => {
 
   const onClickRevert = useCallback(() => {
     if (revertTable && revertId && revertField) {
-      store.updateModelValue({
+      store.updateModelValues({
         table: revertTable,
         id: revertId,
-        field: revertField,
-        value: revertValue,
+        values: { [revertField]: revertValue },
       })
     } else if (revertTable && revertId && revertValues) {
       store.updateModelValues({
