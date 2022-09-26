@@ -41,16 +41,25 @@ const createMessageFunctions = async ({ artId, store }) => {
     where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
   }).toArray()
 
-  const kulturs = await dexie.kulturs
-    .where({ art_id: artId })
-    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-    .toArray()
+  const kulturs = await collectionFromTable({
+    table: 'kultur',
+    where: addTotalCriteriaToWhere({
+      store,
+      table: 'kultur',
+      where: { art_id: artId },
+    }),
+  }).toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
   const kulturIds = kultursSorted.map((k) => k.id)
 
-  const lieferungs = await dexie.lieferungs
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const lieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      store,
+      table: 'lieferung',
+      where: { art_id: artId },
+    }),
+  }).toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
   const persons = await dexie.persons
@@ -618,7 +627,6 @@ const createMessageFunctions = async ({ artId, store }) => {
       },
     lieferungsWithMultipleVon: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !!l.von_sammlung_id)
         .filter((l) => !!l.von_kultur_id)
         .map((l) => {
@@ -635,7 +643,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithMultipleNach: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => l.nach_ausgepflanzt)
         .filter((l) => !!l.nach_kultur_id)
         .map((l) => {
@@ -652,7 +659,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutAnzahlPflanzen: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !exists(l.anzahl_pflanzen))
         .map((l) => {
           const datum = l.datum
@@ -668,7 +674,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutAnzahlAuspflanzbereit: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !exists(l.anzahl_auspflanzbereit))
         .map((l) => {
           const datum = l.datum
@@ -684,7 +689,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutVonAnzahlIndividuen: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !exists(l.von_anzahl_individuen))
         .map((l) => {
           const datum = l.datum
@@ -700,7 +704,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutVon: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !l.von_kultur_id)
         .filter((l) => !l.von_sammlung_id)
         .map((l) => {
@@ -717,7 +720,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutNach: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !!l.von_kultur_id || !!l.von_sammlung_id)
         .filter((l) => !l.nach_kultur_id)
         .filter((l) => !l.nach_ausgepflanzt)
@@ -735,7 +737,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutDatum: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !l.datum)
         .map((l) => {
           const datum = l.datum
@@ -751,7 +752,6 @@ const createMessageFunctions = async ({ artId, store }) => {
         }),
     lieferungsWithoutPerson: async () =>
       lieferungsSorted
-        .filter((l) => l.art_id === artId)
         .filter((l) => !l.person_id)
         .map((l) => {
           const datum = l.datum
