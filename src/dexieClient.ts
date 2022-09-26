@@ -4584,26 +4584,28 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(23).stores({
-      herkunfts: 'id, _deleted, _deleted_indexable',
+    this.version(24).stores({
+      herkunfts: 'id, _deleted_indexable',
       sammlungs:
-        'id, *herkunft_id, *art_id, *person_id, _deleted, _deleted_indexable, [art_id+herkunft_id]',
+        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id]',
       lieferungs:
-        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted, _deleted_indexable',
-      arts: 'id, _deleted, _deleted_indexable',
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
+      arts: 'id, _deleted_indexable',
       ae_arts: 'id, name',
-      gartens: 'id, *person_id, _deleted, _deleted_indexable',
+      gartens: 'id, *person_id, _deleted_indexable, aktiv_indexable',
       kulturs:
-        'id, *garten_id, *art_id, *herkunft_id, _deleted, _deleted_indexable, [art_id+herkunft_id] ',
-      teilkulturs: 'id, *kultur_id, _deleted, _deleted_indexable',
-      zaehlungs: 'id, *kultur_id, datum, _deleted, _deleted_indexable',
-      teilzaehlungs:
-        'id, *zaehlung_id, *teilkultur_id, _deleted, _deleted_indexable',
-      persons: 'id, &account_id, aktiv, _deleted, _deleted_indexable',
-      sammel_lieferungs: 'id, _deleted, _deleted_indexable',
-      events: 'id, *kultur_id, *teilkultur_id, _deleted, _deleted_indexable',
-      avs: 'id, *art_id, *person_id, _deleted, _deleted_indexable',
-      gvs: 'id, *garten_id, *person_id, _deleted, _deleted_indexable',
+        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+herkunft_id] ',
+      teilkulturs: 'id, *kultur_id, _deleted_indexable',
+      zaehlungs:
+        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable',
+      teilzaehlungs: 'id, *zaehlung_id, *teilkultur_id, _deleted_indexable',
+      persons: 'id, &account_id, aktiv, _deleted_indexable, aktiv_indexable',
+      sammel_lieferungs:
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
+      events:
+        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable',
+      avs: 'id, *art_id, *person_id, _deleted_indexable',
+      gvs: 'id, *garten_id, *person_id, _deleted_indexable',
       art_files: 'id, name',
       garten_files: 'id, name',
       herkunft_files: 'id, name',
@@ -4611,10 +4613,10 @@ export class MySubClassedDexie extends Dexie {
       lieferung_files: 'id, name',
       person_files: 'id, name',
       sammlung_files: 'id, name',
-      art_qks: 'id, name, _deleted, _deleted_indexable',
-      kultur_options: 'id, _deleted, _deleted_indexable',
-      kultur_qks: 'id, _deleted, _deleted_indexable',
-      person_options: 'id, _deleted, _deleted_indexable',
+      art_qks: 'id, name, _deleted_indexable',
+      kultur_options: 'id, _deleted_indexable',
+      kultur_qks: 'id, _deleted_indexable',
+      person_options: 'id, _deleted_indexable',
       user_roles: 'id',
       stores: 'id',
       queued_updates: '++id',
