@@ -32,6 +32,8 @@ import {
 } from './utils/fragments'
 import totalFilter from './utils/totalFilter'
 import addIndexableFields from './utils/addIndexableFields'
+import collectionFromTable from './utils/collectionFromTable'
+import addTotalCriteriaToWhere from './utils/addTotalCriteriaToWhere'
 
 window.Dexie = Dexie
 
@@ -788,10 +790,14 @@ export class Art implements IArt {
   }
 
   async herkunfts({ store }) {
-    const sammlungs = await dexie.sammlungs
-      .where({ art_id: this.id })
-      .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
-      .toArray()
+    const sammlungs = await collectionFromTable({
+      table: 'sammlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'sammlung',
+        where: { art_id: this.id },
+      }),
+    })
     const herkunftIds = sammlungs
       .filter((s) => !!s.herkunft_id)
       .map((s) => s.herkunft_id)
@@ -983,11 +989,15 @@ export class Garten implements IGarten {
     )
   }
 
-  async kulturs() {
-    return await dexie.kulturs
-      .where({ garten_id: this.id })
-      .filter((k) => k.aktiv === true && k._deleted === false)
-      .toArray()
+  async kulturs({ store }) {
+    return await collectionFromTable({
+      table: 'kultur',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'kultur',
+        where: { garten_id: this.id },
+      }),
+    }).toArray()
   }
 
   async label() {
@@ -1168,16 +1178,24 @@ export class Kultur implements IKultur {
   }
 
   async anlieferungs({ store }) {
-    return await dexie.lieferungs
-      .where({ nach_kultur_id: this.id })
-      .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-      .toArray()
+    return await collectionFromTable({
+      table: 'lieferung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'lieferung',
+        where: { nach_kultur_id: this.id },
+      }),
+    })
   }
   async auslieferungs({ store }) {
-    return await dexie.lieferungs
-      .where({ von_kultur_id: this.id })
-      .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-      .toArray()
+    return await collectionFromTable({
+      table: 'lieferung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'lieferung',
+        where: { von_kultur_id: this.id },
+      }),
+    }).toArray()
   }
 
   async art() {
@@ -1434,18 +1452,26 @@ export class Teilkultur implements ITeilkultur {
     )
   }
 
-  async events() {
-    return await dexie.events
-      .where({ teilkultur_id: this.id })
-      .filter((e) => e._deleted === false)
-      .toArray()
+  async events({ store }) {
+    return await collectionFromTable({
+      table: 'event',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'event',
+        where: { teilkultur_id: this.id },
+      }),
+    }).toArray()
   }
 
   async teilzaehlungs() {
-    return await dexie.n
-      .where({ teilkultur_id: this.id })
-      .filter((e) => e._deleted === false)
-      .toArray()
+    return await collectionFromTable({
+      table: 'teilzaehlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'teilzaehlung',
+        where: { teilkultur_id: this.id },
+      }),
+    }).toArray()
   }
 
   removeConflict(_rev: string) {
@@ -1594,11 +1620,15 @@ export class Zaehlung implements IZaehlung {
     )
   }
 
-  async teilzaehlungs() {
-    return await dexie.teilzaehlungs
-      .where({ zaehlung_id: this.id })
-      .filter((t) => t._deleted === false)
-      .toArray()
+  async teilzaehlungs({ store }) {
+    return await collectionFromTable({
+      table: 'teilzahlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'teilzahlung',
+        where: { zaehlung_id: this.id },
+      }),
+    })
   }
 
   async kulturOption() {
@@ -1608,10 +1638,14 @@ export class Zaehlung implements IZaehlung {
   }
 
   async label({ store }) {
-    const teilzaehlungs = await dexie.teilzaehlungs
-      .where({ zaehlung_id: this.id })
-      .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
-      .toArray()
+    const teilzaehlungs = await collectionFromTable({
+      table: 'teilzaehlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'teilzaehlung',
+        where: { zaehlung_id: this.id },
+      }),
+    })
 
     return await zaehlungLabelFromZaehlung({
       zaehlung: this,
@@ -4584,7 +4618,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(38).stores({
+    this.version(39).stores({
       herkunfts: 'id, _deleted_indexable',
       sammlungs:
         'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable]',
@@ -4600,7 +4634,8 @@ export class MySubClassedDexie extends Dexie {
         'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
       zaehlungs:
         'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [kultur_id+_deleted_indexable]',
-      teilzaehlungs: 'id, *zaehlung_id, *teilkultur_id, _deleted_indexable',
+      teilzaehlungs:
+        'id, *zaehlung_id, *teilkultur_id, _deleted_indexable, [zaehlung_id+_deleted_indexable] ',
       persons:
         'id, &account_id, aktiv, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable]',
       sammel_lieferungs:

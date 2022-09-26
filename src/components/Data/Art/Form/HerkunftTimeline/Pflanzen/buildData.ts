@@ -222,7 +222,7 @@ const buildData = async ({ artId, herkunftId }) => {
           )
           const lastTzAnzahls = await Promise.all(
             lastZaehlungsOfKultur.map(async (z) => {
-              const tzs = await z.teilzaehlungs()
+              const tzs = await z.teilzaehlungs({ store })
 
               return sum(tzs.map((tz) => tz.anzahl_pflanzen))
             }),
