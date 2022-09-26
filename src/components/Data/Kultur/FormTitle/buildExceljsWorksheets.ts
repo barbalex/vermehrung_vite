@@ -69,7 +69,7 @@ const buildExceljsWorksheets = async ({
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
   const zaehlungen = await Promise.all(
     zaehlungsSorted.map(async (z) => {
-      const tzs = await z.teilzaehlungs()
+      const tzs = await z.teilzaehlungs({ store })
       const tzsSorted = await teilzaehlungsSortByTk(tzs)
       const newZ = {
         id: z.id,

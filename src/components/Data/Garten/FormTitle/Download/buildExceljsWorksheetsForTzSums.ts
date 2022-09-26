@@ -19,7 +19,7 @@ const buildExceljsWorksheetsForTzSums = async ({
   workbook,
 }) => {
   const garten: Garten = await dexie.gartens.get(garten_id)
-  const allKulturs: Kultur[] = await garten?.kulturs()
+  const allKulturs: Kultur[] = await garten?.kulturs({ store })
   const idsOfAllKulturs = allKulturs.map((k) => k.id)
   const allZaehlungs: Zaehlung[] = await dexie?.zaehlungs
     .where('kultur_id')
