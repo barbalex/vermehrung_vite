@@ -782,7 +782,7 @@ export class Art implements IArt {
   }
 
   async sammlungs({ store }) {
-    const sammlungs =  await collectionFromTable({
+    const sammlungs = await collectionFromTable({
       table: 'sammlung',
       where: addTotalCriteriaToWhere({
         store,
@@ -790,10 +790,8 @@ export class Art implements IArt {
         where: { art_id: this.id },
       }),
     }).toArray()
-    
-    return await sammlungsSortedFromSammlungs(
-      sammlungs,
-    )
+
+    return await sammlungsSortedFromSammlungs(sammlungs)
   }
 
   async label() {
@@ -4656,7 +4654,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(40).stores({
+    this.version(41).stores({
       herkunfts: 'id, _deleted_indexable',
       sammlungs:
         'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable]',
@@ -4667,7 +4665,7 @@ export class MySubClassedDexie extends Dexie {
       gartens:
         'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable]',
       kulturs:
-        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable]',
+        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable], [garten_id+_deleted_indexable]',
       teilkulturs:
         'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
       zaehlungs:

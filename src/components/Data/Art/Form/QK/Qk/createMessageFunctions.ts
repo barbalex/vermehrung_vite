@@ -5,7 +5,6 @@ import exists from '../../../../../../utils/exists'
 
 import gartensSortedFromGartens from '../../../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
-import sammlungsSortedFromSammlungs from '../../../../../../utils/sammlungsSortedFromSammlungs'
 import eventSort from '../../../../../../utils/eventSort'
 import lieferungSort from '../../../../../../utils/lieferungSort'
 import personSort from '../../../../../../utils/personSort'
@@ -277,10 +276,10 @@ const createMessageFunctions = async ({ artId, store }) => {
         .toArray()
       const gartensSorted = await gartensSortedFromGartens(gartens)
       const filterPromiseArray = gartensSorted.map(async (g) => {
-        const kulturs = await dexie.kulturs
-          .where({ garten_id: g.id })
-          .filter((g) => g._deleted === false)
-          .toArray()
+        const kulturs = await collectionFromTable({
+          table: 'kultur',
+          where: { garten_id: g.id, _deleted_indexable: 0 },
+        }).toArray()
 
         return !!kulturs.length && kulturs.every((k) => !k.aktiv)
       })
