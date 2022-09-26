@@ -111,7 +111,6 @@ import getShowSammlung from '../../../utils/showSammlung'
 import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
 import { dexie } from '../../../dexieClient'
-import totalFilter from '../../../utils/totalFilter'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTableAndWhere from '../../../utils/collectionFromTableAndWhere'
 
@@ -2088,9 +2087,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > lieferung
-        const personLieferungCollection = dexie.lieferungs
-          .where({ person_id: person.id })
-          .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
+        const personLieferungCollection = collectionFromTableAndWhere({
+          table: 'lieferung',
+          where: addTotalCriteriaToWhere({
+            store,
+            table: 'lieferung',
+            where: { person_id: person.id },
+          }),
+        })
         const personLieferungCount = await personLieferungCollection.count()
         personLieferungFolderNodes.push(
           buildPersonLieferungFolder({
