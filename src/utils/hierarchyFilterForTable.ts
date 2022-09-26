@@ -11,7 +11,7 @@ const hierarchyFilterForTable = async ({ store, table }) => {
     sammelLieferungIdInActiveNodeArray,
     sammlungIdInActiveNodeArray,
   } = store
-  const { activeNodeArray } = store.tree
+  const { activeNodeArray } = store.tree 
 
   switch (table) {
     case 'herkunft': {

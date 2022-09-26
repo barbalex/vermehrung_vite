@@ -20,6 +20,9 @@ import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 import Spinner from '../../shared/Spinner'
+import collectionFromTableAndWhere from '../../../utils/collectionFromTableAndWhere'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 
 const Container = styled.div`
   height: 100%;
@@ -59,7 +62,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'zaehlung',
     })
@@ -68,15 +71,21 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
         store,
         table: 'zaehlung',
       }),
-      dexie.zaehlungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'zaehlung',
-            conditionAdder,
-          }),
-        )
+      conditionAdder(
+        collectionFromTableAndWhere({
+          table: 'zaehlung',
+          where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
+        }),
+      )
+        // dexie.zaehlungs
+        //   .filter((value) =>
+        //     totalFilter({
+        //       value,
+        //       store,
+        //       table: 'zaehlung',
+        //       conditionAdder,
+        //     }),
+        //   )
         .count(),
     ])
 
