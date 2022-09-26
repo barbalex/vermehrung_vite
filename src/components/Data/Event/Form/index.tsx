@@ -23,6 +23,8 @@ import personSort from '../../../../utils/personSort'
 import constants from '../../../../utils/constants'
 import { dexie, KulturOption } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -65,16 +67,18 @@ const EventForm = ({
 
   const data = useLiveQuery(async () => {
     const [kulturs, teilkulturs, persons, kulturOption] = await Promise.all([
-      dexie.kulturs
-        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-        .toArray(),
-      dexie.teilkulturs
-        .filter(
-          (t) =>
-            t._deleted === false &&
-            (showFilter ? true : t.kultur_id === kulturId),
-        )
-        .toArray(),
+      collectionFromTable({
+        table: 'kultur',
+        where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'teilkultur',
+        where: addTotalCriteriaToWhere({
+          table: 'teilkultur',
+          store,
+          ...(showFilter && { where: { kultur_id: kulturId } }),
+        }),
+      }).toArray(),
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .toArray(),
