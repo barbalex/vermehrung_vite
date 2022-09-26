@@ -28,7 +28,7 @@ export default types
     },
     setActiveNodeArray(val) {
       const store = getParent(self, 1)
-      console.log('store.Tree, setting activeNodeArray to:', val)
+      // console.log('store.Tree, setting activeNodeArray to:', val)
       self.activeNodeArray = val
       store.navigate(resolvePath(val.join('/')))
     },

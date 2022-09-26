@@ -1,4 +1,4 @@
-const totalFilter = async ({
+const totalFilter = async ({ 
   value,
   store,
   table,
