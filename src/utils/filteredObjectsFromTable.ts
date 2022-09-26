@@ -2,8 +2,9 @@ import camelCase from 'lodash/camelCase'
 
 import types from '../store/Filter/simpleTypes'
 import exists from './exists'
-import { dexie } from '../dexieClient'
 import hierarchyConditionAdderForTable from './hierarchyConditionAdderForTable'
+import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
+import collectionFromTableAndWhere from './collectionFromTableAndWhere'
 
 const filteredObjectsFromTable = async ({
   store,
@@ -22,9 +23,12 @@ const filteredObjectsFromTable = async ({
 
   // reduce filter to actually set criteria
   const whereObject = {}
-  Object.entries(storeFilter).forEach(([key, value]) => {
+  for (const el of Object.entries(storeFilter)) {
+    const [key, value] = el
+    if (key === 'aktiv') break
+    if (key === '_deleted') break
     if (exists(value)) whereObject[key] = value
-  })
+  }
 
   const filterFunction = (object) => {
     let returnValue = true
@@ -66,7 +70,10 @@ const filteredObjectsFromTable = async ({
     return returnValue
   }
 
-  const filteredCollection1 = dexie[`${table}s`].filter(filterFunction)
+  const filteredCollection1 = collectionFromTableAndWhere({
+    table,
+    where: addTotalCriteriaToWhere({ table, store }),
+  }).filter(filterFunction)
   const filteredCollection2 = filterByHierarchy
     ? conditionAdder(filteredCollection1)
     : filteredCollection1

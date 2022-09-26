@@ -76,17 +76,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
           table: 'zaehlung',
           where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
         }),
-      )
-        // dexie.zaehlungs
-        //   .filter((value) =>
-        //     totalFilter({
-        //       value,
-        //       store,
-        //       table: 'zaehlung',
-        //       conditionAdder,
-        //     }),
-        //   )
-        .count(),
+      ).count(),
     ])
 
     const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
@@ -101,7 +91,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
 
   const zaehlungs: Zaehlung[] = data?.zaehlungs ?? []
   const totalCount = data?.totalCount
-  const filteredCount = store.zaehlungsFilteredCount ?? '...'
+  const filteredCount = data?.zaehlungs?.length ?? '...'
 
   const add = useCallback(() => {
     insertZaehlungRev()
