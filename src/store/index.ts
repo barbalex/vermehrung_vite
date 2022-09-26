@@ -33,6 +33,7 @@ import zaehlungIdInUrl from '../utils/zaehlungIdInUrl'
 import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import { dexie } from '../dexieClient'
+import addIndexableFields from '../utils/addIndexableFields'
 
 const myTypes = types
   .model({
@@ -312,8 +313,9 @@ const myTypes = types
       },
       // used to revert offline operations if they fail
       async updateModelValues({ table, id, values }) {
-        // TODO: add/update indexable booleans
-        dexie[`${table}s`]?.update?.(id, values)
+        // add/update indexable booleans
+        const valuesWithIndexableFields = addIndexableFields({ table, values })
+        dexie[`${table}s`]?.update?.(id, valuesWithIndexableFields)
       },
       removeQueuedQueryById(id) {
         self.queuedQueries.delete(id)

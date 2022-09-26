@@ -24,7 +24,6 @@ const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
     console.log('processTable', { dexie, table, dexieTable: dexie[table] })
     const data = dataIn.map((d) => stripTypename(d))
     data?.forEach((object) => addIndexableFields({ table, object }))
-    console.log('processTable:', { data, dataIn })
 
     try {
       await dexie[`${table}s`].bulkPut(data)
