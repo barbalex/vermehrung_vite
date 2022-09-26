@@ -314,8 +314,8 @@ const myTypes = types
       // used to revert offline operations if they fail
       async updateModelValues({ table, id, values }) {
         // add/update indexable booleans
-        const valuesWithIndexableFields = addIndexableFields({ table, values })
-        dexie[`${table}s`]?.update?.(id, valuesWithIndexableFields)
+        addIndexableFields({ table, values })
+        dexie[`${table}s`]?.update?.(id, values)
       },
       removeQueuedQueryById(id) {
         self.queuedQueries.delete(id)
