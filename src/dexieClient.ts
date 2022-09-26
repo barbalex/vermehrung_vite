@@ -19,6 +19,7 @@ import sammlungLabelFromSammlungUnderHerkunft from './utils/sammlungLabelFromSam
 import zaehlungLabelFromZaehlung from './utils/zaehlungLabelFromZaehlung'
 import toPgArray from './utils/toPgArray'
 import deleteAccount from './utils/deleteAccount'
+import sammlungsSortedFromSammlungs from './utils/sammlungsSortedFromSammlungs'
 // TODO: reinstate when file was copied
 // import updateAllLieferungen from './components/Data/SammelLieferung/FormTitle/Copy/updateAllLieferungen' // 2
 import {
@@ -777,6 +778,21 @@ export class Art implements IArt {
   async aeArt() {
     return await dexie.ae_arts.get(
       this.ae_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async sammlungs({ store }) {
+    const sammlungs =  await collectionFromTable({
+      table: 'sammlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'sammlung',
+        where: { art_id: this.id },
+      }),
+    }).toArray()
+    
+    return await sammlungsSortedFromSammlungs(
+      sammlungs,
     )
   }
 

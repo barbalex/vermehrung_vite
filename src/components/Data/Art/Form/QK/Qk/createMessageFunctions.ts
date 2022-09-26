@@ -7,13 +7,12 @@ import gartensSortedFromGartens from '../../../../../../utils/gartensSortedFromG
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
 import sammlungsSortedFromSammlungs from '../../../../../../utils/sammlungsSortedFromSammlungs'
 import eventSort from '../../../../../../utils/eventSort'
-import herkunftSort from '../../../../../../utils/herkunftSort'
 import lieferungSort from '../../../../../../utils/lieferungSort'
 import personSort from '../../../../../../utils/personSort'
 import teilkulturSort from '../../../../../../utils/teilkulturSort'
 import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
-import { dexie } from '../../../../../../dexieClient'
+import { dexie, Art, Av, Herkunft } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
 import collectionFromTable from '../../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../../utils/addTotalCriteriaToWhere'
@@ -23,11 +22,11 @@ const createMessageFunctions = async ({ artId, store }) => {
   const startYear = `${year}-01-01`
   const startNextYear = `${year + 1}-01-01`
 
-  const art = await dexie.arts.get(
+  const art: Art = await dexie.arts.get(
     artId ?? '99999999-9999-9999-9999-999999999999',
   )
 
-  const avs = await collectionFromTable({
+  const avs: Av[] = await collectionFromTable({
     table: 'av',
     where: addTotalCriteriaToWhere({
       store,
@@ -36,7 +35,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     }),
   }).toArray()
 
-  const allHerkunfts = await collectionFromTable({
+  const allHerkunfts: Herkunft[] = await collectionFromTable({
     table: 'herkunft',
     where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
   }).toArray()
@@ -62,18 +61,13 @@ const createMessageFunctions = async ({ artId, store }) => {
   }).toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
-  const persons = await dexie.persons
-    .filter((value) => totalFilter({ value, store, table: 'person' }))
-    .toArray()
+  const persons = await collectionFromTable({
+    table: 'person',
+    where: addTotalCriteriaToWhere({ store, table: 'person' }),
+  }).toArray()
   const personsSorted = persons.sort(personSort)
 
-  const sammlungsOfArt = await dexie.sammlungs
-    .where({ art_id: artId })
-    .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
-    .toArray()
-  const sammlungsOfArtSorted = await sammlungsSortedFromSammlungs(
-    sammlungsOfArt,
-  )
+  const sammlungsOfArt = await art.sammlungs({ store })
 
   const zaehlungsOfArt = await dexie.zaehlungs
     .where('kultur_id')
@@ -151,7 +145,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     },
     sammlungsWithoutLieferung: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter(
             (s) => !lieferungsSorted.find((l) => l.von_sammlung_id === s.id),
@@ -167,7 +161,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithNonUniqueNr: async () => {
       const sGroupedByNr = groupBy(
-        sammlungsOfArtSorted.filter((s) => s.art_id === artId),
+        sammlungsOfArt.filter((s) => s.art_id === artId),
         (h) => h.nr,
       )
 
@@ -188,7 +182,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     },
     sammlungsWithoutNr: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.nr))
           .map(async (s) => {
@@ -202,7 +196,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithoutHerkunft: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.herkunft_id)
           .map(async (s) => {
@@ -216,7 +210,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithoutPerson: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.person_id)
           .map(async (s) => {
@@ -230,7 +224,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithoutDatum: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !s.datum)
           .map(async (s) => {
@@ -244,7 +238,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithoutAnzahlPflanzen: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.anzahl_pflanzen))
           .map(async (s) => {
@@ -258,7 +252,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     sammlungsWithoutVonAnzahlIdividuen: async () =>
       await Promise.all(
-        sammlungsOfArtSorted
+        sammlungsOfArt
           .filter((s) => s.art_id === artId)
           .filter((s) => !exists(s.von_anzahl_individuen))
           .map(async (s) => {
