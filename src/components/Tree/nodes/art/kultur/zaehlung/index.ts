@@ -5,8 +5,9 @@ const artKulturZaehlungNodes = async ({
   kulturIndex,
   artId,
   artIndex,
+  store,
 }) => {
-  const label = await zaehlung.label({store})
+  const label = await zaehlung.label({ store })
 
   return {
     nodeType: 'table',

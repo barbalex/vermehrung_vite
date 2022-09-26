@@ -5,8 +5,9 @@ const gartenKulturZaehlungNodes = async ({
   kulturIndex,
   gartenId,
   gartenIndex,
+  store,
 }) => {
-  const label = await zaehlung.label()
+  const label = await zaehlung.label({ store })
 
   return {
     nodeType: 'table',
