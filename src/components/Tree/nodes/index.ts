@@ -112,7 +112,7 @@ import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
 import { dexie } from '../../../dexieClient'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
-import collectionFromTableAndWhere from '../../../utils/collectionFromTableAndWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const compare = (a, b) => {
   // sort a before, if it has no value at this index
@@ -240,7 +240,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 1 art
   if (showArt) {
-    const artCollection = collectionFromTableAndWhere({
+    const artCollection = collectionFromTable({
       table: 'art',
       where: addTotalCriteriaToWhere({ table: 'art', store }),
     })
@@ -270,7 +270,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const artIndex = artNodes.findIndex((a) => a.id === artId)
 
         // 1.1 art > Herkunft
-        const sammlungsOfArt = await collectionFromTableAndWhere({
+        const sammlungsOfArt = await collectionFromTable({
           table: 'sammlung',
           where: addTotalCriteriaToWhere({
             table: 'sammlung',
@@ -282,7 +282,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
           (s) => s.herkunft_id,
         )
         // somehow using where('id')anyOf(sammlungsOfArtHerkunftIds) gives to few results ???!!!
-        const herkunftsCollection = collectionFromTableAndWhere({
+        const herkunftsCollection = collectionFromTable({
           table: 'herkunft',
           where: addTotalCriteriaToWhere({ table: 'herkunft', store }),
         }).filter((value) => sammlungsOfArtHerkunftIds.includes(value.id))
@@ -366,7 +366,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-            const lieferungs = await collectionFromTableAndWhere({
+            const lieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 where: { von_sammlung_id: sammlungId },
@@ -413,7 +413,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 1.3 art > kultur
-        const artKulturCollection = collectionFromTableAndWhere({
+        const artKulturCollection = collectionFromTable({
           table: 'kultur',
           where: addTotalCriteriaToWhere({
             where: { art_id: artId },
@@ -464,7 +464,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             // teilkultur nodes
             const kulturOption = await dexie.kultur_options.get(kultur.id)
             if (kulturOption?.tk) {
-              const teilkulturs = await collectionFromTableAndWhere({
+              const teilkulturs = await collectionFromTable({
                 table: 'teilkultur',
                 where: addTotalCriteriaToWhere({
                   where: { kultur_id: kultur.id },
@@ -508,7 +508,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // zaehlung nodes
-            const artKulturZaehlungCollection = collectionFromTableAndWhere({
+            const artKulturZaehlungCollection = collectionFromTable({
               table: 'zaehlung',
               where: addTotalCriteriaToWhere({
                 where: { kultur_id: kultur.id },
@@ -556,7 +556,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // anlieferung nodes
-            const anlieferungs = await collectionFromTableAndWhere({
+            const anlieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 where: { von_kultur_id: kultur.id },
@@ -599,7 +599,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // auslieferung nodes
-            const auslieferungs = await collectionFromTableAndWhere({
+            const auslieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 where: { nach_kultur_id: kultur.id },
@@ -642,7 +642,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // event nodes
-            const eventsCollection = collectionFromTableAndWhere({
+            const eventsCollection = collectionFromTable({
               table: 'event',
               where: addTotalCriteriaToWhere({
                 where: { kultur_id: kultur.id },
@@ -693,7 +693,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 2 herkunft
   if (showHerkunft) {
-    const herkunftCollection = collectionFromTableAndWhere({
+    const herkunftCollection = collectionFromTable({
       table: 'herkunft',
       where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
     })
@@ -720,7 +720,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 herkunft > sammlung
-        const herkunftSammlungCollection = collectionFromTableAndWhere({
+        const herkunftSammlungCollection = collectionFromTable({
           table: 'sammlung',
           where: addTotalCriteriaToWhere({
             where: { herkunft_id: herkunft.id },
@@ -772,7 +772,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newHerkunftSammlungNodes.findIndex(
               (s) => s.id === `${herkunftId}${sammlungId}`,
             )
-            const lieferungs = await collectionFromTableAndWhere({
+            const lieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 where: { von_sammlung_id: sammlung.id },
@@ -823,7 +823,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 3 sammlung
   if (showSammlung) {
-    const sammlungCollection = collectionFromTableAndWhere({
+    const sammlungCollection = collectionFromTable({
       table: 'sammlung',
       where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
     })
@@ -877,7 +877,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 2.1 sammlung > auslieferung
-        const sammlungLieferungCollection = collectionFromTableAndWhere({
+        const sammlungLieferungCollection = collectionFromTable({
           table: 'lieferung',
           where: addTotalCriteriaToWhere({
             where: { von_sammlung_id: sammlung.id },
@@ -920,7 +920,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 4 garten
   if (showGarten) {
-    const gartenCollection = collectionFromTableAndWhere({
+    const gartenCollection = collectionFromTable({
       table: 'garten',
       where: addTotalCriteriaToWhere({ table: 'garten', store }),
     })
@@ -946,7 +946,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const gartenIndex = gartenNodes.findIndex((a) => a.id === gartenId)
 
         // 2.1 garten > kultur
-        const gartenKulturCollection = collectionFromTableAndWhere({
+        const gartenKulturCollection = collectionFromTable({
           table: 'kultur',
           where: addTotalCriteriaToWhere({
             table: 'kultur',
@@ -1004,7 +1004,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             // garten > kultur > teilkultur
             const kulturOption = await dexie.kultur_options.get(kultur.id)
             if (kulturOption?.tk) {
-              const teilkulturs = await collectionFromTableAndWhere({
+              const teilkulturs = await collectionFromTable({
                 table: 'teilkultur',
                 where: addTotalCriteriaToWhere({
                   store,
@@ -1050,7 +1050,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > zaehlung
-            const zaehlungs = await collectionFromTableAndWhere({
+            const zaehlungs = await collectionFromTable({
               table: 'zaehlung',
               where: addTotalCriteriaToWhere({
                 table: 'zaehlung',
@@ -1096,7 +1096,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > anlieferung
-            const anlieferungs = await collectionFromTableAndWhere({
+            const anlieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 table: 'lieferung',
@@ -1141,7 +1141,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > auslieferung
-            const auslieferungs = await collectionFromTableAndWhere({
+            const auslieferungs = await collectionFromTable({
               table: 'lieferung',
               where: addTotalCriteriaToWhere({
                 table: 'lieferung',
@@ -1186,7 +1186,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > event
-            const gartenKulturEventCollection = collectionFromTableAndWhere({
+            const gartenKulturEventCollection = collectionFromTable({
               table: 'event',
               where: addTotalCriteriaToWhere({
                 store,
@@ -1238,7 +1238,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 5 kultur
   if (showKultur) {
-    const kulturCollection = collectionFromTableAndWhere({ table: 'kultur' })
+    const kulturCollection = collectionFromTable({ table: 'kultur' })
     const kulturCount = await kulturCollection.count()
     kulturFolderNodes = buildKulturFolder({ count: kulturCount })
     if (openNodes.some((n) => n.length === 2 && n[1] === 'Kulturen')) {
@@ -1263,7 +1263,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         // 2.1 kultur > teilkultur
         const kulturOption = await dexie.kultur_options.get(kultur.id)
         if (kulturOption?.tk) {
-          const kulturTeilkulturCollection = collectionFromTableAndWhere({
+          const kulturTeilkulturCollection = collectionFromTable({
             table: 'teilkultur',
             where: addTotalCriteriaToWhere({
               store,
@@ -1304,7 +1304,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 2.1 kultur > zaehlung
-        const kulturZaehlungCollection = collectionFromTableAndWhere({
+        const kulturZaehlungCollection = collectionFromTable({
           table: 'zaehlung',
           where: addTotalCriteriaToWhere({
             store,
@@ -1347,7 +1347,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > anlieferung
-        const kulturAnlieferungCollection = collectionFromTableAndWhere({
+        const kulturAnlieferungCollection = collectionFromTable({
           table: 'lieferung',
           where: addTotalCriteriaToWhere({
             store,
@@ -1386,7 +1386,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > auslieferung
-        const kulturAuslieferungCollection = collectionFromTableAndWhere({
+        const kulturAuslieferungCollection = collectionFromTable({
           table: 'lieferung',
           where: addTotalCriteriaToWhere({
             store,
@@ -1426,7 +1426,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > event
-        const kulturEventCollection = collectionFromTableAndWhere({
+        const kulturEventCollection = collectionFromTable({
           table: 'event',
           where: addTotalCriteriaToWhere({
             store,
@@ -1468,7 +1468,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 6 teilkultur
   if (showTeilkultur) {
-    const teilkulturCollection = collectionFromTableAndWhere({
+    const teilkulturCollection = collectionFromTable({
       table: 'teilkultur',
       where: addTotalCriteriaToWhere({ store, table: 'teilkultur' }),
     })
@@ -1485,7 +1485,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 7 zaehlung
   if (showZaehlung) {
-    const zaehlungCollection = collectionFromTableAndWhere({
+    const zaehlungCollection = collectionFromTable({
       table: 'zaehlung',
       where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
     })
@@ -1505,7 +1505,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 8 lieferung
   if (showLieferung) {
-    const lieferungCollection = collectionFromTableAndWhere({
+    const lieferungCollection = collectionFromTable({
       table: 'lieferung',
       where: addTotalCriteriaToWhere({ store, table: 'lieferung' }),
     })
@@ -1522,7 +1522,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 9 sammelLieferung
   if (showSammelLieferung) {
-    const sammelLieferungCollection = collectionFromTableAndWhere({
+    const sammelLieferungCollection = collectionFromTable({
       table: 'sammel_lieferung',
       where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),
     })
@@ -1560,7 +1560,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammelLieferung > lieferung
-        const lieferungs = await collectionFromTableAndWhere({
+        const lieferungs = await collectionFromTable({
           table: 'lieferung',
           where: addTotalCriteriaToWhere({
             store,
@@ -1603,7 +1603,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 10 event
   if (showEvent) {
-    const eventCollection = collectionFromTableAndWhere({
+    const eventCollection = collectionFromTable({
       table: 'event',
       where: addTotalCriteriaToWhere({ store, table: 'event' }),
     })
@@ -1620,7 +1620,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 11 person
   if (showPerson) {
-    const personCollection = collectionFromTableAndWhere({
+    const personCollection = collectionFromTable({
       table: 'person',
       where: addTotalCriteriaToWhere({ store, table: 'person' }),
     })
@@ -1644,7 +1644,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const personIndex = personNodes.findIndex((a) => a.id === personId)
 
         // person > sammlung
-        const personSammlungCollection = collectionFromTableAndWhere({
+        const personSammlungCollection = collectionFromTable({
           table: 'sammlung',
           where: addTotalCriteriaToWhere({
             store,
@@ -1686,7 +1686,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > garten
-        const personGartenCollection = collectionFromTableAndWhere({
+        const personGartenCollection = collectionFromTable({
           table: 'garten',
           where: addTotalCriteriaToWhere({
             store,
@@ -1741,7 +1741,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // person > garten > kultur nodes
-            const gartenKulturCollection = collectionFromTableAndWhere({
+            const gartenKulturCollection = collectionFromTable({
               table: 'kultur',
               where: addTotalCriteriaToWhere({
                 store,
@@ -1806,7 +1806,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 // teilkultur nodes
                 const kulturOption = await dexie.kultur_options.get(kultur.id)
                 if (kulturOption?.tk) {
-                  const teilkulturCollection = collectionFromTableAndWhere({
+                  const teilkulturCollection = collectionFromTable({
                     table: 'teilkultur',
                     where: addTotalCriteriaToWhere({
                       store,
@@ -1862,7 +1862,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // zaehlung nodes
-                const zaehlungCollection = collectionFromTableAndWhere({
+                const zaehlungCollection = collectionFromTable({
                   table: 'zaehlung',
                   where: addTotalCriteriaToWhere({
                     store,
@@ -1919,7 +1919,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // anlieferung nodes
-                const anlieferungCollection = collectionFromTableAndWhere({
+                const anlieferungCollection = collectionFromTable({
                   table: 'lieferung',
                   where: addTotalCriteriaToWhere({
                     store,
@@ -1974,7 +1974,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // auslieferung nodes
-                const auslieferungCollection = collectionFromTableAndWhere({
+                const auslieferungCollection = collectionFromTable({
                   table: 'lieferung',
                   where: addTotalCriteriaToWhere({
                     store,
@@ -2029,7 +2029,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // event nodes
-                const eventCollection = collectionFromTableAndWhere({
+                const eventCollection = collectionFromTable({
                   table: 'event',
                   where: addTotalCriteriaToWhere({
                     store,
@@ -2087,7 +2087,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > lieferung
-        const personLieferungCollection = collectionFromTableAndWhere({
+        const personLieferungCollection = collectionFromTable({
           table: 'lieferung',
           where: addTotalCriteriaToWhere({
             store,

@@ -4,7 +4,7 @@ import types from '../store/Filter/simpleTypes'
 import exists from './exists'
 import hierarchyConditionAdderForTable from './hierarchyConditionAdderForTable'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
-import collectionFromTableAndWhere from './collectionFromTableAndWhere'
+import collectionFromTable from './collectionFromTable'
 
 const filteredObjectsFromTable = async ({
   store,
@@ -70,7 +70,7 @@ const filteredObjectsFromTable = async ({
     return returnValue
   }
 
-  const filteredCollection1 = collectionFromTableAndWhere({
+  const filteredCollection1 = collectionFromTable({
     table,
     where: addTotalCriteriaToWhere({ table, store }),
   }).filter(filterFunction)

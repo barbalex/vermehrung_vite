@@ -15,12 +15,10 @@ import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import zaehlungSort from '../../../utils/zaehlungSort'
 import constants from '../../../utils/constants'
-import { dexie, Zaehlung } from '../../../dexieClient'
+import { Zaehlung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import totalFilter from '../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
 import Spinner from '../../shared/Spinner'
-import collectionFromTableAndWhere from '../../../utils/collectionFromTableAndWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 
@@ -72,7 +70,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
         table: 'zaehlung',
       }),
       conditionAdder(
-        collectionFromTableAndWhere({
+        collectionFromTable({
           table: 'zaehlung',
           where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
         }),
