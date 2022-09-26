@@ -5,9 +5,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import totalFilter from '../../../../utils/totalFilter'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
-import { dexie } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const ArtFormTitleChooser = ({
   row,
@@ -19,9 +19,10 @@ const ArtFormTitleChooser = ({
 
   const data = useLiveQuery(async () => {
     const [totalCount, filteredCount] = await Promise.all([
-      await dexie.arts
-        .filter((value) => totalFilter({ value, store, table: 'art' }))
-        .count(),
+      await collectionFromTable({
+        table: 'art',
+        where: addTotalCriteriaToWhere({ store, table: 'art' }),
+      }).count(),
       filteredObjectsFromTable({ store, table: 'art', count: true }),
     ])
     return { totalCount, filteredCount }
