@@ -30,7 +30,6 @@ import {
   personFile as personFileFragment,
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
-import totalFilter from './utils/totalFilter'
 import addIndexableFields from './utils/addIndexableFields'
 import collectionFromTable from './utils/collectionFromTable'
 import addTotalCriteriaToWhere from './utils/addTotalCriteriaToWhere'
@@ -1638,6 +1637,9 @@ export class Zaehlung implements IZaehlung {
   }
 
   async label({ store }) {
+    if (!store) {
+      throw new Error('Zaehlung, label: need to pass store - it is missing')
+    }
     const teilzaehlungs = await collectionFromTable({
       table: 'teilzaehlung',
       where: addTotalCriteriaToWhere({
@@ -1645,7 +1647,7 @@ export class Zaehlung implements IZaehlung {
         table: 'teilzaehlung',
         where: { zaehlung_id: this.id },
       }),
-    })
+    }).toArray()
 
     return await zaehlungLabelFromZaehlung({
       zaehlung: this,

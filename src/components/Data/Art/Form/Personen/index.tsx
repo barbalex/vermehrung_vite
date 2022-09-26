@@ -14,8 +14,9 @@ import avsSortByPerson from '../../../../../utils/avsSortByPerson'
 import personSort from '../../../../../utils/personSort'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import constants from '../../../../../utils/constants'
-import { dexie, Avs } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
+import { Avs } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -74,13 +75,18 @@ const ArtPersonen = ({ art }) => {
 
   const data = useLiveQuery(async () => {
     const [avs, persons] = await Promise.all([
-      dexie.avs
-        .where({ art_id: art.id })
-        .filter((av) => av._deleted === false)
-        .toArray(),
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'av',
+        where: addTotalCriteriaToWhere({
+          store,
+          table: 'av',
+          where: { art_id: art.id },
+        }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ store, table: 'person' }),
+      }).toArray(),
     ])
 
     const avsSorted = await avsSortByPerson(avs)

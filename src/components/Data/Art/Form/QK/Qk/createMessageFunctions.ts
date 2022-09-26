@@ -3,7 +3,6 @@ import groupBy from 'lodash/groupBy'
 
 import exists from '../../../../../../utils/exists'
 
-import artsSortedFromArts from '../../../../../../utils/artsSortedFromArts'
 import gartensSortedFromGartens from '../../../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
 import sammlungsSortedFromSammlungs from '../../../../../../utils/sammlungsSortedFromSammlungs'
@@ -16,25 +15,31 @@ import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import personFullname from '../../../../../../utils/personFullname'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../utils/addTotalCriteriaToWhere'
 
 const createMessageFunctions = async ({ artId, store }) => {
   const year = +format(new Date(), 'yyyy')
   const startYear = `${year}-01-01`
   const startNextYear = `${year + 1}-01-01`
 
-  const arts = await dexie.arts
-    .filter((value) => totalFilter({ value, store, table: 'art' }))
-    .toArray()
-  const artsSorted = await artsSortedFromArts(arts)
+  const art = await dexie.arts.get(
+    artId ?? '99999999-9999-9999-9999-999999999999',
+  )
 
-  const avs = await dexie.avs
-    .filter((value) => totalFilter({ value, store, table: 'av' }))
-    .toArray()
+  const avs = await collectionFromTable({
+    table: 'av',
+    where: addTotalCriteriaToWhere({
+      store,
+      table: 'av',
+      where: { art_id: artId },
+    }),
+  }).toArray()
 
-  const herkunfts = await dexie.herkunfts
-    .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
-    .toArray()
-  const herkunftsSorted = herkunfts.sort(herkunftSort)
+  const allHerkunfts = await collectionFromTable({
+    table: 'herkunft',
+    where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
+  }).toArray()
 
   const kulturs = await dexie.kulturs
     .where({ art_id: artId })
@@ -109,7 +114,7 @@ const createMessageFunctions = async ({ artId, store }) => {
         )
     },
     herkunftsWithNonUniqueNr: async () => {
-      const hkGroupedByNr = groupBy(herkunftsSorted, (h) => h.nr)
+      const hkGroupedByNr = groupBy(allHerkunfts, (h) => h.nr)
 
       return Object.values(hkGroupedByNr)
         .filter((v) => v.length > 1)
@@ -122,25 +127,19 @@ const createMessageFunctions = async ({ artId, store }) => {
           })),
         )
     },
-    artsOhneAv: async () =>
-      await Promise.all(
-        artsSorted
-          .filter((a) => a.id === artId)
-          .filter(
-            (a) =>
-              !avs
-                .filter((av) => av.art_id === a.id)
-                .filter((av) => !av._deleted).length,
-          )
-          .map(async (a) => {
-            const text = await a.label()
+    artsOhneAv: async () => {
+      if (!avs.length) return []
+      return await Promise.all(
+        [art].map(async (a) => {
+          const text = await a.label()
 
-            return {
-              url: ['Vermehrung', 'Arten', a.id],
-              text,
-            }
-          }),
-      ),
+          return {
+            url: ['Vermehrung', 'Arten', a.id],
+            text,
+          }
+        }),
+      )
+    },
     sammlungsWithoutLieferung: async () =>
       await Promise.all(
         sammlungsOfArtSorted
