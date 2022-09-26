@@ -463,6 +463,7 @@ export class Sammlung implements ISammlung {
     }
     // set all indexable boolean fields
     addIndexableFields({ table: 'sammlung', object: storeUpdate })
+
     dexie.sammlungs.update(this.id, storeUpdate)
   }
 
@@ -710,6 +711,7 @@ export class Lieferung {
     }
     // set all indexable boolean fields
     addIndexableFields({ table: 'lieferung', object: storeUpdate })
+
     dexie.lieferungs.update(this.id, storeUpdate)
   }
 
@@ -853,6 +855,7 @@ export class Art implements IArt {
     }
     // set all indexable boolean fields
     addIndexableFields({ table: 'art', object: storeUpdate })
+
     dexie.arts.update(this.id, storeUpdate)
   }
 

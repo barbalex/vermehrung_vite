@@ -10,6 +10,7 @@ import toPgArray from '../../../../utils/toPgArray'
 import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
+import addIndexableFields from '../../../../utils/addIndexableFields'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
@@ -70,6 +71,7 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     newObjectForStore.id = row.id
     delete newObjectForStore.event_id
     // optimistically update store
+    addIndexableFields({ table: 'event', object: newObjectForStore })
     await dexie.events.update(row.id, newObjectForStore)
   }, [
     row,
