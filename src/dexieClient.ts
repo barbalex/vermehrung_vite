@@ -4584,26 +4584,27 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(24).stores({
+    this.version(31).stores({
       herkunfts: 'id, _deleted_indexable',
       sammlungs:
-        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id]',
+        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable]',
       lieferungs:
-        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable, [von_kultur_id+_deleted_indexable], [nach_kultur_id+_deleted_indexable]',
       arts: 'id, _deleted_indexable',
       ae_arts: 'id, name',
       gartens: 'id, *person_id, _deleted_indexable, aktiv_indexable',
       kulturs:
-        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+herkunft_id] ',
-      teilkulturs: 'id, *kultur_id, _deleted_indexable',
+        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable]',
+      teilkulturs:
+        'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
       zaehlungs:
-        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable',
+        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [kultur_id+_deleted_indexable]',
       teilzaehlungs: 'id, *zaehlung_id, *teilkultur_id, _deleted_indexable',
       persons: 'id, &account_id, aktiv, _deleted_indexable, aktiv_indexable',
       sammel_lieferungs:
         'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
       events:
-        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable',
+        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable]',
       avs: 'id, *art_id, *person_id, _deleted_indexable',
       gvs: 'id, *garten_id, *person_id, _deleted_indexable',
       art_files: 'id, name',

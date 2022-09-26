@@ -34,8 +34,8 @@ const Arten = ({ row, style, last }) => {
 
   const [label, setLabel] = useState('')
   useEffect(() => {
-    row.label().then(setLabel)
-  }, [row])
+    row.label({ store }).then(setLabel)
+  }, [row, store])
 
   const onClickRow = useCallback(
     () => setActiveNodeArray([...activeNodeArray, row.id]),

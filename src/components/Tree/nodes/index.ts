@@ -112,6 +112,7 @@ import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
 import { dexie } from '../../../dexieClient'
 import totalFilter from '../../../utils/totalFilter'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 
 const compare = (a, b) => {
   // sort a before, if it has no value at this index
@@ -239,8 +240,8 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 1 art
   if (showArt) {
-    const artCollection = dexie.arts.filter((value) =>
-      totalFilter({ value, store, table: 'art' }),
+    const artCollection = dexie.arts.where(
+      addTotalCriteriaToWhere({ table: 'art', store }),
     )
     const artCount = await artCollection.count()
     artFolderNodes = buildArtFolder({ count: artCount })
@@ -269,18 +270,21 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
         // 1.1 art > Herkunft
         const sammlungsOfArt = await dexie.sammlungs
-          .where({ art_id: artId })
-          .and((value) => totalFilter({ value, store, table: 'sammlung' }))
+          .where(
+            addTotalCriteriaToWhere({
+              table: 'sammlung',
+              store,
+              where: { art_id: artId },
+            }),
+          )
           .toArray()
         const sammlungsOfArtHerkunftIds = sammlungsOfArt.map(
           (s) => s.herkunft_id,
         )
         // somehow using where('id')anyOf(sammlungsOfArtHerkunftIds) gives to few results ???!!!
-        const herkunftsCollection = dexie.herkunfts.filter(
-          (value) =>
-            totalFilter({ value, store, table: 'herkunft' }) &&
-            sammlungsOfArtHerkunftIds.includes(value.id),
-        )
+        const herkunftsCollection = dexie.herkunfts
+          .where(addTotalCriteriaToWhere({ table: 'herkunft', store }))
+          .filter((value) => sammlungsOfArtHerkunftIds.includes(value.id))
         const herkunftCount = await herkunftsCollection.count()
         artHerkunftFolderNodes.push(
           buildArtHerkunftFolder({
@@ -361,9 +365,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-            const lieferungs = await dexie.lieferungs.where({von_sammlung_id:sammlungId})
-              .filter((value) =>
-                totalFilter({ value, store, table: 'lieferung' }),
+            const lieferungs = await dexie.lieferungs
+              .where(
+                addTotalCriteriaToWhere({
+                  where: { von_sammlung_id: sammlungId },
+                  store,
+                  table: 'lieferung',
+                }),
               )
               .toArray()
             artSammlungAuslieferungFolderNodes.push(
@@ -405,9 +413,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // // 1.3 art > kultur
-        const artKulturCollection = dexie.kulturs
-          .where({ art_id: artId })
-          .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+        const artKulturCollection = dexie.kulturs.where(
+          addTotalCriteriaToWhere({
+            where: { art_id: artId },
+            store,
+            table: 'kultur',
+          }),
+        )
         const kulturCount = await artKulturCollection.count()
         artKulturFolderNodes.push(
           buildArtKulturFolder({
@@ -452,10 +464,12 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const kulturOption = await dexie.kultur_options.get(kultur.id)
             if (kulturOption?.tk) {
               const teilkulturs = await dexie.teilkulturs
-                .where('kultur_id')
-                .equals(kultur.id)
-                .and((value) =>
-                  totalFilter({ value, store, table: 'teilkultur' }),
+                .where(
+                  addTotalCriteriaToWhere({
+                    where: { kultur_id: kultur.id },
+                    store,
+                    table: 'teilkultur',
+                  }),
                 )
                 .toArray()
               artKulturTeilkulturFolderNodes.push(
@@ -494,10 +508,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // // zaehlung nodes
-            const artKulturZaehlungCollection = dexie.zaehlungs
-              .where('kultur_id')
-              .equals(kultur.id)
-              .and((value) => totalFilter({ value, store, table: 'zaehlung' }))
+            const artKulturZaehlungCollection = dexie.zaehlungs.where(
+              addTotalCriteriaToWhere({
+                where: { kultur_id: kultur.id },
+                store,
+                table: 'zaehlung',
+              }),
+            )
             const zaehlungsCount = await artKulturZaehlungCollection.count()
             artKulturZaehlungFolderNodes.push(
               buildArtKulturZaehlungFolder({
@@ -530,6 +547,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                       kulturIndex,
                       artId,
                       artIndex,
+                      store,
                     }),
                 ),
               )
@@ -538,9 +556,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
             // // anlieferung nodes
             const anlieferungs = await dexie.lieferungs
-              .where('von_kultur_id')
-              .equals(kultur.id)
-              .and((value) => totalFilter({ value, store, table: 'lieferung' }))
+              .where(
+                addTotalCriteriaToWhere({
+                  where: { von_kultur_id: kultur.id },
+                  store,
+                  table: 'lieferung',
+                }),
+              )
               .toArray()
             artKulturAnlieferungFolderNodes.push(
               buildArtKulturAnlieferungFolder({
@@ -578,9 +600,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
             // // auslieferung nodes
             const auslieferungs = await dexie.lieferungs
-              .where('nach_kultur_id')
-              .equals(kultur.id)
-              .and((value) => totalFilter({ value, store, table: 'lieferung' }))
+              .where(
+                addTotalCriteriaToWhere({
+                  where: { nach_kultur_id: kultur.id },
+                  store,
+                  table: 'lieferung',
+                }),
+              )
               .toArray()
             artKulturAuslieferungFolderNodes.push(
               buildArtKulturAuslieferungFolder({
@@ -617,9 +643,13 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // event nodes
-            const eventsCollection = dexie.events
-              .where({ kultur_id: kultur.id })
-              .and((value) => totalFilter({ value, store, table: 'event' }))
+            const eventsCollection = dexie.events.where(
+              addTotalCriteriaToWhere({
+                where: { kultur_id: kultur.id },
+                store,
+                table: 'event',
+              }),
+            )
             const eventsCount = await eventsCollection.count()
             artKulturEventFolderNodes.push(
               buildArtKulturEventFolder({
@@ -663,8 +693,8 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 2 herkunft
   if (showHerkunft) {
-    const herkunftCollection = dexie.herkunfts.filter((value) =>
-      totalFilter({ value, store, table: 'herkunft' }),
+    const herkunftCollection = dexie.herkunfts.where(
+      addTotalCriteriaToWhere({ store, table: 'herkunft' }),
     )
     const herkunftCount = await herkunftCollection.count()
     herkunftFolderNodes = buildHerkunftFolder({ count: herkunftCount })
