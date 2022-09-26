@@ -2043,39 +2043,59 @@ export class Person implements IPerson {
     this._conflicts = _conflicts ?? null
   }
 
-  async sammelLieferungs() {
-    return await dexie.sammel_lieferungs
-      .where({ person_id: this.id })
-      .filter((s) => s._deleted === false)
-      .toArray()
+  async sammelLieferungs({ store }) {
+    return await collectionFromTable({
+      table: 'sammel_lieferung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'sammel_lieferung',
+        where: { person_id: this.id },
+      }),
+    }).toArray()
   }
 
-  async lieferungs() {
-    return await dexie.lieferungs
-      .where({ person_id: this.id })
-      .filter((s) => s._deleted === false)
-      .toArray()
+  async lieferungs({ store }) {
+    return await collectionFromTable({
+      table: 'lieferung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'lieferung',
+        where: { person_id: this.id },
+      }),
+    }).toArray()
   }
 
-  async sammlungs() {
-    return await dexie.sammlungs
-      .where({ person_id: this.id })
-      .filter((s) => s._deleted === false)
-      .toArray()
+  async sammlungs({ store }) {
+    return await collectionFromTable({
+      table: 'sammlung',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'sammlung',
+        where: { person_id: this.id },
+      }),
+    }).toArray()
   }
 
-  async gartens() {
-    return await dexie.gartens
-      .where({ person_id: this.id })
-      .filter((s) => s._deleted === false && s.aktiv === true)
-      .toArray()
+  async gartens({ store }) {
+    return await collectionFromTable({
+      table: 'garten',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'garten',
+        where: { person_id: this.id },
+      }),
+    }).toArray()
   }
 
-  async events() {
-    return await dexie.events
-      .where({ person_id: this.id })
-      .filter((s) => s._deleted === false)
-      .toArray()
+  async events({ store }) {
+    return await collectionFromTable({
+      table: 'event',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'event',
+        where: { person_id: this.id },
+      }),
+    }).toArray()
   }
 
   fullname() {
