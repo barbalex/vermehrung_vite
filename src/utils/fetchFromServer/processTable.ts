@@ -1,20 +1,17 @@
 import { dexie } from '../../dexieClient'
+import addIndexableFields from '../addIndexableFields'
 
-// const stripTypename = (object) => {
-//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//   const { __typename, ...rest } = object
-//   return rest
-// }
+const stripTypename = (object) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { __typename, ...rest } = object
+  return rest
+}
 
 // TODO: do this in worker?
-const processSubscriptionResult = async ({
-  data: dataToCheck,
-  table,
-  store,
-}) => {
-  console.log('processTable, dataToCheck:', dataToCheck)
+const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
+  // console.log('processTable, data:', data)
   const { setInitiallyQueried, setLastUpdated, setInitiallyQuerying } = store
-  if (!dataToCheck.length) {
+  if (!dataIn.length) {
     setInitiallyQueried({ table })
     return
   }
@@ -24,10 +21,13 @@ const processSubscriptionResult = async ({
   // reason: indexedDB creates indexes right after a table was imported
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
-    // TODO: strip out typeName
     console.log('processTable', { dexie, table, dexieTable: dexie[table] })
+    const data = dataIn.map((d) => stripTypename(d))
+    data?.forEach((object) => addIndexableFields({ table, object }))
+    console.log('processTable:', { data, dataIn })
+
     try {
-      await dexie[`${table}s`].bulkPut(dataToCheck)
+      await dexie[`${table}s`].bulkPut(data)
     } catch (error) {
       console.log('Error in processSubscriptionResult > db.action:', error)
     }

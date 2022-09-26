@@ -31,6 +31,8 @@ import {
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
 import totalFilter from './utils/totalFilter'
+import indexableFields from './utils/indexableFields'
+import booleanToInteger from './utils/booleanToInteger'
 
 window.Dexie = Dexie
 
@@ -202,12 +204,8 @@ export class Herkunft implements IHerkunft {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.herkunft.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.herkunfts.update(this.id, storeUpdate)
   }
@@ -467,12 +465,8 @@ export class Sammlung implements ISammlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['geplant', '_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.sammlung.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.sammlungs.update(this.id, storeUpdate)
   }
@@ -720,12 +714,8 @@ export class Lieferung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted', 'nach_ausgepflanzt', 'geplant'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.lieferung.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.lieferungs.update(this.id, storeUpdate)
   }
@@ -869,12 +859,8 @@ export class Art implements IArt {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.art.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.arts.update(this.id, storeUpdate)
   }
@@ -1084,12 +1070,8 @@ export class Garten implements IGarten {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted', 'aktiv'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.garten.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.gartens.update(this.id, storeUpdate)
   }
@@ -1370,14 +1352,8 @@ export class Kultur implements IKultur {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (
-      ['_deleted', 'aktiv', 'erhaltungskultur', 'zwischenlager'].includes(field)
-    ) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.kultur.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.kulturs.update(this.id, storeUpdate)
   }
@@ -1541,12 +1517,8 @@ export class Teilkultur implements ITeilkultur {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.teilkultur.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.teilkulturs.update(this.id, storeUpdate)
   }
@@ -1715,12 +1687,8 @@ export class Zaehlung implements IZaehlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted', 'prognose'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.zaehlung.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.zaehlungs.update(this.id, storeUpdate)
   }
@@ -1903,12 +1871,8 @@ export class Teilzaehlung implements ITeilzaehlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.teilzaehlung.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     await dexie.teilzaehlungs.update(this.id, storeUpdate)
     return
@@ -2186,14 +2150,8 @@ export class Person implements IPerson {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (
-      ['_deleted', 'kein_email', 'kommerziell', 'info', 'aktiv'].includes(field)
-    ) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.person.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.persons.update(this.id, storeUpdate)
   }
@@ -2451,12 +2409,8 @@ export class SammelLieferung implements ISammelLieferung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted', 'nach_ausgepflanzt', 'geplant'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.sammel_lieferung.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.sammel_lieferungs.update(this.id, storeUpdate)
     const sl_auto_copy_edits = userPersonOption?.sl_auto_copy_edits
@@ -2647,12 +2601,8 @@ export class Event implements IEvent {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted', 'geplant'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.event.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.events.update(this.id, storeUpdate)
   }
@@ -2803,12 +2753,8 @@ export class Av implements IAv {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.av.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.avs.update(this.id, storeUpdate)
   }
@@ -2957,12 +2903,8 @@ export class Gv implements IGv {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.gv.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.gvs.update(this.id, storeUpdate)
   }
@@ -3973,12 +3915,8 @@ export class ArtQk implements IArtQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.art_qk.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.art_qks.update(this.id, storeUpdate)
   }
@@ -4153,12 +4091,8 @@ export class KulturOption implements IKulturOption {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.kultur_option.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.kultur_options.update(this.id, storeUpdate)
   }
@@ -4294,12 +4228,8 @@ export class KulturQk implements IKulturQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.kultur_qk.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.kultur_qks.update(this.id, storeUpdate)
   }
@@ -4552,12 +4482,8 @@ export class PersonOption implements IPersonOption {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    if (['_deleted'].includes(field)) {
-      storeUpdate[`${field}_indexable`] = [undefined, null].includes(value)
-        ? value
-        : value
-        ? 1
-        : 0
+    if (indexableFields.person_option.includes(field)) {
+      storeUpdate[`${field}_indexable`] = booleanToInteger(value)
     }
     dexie.person_options.update(this.id, storeUpdate)
   }
