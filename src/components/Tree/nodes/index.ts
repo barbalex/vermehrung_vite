@@ -1604,9 +1604,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 10 event
   if (showEvent) {
-    const eventCollection = dexie.events.filter((value) =>
-      totalFilter({ value, store, table: 'event' }),
-    )
+    const eventCollection = collectionFromTableAndWhere({
+      table: 'event',
+      where: addTotalCriteriaToWhere({ store, table: 'event' }),
+    })
     const eventCount = await eventCollection.count()
     eventFolderNodes = buildEventFolder({ count: eventCount })
     if (openNodes.some((n) => n.length === 2 && n[1] === 'Events')) {
@@ -1620,9 +1621,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 11 person
   if (showPerson) {
-    const personCollection = dexie.persons.filter((value) =>
-      totalFilter({ value, store, table: 'person' }),
-    )
+    const personCollection = collectionFromTableAndWhere({
+      table: 'person',
+      where: addTotalCriteriaToWhere({ store, table: 'person' }),
+    })
     const personCount = await personCollection.count()
     personFolderNodes = buildPersonFolder({ count: personCount })
     if (openNodes.some((n) => n.length === 2 && n[1] === 'Personen')) {
@@ -1643,9 +1645,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const personIndex = personNodes.findIndex((a) => a.id === personId)
 
         // person > sammlung
-        const personSammlungCollection = dexie.sammlungs
-          .where({ person_id: person.id })
-          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
+        const personSammlungCollection = collectionFromTableAndWhere({
+          table: 'sammlung',
+          where: addTotalCriteriaToWhere({
+            store,
+            table: 'sammlung',
+            where: { person_id: person.id },
+          }),
+        })
         const personSammlungCount = await personSammlungCollection.count()
         personSammlungFolderNodes.push(
           buildPersonSammlungFolder({
@@ -1680,9 +1687,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > garten
-        const personGartenCollection = dexie.gartens
-          .where({ person_id: person.id })
-          .filter((value) => totalFilter({ value, store, table: 'garten' }))
+        const personGartenCollection = collectionFromTableAndWhere({
+          table: 'garten',
+          where: addTotalCriteriaToWhere({
+            store,
+            table: 'garten',
+            where: { person_id: person.id },
+          }),
+        })
         const personGartenCount = await personGartenCollection.count()
         personGartenFolderNodes.push(
           buildPersonGartenFolder({
@@ -1730,9 +1742,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // person > garten > kultur nodes
-            const gartenKulturCollection = dexie.kulturs
-              .where({ garten_id: garten.id })
-              .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+            const gartenKulturCollection = collectionFromTableAndWhere({
+              table: 'kultur',
+              where: addTotalCriteriaToWhere({
+                store,
+                table: 'kultur',
+                where: { garten_id: garten.id },
+              }),
+            })
             const gartenKulturCount = await gartenKulturCollection.count()
             personGartenKulturFolderNodes.push(
               buildPersonGartenKulturFolder({
@@ -1790,11 +1807,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 // teilkultur nodes
                 const kulturOption = await dexie.kultur_options.get(kultur.id)
                 if (kulturOption?.tk) {
-                  const teilkulturCollection = dexie.teilkulturs
-                    .where({ kultur_id: kultur.id })
-                    .filter((value) =>
-                      totalFilter({ value, store, table: 'teilkultur' }),
-                    )
+                  const teilkulturCollection = collectionFromTableAndWhere({
+                    table: 'teilkultur',
+                    where: addTotalCriteriaToWhere({
+                      store,
+                      table: 'teilkultur',
+                      where: { kultur_id: kultur.id },
+                    }),
+                  })
                   const teilkulturCount = await teilkulturCollection.count()
                   personGartenKulturTeilkulturFolderNodes.push(
                     buildPersonGartenKulturTeilkulturFolder({
@@ -1843,11 +1863,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // zaehlung nodes
-                const zaehlungCollection = dexie.zaehlungs
-                  .where({ kultur_id: kultur.id })
-                  .filter((value) =>
-                    totalFilter({ value, store, table: 'zaehlung' }),
-                  )
+                const zaehlungCollection = collectionFromTableAndWhere({
+                  table: 'zaehlung',
+                  where: addTotalCriteriaToWhere({
+                    store,
+                    table: 'zaehlung',
+                    where: { kultur_id: kultur.id },
+                  }),
+                })
                 const zaehlungCount = await zaehlungCollection.count()
                 personGartenKulturZaehlungFolderNodes.push(
                   buildPersonGartenKulturZaehlungFolder({
@@ -1897,11 +1920,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // anlieferung nodes
-                const anlieferungCollection = dexie.lieferungs
-                  .where({ nach_kultur_id: kultur.id })
-                  .filter((value) =>
-                    totalFilter({ value, store, table: 'lieferung' }),
-                  )
+                const anlieferungCollection = collectionFromTableAndWhere({
+                  table: 'lieferung',
+                  where: addTotalCriteriaToWhere({
+                    store,
+                    table: 'lieferung',
+                    where: { nach_kultur_id: kultur.id },
+                  }),
+                })
                 const anlieferungCount = await anlieferungCollection.count()
                 personGartenKulturAnlieferungFolderNodes.push(
                   buildPersonGartenKulturAnlieferungFolder({
@@ -1949,11 +1975,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // auslieferung nodes
-                const auslieferungCollection = dexie.lieferungs
-                  .where({ von_kultur_id: kultur.id })
-                  .filter((value) =>
-                    totalFilter({ value, store, table: 'lieferung' }),
-                  )
+                const auslieferungCollection = collectionFromTableAndWhere({
+                  table: 'lieferung',
+                  where: addTotalCriteriaToWhere({
+                    store,
+                    table: 'lieferung',
+                    where: { von_kultur_id: kultur.id },
+                  }),
+                })
                 const auslieferungCount = await auslieferungCollection.count()
                 personGartenKulturAuslieferungFolderNodes.push(
                   buildPersonGartenKulturAuslieferungFolder({
@@ -2001,11 +2030,14 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // event nodes
-                const eventCollection = dexie.events
-                  .where({ kultur_id: kultur.id })
-                  .filter((value) =>
-                    totalFilter({ value, store, table: 'event' }),
-                  )
+                const eventCollection = collectionFromTableAndWhere({
+                  table: 'event',
+                  where: addTotalCriteriaToWhere({
+                    store,
+                    table: 'event',
+                    where: { kultur_id: kultur.id },
+                  }),
+                })
                 const eventCount = await eventCollection.count()
                 personGartenKulturEventFolderNodes.push(
                   buildPersonGartenKulturEventFolder({
