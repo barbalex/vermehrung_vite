@@ -1,4 +1,4 @@
-import indexableFields from './indexableFields'
+import indexableFields from './indexableFields' 
 import booleanToInteger from './booleanToInteger'
 
 const addIndexableFields = ({ table, object }) => {
