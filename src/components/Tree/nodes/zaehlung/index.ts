@@ -1,5 +1,5 @@
-const zaehlungNodes = async ({ zaehlung, index }) => {
-  const label = await zaehlung.label()
+const zaehlungNodes = async ({ zaehlung, index, store }) => {
+  const label = await zaehlung.label({ store })
 
   return {
     nodeType: 'table',

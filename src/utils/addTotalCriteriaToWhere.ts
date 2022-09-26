@@ -1,14 +1,19 @@
 // receives where = object with maybe existing criteria
 // adds _deleted value according to set filter
 // also adds aktiv value according to set filter if applicable
-import booleanToInteger from './booleanToInteger'
 
 const addTotalCriteriaToWhere = ({ table, where = {}, store }) => {
-  if (store.filter?.[table] && 'aktiv' in store.filter[table]) {
-    where.aktiv_indexable = booleanToInteger(store.filter?.[table]?.aktiv)
+  // default: true, 1
+  if (store.filter[table]?.aktiv === true) {
+    where.aktiv_indexable = 1
   }
-  where._deleted_indexable = booleanToInteger(store.filter?.[table]?._deleted)
-
+  // default false, 0
+  if (store.filter[table]?._deleted === false) {
+    where._deleted_indexable = 0
+  }
+  // Problem:
+  // is possible to not have a where clause (depending on filter settings)
+  // thus collectionFromTableAndWhere is needed
   return where
 }
 
