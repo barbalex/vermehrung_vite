@@ -24,7 +24,8 @@ import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
 import personSort from '../../../../utils/personSort'
 import herkunftSort from '../../../../utils/herkunftSort'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -64,15 +65,18 @@ const SammlungForm = ({
 
   const data = useLiveQuery(async () => {
     const [persons, herkunfts, arts] = await Promise.all([
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
-      dexie.herkunfts
-        .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
-        .toArray(),
-      dexie.arts
-        .filter((value) => totalFilter({ value, store, table: 'art' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ table: 'person', store }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'herkunft',
+        where: addTotalCriteriaToWhere({ table: 'herkunft', store }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'art',
+        where: addTotalCriteriaToWhere({ table: 'art', store }),
+      }).toArray(),
     ])
 
     // need to show a choosen person even if inactive but not if deleted
