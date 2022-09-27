@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniqBy from 'lodash/uniqBy'
-import { useLiveQuery } from 'dexie-react-hooks' 
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Select from '../../../../shared/Select'
@@ -12,7 +12,8 @@ import ConflictList from '../../../../shared/ConflictList'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import personSort from '../../../../../utils/personSort'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const Title = styled.div`
   font-weight: bold;
@@ -51,9 +52,10 @@ const LieferungWer = ({
   const { errors, online, filter } = store
 
   const data = useLiveQuery(async () => {
-    const persons = await dexie.persons
-      .filter((value) => totalFilter({ value, store, table: 'person' }))
-      .toArray()
+    const persons = await collectionFromTable({
+      table: 'person',
+      where: addTotalCriteriaToWhere({ table: 'person', store }),
+    }).toArray()
 
     const person = await dexie.persons.get(
       row.person_id ?? '99999999-9999-9999-9999-999999999999',

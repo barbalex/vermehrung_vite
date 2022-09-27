@@ -11,7 +11,8 @@ import JesNo from '../../../../shared/JesNo'
 import exists from '../../../../../utils/exists'
 import { dexie } from '../../../../../dexieClient'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
-import totalFilter from '../../../../../utils/totalFilter'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
 
 const Title = styled.div`
   font-weight: bold;
@@ -43,9 +44,10 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
   const { errors, filter } = store
 
   const nachKulturWerte = useLiveQuery(async () => {
-    const kulturs = await dexie.kulturs
-      .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-      .toArray()
+    const kulturs = await collectionFromTable({
+      table: 'kultur',
+      where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+    }).toArray()
 
     const kultursFiltered = kulturs
       // show only kulturen of art_id
