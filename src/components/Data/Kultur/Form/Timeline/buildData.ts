@@ -4,13 +4,18 @@ import sumBy from 'lodash/sumBy'
 import format from 'date-fns/format'
 
 import exists from '../../../../../utils/exists'
-import { dexie } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const buildData = async ({ row }) => {
-  const zaehlungs = await dexie.zaehlungs
-    .where({ kultur_id: row.id })
-    .filter((z) => z._deleted === false)
-    .sortBy('datum')
+  const zaehlungs = await collectionFromTable({
+    table: 'zaehlung',
+    where: addTotalCriteriaToWhere({
+      table: 'zaehlung',
+      store,
+      where: { kultur_id: row.id },
+    }),
+  }).sortBy('datum')
   const zaehlungsDone = await zaehlungs.filter(
     (z) =>
       z.prognose === false &&
@@ -50,9 +55,14 @@ const buildData = async ({ row }) => {
   const zaehlungenForLineReversed = [...zaehlungenForLine].reverse()
   const zaehlungenDoneData = await Promise.all(
     zaehlungsDone.map(async (z) => {
-      const teilzaehlungs = await dexie.teilzaehlungs
-        .filter((t) => t._deleted === false && t.zaehlung_id === z.id)
-        .toArray()
+      const teilzaehlungs = await collectionFromTable({
+        table: 'teilzaehlung',
+        where: addTotalCriteriaToWhere({
+          table: 'teilzaehlung',
+          store,
+          where: { zaehlung_id: z.id },
+        }),
+      }).toArray()
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -94,10 +104,14 @@ const buildData = async ({ row }) => {
   const zaehlungenPlannedIncludedData = await Promise.all(
     zaehlungenPlannedIncluded.map(async (z) => {
       const teilzaehlungs = z.teilzaehlungs
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: z.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: z.id },
+            }),
+          }).toArray()
         : []
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
@@ -141,10 +155,14 @@ const buildData = async ({ row }) => {
   )
   const zaehlungenPlannedIgnoredData = await Promise.all(
     zaehlungenPlannedIgnored.map(async (z) => {
-      const teilzaehlungs = await dexie.teilzaehlungs
-        .where({ zaehlung_id: z.id })
-        .filter((t) => t._deleted === false)
-        .toArray()
+      const teilzaehlungs = await collectionFromTable({
+        table: 'teilzaehlung',
+        where: addTotalCriteriaToWhere({
+          table: 'teilzaehlung',
+          store,
+          where: { zaehlung_id: z.id },
+        }),
+      }).toArray()
       const anzahlenPflanzen = teilzaehlungs
         .map((tz) => tz.anzahl_pflanzen)
         .filter((a) => exists(a))
@@ -195,19 +213,30 @@ const buildData = async ({ row }) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ).map(([key, value]) => Object.assign({}, ...value))
 
-  const anLieferungenDone = await dexie.lieferungs
-    .where({ nach_kultur_id: row.id })
+  const anLieferungenDone = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { nach_kultur_id: row.id },
+    }),
+  })
     .filter(
       (l) =>
-        l._deleted === false &&
         l.geplant === false &&
         !!l.datum &&
         l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
-  const anLieferungenPlanned = await dexie.lieferungs
-    .where({ nach_kultur_id: row.id })
-    .filter((l) => l._deleted === false && l.geplant === false && !!l.datum)
+  const anLieferungenPlanned = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { nach_kultur_id: row.id },
+    }),
+  })
+    .filter((l) => l.geplant === false && !!l.datum)
     .toArray()
   const anLieferungenPlannedIgnored = anLieferungenPlanned.filter((lg) =>
     // check if more recent anLieferungenDone exists
@@ -221,19 +250,30 @@ const buildData = async ({ row }) => {
     'datum',
   )
 
-  const ausLieferungenDone = await dexie.lieferungs
-    .where({ von_kultur_id: row.id })
+  const ausLieferungenDone = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { von_kultur_id: row.id },
+    }),
+  })
     .filter(
       (l) =>
-        l._deleted === false &&
         l.geplant === false &&
         !!l.datum &&
         l.datum <= format(new Date(), 'yyyy-mm-dd'),
     )
     .toArray()
-  const ausLieferungenPlanned = await dexie.lieferungs
-    .where({ von_kultur_id: row.id })
-    .filter((l) => l._deleted === false && l.geplant === true && !!l.datum)
+  const ausLieferungenPlanned = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { von_kultur_id: row.id },
+    }),
+  })
+    .filter((l) => l.geplant === true && !!l.datum)
     .toArray()
   const ausLieferungenPlannedIgnored = ausLieferungenPlanned.filter((lg) =>
     // check if more recent ausLieferungenDone exists
@@ -266,10 +306,14 @@ const buildData = async ({ row }) => {
       )
 
       const previousZaehlungTzs = previousZaehlung
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: previousZaehlung?.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: previousZaehlung?.id },
+            }),
+          }).toArray()
         : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
@@ -327,10 +371,14 @@ const buildData = async ({ row }) => {
           a.datum < l.datum,
       )
       const previousZaehlungTzs = previousZaehlung
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: previousZaehlung.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: previousZaehlung?.id },
+            }),
+          }).toArray()
         : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
@@ -389,10 +437,14 @@ const buildData = async ({ row }) => {
       )
 
       const previousZaehlungTzs = previousZaehlung
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: previousZaehlung.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: previousZaehlung?.id },
+            }),
+          }).toArray()
         : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)
@@ -473,10 +525,14 @@ const buildData = async ({ row }) => {
       )
 
       const previousZaehlungTzs = previousZaehlung
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: previousZaehlung.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: previousZaehlung?.id },
+            }),
+          }).toArray()
         : []
       const anzahlenPflanzenOfPreviousZaehlung = previousZaehlungTzs
         .map((tz) => tz.anzahl_pflanzen)

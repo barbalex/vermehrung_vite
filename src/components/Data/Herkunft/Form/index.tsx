@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { useLiveQuery } from 'dexie-react-hooks'
-import uniqBy from 'lodash/uniqBy'
-import { toJS } from 'mobx'
 
 import StoreContext from '../../../../storeContext'
 import TextField from '../../../shared/TextField'
@@ -14,8 +12,6 @@ import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import ConflictList from '../../../shared/ConflictList'
 import { dexie } from '../../../../dexieClient'
-import personSort from '../../../../utils/personSort'
-import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 
@@ -75,9 +71,15 @@ const Herkunft = ({
       return unsetError('herkunft')
     }
     if (!row.nr) return
-    dexie.herkunfts
-      .where({ _deleted_indexable: 0 })
-      .filter((h) => h.nr === row.nr && h.id !== row.id)
+    collectionFromTable({
+      table: 'herkunft',
+      where: addTotalCriteriaToWhere({
+        table: 'herkunft',
+        store,
+        where: { _deleted_indexable: 0, nr: row.nr },
+      }),
+    })
+      .filter((h) => h.id !== row.id)
       .toArray()
       .then((otherHerkunftsWithSameNr) => {
         if (otherHerkunftsWithSameNr.length > 0) {
@@ -92,7 +94,15 @@ const Herkunft = ({
           unsetError('herkunft')
         }
       })
-  }, [showFilter, row.nr, row.id, setError, unsetError, errors.herkunft.nr])
+  }, [
+    showFilter,
+    row.nr,
+    row.id,
+    setError,
+    unsetError,
+    errors.herkunft.nr,
+    store,
+  ])
 
   const saveToDb = useCallback(
     async (event) => {
