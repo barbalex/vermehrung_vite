@@ -88,7 +88,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   ])
 
   const zaehlungs: Zaehlung[] = data?.zaehlungs ?? []
-  const totalCount = data?.totalCount
+  const totalCount = data?.totalCount ?? '...'
   const filteredCount = data?.zaehlungs?.length ?? '...'
 
   const add = useCallback(() => {

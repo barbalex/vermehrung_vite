@@ -19,6 +19,8 @@ import { dexie, Person } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -61,10 +63,16 @@ const Personen = ({ filter: showFilter, width, height }) => {
   const data = useLiveQuery(async () => {
     const [persons, totalCount, userRole] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'person' }),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ store, table: 'evepersonnt' }),
+      }).count(),
       dexie.persons
         .filter((value) => totalFilter({ value, store, table: 'person' }))
         .count(),
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
     ])
 
     const personsSorted = persons.sort(personSort)
@@ -73,9 +81,9 @@ const Personen = ({ filter: showFilter, width, height }) => {
   }, [...Object.values(personFilter), store.person_initially_queried, user.uid])
 
   const persons: Person[] = data?.persons ?? []
-  const totalCount = data?.totalCount
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.persons?.length ?? '...'
   const userRole = data?.userRole
-  const filteredCount = persons.length
 
   const add = useCallback(() => {
     insertPersonRev()

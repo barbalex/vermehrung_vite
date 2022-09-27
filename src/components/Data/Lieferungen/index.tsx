@@ -19,8 +19,11 @@ import constants from '../../../utils/constants'
 import { dexie, Lieferung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
+
 
 const Container = styled.div`
   height: 100%;
@@ -66,7 +69,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'lieferung',
     })
@@ -75,16 +78,12 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
         store,
         table: 'lieferung',
       }),
-      dexie.lieferungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'lieferung',
-            conditionAdder,
-          }),
-        )
-        .count(),
+      conditionAdder(
+        collectionFromTable({
+          table: 'lieferung',
+          where: addTotalCriteriaToWhere({ store, table: 'lieferung' }),
+        }),
+      ).count(),
     ])
 
     const lieferungsSorted = lieferungs.sort(lieferungSort)
@@ -101,8 +100,8 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
   ])
 
   const lieferungs: Lieferung[] = data?.lieferungs ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = store.lieferungsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.lieferungs?.length ?? '...'
 
   const add = useCallback(async () => {
     const isSammelLieferung =

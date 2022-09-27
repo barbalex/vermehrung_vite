@@ -18,8 +18,10 @@ import constants from '../../../utils/constants'
 import { dexie, Kultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -60,17 +62,18 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'kultur',
     })
     const [kulturs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'kultur' }),
-      dexie.kulturs
-        .filter((value) =>
-          totalFilter({ value, store, table: 'kultur', conditionAdder }),
-        )
-        .count(),
+      conditionAdder(
+        collectionFromTable({
+          table: 'kultur',
+          where: addTotalCriteriaToWhere({ store, table: 'kultur' }),
+        }),
+      ).count(),
     ])
 
     const kultursSorted = await kultursSortedFromKulturs(kulturs)
@@ -85,8 +88,8 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
   ])
 
   const kulturs: Kultur[] = data?.kulturs ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = kulturs.length
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.kulturs?.length ?? '...'
 
   const onClickUp = useCallback(() => {
     removeOpenNode(activeNodeArray)
