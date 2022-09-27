@@ -55,31 +55,37 @@ const Person = ({
       label: el.label,
     }))
 
-    if (!showFilter && row.nr) {
-      const otherPersonsWithSameNr = await dexie.persons
-        .filter(
-          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
-        )
-        .toArray()
-      if (otherPersonsWithSameNr.length > 0) {
-        setError({
-          path: 'person.nr',
-          value: `Diese Nummer wird ${
-            otherPersonsWithSameNr.length + 1
-          } mal verwendet. Sie sollte aber über alle Personen eindeutig sein`,
-        })
-      }
-    }
-
     return { userRoleWerte, userRole }
-  }, [row, setError, showFilter])
+  }, [row.user_role_id])
 
   const userRoleWerte = data?.userRoleWerte ?? []
   const userRole = data?.userRole
 
+  // catch multiple nr's
   useEffect(() => {
-    unsetError('person')
-  }, [id, unsetError])
+    if (showFilter) return
+    if (!row.nr && errors.person.nr) {
+      return unsetError('person')
+    }
+    if (!row.nr) return
+    dexie.persons
+      .where({ _deleted_indexable: 0, aktiv_indexable: 1 })
+      .filter((h) => h.nr === row.nr && h.id !== row.id)
+      .toArray()
+      .then((otherPersonsWithSameNr) => {
+        if (otherPersonsWithSameNr.length > 0) {
+          setError({
+            table: 'person',
+            field: 'nr',
+            value: `Diese Nummer wird ${
+              otherPersonsWithSameNr.length + 1
+            } mal verwendet. Sie sollte aber über alle aktiven Personen eindeutig sein`,
+          })
+        } else {
+          unsetError('person')
+        }
+      })
+  }, [showFilter, row.nr, row.id, setError, unsetError, errors.person.nr])
 
   const saveToDb = useCallback(
     (event) => {
@@ -118,7 +124,7 @@ const Person = ({
               name="_deleted"
               value={row._deleted}
               saveToDb={saveToDb}
-              error={errors?.person?._deleted}
+              error={!showFilter && errors?.person?._deleted}
             />
           ) : (
             <Checkbox2States
@@ -127,7 +133,7 @@ const Person = ({
               name="_deleted"
               value={row._deleted}
               saveToDb={saveToDb}
-              error={errors?.person?._deleted}
+              error={!showFilter && errors?.person?._deleted}
             />
           )}
         </>
@@ -141,7 +147,7 @@ const Person = ({
         helperText={userRole?.comment || ' '}
         options={userRoleWerte}
         saveToDb={saveToDb}
-        error={errors?.person?.user_role_id}
+        error={!showFilter && errors?.person?.user_role_id}
       />
       <TextField
         key={`${row.id}nr`}
@@ -149,7 +155,7 @@ const Person = ({
         label="Nr"
         value={row.nr}
         saveToDb={saveToDb}
-        error={errors?.person?.nr}
+        error={!showFilter && errors?.person?.nr}
       />
       <TextField
         key={`${row.id}vorname`}
@@ -157,7 +163,7 @@ const Person = ({
         label="Vorname"
         value={row.vorname}
         saveToDb={saveToDb}
-        error={errors?.person?.vorname}
+        error={!showFilter && errors?.person?.vorname}
       />
       <TextField
         key={`${row.id}name`}
@@ -165,7 +171,7 @@ const Person = ({
         label="Nachname"
         value={row.name}
         saveToDb={saveToDb}
-        error={errors?.person?.name}
+        error={!showFilter && errors?.person?.name}
       />
       <TextField
         key={`${row.id}adresszusatz`}
@@ -173,7 +179,7 @@ const Person = ({
         label="Adress-Zusatz"
         value={row.adresszusatz}
         saveToDb={saveToDb}
-        error={errors?.person?.adresszusatz}
+        error={!showFilter && errors?.person?.adresszusatz}
       />
       <TextField
         key={`${row.id}strasse`}
@@ -181,7 +187,7 @@ const Person = ({
         label="Strasse"
         value={row.strasse}
         saveToDb={saveToDb}
-        error={errors?.person?.strasse}
+        error={!showFilter && errors?.person?.strasse}
       />
       <TextField
         key={`${row.id}plz`}
@@ -189,7 +195,7 @@ const Person = ({
         label="PLZ"
         value={row.plz}
         saveToDb={saveToDb}
-        error={errors?.person?.plz}
+        error={!showFilter && errors?.person?.plz}
         type="number"
       />
       <TextField
@@ -198,7 +204,7 @@ const Person = ({
         label="Ort"
         value={row.ort}
         saveToDb={saveToDb}
-        error={errors?.person?.ort}
+        error={!showFilter && errors?.person?.ort}
       />
       <TextField
         key={`${row.id}telefon_privat`}
@@ -206,7 +212,7 @@ const Person = ({
         label="Telefon privat"
         value={row.telefon_privat}
         saveToDb={saveToDb}
-        error={errors?.person?.telefon_privat}
+        error={!showFilter && errors?.person?.telefon_privat}
       />
       <TextField
         key={`${row.id}telefon_geschaeft`}
@@ -214,7 +220,7 @@ const Person = ({
         label="Telefon Geschäft"
         value={row.telefon_geschaeft}
         saveToDb={saveToDb}
-        error={errors?.person?.telefon_geschaeft}
+        error={!showFilter && errors?.person?.telefon_geschaeft}
       />
       <TextField
         key={`${row.id}telefon_mobile`}
@@ -222,7 +228,7 @@ const Person = ({
         label="Telefon mobile"
         value={row.telefon_mobile}
         saveToDb={saveToDb}
-        error={errors?.person?.telefon_mobile}
+        error={!showFilter && errors?.person?.telefon_mobile}
       />
       <TextField
         key={`${row.id}email`}
@@ -230,7 +236,7 @@ const Person = ({
         label="Email"
         value={row.email}
         saveToDb={saveToDb}
-        error={errors?.person?.email}
+        error={!showFilter && errors?.person?.email}
       />
       {showFilter ? (
         <JesNo
@@ -239,7 +245,7 @@ const Person = ({
           name="kein_email"
           value={row.kein_email}
           saveToDb={saveToDb}
-          error={errors?.person?.kein_email}
+          error={!showFilter && errors?.person?.kein_email}
         />
       ) : (
         <Checkbox2States
@@ -248,7 +254,7 @@ const Person = ({
           name="kein_email"
           value={row.kein_email}
           saveToDb={saveToDb}
-          error={errors?.person?.kein_email}
+          error={!showFilter && errors?.person?.kein_email}
         />
       )}
       {showFilter ? (
@@ -258,7 +264,7 @@ const Person = ({
           name="kommerziell"
           value={row.kommerziell}
           saveToDb={saveToDb}
-          error={errors?.person?.kommerziell}
+          error={!showFilter && errors?.person?.kommerziell}
         />
       ) : (
         <Checkbox2States
@@ -267,7 +273,7 @@ const Person = ({
           name="kommerziell"
           value={row.kommerziell}
           saveToDb={saveToDb}
-          error={errors?.person?.kommerziell}
+          error={!showFilter && errors?.person?.kommerziell}
         />
       )}
       {showFilter ? (
@@ -277,7 +283,7 @@ const Person = ({
           name="info"
           value={row.info}
           saveToDb={saveToDb}
-          error={errors?.person?.info}
+          error={!showFilter && errors?.person?.info}
         />
       ) : (
         <Checkbox2States
@@ -286,7 +292,7 @@ const Person = ({
           name="info"
           value={row.info}
           saveToDb={saveToDb}
-          error={errors?.person?.info}
+          error={!showFilter && errors?.person?.info}
         />
       )}
       {showFilter ? (
@@ -296,7 +302,7 @@ const Person = ({
           name="aktiv"
           value={row.aktiv}
           saveToDb={saveToDb}
-          error={errors?.person?.aktiv}
+          error={!showFilter && errors?.person?.aktiv}
         />
       ) : (
         <Checkbox2States
@@ -305,7 +311,7 @@ const Person = ({
           name="aktiv"
           value={row.aktiv}
           saveToDb={saveToDb}
-          error={errors?.person?.aktiv}
+          error={!showFilter && errors?.person?.aktiv}
         />
       )}
       <TextField
@@ -314,7 +320,7 @@ const Person = ({
         label="Bemerkungen"
         value={row.bemerkungen}
         saveToDb={saveToDb}
-        error={errors?.person?.bemerkungen}
+        error={!showFilter && errors?.person?.bemerkungen}
         multiLine
       />
       {online && !showFilter && row?._conflicts?.map && (

@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { useLiveQuery } from 'dexie-react-hooks'
 import uniqBy from 'lodash/uniqBy'
+import { toJS } from 'mobx'
 
 import StoreContext from '../../../../storeContext'
 import TextField from '../../../shared/TextField'
@@ -13,9 +14,10 @@ import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import ConflictList from '../../../shared/ConflictList'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 import personSort from '../../../../utils/personSort'
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../../utils/collectionFromTable'
 
 const Container = styled.div`
   padding: 10px;
@@ -42,49 +44,19 @@ const Herkunft = ({
 }) => {
   const store = useContext(StoreContext)
   const { filter, online, errors, setError, unsetError, user } = store
+  const { herkunft: herkunftError } = errors
 
   const data = useLiveQuery(async () => {
-    const [persons, userPerson] = await Promise.all([
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
-      dexie.persons.get({
-        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
-      }),
-    ])
+    const userPerson = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
 
-    // need to show a choosen person even if inactive but not if deleted
-    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
-    const personsIncludingChoosen = uniqBy(
-      [...persons, ...(person && !showFilter ? [person] : [])],
-      'id',
+    const userPersonOption = await dexie.person_options.get(
+      userPerson.id ?? '99999999-9999-9999-9999-999999999999',
     )
-    const personWerte = personsIncludingChoosen
-      .sort(personSort)
-      .map((person) => ({
-        value: person.id,
-        label: personLabelFromPerson({ person }),
-      }))
 
-    const userPersonOption = await dexie.person_options.get(userPerson.id)
-    if (!showFilter && row.nr) {
-      const otherHerkunftsWithSameNr = await dexie.herkunfts
-        .filter(
-          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
-        )
-        .toArray()
-      if (otherHerkunftsWithSameNr.length > 0) {
-        setError({
-          path: 'herkunft.nr',
-          value: `Diese Nummer wird ${
-            otherHerkunftsWithSameNr.length + 1
-          } mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
-        })
-      }
-    }
-
-    return { personWerte, userPersonOption }
-  }, [store.filter.garten, store.garten_initially_queried, id, user, row])
+    return { userPersonOption }
+  }, [user.uid])
 
   const userPersonOption = data?.userPersonOption ?? {}
 
@@ -97,9 +69,31 @@ const Herkunft = ({
   const { hk_kanton, hk_land, hk_bemerkungen, hk_geom_point } =
     userPersonOption ?? {}
 
+  // catch multiple nr's
   useEffect(() => {
-    unsetError('herkunft')
-  }, [id, unsetError])
+    if (showFilter) return
+    if (!row.nr && errors.herkunft.nr) {
+      return unsetError('herkunft')
+    }
+    if (!row.nr) return
+    dexie.herkunfts
+      .where({ _deleted_indexable: 0 })
+      .filter((h) => h.nr === row.nr && h.id !== row.id)
+      .toArray()
+      .then((otherHerkunftsWithSameNr) => {
+        if (otherHerkunftsWithSameNr.length > 0) {
+          setError({
+            table: 'herkunft',
+            field: 'nr',
+            value: `Diese Nummer wird ${
+              otherHerkunftsWithSameNr.length + 1
+            } mal verwendet. Sie sollte aber über alle Herkünfte eindeutig sein`,
+          })
+        } else {
+          unsetError('herkunft')
+        }
+      })
+  }, [showFilter, row.nr, row.id, setError, unsetError, errors.herkunft.nr])
 
   const saveToDb = useCallback(
     async (event) => {
@@ -138,7 +132,7 @@ const Herkunft = ({
               name="_deleted"
               value={row._deleted}
               saveToDb={saveToDb}
-              error={errors?.herkunft?._deleted}
+              error={!showFilter && errors?.herkunft?._deleted}
             />
           ) : (
             <Checkbox2States
@@ -147,7 +141,7 @@ const Herkunft = ({
               name="_deleted"
               value={row._deleted}
               saveToDb={saveToDb}
-              error={errors?.herkunft?._deleted}
+              error={!showFilter && errors?.herkunft?._deleted}
             />
           )}
         </>
@@ -158,7 +152,7 @@ const Herkunft = ({
         label="Nr"
         value={row.nr}
         saveToDb={saveToDb}
-        error={errors?.herkunft?.nr}
+        error={!showFilter && errors?.herkunft?.nr}
       />
       <TextField
         key={`${row.id}lokalname`}
@@ -166,7 +160,7 @@ const Herkunft = ({
         label="Lokalname"
         value={row.lokalname}
         saveToDb={saveToDb}
-        error={errors?.herkunft?.lokalname}
+        error={!showFilter && errors?.herkunft?.lokalname}
       />
       <TextField
         key={`${row.id}gemeinde`}
@@ -174,7 +168,7 @@ const Herkunft = ({
         label="Gemeinde"
         value={row.gemeinde}
         saveToDb={saveToDb}
-        error={errors?.herkunft?.gemeinde}
+        error={!showFilter && errors?.herkunft?.gemeinde}
       />
       {hk_kanton && (
         <TextField
@@ -183,7 +177,7 @@ const Herkunft = ({
           label="Kanton"
           value={row.kanton}
           saveToDb={saveToDb}
-          error={errors?.herkunft?.kanton}
+          error={!showFilter && errors?.herkunft?.kanton}
         />
       )}
       {hk_land && (
@@ -193,7 +187,7 @@ const Herkunft = ({
           label="Land"
           value={row.land}
           saveToDb={saveToDb}
-          error={errors?.herkunft?.land}
+          error={!showFilter && errors?.herkunft?.land}
         />
       )}
       {!showFilter && hk_geom_point && (
@@ -206,7 +200,7 @@ const Herkunft = ({
           label="Bemerkungen"
           value={row.bemerkungen}
           saveToDb={saveToDb}
-          error={errors?.herkunft?.bemerkungen}
+          error={!showFilter && errors?.herkunft?.bemerkungen}
           multiLine
         />
       )}
