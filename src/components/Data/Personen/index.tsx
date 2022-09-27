@@ -17,7 +17,6 @@ import personSort from '../../../utils/personSort'
 import constants from '../../../utils/constants'
 import { dexie, Person } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import totalFilter from '../../../utils/totalFilter'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -67,9 +66,10 @@ const Personen = ({ filter: showFilter, width, height }) => {
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'evepersonnt' }),
       }).count(),
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .count(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ table: 'person', store }),
+      }).count(),
       dexie.persons.get({
         account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
       }),

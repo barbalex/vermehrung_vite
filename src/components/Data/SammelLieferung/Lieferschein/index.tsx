@@ -18,7 +18,8 @@ import lieferungSort from '../../../../utils/lieferungSort'
 import personFullname from '../../../../utils/personFullname'
 import constants from '../../../../utils/constants'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import ProgressiveImg from '../../../shared/ProgressiveImg'
 import image from '../../../../images/toposLogo.png'
 
@@ -102,10 +103,14 @@ const Lieferschein = ({ row }) => {
 
   const data = useLiveQuery(async () => {
     const [lieferungs, kultur, person] = await Promise.all([
-      dexie.lieferungs
-        .where({ sammel_lieferung_id: row.id })
-        .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'lieferung',
+        where: addTotalCriteriaToWhere({
+          table: 'lieferung',
+          store,
+          where: { sammel_lieferung_id: row.id },
+        }),
+      }).toArray(),
       dexie.kulturs.get(
         row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
       ),
