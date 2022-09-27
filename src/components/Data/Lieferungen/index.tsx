@@ -18,12 +18,10 @@ import lieferungSort from '../../../utils/lieferungSort'
 import constants from '../../../utils/constants'
 import { dexie, Lieferung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import totalFilter from '../../../utils/totalFilter'
 import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
-
 
 const Container = styled.div`
   height: 100%;
