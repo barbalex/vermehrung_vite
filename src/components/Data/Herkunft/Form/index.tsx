@@ -44,7 +44,6 @@ const Herkunft = ({
 }) => {
   const store = useContext(StoreContext)
   const { filter, online, errors, setError, unsetError, user } = store
-  const { herkunft: herkunftError } = errors
 
   const data = useLiveQuery(async () => {
     const userPerson = await dexie.persons.get({

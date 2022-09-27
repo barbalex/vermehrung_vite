@@ -24,8 +24,9 @@ import constants from '../../../../utils/constants'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import herkunftSort from '../../../../utils/herkunftSort'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 import { kultur } from '../../../../utils/fragments'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const Container = styled.div`
   padding: 10px;
@@ -74,28 +75,31 @@ const KulturForm = ({
 
   const data = useLiveQuery(async () => {
     const [userPerson, gartens, gartenQueried, sammlungs] = await Promise.all([
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
-      dexie.gartens
-        .filter((value) => totalFilter({ value, store, table: 'garten' }))
-        .toArray(),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
+      collectionFromTable({
+        table: 'garten',
+        where: addTotalCriteriaToWhere({ table: 'garten', store }),
+      }).toArray(),
       dexie.gartens.get(
         row?.garten_id ?? '99999999-9999-9999-9999-999999999999',
       ),
-      dexie.sammlungs
-        .filter((s) => s._deleted === false && !!s.art_id && !!s.herkunft_id)
+      collectionFromTable({
+        table: 'sammlung',
+        where: addTotalCriteriaToWhere({ table: 'sammlung', store }),
+      })
+        .filter((s) => !!s.art_id && !!s.herkunft_id)
         .toArray(),
     ])
 
     const garten = showFilter ? filter.garten : gartenQueried
 
-    const thisGartenKulturs = await dexie.kulturs
-      .filter(
-        (k) =>
-          kultur._deleted === false &&
-          k.aktiv === true &&
-          !!k.art_id &&
-          !!kultur.herkunft_id,
-      )
+    const thisGartenKulturs = await collectionFromTable({
+      table: 'kultur',
+      where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+    })
+      .filter((s) => !!s.art_id && !!s.herkunft_id)
       .toArray()
 
     // TODO:
