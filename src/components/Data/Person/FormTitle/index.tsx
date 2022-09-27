@@ -5,8 +5,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const PersonFormTitleChooser = ({
   showFilter,
@@ -16,21 +17,25 @@ const PersonFormTitleChooser = ({
 }) => {
   const store = useContext(StoreContext)
 
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .count(),
-    [
-      store.filter.person,
-      store.person_initially_queried,
-      // need to rerender if any of the values of personFilter changes
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      ...Object.values(store.filter.person),
-    ],
-  )
+  const data = useLiveQuery(async () => {
+    const [totalCount, filteredCount] = await Promise.all([
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ store, table: 'person' }),
+      }).count(),
+      filteredObjectsFromTable({ store, table: 'person', count: true }),
+    ])
 
-  const filteredCount = store.personsFilteredCount ?? '...'
+    return { totalCount, filteredCount }
+  }, [
+    store.person_initially_queried,
+    // need to rerender if any of the values of personFilter changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    ...Object.values(store.filter.person),
+  ])
+
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

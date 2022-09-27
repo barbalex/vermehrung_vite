@@ -7,6 +7,9 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const SammelLieferungFormTitleChooser = ({
   lieferung,
@@ -21,22 +24,28 @@ const SammelLieferungFormTitleChooser = ({
 
   const { filter } = store
 
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.sammel_lieferungs
-        .filter((value) =>
-          totalFilter({ value, store, table: 'sammel_lieferung' }),
-        )
-        .count(),
-    [
-      store.filter.sammel_lieferung,
-      // need to rerender if any of the values of lieferungFilter changes
-      ...Object.values(store.filter.sammel_lieferung),
-      store.sammel_lieferung_initially_queried,
-    ],
-  )
+  const data = useLiveQuery(async () => {
+    const [totalCount, filteredCount] = await Promise.all([
+      collectionFromTable({
+        table: 'sammel_lieferung',
+        where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),
+      }).count(),
+      filteredObjectsFromTable({
+        store,
+        table: 'sammel_lieferung',
+        count: true,
+      }),
+    ])
 
-  const filteredCount = store.sammelLieferungsFilteredCount ?? '...'
+    return { totalCount, filteredCount }
+  }, [
+    // need to rerender if any of the values of lieferungFilter changes
+    ...Object.values(store.filter.sammel_lieferung),
+    store.sammel_lieferung_initially_queried,
+  ])
+
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (!row || (!showFilter && filter.show)) return null
 
