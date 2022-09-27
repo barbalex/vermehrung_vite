@@ -19,6 +19,7 @@ import { Art } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;

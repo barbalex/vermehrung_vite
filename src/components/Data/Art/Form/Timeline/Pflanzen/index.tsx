@@ -28,6 +28,9 @@ import Spinner from '../../../../../shared/Spinner'
 const NoData = styled.div`
   padding: 0 10px 10px 10px;
 `
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  padding-bottom: 15px;
+`
 
 const ArtTimeline = ({ artId, width }) => {
   const [narrow, setNarrow] = useState(false)
@@ -62,7 +65,7 @@ const ArtTimeline = ({ artId, width }) => {
 
   return (
     <ErrorBoundary>
-      <ResponsiveContainer width="99%" height={450}>
+      <StyledResponsiveContainer width="99%" height={450}>
         <ComposedChart
           data={data}
           margin={{ top: 35, right: 0, left: 0, bottom: 45 }}
@@ -135,7 +138,7 @@ const ArtTimeline = ({ artId, width }) => {
             strokeWidth={3}
           ></Scatter>
         </ComposedChart>
-      </ResponsiveContainer>
+      </StyledResponsiveContainer>
     </ErrorBoundary>
   )
 }

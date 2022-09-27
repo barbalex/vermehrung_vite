@@ -57,6 +57,9 @@ const Content = styled.div`
   flex-direction: column;
   justify-content: center;
 `
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  padding-bottom: 15px;
+`
 
 const KulturTimeline = ({ row, width }) => {
   const [narrow, setNarrow] = useState(false)
@@ -163,7 +166,7 @@ const KulturTimeline = ({ row, width }) => {
       </TitleRow>
       <motion.div animate={anim} transition={{ type: 'just', duration: 0.2 }}>
         {open && (
-          <ResponsiveContainer width="99%" height={450}>
+          <StyledResponsiveContainer width="99%" height={450}>
             <ComposedChart
               data={allData}
               margin={{ top: 15, right: 0, left: 0, bottom: 45 }}
@@ -332,7 +335,7 @@ const KulturTimeline = ({ row, width }) => {
                 />
               )}
             </ComposedChart>
-          </ResponsiveContainer>
+          </StyledResponsiveContainer>
         )}
       </motion.div>
     </ErrorBoundary>
