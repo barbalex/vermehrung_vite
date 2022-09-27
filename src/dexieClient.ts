@@ -31,7 +31,7 @@ import {
   personFile as personFileFragment,
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
-import addIndexableFields from './utils/addIndexableFields'
+import addIndexableBooleans from './utils/addIndexableBooleans'
 import collectionFromTable from './utils/collectionFromTable'
 import addTotalCriteriaToWhere from './utils/addTotalCriteriaToWhere'
 
@@ -205,7 +205,7 @@ export class Herkunft implements IHerkunft {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'herkunft', object: storeUpdate })
+    addIndexableBooleans({ table: 'herkunft', object: storeUpdate })
     dexie.herkunfts.update(this.id, storeUpdate)
   }
 
@@ -464,7 +464,7 @@ export class Sammlung implements ISammlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'sammlung', object: storeUpdate })
+    addIndexableBooleans({ table: 'sammlung', object: storeUpdate })
 
     dexie.sammlungs.update(this.id, storeUpdate)
   }
@@ -712,7 +712,7 @@ export class Lieferung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'lieferung', object: storeUpdate })
+    addIndexableBooleans({ table: 'lieferung', object: storeUpdate })
 
     dexie.lieferungs.update(this.id, storeUpdate)
   }
@@ -873,7 +873,7 @@ export class Art implements IArt {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'art', object: storeUpdate })
+    addIndexableBooleans({ table: 'art', object: storeUpdate })
 
     dexie.arts.update(this.id, storeUpdate)
   }
@@ -1087,7 +1087,7 @@ export class Garten implements IGarten {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'garten', object: storeUpdate })
+    addIndexableBooleans({ table: 'garten', object: storeUpdate })
 
     dexie.gartens.update(this.id, storeUpdate)
   }
@@ -1376,7 +1376,7 @@ export class Kultur implements IKultur {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'kultur', object: storeUpdate })
+    addIndexableBooleans({ table: 'kultur', object: storeUpdate })
 
     dexie.kulturs.update(this.id, storeUpdate)
   }
@@ -1548,7 +1548,7 @@ export class Teilkultur implements ITeilkultur {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'teilkultur', object: storeUpdate })
+    addIndexableBooleans({ table: 'teilkultur', object: storeUpdate })
 
     dexie.teilkulturs.update(this.id, storeUpdate)
   }
@@ -1728,7 +1728,7 @@ export class Zaehlung implements IZaehlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'zaehlung', object: storeUpdate })
+    addIndexableBooleans({ table: 'zaehlung', object: storeUpdate })
 
     dexie.zaehlungs.update(this.id, storeUpdate)
   }
@@ -1911,7 +1911,7 @@ export class Teilzaehlung implements ITeilzaehlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'teilzaehlung', object: storeUpdate })
+    addIndexableBooleans({ table: 'teilzaehlung', object: storeUpdate })
 
     await dexie.teilzaehlungs.update(this.id, storeUpdate)
     return
@@ -2209,7 +2209,7 @@ export class Person implements IPerson {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'person', object: storeUpdate })
+    addIndexableBooleans({ table: 'person', object: storeUpdate })
 
     dexie.persons.update(this.id, storeUpdate)
   }
@@ -2467,7 +2467,7 @@ export class SammelLieferung implements ISammelLieferung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'sammel_lieferung', object: storeUpdate })
+    addIndexableBooleans({ table: 'sammel_lieferung', object: storeUpdate })
 
     dexie.sammel_lieferungs.update(this.id, storeUpdate)
     const sl_auto_copy_edits = userPersonOption?.sl_auto_copy_edits
@@ -2658,7 +2658,7 @@ export class Event implements IEvent {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'event', object: storeUpdate })
+    addIndexableBooleans({ table: 'event', object: storeUpdate })
 
     dexie.events.update(this.id, storeUpdate)
   }
@@ -2809,7 +2809,7 @@ export class Av implements IAv {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'av', object: storeUpdate })
+    addIndexableBooleans({ table: 'av', object: storeUpdate })
 
     dexie.avs.update(this.id, storeUpdate)
   }
@@ -2958,7 +2958,7 @@ export class Gv implements IGv {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'gv', object: storeUpdate })
+    addIndexableBooleans({ table: 'gv', object: storeUpdate })
 
     dexie.gvs.update(this.id, storeUpdate)
   }
@@ -3969,7 +3969,7 @@ export class ArtQk implements IArtQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'art_qk', object: storeUpdate })
+    addIndexableBooleans({ table: 'art_qk', object: storeUpdate })
 
     dexie.art_qks.update(this.id, storeUpdate)
   }
@@ -4144,7 +4144,7 @@ export class KulturOption implements IKulturOption {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'kultur_option', object: storeUpdate })
+    addIndexableBooleans({ table: 'kultur_option', object: storeUpdate })
 
     dexie.kultur_options.update(this.id, storeUpdate)
   }
@@ -4280,7 +4280,7 @@ export class KulturQk implements IKulturQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'kultur_qk', object: storeUpdate })
+    addIndexableBooleans({ table: 'kultur_qk', object: storeUpdate })
 
     dexie.kultur_qks.update(this.id, storeUpdate)
   }
@@ -4533,7 +4533,7 @@ export class PersonOption implements IPersonOption {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableFields({ table: 'person_option', object: storeUpdate })
+    addIndexableBooleans({ table: 'person_option', object: storeUpdate })
 
     dexie.person_options.update(this.id, storeUpdate)
   }

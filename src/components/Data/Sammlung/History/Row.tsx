@@ -10,7 +10,7 @@ import toPgArray from '../../../../utils/toPgArray'
 import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
-import addIndexableFields from '../../../../utils/addIndexableFields'
+import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
@@ -75,7 +75,7 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     // for store: convert rev to winner
     newObjectForStore.id = row.id
     delete newObjectForStore.sammlung_id
-    addIndexableFields({ table: 'sammlung', object: newObjectForStore })
+    addIndexableBooleans({ table: 'sammlung', object: newObjectForStore })
     // optimistically update store
     await dexie.sammlungs.update(row.id, newObjectForStore)
   }, [

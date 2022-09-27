@@ -1,5 +1,5 @@
 import { dexie } from '../../dexieClient'
-import addIndexableFields from '../addIndexableFields'
+import addIndexableBooleans from '../addIndexableBooleans'
 
 const stripTypename = (object) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,7 +23,7 @@ const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
   setTimeout(async () => {
     console.log('processTable', { dexie, table, dexieTable: dexie[table] })
     const data = dataIn.map((d) => stripTypename(d))
-    data?.forEach((object) => addIndexableFields({ table, object }))
+    data?.forEach((object) => addIndexableBooleans({ table, object }))
 
     try {
       await dexie[`${table}s`].bulkPut(data)

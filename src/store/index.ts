@@ -33,7 +33,7 @@ import zaehlungIdInUrl from '../utils/zaehlungIdInUrl'
 import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import { dexie } from '../dexieClient'
-import addIndexableFields from '../utils/addIndexableFields'
+import addIndexableBooleans from '../utils/addIndexableBooleans'
 
 const myTypes = types
   .model({
@@ -319,7 +319,7 @@ const myTypes = types
       // used to revert offline operations if they fail
       async updateModelValues({ table, id, values }) {
         // add/update indexable booleans
-        addIndexableFields({ table, values })
+        addIndexableBooleans({ table, values })
         dexie[`${table}s`]?.update?.(id, values)
       },
       removeQueuedQueryById(id) {
@@ -401,7 +401,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'art', object: newObjectForStore })
+        addIndexableBooleans({ table: 'art', object: newObjectForStore })
         // optimistically update store
         await dexie.arts.put(newObjectForStore)
         setTimeout(() => {
@@ -454,7 +454,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'av', object: newObjectForStore })
+        addIndexableBooleans({ table: 'av', object: newObjectForStore })
         // optimistically update store
         dexie.avs.put(newObjectForStore)
       },
@@ -512,7 +512,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'event', object: newObjectForStore })
+        addIndexableBooleans({ table: 'event', object: newObjectForStore })
         // optimistically update store
         await dexie.events.put(newObjectForStore)
         setTimeout(() => {
@@ -574,7 +574,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'garten', object: newObjectForStore })
+        addIndexableBooleans({ table: 'garten', object: newObjectForStore })
         // optimistically update store
         await dexie.gartens.put(newObjectForStore)
         setTimeout(() => {
@@ -627,7 +627,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'gv', object: newObjectForStore })
+        addIndexableBooleans({ table: 'gv', object: newObjectForStore })
         // optimistically update store
         await dexie.gvs.put(newObjectForStore)
       },
@@ -680,7 +680,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'herkunft', object: newObjectForStore })
+        addIndexableBooleans({ table: 'herkunft', object: newObjectForStore })
         // optimistically update store
         await dexie.herkunfts.put(newObjectForStore)
         setTimeout(() => {
@@ -751,7 +751,7 @@ const myTypes = types
           isInsert: true,
         })
         // optimistically update store
-        addIndexableFields({ table: 'kultur', object: newObjectForStore })
+        addIndexableBooleans({ table: 'kultur', object: newObjectForStore })
         await dexie.kulturs.put(newObjectForStore)
         await dexie.kultur_options.put({ id })
         setTimeout(() => {
@@ -836,7 +836,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'lieferung', object: newObjectForStore })
+        addIndexableBooleans({ table: 'lieferung', object: newObjectForStore })
         // optimistically update store
         await dexie.lieferungs.put(newObjectForStore)
         setTimeout(() => {
@@ -906,7 +906,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'person', object: newObjectForStore })
+        addIndexableBooleans({ table: 'person', object: newObjectForStore })
         // optimistically update store
         await dexie.persons.put(newObjectForStore)
         await dexie.person_options.put({ id })
@@ -982,7 +982,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({
+        addIndexableBooleans({
           table: 'sammel_lieferung',
           object: newObjectForStore,
         })
@@ -1056,7 +1056,7 @@ const myTypes = types
           revertField: '_deleted',
           revertValue: true,
         })
-        addIndexableFields({ table: 'sammlung', object: newObjectForStore })
+        addIndexableBooleans({ table: 'sammlung', object: newObjectForStore })
         // optimistically update store
         await dexie.sammlungs.put(newObjectForStore)
         setTimeout(() => {
@@ -1118,7 +1118,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'teilkultur', object: newObjectForStore })
+        addIndexableBooleans({ table: 'teilkultur', object: newObjectForStore })
         // optimistically update store
         await dexie.teilkulturs.put(newObjectForStore)
         if (!noNavigateInTree) {
@@ -1186,7 +1186,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'teilzaehlung', object: newObjectForStore })
+        addIndexableBooleans({ table: 'teilzaehlung', object: newObjectForStore })
         // optimistically update store
         await dexie.teilzaehlungs.put(newObjectForStore)
       },
@@ -1236,7 +1236,7 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableFields({ table: 'zaehlung', object: newObjectForStore })
+        addIndexableBooleans({ table: 'zaehlung', object: newObjectForStore })
         // optimistically update store
         await dexie.zaehlungs.put(newObjectForStore)
         setTimeout(() => {

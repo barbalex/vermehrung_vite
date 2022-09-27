@@ -4,7 +4,7 @@ import { v1 as uuidv1 } from 'uuid'
 
 import toPgArray from '../../../../../utils/toPgArray'
 import exists from '../../../../../utils/exists'
-import addIndexableFields from '../../../../../utils/addIndexableFields'
+import addIndexableBooleans from '../../../../../utils/addIndexableBooleans'
 
 const lieferungRevFields = [
   'id',
@@ -134,7 +134,7 @@ const updateLieferung = async ({
   newObjectForStore._conflicts = lfLastVersion._conflicts
   newObjectForStore.id = lfLastVersion.id
   delete newObjectForStore.sammel_lieferung_id
-  addIndexableFields({ table: 'sammel_lieferung', object: newObjectForStore })
+  addIndexableBooleans({ table: 'sammel_lieferung', object: newObjectForStore })
 
   await dexie.sammel_lieferungs.update(row.id, newObjectForStore)
 }
