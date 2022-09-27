@@ -19,6 +19,8 @@ import { dexie, SammelLieferung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -60,15 +62,10 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
   const data = useLiveQuery(async () => {
     const [sammelLieferungs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'sammel_lieferung' }),
-      dexie.sammel_lieferungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'sammel_lieferung',
-          }),
-        )
-        .count(),
+      collectionFromTable({
+        table: 'sammel_lieferung',
+        where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),
+      }).count(),
     ])
 
     const sammelLieferungsSorted = sammelLieferungs.sort(lieferungSort)
@@ -81,8 +78,8 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
   ])
 
   const sammelLieferungs: SammelLieferung[] = data?.sammelLieferungs ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = sammelLieferungs.length
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.sammelLieferungs?.length ?? '...'
 
   const add = useCallback(() => {
     insertSammelLieferungRev()

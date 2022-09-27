@@ -18,8 +18,10 @@ import constants from '../../../utils/constants'
 import { dexie, Teilkultur } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -59,17 +61,18 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'teilkultur',
     })
     const [teilkulturs, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'teilkultur' }),
-      dexie.teilkulturs
-        .filter((value) =>
-          totalFilter({ value, store, table: 'teilkultur', conditionAdder }),
-        )
-        .count(),
+      conditionAdder(
+        collectionFromTable({
+          table: 'teilkultur',
+          where: addTotalCriteriaToWhere({ store, table: 'teilkultur' }),
+        }),
+      ).count(),
     ])
 
     const teilkultursSorted = teilkulturs.sort(teilkulturSort)
@@ -83,8 +86,8 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
   ])
 
   const teilkulturs: Teilkultur[] = data?.teilkulturs ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = teilkulturs.length
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.teilkulturs?.length ?? '...'
 
   const add = useCallback(() => {
     insertTeilkulturRev()

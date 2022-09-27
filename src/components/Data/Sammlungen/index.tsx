@@ -18,8 +18,10 @@ import constants from '../../../utils/constants'
 import { dexie, Sammlung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -64,7 +66,7 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'sammlung',
     })
@@ -74,16 +76,12 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
         store,
         table: 'sammlung',
       }),
-      dexie.sammlungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'sammlung',
-            conditionAdder,
-          }),
-        )
-        .count(),
+      conditionAdder(
+        collectionFromTable({
+          table: 'sammlung',
+          where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
+        }),
+      ).count(),
     ])
 
     const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
@@ -99,8 +97,8 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
   ])
 
   const sammlungs: Sammlung[] = data?.sammlungs ?? []
-  const totalCount = data?.totalCount
-  const filteredCount = sammlungs.length
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.sammlungs?.length ?? '...'
 
   const add = useCallback(() => {
     insertSammlungRev()

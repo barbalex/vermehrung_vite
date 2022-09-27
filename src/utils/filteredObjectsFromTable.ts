@@ -77,7 +77,7 @@ const filteredObjectsFromTable = async ({
         returnValue = false
         break
       } else if (type !== 'string' && !(objectValue === value)) {
-        console.log('filteredObjectsFromTable, false due to not equal')
+        // console.log('filteredObjectsFromTable, false due to not equal')
         returnValue = false
         break
       }
