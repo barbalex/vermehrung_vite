@@ -130,6 +130,10 @@ export class Herkunft implements IHerkunft {
     this._conflicts = _conflicts ?? null
   }
 
+  async person(){
+    
+  }
+
   label() {
     // only show lokalname if exist
     // does not exist if user does not have right to see it
