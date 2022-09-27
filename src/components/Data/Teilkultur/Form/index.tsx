@@ -16,6 +16,8 @@ import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import { dexie } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const FieldsContainer = styled.div`
   padding: 10px;
