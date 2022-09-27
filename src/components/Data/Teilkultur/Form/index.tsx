@@ -16,7 +16,6 @@ import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -50,9 +49,10 @@ const TeilkulturForm = ({
 
   const data = useLiveQuery(async () => {
     const [kulturs, kultur, kulturOption] = await Promise.all([
-      dexie.kulturs
-        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'kultur',
+        where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+      }).toArray(),
       dexie.kulturs.get(
         row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
       ),

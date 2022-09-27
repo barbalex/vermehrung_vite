@@ -56,9 +56,10 @@ const ZaehlungForm = ({
 
   const data = useLiveQuery(async () => {
     const [kulturs, kultur, kulturOption] = await Promise.all([
-      dexie.kulturs
-        .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'kultur',
+        where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+      }).toArray(),
       dexie.kulturs.get(
         row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
       ),
