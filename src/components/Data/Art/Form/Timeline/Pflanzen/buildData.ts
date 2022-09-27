@@ -1,16 +1,24 @@
 import uniq from 'lodash/uniq'
 import sum from 'lodash/sum'
 import max from 'lodash/max'
+
 import { dexie } from '../../../../../../dexieClient'
+import collectionFromTable from '../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../utils/addTotalCriteriaToWhere'
+import exists from '../../../../../../utils/exists'
 
 const buildData = async ({ artId }) => {
   // 1. get list of all active, non deleted kulturs
   //    these are the basis for counting:
   //    at every date the last count is used
-  const kulturs = await dexie.kulturs
-    .where({ art_id: artId })
-    .filter((k) => k._deleted === false && k.aktiv === true)
-    .toArray()
+  const kulturs = await collectionFromTable({
+    table: 'kultur',
+    where: addTotalCriteriaToWhere({
+      table: 'kultur',
+      store,
+      where: { art_id: artId },
+    }),
+  }).toArray()
   const kultursIds = kulturs.map((k) => k.id)
   const zaehlungs = await dexie.zaehlungs
     .where('kultur_id')
@@ -62,25 +70,27 @@ const buildData = async ({ artId }) => {
     (lg) => !zaehlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const sammlungsDone = await dexie.sammlungs
-    .where({ art_id: artId })
+  const sammlungsDone = await collectionFromTable({
+    table: 'sammlung',
+    where: addTotalCriteriaToWhere({
+      table: 'sammlung',
+      store,
+      where: { art_id: artId },
+    }),
+  })
     .filter(
-      (s) =>
-        s.geplant === false &&
-        !!s.datum &&
-        s.anzahl_pflanzen !== null &&
-        s._deleted === false,
+      (s) => s.geplant === false && !!s.datum && exists(s.anzahl_pflanzen),
     )
     .toArray()
-  const sammlungsPlannedAll = await dexie.sammlungs
-    .where({ art_id: artId })
-    .filter(
-      (s) =>
-        s.geplant === true &&
-        !!s.datum &&
-        s.anzahl_pflanzen !== null &&
-        s._deleted === false,
-    )
+  const sammlungsPlannedAll = await collectionFromTable({
+    table: 'sammlung',
+    where: addTotalCriteriaToWhere({
+      table: 'sammlung',
+      store,
+      where: { art_id: artId },
+    }),
+  })
+    .filter((s) => s.geplant === true && !!s.datum && exists(s.anzahl_pflanzen))
     .toArray()
   const sammlungsPlannedIgnored = sammlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
@@ -90,27 +100,39 @@ const buildData = async ({ artId }) => {
     (lg) => !sammlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const lieferungsDone = await dexie.lieferungs
-    .where({ art_id: artId })
+  const lieferungsDone = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: {
+        art_id: artId,
+        nach_ausgepflanzt_indexable: 1,
+        geplant_indexable: 0,
+      },
+    }),
+  })
     .filter(
       (s) =>
         s.nach_ausgepflanzt === true &&
         s.geplant === false &&
         !!s.datum &&
-        s.anzahl_pflanzen !== null &&
-        s._deleted === false,
+        exists(s.anzahl_pflanzen),
     )
     .toArray()
-  const lieferungsPlannedAll = await dexie.lieferungs
-    .where({ art_id: artId })
-    .filter(
-      (s) =>
-        s.nach_ausgepflanzt === true &&
-        s.geplant === true &&
-        !!s.datum &&
-        s.anzahl_pflanzen !== null &&
-        s._deleted === false,
-    )
+  const lieferungsPlannedAll = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: {
+        art_id: artId,
+        nach_ausgepflanzt_indexable: 1,
+        geplant_indexable: 1,
+      },
+    }),
+  })
+    .filter((s) => !!s.datum && exists(s.anzahl_pflanzen))
     .toArray()
   const lieferungsPlannedIgnored = lieferungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
@@ -163,13 +185,17 @@ const buildData = async ({ artId }) => {
         kulturs.map(async (k) => {
           // for every kultur return
           // last zaehlung and whether it is prognose
-          const zaehlungs = await dexie.zaehlungs
-            .where({ kultur_id: k.id })
+          const zaehlungs = await collectionFromTable({
+            table: 'zaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'zaehlung',
+              store,
+              where: { kultur_id: k.id },
+            }),
+          })
             .filter(
               (z) =>
-                z._deleted === false &&
-                !!z.datum &&
-                zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
+                !!z.datum && zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
             )
             .toArray()
           const lastZaehlungDatum = max(

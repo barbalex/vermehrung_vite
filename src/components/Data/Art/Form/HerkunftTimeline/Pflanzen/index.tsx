@@ -32,6 +32,9 @@ const H4 = styled.h4`
 const NoData = styled.div`
   padding: 0 10px 15px 0;
 `
+const StyledResponsiveContainer = styled(ResponsiveContainer)`
+  padding-bottom: 15px;
+`
 
 const ArtTimeline = ({ artId, herkunft, width }) => {
   const herkunftId = herkunft.id
@@ -76,7 +79,7 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
   return (
     <ErrorBoundary>
       <h4>{herkunftLabel}</h4>
-      <ResponsiveContainer width="99%" height={450}>
+      <StyledResponsiveContainer width="99%" height={450}>
         <ComposedChart
           data={data}
           margin={{ top: 25, right: 0, left: 0, bottom: 45 }}
@@ -149,7 +152,7 @@ const ArtTimeline = ({ artId, herkunft, width }) => {
             strokeWidth={3}
           ></Scatter>
         </ComposedChart>
-      </ResponsiveContainer>
+      </StyledResponsiveContainer>
     </ErrorBoundary>
   )
 }
