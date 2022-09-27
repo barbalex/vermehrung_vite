@@ -1567,7 +1567,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             table: 'lieferung',
             where: { sammel_lieferung_id: sammelLieferung.id },
           }),
-        })
+        }).toArray()
         const lieferungsSorted = lieferungs.sort(lieferungSort)
         sammelLieferungLieferungFolderNodes.push(
           buildSammelLieferungLieferungFolder({

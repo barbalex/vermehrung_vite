@@ -7,7 +7,10 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const TeilkulturFormTitleChooser = ({
   row,
@@ -18,17 +21,23 @@ const TeilkulturFormTitleChooser = ({
   const store = useContext(StoreContext)
   const { kulturIdInActiveNodeArray } = store
 
-  const totalCount = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+  const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'teilkultur',
     })
 
-    return await dexie.teilkulturs
-      .filter((value) =>
-        totalFilter({ value, store, table: 'teilkultur', conditionAdder }),
-      )
-      .count()
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
+          table: 'teilkultur',
+          where: addTotalCriteriaToWhere({ store, table: 'teilkultur' }),
+        }),
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'teilkultur', count: true }),
+    ])
+
+    return { totalCount, filteredCount }
   }, [
     kulturIdInActiveNodeArray,
     // need to rerender if any of the values of sammlungFilter changes
@@ -37,7 +46,8 @@ const TeilkulturFormTitleChooser = ({
     store,
   ])
 
-  const filteredCount = store.teilkultursFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (
