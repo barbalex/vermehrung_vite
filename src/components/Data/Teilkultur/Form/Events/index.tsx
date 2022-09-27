@@ -7,8 +7,9 @@ import eventSort from '../../../../../utils/eventSort'
 import storeContext from '../../../../../storeContext'
 import Row from './Row'
 import constants from '../../../../../utils/constants'
-import { dexie } from '../../../../../dexieClient'
 import Spinner from '../../../../shared/Spinner'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -38,10 +39,14 @@ const TkEvents = ({ teilkultur }) => {
 
   const events = useLiveQuery(
     async () =>
-      await dexie.events
-        .where({ teilkultur_id: teilkultur.id })
-        .filter((e) => e._deleted === false)
-        .toArray(),
+      await collectionFromTable({
+        table: 'event',
+        where: addTotalCriteriaToWhere({
+          table: 'event',
+          store,
+          where: { teilkultur_id: teilkultur.id },
+        }),
+      }).toArray(),
     [filter.event._deleted, teilkultur],
   )
   const eventsSorted = (events ?? []).sort(eventSort)

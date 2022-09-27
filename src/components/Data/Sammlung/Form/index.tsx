@@ -155,9 +155,15 @@ const SammlungForm = ({
       return unsetError('sammlung')
     }
     if (!row.nr) return
-    dexie.sammlungs
-      .where({ _deleted_indexable: 0 })
-      .filter((h) => h.nr === row.nr && h.id !== row.id)
+    collectionFromTable({
+      table: 'sammlung',
+      where: addTotalCriteriaToWhere({
+        table: 'sammlung',
+        store,
+        where: { nr: row.nr },
+      }),
+    })
+      .filter((h) => h.id !== row.id)
       .toArray()
       .then((otherSammlungsWithSameNr) => {
         if (otherSammlungsWithSameNr.length > 0) {
@@ -172,7 +178,15 @@ const SammlungForm = ({
           unsetError('sammlung')
         }
       })
-  }, [showFilter, row.nr, row.id, setError, unsetError, errors.sammlung.nr])
+  }, [
+    showFilter,
+    row.nr,
+    row.id,
+    setError,
+    unsetError,
+    errors.sammlung.nr,
+    store,
+  ])
 
   const saveToDb = useCallback(
     (event) => {
