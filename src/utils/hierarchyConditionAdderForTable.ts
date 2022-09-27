@@ -1,4 +1,4 @@
-import { dexie } from '../dexieClient'
+import { dexie } from '../dexieClient' 
 
 const hierarchyConditionAdderForTable = async ({ store, table }) => {
   const {

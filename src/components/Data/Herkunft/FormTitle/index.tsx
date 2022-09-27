@@ -5,9 +5,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const HerkunftFormTitleChooser = ({
   row,
@@ -19,25 +20,33 @@ const HerkunftFormTitleChooser = ({
   const store = useContext(StoreContext)
   const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
-  const totalCount = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+  const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'herkunft',
     })
 
-    return await dexie.herkunfts
-      .filter((value) =>
-        totalFilter({ value, store, table: 'herkunft', conditionAdder }),
-      )
-      .count()
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
+          table: 'herkunft',
+          where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
+        }),
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'herkunft', count: true }),
+    ])
+
+    return { totalCount, filteredCount }
   }, [
     store.filter.herkunft,
+    Object.values(store.filter.herkunft),
     store.herkunft_initially_queried,
     sammlungIdInActiveNodeArray,
     artIdInActiveNodeArray,
   ])
 
-  const filteredCount = store.herkunftsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

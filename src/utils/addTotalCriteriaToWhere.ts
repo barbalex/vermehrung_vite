@@ -7,9 +7,15 @@ const addTotalCriteriaToWhere = ({ table, where = {}, store }) => {
   if (store.filter[table]?.aktiv === true) {
     where.aktiv_indexable = 1
   }
+  if (store.filter[table]?.aktiv === false) {
+    where.aktiv_indexable = 0
+  }
   // default false, 0
   if (store.filter[table]?._deleted === false) {
     where._deleted_indexable = 0
+  }
+  if (store.filter[table]?._deleted === true) {
+    where._deleted_indexable = 1
   }
   // Problem:
   // is possible to not have a where clause (depending on filter settings)
