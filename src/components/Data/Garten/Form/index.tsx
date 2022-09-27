@@ -16,8 +16,9 @@ import Files from '../../Files'
 import Coordinates from '../../../shared/Coordinates'
 import Personen from './Personen'
 import ConflictList from '../../../shared/ConflictList'
-import { dexie } from '../../../../dexieClient' 
-import totalFilter from '../../../../utils/totalFilter' 
+import { dexie } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -47,15 +48,21 @@ const GartenForm = ({
 
   const data = useLiveQuery(async () => {
     const [persons, userPerson, gvs] = await Promise.all([
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
-      dexie.gvs.filter((g) => g._deleted === false).toArray(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ table: 'person', store }),
+      }).toArray(),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
+      collectionFromTable({
+        table: 'gv',
+        where: addTotalCriteriaToWhere({ table: 'gv', store }),
+      }).toArray(),
     ])
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    const person = await row.person()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',

@@ -56,7 +56,7 @@ const Herkunft = ({
   id = '99999999-9999-9999-9999-999999999999',
 }) => {
   const store = useContext(StoreContext)
-  const { filter, online } = store
+  const { filter, online, errors } = store
 
   let row = useLiveQuery(async () => await dexie.herkunfts.get(id), [id])
   if (showFilter) row = filter.herkunft
