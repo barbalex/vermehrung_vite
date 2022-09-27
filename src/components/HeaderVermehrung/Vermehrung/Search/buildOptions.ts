@@ -3,7 +3,6 @@ import { DateTime } from 'luxon'
 
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import lieferungLabelFromLieferung from '../../../../utils/lieferungLabelFromLieferung'
-import totalFilter from '../../../../utils/totalFilter'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import sammlungsSortedFromSammlungs from '../../../../utils/sammlungsSortedFromSammlungs'
@@ -15,6 +14,8 @@ import lieferungSort from '../../../../utils/lieferungSort'
 import personSort from '../../../../utils/personSort'
 import zaehlungSort from '../../../../utils/zaehlungSort'
 import { dexie, Kultur, Garten, Art, Event } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const threshold = 0.2
 const distance = 1000 // ensure text in long labels is found
@@ -23,49 +24,58 @@ const formatDateForSearch = (datum) =>
   datum ? DateTime.fromSQL(datum).toFormat('yyyy.LL.dd') : ''
 
 const buildOptions = async ({ store, cb, val }) => {
-  const arts = await dexie.arts
-    .filter((value) => totalFilter({ value, store, table: 'art' }))
-    .toArray()
+  const arts = await collectionFromTable({
+    table: 'art',
+    where: addTotalCriteriaToWhere({ table: 'art', store }),
+  }).toArray()
   const artsSorted = await artsSortedFromArts(arts)
 
-  const events = await dexie.events
-    .filter((value) => totalFilter({ value, store, table: 'event' }))
-    .toArray()
+  const events = await collectionFromTable({
+    table: 'event',
+    where: addTotalCriteriaToWhere({ table: 'event', store }),
+  }).toArray()
   const eventsSorted = events.sort(eventSort)
 
-  const gartens = await dexie.gartens
-    .filter((value) => totalFilter({ value, store, table: 'garten' }))
-    .toArray()
+  const gartens = await collectionFromTable({
+    table: 'garten',
+    where: addTotalCriteriaToWhere({ table: 'garten', store }),
+  }).toArray()
   const gartensSorted = await gartensSortedFromGartens(gartens)
 
-  const herkunfts = await dexie.herkunfts
-    .filter((value) => totalFilter({ value, store, table: 'herkunft' }))
-    .toArray()
+  const herkunfts = await collectionFromTable({
+    table: 'herkunft',
+    where: addTotalCriteriaToWhere({ table: 'herkunft', store }),
+  }).toArray()
   const herkunftsSorted = herkunfts.sort(herkunftSort)
 
-  const kulturs = await dexie.kulturs
-    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-    .toArray()
+  const kulturs = await collectionFromTable({
+    table: 'kultur',
+    where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+  }).toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
 
-  const lieferungs = await dexie.lieferungs
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const lieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({ table: 'lieferung', store }),
+  }).toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)
 
-  const persons = await dexie.persons
-    .filter((value) => totalFilter({ value, store, table: 'person' }))
-    .toArray()
+  const persons = await collectionFromTable({
+    table: 'person',
+    where: addTotalCriteriaToWhere({ table: 'person', store }),
+  }).toArray()
   const personsSorted = persons.sort(personSort)
 
-  const sammlungs = await dexie.sammlungs
-    .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
-    .toArray()
+  const sammlungs = await collectionFromTable({
+    table: 'sammlung',
+    where: addTotalCriteriaToWhere({ table: 'sammlung', store }),
+  }).toArray()
   const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
 
-  const zaehlungs = await dexie.zaehlungs
-    .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
-    .toArray()
+  const zaehlungs = await collectionFromTable({
+    table: 'zaehlung',
+    where: addTotalCriteriaToWhere({ table: 'zaehlung', store }),
+  }).toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
 
   const options = []
