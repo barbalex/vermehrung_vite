@@ -22,7 +22,6 @@ import teilkulturSort from '../../../../utils/teilkulturSort'
 import personSort from '../../../../utils/personSort'
 import constants from '../../../../utils/constants'
 import { dexie, KulturOption } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -76,12 +75,13 @@ const EventForm = ({
         where: addTotalCriteriaToWhere({
           table: 'teilkultur',
           store,
-          ...(showFilter && { where: { kultur_id: kulturId } }),
+          where: showFilter ? { where: { kultur_id: kulturId } } : {},
         }),
       }).toArray(),
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ store, table: 'person' }),
+      }).toArray(),
       dexie.kultur_options.get(
         row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
       ),

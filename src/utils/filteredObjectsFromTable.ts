@@ -9,7 +9,7 @@ import collectionFromTable from './collectionFromTable'
 const filteredObjectsFromTable = async ({
   store,
   table,
-  count,
+  count = false,
   filterByHierarchy = true,
 }) => {
   if (!table) throw `no table passed`

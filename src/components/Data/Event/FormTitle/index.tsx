@@ -8,29 +8,41 @@ import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
   const { kulturIdInActiveNodeArray } = store
 
-  const totalCount = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+  const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'event',
     })
 
-    return await dexie.events
-      .filter((value) =>
-        totalFilter({ value, store, table: 'event', conditionAdder }),
-      )
-      .count()
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
+          table: 'event',
+          where: addTotalCriteriaToWhere({ store, table: 'event' }),
+        }),
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'event', count: true }),
+    ])
+
+    return { totalCount, filteredCount }
   }, [
     store.filter.event,
+    Object.values(store.filter.event),
     store.event_initially_queried,
     kulturIdInActiveNodeArray,
   ])
 
-  const filteredCount = store.eventsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

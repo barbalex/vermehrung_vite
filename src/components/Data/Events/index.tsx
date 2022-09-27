@@ -19,7 +19,10 @@ import { dexie, Event } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import totalFilter from '../../../utils/totalFilter'
 import hierarchyFilterForTable from '../../../utils/hierarchyFilterForTable'
+import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
 import Spinner from '../../shared/Spinner'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
+import collectionFromTable from '../../../utils/collectionFromTable'
 
 const Container = styled.div`
   height: 100%;
@@ -59,17 +62,18 @@ const Events = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'event',
     })
     const [events, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'event' }),
-      dexie.events
-        .filter((value) =>
-          totalFilter({ value, store, table: 'event', conditionAdder }),
-        )
-        .count(),
+      conditionAdder(
+        collectionFromTable({
+          table: 'event',
+          where: addTotalCriteriaToWhere({ store, table: 'event' }),
+        }),
+      ).count(),
     ])
 
     const eventsSorted = events.sort(eventSort)
