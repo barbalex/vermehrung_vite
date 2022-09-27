@@ -1,13 +1,14 @@
 import format from 'date-fns/format'
 
 import exists from '../../../../../../utils/exists'
-import kultursSortedFromKulturs from '../../../../../../utils/kultursSortedFromKulturs'
 import eventSort from '../../../../../../utils/eventSort'
 import lieferungSort from '../../../../../../utils/lieferungSort'
 import teilkulturSort from '../../../../../../utils/teilkulturSort'
 import zaehlungSort from '../../../../../../utils/zaehlungSort'
 import { dexie } from '../../../../../../dexieClient'
 import totalFilter from '../../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../utils/addTotalCriteriaToWhere'
 
 const createMessageFunctions = async ({ kulturId, store }) => {
   const year = +format(new Date(), 'yyyy')
@@ -15,35 +16,55 @@ const createMessageFunctions = async ({ kulturId, store }) => {
   const startNextYear = `${year + 1}-01-01`
   const now = new Date()
 
-  const events = await dexie.events
-    .where({ kultur_id: kulturId })
-    .filter((value) => totalFilter({ value, store, table: 'event' }))
-    .toArray()
+  const events = await collectionFromTable({
+    table: 'event',
+    where: addTotalCriteriaToWhere({
+      table: 'event',
+      store,
+      where: { kultur_id: kulturId },
+    }),
+  }).toArray()
   const eventsSorted = events.sort(eventSort)
 
   const kultur = await dexie.kulturs.get(kulturId)
 
-  const auslieferungs = await dexie.lieferungs
-    .where({ von_kultur_id: kulturId })
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const auslieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { von_kultur_id: kulturId },
+    }),
+  }).toArray()
   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
-  const anlieferungs = await dexie.lieferungs
-    .where({ nach_kultur_id: kulturId })
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const anlieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { nach_kultur_id: kulturId },
+    }),
+  }).toArray()
   const anlieferungsSorted = anlieferungs.sort(lieferungSort)
 
-  const teilkulturs = await dexie.teilkulturs
-    .where({ kultur_id: kulturId })
-    .filter((value) => totalFilter({ value, store, table: 'teilkultur' }))
-    .toArray()
+  const teilkulturs = await collectionFromTable({
+    table: 'teilkultur',
+    where: addTotalCriteriaToWhere({
+      table: 'teilkultur',
+      store,
+      where: { kultur_id: kulturId },
+    }),
+  }).toArray()
   const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
-  const zaehlungs = await dexie.zaehlungs
-    .where({ kultur_id: kulturId })
-    .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
-    .toArray()
+  const zaehlungs = await collectionFromTable({
+    table: 'zaehlung',
+    where: addTotalCriteriaToWhere({
+      table: 'zaehlung',
+      store,
+      where: { kultur_id: kulturId },
+    }),
+  }).toArray()
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
   const idsOfZaehlungs = zaehlungs.map((z) => z.id)
 

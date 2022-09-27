@@ -16,6 +16,8 @@ import {
   Herkunft,
 } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 /**
  * this function cann be used from higher up
@@ -61,10 +63,14 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 2. Get Zählungen
-  const zaehlungs = await dexie.zaehlungs
-    .where({ kultur_id })
-    .filter((value) => totalFilter({ value, store, table: 'zaehlung' }))
-    .toArray()
+  const zaehlungs = await collectionFromTable({
+    table: 'zaehlung',
+    where: addTotalCriteriaToWhere({
+      table: 'zaehlung',
+      store,
+      where: { kultur_id },
+    }),
+  }).toArray()
   const idsOfZaehlungs = zaehlungs.map((z) => z.id)
   const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
   const zaehlungen = await Promise.all(
@@ -158,10 +164,14 @@ const buildExceljsWorksheets = async ({
     }
   }
   // 4. Get An-Lieferungen
-  const anlieferungs = await dexie.lieferungs
-    .where({ nach_kultur_id: kultur_id })
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const anlieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { nach_kultur_id: kultur_id },
+    }),
+  }).toArray()
   const lieferungsSorted = anlieferungs.sort(lieferungSort)
   const anlieferungData = await Promise.all(
     lieferungsSorted.map(async (l: Lieferung) => {
@@ -234,10 +244,14 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 5. Get Aus-Lieferungen
-  const auslieferungs = await dexie.lieferungs
-    .where({ von_kultur_id: kultur_id })
-    .filter((value) => totalFilter({ value, store, table: 'lieferung' }))
-    .toArray()
+  const auslieferungs = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { von_kultur_id: kultur_id },
+    }),
+  }).toArray()
   const auslieferungsSorted = auslieferungs.sort(lieferungSort)
   const auslieferungen = await Promise.all(
     auslieferungsSorted.map(async (l: Lieferung) => {
@@ -310,10 +324,14 @@ const buildExceljsWorksheets = async ({
     })
   }
   // 6. Get Events
-  const events = await dexie.events
-    .where({ kultur_id })
-    .filter((value) => totalFilter({ value, store, table: 'event' }))
-    .toArray()
+  const events = await collectionFromTable({
+    table: 'event',
+    where: addTotalCriteriaToWhere({
+      table: 'event',
+      store,
+      where: { kultur_id },
+    }),
+  }).toArray()
   const eventsSorted = events.sort(eventSort)
   const eventsData = await Promise.all(
     eventsSorted.map(async (e) => {
