@@ -15,6 +15,8 @@ import constants from '../../../../../../../utils/constants'
 import zaehlungSort from '../../../../../../../utils/zaehlungSort'
 import ErrorBoundary from '../../../../../../shared/ErrorBoundary'
 import { dexie } from '../../../../../../../dexieClient'
+import collectionFromTable from '../../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   display: flex;
@@ -88,10 +90,18 @@ const PrognoseMenu = ({
       // we have both values. Let's go on
       // check if zaehlung with date of 15.09. of year exist
       const dateOfZaehlung = `${yearToUse}-09-15`
-      const existingZaehlungData = await dexie.zaehlungs
-        .where({ kultur_id: kulturId, datum: dateOfZaehlung })
-        .filter((z) => z.prognose === true && z._deleted === false)
-        .toArray()
+      const existingZaehlungData = await collectionFromTable({
+        table: 'zaehlung',
+        where: addTotalCriteriaToWhere({
+          table: 'zaehlung',
+          store,
+          where: {
+            kultur_id: kulturId,
+            datum: dateOfZaehlung,
+            prognose_indexable: 1,
+          },
+        }),
+      }).toArray()
       const existingZaehlungDataSorted = existingZaehlungData.sort(zaehlungSort)
       const existingZaehlung = existingZaehlungDataSorted?.[0]
       // if not: create it first
@@ -110,9 +120,14 @@ const PrognoseMenu = ({
       // fetch teilzaehlungen with zaehlung_id === newZaehlungId, then update that
       // if inserting there will be two teilzaehlungs because of server trigger
       const interval = setInterval(async () => {
-        const newTzs = await dexie.teilzaehlungs
-          .where({ zaehlung_id: zaehlungId })
-          .toArray()
+        const newTzs = await collectionFromTable({
+          table: 'teilzaehlung',
+          where: addTotalCriteriaToWhere({
+            table: 'teilzaehlung',
+            store,
+            where: { zaehlung_id: zaehlungId },
+          }),
+        }).toArray()
         const newTz = newTzs?.[0]
         if (newTz) {
           clearInterval(interval)

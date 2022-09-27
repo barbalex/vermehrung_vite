@@ -35,10 +35,14 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
       const herkunft = await kultur.herkunft()
       const garten = await kultur.garten()
       const garten_label = await garten.label()
-      const zaehlungsOfKultur = await dexie.zaehlungs
-        .where({ kultur_id: kultur.id })
-        .filter((k) => k._deleted === false)
-        .toArray()
+      const zaehlungsOfKultur = await collectionFromTable({
+        table: 'zaehlung',
+        where: addTotalCriteriaToWhere({
+          table: 'zaehlung',
+          store,
+          where: { kultur_id: kultur.id },
+        }),
+      }).toArray()
       const idsOfZaehlungsOfKultur = zaehlungsOfKultur.map((z) => z.id)
       const tzsWithAnzahlPflanzen = await dexie.teilzaehlungs
         .where('zaehlung_id')
@@ -95,26 +99,26 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
             (anzahl_mutterpflanzen ?? 0)
           : ''
 
-      const ownAusLieferungsGeplant = await dexie.lieferungs
-        .where({ von_kultur_id: kultur.id })
-        .filter(
-          (l) =>
-            l._deleted === false &&
-            l.geplant === true &&
-            !!l.datum &&
-            exists(l.anzahl_pflanzen),
-        )
+      const ownAusLieferungsGeplant = await collectionFromTable({
+        table: 'lieferung',
+        where: addTotalCriteriaToWhere({
+          table: 'lieferung',
+          store,
+          where: { von_kultur_id: kultur.id, geplant_indexable: 1 },
+        }),
+      })
+        .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))
         .toArray()
 
-      const ownAusLieferungenUnsorted = await dexie.lieferungs
-        .where({ von_kultur_id: kultur.id })
-        .filter(
-          (l) =>
-            l._deleted === false &&
-            l.geplant === false &&
-            !!l.datum &&
-            exists(l.anzahl_pflanzen),
-        )
+      const ownAusLieferungenUnsorted = await collectionFromTable({
+        table: 'lieferung',
+        where: addTotalCriteriaToWhere({
+          table: 'lieferung',
+          store,
+          where: { von_kultur_id: kultur.id, geplant_indexable: 0 },
+        }),
+      })
+        .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))
         .toArray()
 
       const ownAusLieferungen = ownAusLieferungenUnsorted.sort(lieferungSort)
@@ -167,15 +171,15 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
             (auslSinceAnzahlMutterpflanzen ?? 0)
           : ''
 
-      const ownAnLieferungenUnsorted = await dexie.lieferungs
-        .where({ nach_kultur_id: kultur.id })
-        .filter(
-          (l) =>
-            l._deleted === false &&
-            l.geplant === false &&
-            !!l.datum &&
-            exists(l.anzahl_pflanzen),
-        )
+      const ownAnLieferungenUnsorted = await collectionFromTable({
+        table: 'lieferung',
+        where: addTotalCriteriaToWhere({
+          table: 'lieferung',
+          store,
+          where: { nach_kultur_id: kultur.id, geplant_indexable: 0 },
+        }),
+      })
+        .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))
         .toArray()
       const ownAnLieferungen = ownAnLieferungenUnsorted.sort(lieferungSort)
 
