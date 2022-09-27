@@ -1,4 +1,6 @@
-import { dexie } from '../dexieClient' 
+import { dexie } from '../dexieClient'
+import collectionFromTable from './collectionFromTable'
+import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 
 const hierarchyConditionAdderForTable = async ({ store, table }) => {
   const {
@@ -23,12 +25,18 @@ const hierarchyConditionAdderForTable = async ({ store, table }) => {
           collection.and('id').equals(activeSammlung.herkunft_id)
       }
       if (artIdInActiveNodeArray) {
-        const sammlungsOfArt = await dexie.sammlungs
-          .where({
-            art_id:
-              artIdInActiveNodeArray ?? '99999999-9999-9999-9999-999999999999',
-          })
-          .toArray()
+        const sammlungsOfArt = await collectionFromTable({
+          table: 'sammlung',
+          where: addTotalCriteriaToWhere({
+            table: 'sammlung',
+            store,
+            where: {
+              art_id:
+                artIdInActiveNodeArray ??
+                '99999999-9999-9999-9999-999999999999',
+            },
+          }),
+        }).toArray()
         return (collection) => {
           const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
 

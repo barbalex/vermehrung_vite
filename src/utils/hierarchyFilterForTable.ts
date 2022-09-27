@@ -1,5 +1,6 @@
 import { dexie } from '../dexieClient'
-import totalFilter from './totalFilter'
+import collectionFromTable from './collectionFromTable'
+import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 
 const hierarchyFilterForTable = async ({ store, table }) => {
   const {
@@ -11,7 +12,7 @@ const hierarchyFilterForTable = async ({ store, table }) => {
     sammelLieferungIdInActiveNodeArray,
     sammlungIdInActiveNodeArray,
   } = store
-  const { activeNodeArray } = store.tree 
+  const { activeNodeArray } = store.tree
 
   switch (table) {
     case 'herkunft': {
@@ -23,12 +24,14 @@ const hierarchyFilterForTable = async ({ store, table }) => {
         return (s) => s.id === activeSammlung.herkunft_id
       }
       if (artIdInActiveNodeArray) {
-        const sammlungsOfArt = await dexie.sammlungs
-          .where({
-            art_id: artIdInActiveNodeArray,
-          })
-          .filter((value) => totalFilter({ value, store, table: 'sammlung' }))
-          .toArray()
+        const sammlungsOfArt = await collectionFromTable({
+          table: 'sammlung',
+          where: addTotalCriteriaToWhere({
+            table: 'sammlung',
+            store,
+            where: { art_id: artIdInActiveNodeArray },
+          }),
+        }).toArray()
         const herkunftIds = sammlungsOfArt.map((e) => e.herkunft_id)
 
         return (s) => herkunftIds.includes(s.id)
