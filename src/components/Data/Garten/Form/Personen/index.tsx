@@ -14,8 +14,8 @@ import gvsSortByPerson from '../../../../../utils/gvsSortByPerson'
 import personSort from '../../../../../utils/personSort'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import constants from '../../../../../utils/constants'
-import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -75,13 +75,18 @@ const GartenPersonen = ({ garten }) => {
 
   const data = useLiveQuery(async () => {
     const [persons, gvs] = await Promise.all([
-      dexie.persons
-        .filter((value) => totalFilter({ value, store, table: 'person' }))
-        .toArray(),
-      dexie.gvs
-        .where({ garten_id: garten.id })
-        .filter((g) => g._deleted === false)
-        .toArray(),
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ table: 'person', store }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'gv',
+        where: addTotalCriteriaToWhere({
+          table: 'gv',
+          store,
+          where: { garten_id: garten.id },
+        }),
+      }).toArray(),
     ])
 
     const gvsSorted = await gvsSortByPerson(gvs)
