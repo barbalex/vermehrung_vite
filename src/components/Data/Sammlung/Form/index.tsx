@@ -121,22 +121,6 @@ const SammlungForm = ({
       }),
     )
 
-    if (!showFilter && row.nr) {
-      const otherHerkunftsWithSameNr = await dexie.herkunfts
-        .filter(
-          (h) => h._deleted === false && h.nr === row.nr && h.id !== row.id,
-        )
-        .toArray()
-      if (otherHerkunftsWithSameNr.length > 0) {
-        setError({
-          path: 'sammlung.nr',
-          value: `Diese Nummer wird ${
-            otherHerkunftsWithSameNr.length + 1
-          } mal verwendet. Sie sollte aber über alle Sammlungen eindeutig sein`,
-        })
-      }
-    }
-
     return { personWerte, herkunftWerte, artWerte }
   }, [
     filter.art._deleted,
@@ -146,9 +130,7 @@ const SammlungForm = ({
     filter.sammlung._deleted,
     row.art,
     row.herkunft,
-    row.nr,
     row.person,
-    setError,
     showFilter,
   ])
 
@@ -162,9 +144,31 @@ const SammlungForm = ({
     setActiveConflict(null)
   }, [id, setActiveConflict])
 
+  // catch multiple nr's
   useEffect(() => {
-    unsetError('sammlung')
-  }, [id, unsetError])
+    if (showFilter) return
+    if (!row.nr && errors.sammlung.nr) {
+      return unsetError('sammlung')
+    }
+    if (!row.nr) return
+    dexie.sammlungs
+      .where({ _deleted_indexable: 0 })
+      .filter((h) => h.nr === row.nr && h.id !== row.id)
+      .toArray()
+      .then((otherSammlungsWithSameNr) => {
+        if (otherSammlungsWithSameNr.length > 0) {
+          setError({
+            table: 'sammlung',
+            field: 'nr',
+            value: `Diese Nummer wird ${
+              otherSammlungsWithSameNr.length + 1
+            } mal verwendet. Sie sollte aber über alle Sammlungen eindeutig sein`,
+          })
+        } else {
+          unsetError('sammlung')
+        }
+      })
+  }, [showFilter, row.nr, row.id, setError, unsetError, errors.sammlung.nr])
 
   const saveToDb = useCallback(
     (event) => {
@@ -218,7 +222,7 @@ const SammlungForm = ({
                 name="_deleted"
                 value={row._deleted}
                 saveToDb={saveToDb}
-                error={errors?.sammlung?._deleted}
+                error={!showFilter && errors?.sammlung?._deleted}
               />
             ) : (
               <Checkbox2States
@@ -227,7 +231,7 @@ const SammlungForm = ({
                 name="_deleted"
                 value={row._deleted}
                 saveToDb={saveToDb}
-                error={errors?.sammlung?._deleted}
+                error={!showFilter && errors?.sammlung?._deleted}
               />
             )}
           </>
@@ -238,7 +242,7 @@ const SammlungForm = ({
           label="Nr."
           value={row.nr}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.nr}
+          error={!showFilter && errors?.sammlung?.nr}
           type="text"
         />
         <Select
@@ -249,7 +253,7 @@ const SammlungForm = ({
           label="Art"
           options={artWerte}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.art_id}
+          error={!showFilter && errors?.sammlung?.art_id}
         />
         <Select
           key={`${row.id}${row.herkunft_id}herkunft_id`}
@@ -259,7 +263,7 @@ const SammlungForm = ({
           label="Herkunft"
           options={herkunftWerte}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.herkunft_id}
+          error={!showFilter && errors?.sammlung?.herkunft_id}
         />
         <Select
           key={`${row.id}${row.person_id}person_id`}
@@ -269,7 +273,7 @@ const SammlungForm = ({
           label="Person"
           options={personWerte}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.person_id}
+          error={!showFilter && errors?.sammlung?.person_id}
         />
         <Date
           key={`${row.id}datum`}
@@ -277,7 +281,7 @@ const SammlungForm = ({
           label="Datum"
           value={row.datum}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.datum}
+          error={!showFilter && errors?.sammlung?.datum}
         />
         <TextField
           key={`${row.id}anzahl_pflanzen`}
@@ -285,7 +289,7 @@ const SammlungForm = ({
           label="Anzahl Pflanzen"
           value={row.anzahl_pflanzen}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.anzahl_pflanzen}
+          error={!showFilter && errors?.sammlung?.anzahl_pflanzen}
           type="number"
         />
         <FieldRow>
@@ -295,7 +299,7 @@ const SammlungForm = ({
             label="Gramm Samen"
             value={row.gramm_samen}
             saveToDb={saveToDb}
-            error={errors?.sammlung?.gramm_samen}
+            error={!showFilter && errors?.sammlung?.gramm_samen}
             type="number"
           />
           <TextField
@@ -304,7 +308,7 @@ const SammlungForm = ({
             label={`Andere Menge (z.B. "3 Zwiebeln")`}
             value={row.andere_menge}
             saveToDb={saveToDb}
-            error={errors?.sammlung?.andere_menge}
+            error={!showFilter && errors?.sammlung?.andere_menge}
             type="text"
           />
         </FieldRow>
@@ -315,7 +319,7 @@ const SammlungForm = ({
             label="von Anzahl Individuen"
             value={row.von_anzahl_individuen}
             saveToDb={saveToDb}
-            error={errors?.sammlung?.von_anzahl_individuen}
+            error={!showFilter && errors?.sammlung?.von_anzahl_individuen}
             type="number"
           />
           <div>
@@ -338,7 +342,7 @@ const SammlungForm = ({
               name="geplant"
               value={row.geplant}
               saveToDb={saveToDb}
-              error={errors?.sammlung?.geplant}
+              error={!showFilter && errors?.sammlung?.geplant}
             />
           ) : (
             <Checkbox2States
@@ -347,7 +351,7 @@ const SammlungForm = ({
               name="geplant"
               value={row.geplant}
               saveToDb={saveToDb}
-              error={errors?.sammlung?.geplant}
+              error={!showFilter && errors?.sammlung?.geplant}
             />
           )}
           <div>
@@ -367,7 +371,7 @@ const SammlungForm = ({
           label="Bemerkungen"
           value={row.bemerkungen}
           saveToDb={saveToDb}
-          error={errors?.sammlung?.bemerkungen}
+          error={!showFilter && errors?.sammlung?.bemerkungen}
           multiLine
         />
         {online && !showFilter && row?._conflicts?.map && (

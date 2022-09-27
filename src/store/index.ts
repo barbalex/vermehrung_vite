@@ -209,7 +209,8 @@ const myTypes = types
               }
               // do not add a notification: show this response.error below the field
               self.setError({
-                path: `${revertTable}.${revertField}`,
+                table: revertTable,
+                field: revertField,
                 value: message,
               })
               console.log('a unique constraint was violated')
@@ -219,7 +220,8 @@ const myTypes = types
               return
             } else {
               self.setError({
-                path: `${revertTable}.${revertField}`,
+                table: revertTable,
+                field: revertField,
                 value: response.error.message,
               })
               return self.addNotification({
@@ -302,8 +304,11 @@ const myTypes = types
       setShowQueuedQueries(val) {
         self.showQueuedQueries = val
       },
-      setError({ path, value }) {
-        set(self.errors, path, value)
+      setError({ table, field, value }) {
+        // need to replace now or form will not rerender
+        const now = { ...self.errors?.[table] }
+        now[field] = value
+        self.errors[table] = now
       },
       unsetError(path) {
         self.errors[path] = {}
