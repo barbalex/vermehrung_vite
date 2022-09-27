@@ -4656,10 +4656,10 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(48).stores({
+    this.version(50).stores({
       herkunfts: 'id, nr, _deleted_indexable',
       sammlungs:
-        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+herkunft_id]',
+        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+herkunft_id], [nr+_deleted_indexable]',
       lieferungs:
         'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable, [von_kultur_id+_deleted_indexable], [nach_kultur_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+_deleted_indexable], [von_sammlung_id+_deleted_indexable], [sammel_lieferung_id+_deleted_indexable], [art_id+nach_ausgepflanzt_indexable+geplant_indexable+_deleted_indexable]',
       arts: 'id, _deleted_indexable',
@@ -4679,7 +4679,7 @@ export class MySubClassedDexie extends Dexie {
       sammel_lieferungs:
         'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
       events:
-        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable]',
+        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
       avs: 'id, *art_id, *person_id, _deleted_indexable',
       gvs: 'id, *garten_id, *person_id, _deleted_indexable',
       art_files: 'id, name',

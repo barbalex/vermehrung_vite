@@ -15,6 +15,8 @@ import gvsSortByGarten from '../../../../../utils/gvsSortByGarten'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
 import totalFilter from '../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -73,9 +75,14 @@ const PersonArten = ({ person }) => {
   )
 
   const data = useLiveQuery(async () => {
-    const gvs = await dexie.gvs.where({person_id: person.id})
-      .filter((g) => g._deleted === false )
-      .toArray()
+    const gvs = await collectionFromTable({
+      table: 'gv',
+      where: addTotalCriteriaToWhere({
+        table: 'gv',
+        store,
+        where: { person_id: person.id },
+      }),
+    }).toArray()
     const gvsSorted = await gvsSortByGarten(gvs)
     const gvGartenIds = gvs.map((v) => v.garten_id)
 

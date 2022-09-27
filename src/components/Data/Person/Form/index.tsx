@@ -15,7 +15,8 @@ import Gaerten from './Gaerten'
 import ConflictList from '../../../shared/ConflictList'
 import userRoleSort from '../../../../utils/userRoleSort'
 import { dexie } from '../../../../dexieClient'
-
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 const Container = styled.div`
   padding: 10px;
   height: 100%;
@@ -68,9 +69,15 @@ const Person = ({
       return unsetError('person')
     }
     if (!row.nr) return
-    dexie.persons
-      .where({ _deleted_indexable: 0, aktiv_indexable: 1 })
-      .filter((h) => h.nr === row.nr && h.id !== row.id)
+    collectionFromTable({
+      table: 'person',
+      where: addTotalCriteriaToWhere({
+        table: 'person',
+        store,
+        where: { nr: row.nr },
+      }),
+    })
+      .filter((h) => h.id !== row.id)
       .toArray()
       .then((otherPersonsWithSameNr) => {
         if (otherPersonsWithSameNr.length > 0) {
@@ -85,7 +92,15 @@ const Person = ({
           unsetError('person')
         }
       })
-  }, [showFilter, row.nr, row.id, setError, unsetError, errors.person.nr])
+  }, [
+    showFilter,
+    row.nr,
+    row.id,
+    setError,
+    unsetError,
+    errors.person.nr,
+    store,
+  ])
 
   const saveToDb = useCallback(
     (event) => {
