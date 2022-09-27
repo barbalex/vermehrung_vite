@@ -7,6 +7,10 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import { dexie } from '../../../../dexieClient'
 import totalFilter from '../../../../utils/totalFilter'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const ZaehlungFormTitleChooser = ({
   row,
@@ -15,24 +19,34 @@ const ZaehlungFormTitleChooser = ({
   setShowHistory,
 }) => {
   const store = useContext(StoreContext)
-  const { kulturIdInActiveNodeArray, hierarchyFilterForZaehlung } = store
+  const { kulturIdInActiveNodeArray } = store
 
-  const totalCount = useLiveQuery(
-    async () =>
-      await dexie.zaehlungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'zaehlung',
-            conditionAdder: hierarchyFilterForZaehlung,
-          }),
-        )
-        .count(),
-    [kulturIdInActiveNodeArray, store],
-  )
+  const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyConditionAdderForTable({
+      store,
+      table: 'zaehlung',
+    })
 
-  const filteredCount = store.zaehlungsFilteredCount ?? '...'
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
+          table: 'zaehlung',
+          where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
+        }),
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'zaehlung', count: true }),
+    ])
+
+    return { totalCount, filteredCount }
+  }, [
+    kulturIdInActiveNodeArray,
+    store,
+    Object.values(store.filter.zaehlung),
+    store.zaehlung_initially_queried,
+  ])
+
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

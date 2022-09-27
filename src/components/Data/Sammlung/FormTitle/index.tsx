@@ -5,9 +5,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import { dexie } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../../utils/hierarchyFilterForTable'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
+import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const SammlungFormTitleChooser = ({
   row,
@@ -22,30 +23,33 @@ const SammlungFormTitleChooser = ({
     personIdInActiveNodeArray,
   } = store
 
-  const totalCount = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+  const data = useLiveQuery(async () => {
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'sammlung',
     })
 
-    return await dexie.sammlungs
-      .filter((value) =>
-        totalFilter({
-          value,
-          store,
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
           table: 'sammlung',
-          conditionAdder,
+          where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
         }),
-      )
-      .count()
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'sammlung', count: true }),
+    ])
+
+    return { totalCount, filteredCount }
   }, [
+    Object.values(store.filter.sammlung),
     store,
     artIdInActiveNodeArray,
     herkunftIdInActiveNodeArray,
     personIdInActiveNodeArray,
   ])
 
-  const filteredCount = store.sammlungsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (
