@@ -3,7 +3,8 @@ import buildExceljsWorksheetsForKultur from '../../../Kultur/FormTitle/buildExce
 import removeMetadataFromDataset from '../../../../../utils/removeMetadataFromDataset'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 /**
  * this function cann be used from higher up
@@ -45,10 +46,14 @@ const buildExceljsWorksheetsForDaten = async ({
     data: [newGarten],
   })
   // 2. Get Kulturen
-  const kultursOfGarten = await dexie.kulturs
-    .where({ garten_id: garten_id })
-    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
-    .toArray()
+  const kultursOfGarten = await collectionFromTable({
+    table: 'kultur',
+    where: addTotalCriteriaToWhere({
+      table: 'kultur',
+      store,
+      where: { garten_id },
+    }),
+  }).toArray()
   const kultursOfGartenSorted = await kultursSortedFromKulturs(kultursOfGarten)
   const kulturData = await Promise.all(
     kultursOfGartenSorted.map(async (kultur) => {
