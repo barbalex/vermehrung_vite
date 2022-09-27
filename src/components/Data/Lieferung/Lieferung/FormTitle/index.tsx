@@ -5,9 +5,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../../storeContext'
 import FilterTitle from '../../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
-import hierarchyFilterForTable from '../../../../../utils/hierarchyFilterForTable'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
+import hierarchyConditionAdderForTable from '../../../../../utils/hierarchyConditionAdderForTable'
+import filteredObjectsFromTable from '../../../../../utils/filteredObjectsFromTable'
 
 const LieferungTitleChooser = ({
   row,
@@ -25,24 +26,24 @@ const LieferungTitleChooser = ({
   } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyFilterForTable({
+    const conditionAdder = await hierarchyConditionAdderForTable({
       store,
       table: 'lieferung',
     })
-    const [totalCount] = Promise.all([
-      await dexie.lieferungs
-        .filter((value) =>
-          totalFilter({
-            value,
-            store,
-            table: 'lieferung',
-            conditionAdder,
-          }),
-        )
-        .count(),
+
+    const [totalCount, filteredCount] = await Promise.all([
+      conditionAdder(
+        collectionFromTable({
+          table: 'lieferung',
+          where: addTotalCriteriaToWhere({ store, table: 'lieferung' }),
+        }),
+      ).count(),
+      filteredObjectsFromTable({ store, table: 'lieferung', count: true }),
     ])
-    return { totalCount }
+
+    return { totalCount, filteredCount }
   }, [
+    Object.values(store.filter.lieferung),
     store.lieferung_initially_queried,
     kulturIdInActiveNodeArray,
     sammelLieferungIdInActiveNodeArray,
@@ -50,8 +51,8 @@ const LieferungTitleChooser = ({
     sammlungIdInActiveNodeArray,
   ])
 
-  const totalCount = data?.totalCount
-  const filteredCount = store.lieferungsFilteredCount ?? '...'
+  const totalCount = data?.totalCount ?? '...'
+  const filteredCount = data?.filteredCount ?? '...'
 
   if (showFilter) {
     return (

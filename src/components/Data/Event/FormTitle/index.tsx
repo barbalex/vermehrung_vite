@@ -32,7 +32,6 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
 
     return { totalCount, filteredCount }
   }, [
-    store.filter.event,
     Object.values(store.filter.event),
     store.event_initially_queried,
     kulturIdInActiveNodeArray,
