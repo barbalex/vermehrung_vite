@@ -8,15 +8,18 @@ import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKult
 import zaehlungSort from '../../../../../utils/zaehlungSort'
 import lieferungSort from '../../../../../utils/lieferungSort'
 import totalFilter from '../../../../../utils/totalFilter'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 import { dexie, Kultur } from '../../../../../dexieClient'
 
 const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
   store,
   workbook,
 }) => {
-  const gartens = await dexie.gartens
-    .filter((value) => totalFilter({ value, store, table: 'garten' }))
-    .toArray()
+  const gartens = await collectionFromTable({
+    table: 'garten',
+    where: addTotalCriteriaToWhere({ table: 'garten', store }),
+  }).toArray()
   const gartenIds = gartens.map((g) => g.id)
   const kulturs = await dexie.kulturs
     .where('garten_id')
@@ -55,10 +58,14 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
       const ownZaehlungenSorted = ownZaehlungen.sort(zaehlungSort)
       const lastZaehlung = ownZaehlungenSorted[ownZaehlungenSorted.length - 1]
       const lZTeilzaehlungs = lastZaehlung
-        ? await dexie.teilzaehlungs
-            .where({ zaehlung_id: lastZaehlung.id })
-            .filter((t) => t._deleted === false)
-            .toArray()
+        ? await collectionFromTable({
+            table: 'teilzaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'teilzaehlung',
+              store,
+              where: { zaehlung_id: lastZaehlung.id },
+            }),
+          }).toArray()
         : []
 
       // danger: sumBy returns 0 when field was undefined!
