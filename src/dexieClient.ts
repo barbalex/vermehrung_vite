@@ -130,9 +130,7 @@ export class Herkunft implements IHerkunft {
     this._conflicts = _conflicts ?? null
   }
 
-  async person(){
-    
-  }
+  async person() {}
 
   label() {
     // only show lokalname if exist
@@ -1639,13 +1637,13 @@ export class Zaehlung implements IZaehlung {
 
   async teilzaehlungs({ store }) {
     return await collectionFromTable({
-      table: 'teilzahlung',
+      table: 'teilzaehlung',
       where: addTotalCriteriaToWhere({
         store,
-        table: 'teilzahlung',
+        table: 'teilzaehlung',
         where: { zaehlung_id: this.id },
       }),
-    })
+    }).toArray()
   }
 
   async kulturOption() {
