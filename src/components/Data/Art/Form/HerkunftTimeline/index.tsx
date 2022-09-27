@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import IconButton from '@mui/material/IconButton'
-import uniq from 'lodash/uniq'
 import { motion, useAnimation } from 'framer-motion'
 import { useLiveQuery } from 'dexie-react-hooks'
 
@@ -12,6 +11,8 @@ import herkunftSort from '../../../../../utils/herkunftSort'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
 import Spinner from '../../../../shared/Spinner'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -40,10 +41,14 @@ const Title = styled.div`
 
 const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
   const herkunfts = useLiveQuery(async () => {
-    const sammlungs = await dexie.sammlungs
-      .where({ art_id: artId })
-      .filter((s) => s._deleted === false && !!s.herkunft_id)
-      .toArray()
+    const sammlungs = await collectionFromTable({
+      table: 'sammlung',
+      where: addTotalCriteriaToWhere({
+        table: 'sammlung',
+        store,
+        where: { art_id: artId },
+      }),
+    }).toArray()
     const herkunftIds = [...new Set(sammlungs.map((s) => s.herkunft_id))]
     const herkunfts = await dexie.herkunfts
       .where('id')

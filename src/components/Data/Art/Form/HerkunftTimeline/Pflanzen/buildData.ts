@@ -4,12 +4,18 @@ import max from 'lodash/max'
 
 import { dexie } from '../../../../../../dexieClient'
 import exists from '../../../../../../utils/exists'
+import collectionFromTable from '../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../utils/addTotalCriteriaToWhere'
 
 const buildData = async ({ artId, herkunftId }) => {
-  const kultursOfArt = await dexie.kulturs
-    .where({ art_id: artId, herkunft_id: herkunftId })
-    .filter((k) => k._deleted === false && k.aktiv === true)
-    .toArray()
+  const kultursOfArt = await collectionFromTable({
+    table: 'kultur',
+    where: addTotalCriteriaToWhere({
+      table: 'kultur',
+      store,
+      where: { art_id: artId, herkunft_id: herkunftId },
+    }),
+  }).toArray()
   const idsOfKultursOfArt = kultursOfArt.map((k) => k.id)
   const zaehlungsDoneAll = await dexie.zaehlungs
     .where('kultur_id')
@@ -66,25 +72,27 @@ const buildData = async ({ artId, herkunftId }) => {
     (lg) => !zaehlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const sammlungsDone = await dexie.sammlungs
-    .where({ art_id: artId, herkunft_id: herkunftId })
+  const sammlungsDone = await collectionFromTable({
+    table: 'sammlung',
+    where: addTotalCriteriaToWhere({
+      table: 'sammlung',
+      store,
+      where: { art_id: artId, herkunft_id: herkunftId },
+    }),
+  })
     .filter(
-      (s) =>
-        s._deleted === false &&
-        s.geplant === false &&
-        !!s.datum &&
-        exists(s.anzahl_pflanzen),
+      (s) => s.geplant === false && !!s.datum && exists(s.anzahl_pflanzen),
     )
     .toArray()
-  const sammlungsPlannedAll = await dexie.sammlungs
-    .where({ art_id: artId, herkunft_id: herkunftId })
-    .filter(
-      (s) =>
-        s._deleted === false &&
-        s.geplant === true &&
-        !!s.datum &&
-        exists(s.anzahl_pflanzen),
-    )
+  const sammlungsPlannedAll = await collectionFromTable({
+    table: 'sammlung',
+    where: addTotalCriteriaToWhere({
+      table: 'sammlung',
+      store,
+      where: { art_id: artId, herkunft_id: herkunftId },
+    }),
+  })
+    .filter((s) => s.geplant === true && !!s.datum && exists(s.anzahl_pflanzen))
     .toArray()
   const sammlungsPlannedIgnored = sammlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
@@ -94,11 +102,16 @@ const buildData = async ({ artId, herkunftId }) => {
     (lg) => !sammlungsPlannedIgnored.map((l) => l.id).includes(lg.id),
   )
 
-  const allLieferungsDone = await dexie.lieferungs
-    .where({ art_id: artId })
+  const allLieferungsDone = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { art_id: artId },
+    }),
+  })
     .filter(
       (l) =>
-        l._deleted === false &&
         l.nach_ausgepflanzt === true &&
         l.geplant === false &&
         !!l.datum &&
@@ -118,11 +131,16 @@ const buildData = async ({ artId, herkunftId }) => {
     (p, i) => allLieferungsDonePromises[i],
   )
 
-  const allLieferungsPlanned = await dexie.lieferungs
-    .where({ art_id: artId })
+  const allLieferungsPlanned = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({
+      table: 'lieferung',
+      store,
+      where: { art_id: artId },
+    }),
+  })
     .filter(
       (l) =>
-        l._deleted === false &&
         l.nach_ausgepflanzt === true &&
         l.geplant === true &&
         !!l.datum &&
@@ -197,9 +215,15 @@ const buildData = async ({ artId, herkunftId }) => {
         kultursOfArt.map(async (k) => {
           // for every kultur return
           // last zaehlung and whether it is prognose
-          const allZaehlungs = await dexie.zaehlungs
-            .where({ kultur_id: k.id })
-            .filter((z) => z._deleted === false && !!z.datum)
+          const allZaehlungs = await collectionFromTable({
+            table: 'zaehlung',
+            where: addTotalCriteriaToWhere({
+              table: 'zaehlung',
+              store,
+              where: { kultur_id: k.id },
+            }),
+          })
+            .filter((z) => !!z.datum)
             .toArray()
           const idsOfAllZaehlungs = allZaehlungs.map((z) => z.id)
           const tzsOfAllZaehlungs = await dexie.teilzaehlungs
