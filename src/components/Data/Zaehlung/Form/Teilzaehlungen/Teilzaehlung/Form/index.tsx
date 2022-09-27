@@ -26,6 +26,8 @@ import PrognoseMenu from './PrognoseMenu'
 import ErrorBoundary from '../../../../../../shared/ErrorBoundary'
 import exists from '../../../../../../../utils/exists'
 import { dexie } from '../../../../../../../dexieClient'
+import collectionFromTable from '../../../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../../../utils/addTotalCriteriaToWhere'
 
 const FieldContainer = styled.div`
   display: flex;
@@ -93,10 +95,14 @@ const TeilzaehlungForm = ({
 
   const data = useLiveQuery(async () => {
     const [teilkulturs, teilkultur, kulturOption] = await Promise.all([
-      dexie.teilkulturs
-        .where({ kultur_id: kulturId })
-        .filter((t) => t._deleted === false)
-        .toArray(),
+      collectionFromTable({
+        table: 'teilkultur',
+        where: addTotalCriteriaToWhere({
+          table: 'teilkultur',
+          store,
+          where: { kultur_id: kulturId },
+        }),
+      }).toArray(),
       dexie.teilkulturs.get(
         row.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
       ),

@@ -8,6 +8,8 @@ import Teilzaehlungen from './Teilzaehlungen'
 import constants from '../../../../../utils/constants'
 import Spinner from '../../../../shared/Spinner'
 import { dexie } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const TitleRow = styled.div`
   background-color: rgba(248, 243, 254, 1);
@@ -33,10 +35,14 @@ const Rows = styled.div``
 
 const TkZaehlungen = ({ teilkultur }) => {
   const teilzaehlungs = useLiveQuery(async () => {
-    const teilzaehlungs = await dexie.teilzaehlungs
-      .where({ teilkultur_id: teilkultur.id })
-      .filter((t) => t._deleted === false)
-      .toArray()
+    const teilzaehlungs = await collectionFromTable({
+      table: 'teilzaehlung',
+      where: addTotalCriteriaToWhere({
+        table: 'teilzaehlung',
+        store,
+        where: { teilkultur_id: teilkultur.id },
+      }),
+    }).toArray()
     const teilzaehlungsSorted = await teilzaehlungsSortByZaehlungTk(
       teilzaehlungs,
     )
