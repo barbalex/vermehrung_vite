@@ -463,7 +463,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // teilkultur nodes
-            const kulturOption = await dexie.kultur_options.get(kultur.id)
+            const kulturOption = await kultur.kulturOption()
             if (kulturOption?.tk) {
               const teilkulturs = await collectionFromTable({
                 table: 'teilkultur',
@@ -1003,7 +1003,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // garten > kultur > teilkultur
-            const kulturOption = await dexie.kultur_options.get(kultur.id)
+            const kulturOption = await kultur.kulturOption()
             if (kulturOption?.tk) {
               const teilkulturs = await collectionFromTable({
                 table: 'teilkultur',
@@ -1265,7 +1265,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const kulturIndex = kulturNodes.findIndex((a) => a.id === kulturId)
 
         // 2.1 kultur > teilkultur
-        const kulturOption = await dexie.kultur_options.get(kultur.id)
+        const kulturOption = await kultur.kulturOption()
         if (kulturOption?.tk) {
           const kulturTeilkulturCollection = collectionFromTable({
             table: 'teilkultur',
@@ -1808,7 +1808,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 )
 
                 // teilkultur nodes
-                const kulturOption = await dexie.kultur_options.get(kultur.id)
+                const kulturOption = await kultur.kulturOption()
                 if (kulturOption?.tk) {
                   const teilkulturCollection = collectionFromTable({
                     table: 'teilkultur',

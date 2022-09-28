@@ -43,7 +43,7 @@ const Tree = () => {
     const person = await dexie.persons.get({
       account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
     })
-    const personOption: PersonOption = await dexie.person_options.get(person.id)
+    const personOption: PersonOption = await person?.personOption()
 
     return { personOption, userRole: person.user_role }
   }, [user.uid])

@@ -6,17 +6,19 @@ import herkunftLabelFromHerkunft from '../../../../../utils/herkunftLabelFromHer
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import downloadExceljsWorkbook from '../../../../../utils/downloadExceljsWorkbook'
 import lieferungSort from '../../../../../utils/lieferungSort'
-import { dexie, Lieferung, Sammlung, Kultur } from '../../../../../dexieClient'
+import { Lieferung, Sammlung, Kultur } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const buildExceljsWorksheetsForLieferungenOfYear = async ({ store, year }) => {
   const workbook = new ExcelJs.Workbook()
 
-  const lieferungs: Lieferung[] = await dexie.lieferungs
+  const lieferungs: Lieferung[] = await collectionFromTable({
+    table: 'lieferung',
+    where: addTotalCriteriaToWhere({ store, table: 'lieferung' }),
+  })
     .filter(
-      (l) =>
-        l._deleted === false &&
-        !!l.datum &&
-        DateTime.fromSQL(l.datum).toFormat('yyyy') == year,
+      (l) => !!l.datum && DateTime.fromSQL(l.datum).toFormat('yyyy') == year,
     )
     .toArray()
   const lieferungsSorted = lieferungs.sort(lieferungSort)

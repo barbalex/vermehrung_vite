@@ -247,14 +247,10 @@ const buildOptions = async ({ store, cb, val }) => {
       const sammlung = await l.sammlung()
       const sammlungPerson = await sammlung?.person()
       const sammlungHerkunft = await sammlung?.herkunft()
-      const vonKultur = await dexie.kulturs.get(
-        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const vonKultur = await l.vonKultur()
       const vonKulturGarten = await vonKultur?.garten()
       const vonKulturGartenPerson = await vonKulturGarten?.person()
-      const nachKultur = await dexie.kulturs.get(
-        l.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const nachKultur = await l.nachKultur()
       const nachKulturGarten = await nachKultur?.garten()
       const nachKulturGartenPerson = nachKulturGarten?.person()
       const art = await l.art()
