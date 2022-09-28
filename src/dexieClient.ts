@@ -350,18 +350,16 @@ export class Sammlung implements ISammlung {
   }
 
   async label() {
-    const herkunft = await dexie.herkunfts.get(
-      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const art = await dexie.arts.get(
-      this.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const ae_art = await dexie.ae_arts.get(
-      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const person = await dexie.persons.get(
-      this.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [herkunft, art, person] = await Promise.all([
+      dexie.herkunfts.get(
+        this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.arts.get(this.art_id ?? '99999999-9999-9999-9999-999999999999'),
+      dexie.persons.get(
+        this.person_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
+    const ae_art = await art?.aeArt()
 
     return sammlungLabelFromSammlung({
       sammlung: this,
@@ -373,15 +371,13 @@ export class Sammlung implements ISammlung {
   }
 
   async labelUnderHerkunft() {
-    const art = await dexie.arts.get(
-      this.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const ae_art = await dexie.ae_arts.get(
-      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const person = await dexie.persons.get(
-      this.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [art, person] = await Promise.all([
+      dexie.arts.get(this.art_id ?? '99999999-9999-9999-9999-999999999999'),
+      dexie.persons.get(
+        this.person_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
+    const ae_art = await art?.aeArt()
 
     return sammlungLabelFromSammlungUnderHerkunft({
       sammlung: this,
@@ -1248,21 +1244,21 @@ export class Kultur implements IKultur {
   }
 
   async label() {
-    const garten = await dexie.gartens.get(
-      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const gartenPerson = await dexie.persons.get(
-      garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const art = await dexie.arts.get(
-      this.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const aeArt = await dexie.ae_arts.get(
-      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const herkunft = await dexie.herkunfts.get(
-      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [garten, art, herkunft] = await Promise.all([
+      dexie.gartens.get(
+        this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.arts.get(this.art_id ?? '99999999-9999-9999-9999-999999999999'),
+      dexie.herkunfts.get(
+        this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
+    const [gartenPerson, aeArt] = await Promise.all([
+      dexie.persons.get(
+        garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.ae_arts.get(art?.ae_id ?? '99999999-9999-9999-9999-999999999999'),
+    ])
 
     return kulturLabelFromKultur({
       kultur: this,
@@ -1275,14 +1271,16 @@ export class Kultur implements IKultur {
   }
 
   async labelUnderArt() {
-    const garten = await dexie.gartens.get(
-      this.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [garten, herkunft] = await Promise.all([
+      dexie.gartens.get(
+        this.garten_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.herkunfts.get(
+        this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
     const gartenPerson = await dexie.persons.get(
       garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const herkunft = await dexie.herkunfts.get(
-      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
     )
 
     return kulturLabelFromKulturUnderArt({
@@ -1294,15 +1292,13 @@ export class Kultur implements IKultur {
   }
 
   async labelUnderGarten() {
-    const art = await dexie.arts.get(
-      this.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const aeArt = await dexie.ae_arts.get(
-      art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const herkunft = await dexie.herkunfts.get(
-      this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [art, herkunft] = await Promise.all([
+      dexie.arts.get(this.art_id ?? '99999999-9999-9999-9999-999999999999'),
+      dexie.herkunfts.get(
+        this.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
+    const aeArt = await art?.aeArt()
 
     return kulturLabelFromKulturUnderGarten({
       kultur: this,
@@ -2364,16 +2360,16 @@ export class SammelLieferung implements ISammelLieferung {
   }
 
   async label() {
-    const vonKultur = await dexie.kulturs.get(
-      this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const vonGarten = await dexie.gartens.get(
-      vonKultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [vonKultur, person] = await Promise.all([
+      dexie.kulturs.get(
+        this.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+      dexie.persons.get(
+        this.person_id ?? '99999999-9999-9999-9999-999999999999',
+      ),
+    ])
+    const vonGarten = await vonKultur?.garten()
     const gartenLabel = await vonGarten?.label()
-    const person = await dexie.persons.get(
-      this.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
     const personLabel = person ? personLabelFromPerson({ person }) : undefined
     const datumLabel = this.datum
       ? DateTime.fromSQL(this.datum).toFormat('yyyy.LL.dd')
@@ -4654,7 +4650,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(72).stores({
+    this.version(73).stores({
       herkunfts:
         'id, nr, _deleted_indexable, [id+_deleted_indexable], [nr+_deleted_indexable]',
       sammlungs:
@@ -4680,7 +4676,7 @@ export class MySubClassedDexie extends Dexie {
       events:
         'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
       avs: 'id, *art_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable], [art_id+_deleted_indexable]',
-      gvs: 'id, *garten_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable]',
+      gvs: 'id, *garten_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable], [garten_id+_deleted_indexable]',
       art_files: 'id, name',
       garten_files: 'id, name',
       herkunft_files: 'id, name',
