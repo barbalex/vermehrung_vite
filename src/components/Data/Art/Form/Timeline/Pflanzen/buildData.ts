@@ -21,15 +21,15 @@ const buildData = async ({ artId }) => {
   }).toArray()
   const kultursIds = kulturs.map((k) => k.id)
   const zaehlungs = await dexie.zaehlungs
-    .where('kultur_id')
-    .anyOf(kultursIds)
-    .and((z) => z._deleted === false && !!z.datum)
+    .where('[kultur_id+_deleted_indexable]')
+    .anyOf(kultursIds.map((id) => [id, 0]))
+    .and((z) => !!z.datum)
     .toArray()
   const zaehlungsIds = zaehlungs.map((z) => z.id)
   const teilzaehlungsWithAnzahlPflanzen = await dexie.teilzaehlungs
-    .where('zaehlung_id')
-    .anyOf(zaehlungsIds)
-    .and((tz) => tz._deleted === false && tz.anzahl_pflanzen !== null)
+    .where('[zaehlung_id+_deleted_indexable]')
+    .anyOf(zaehlungsIds.map((id) => [id, 0]))
+    .and((tz) => tz.anzahl_pflanzen !== null)
     .toArray()
   const zaehlungIdsOfTzWithAnzahlPflanzen = [
     ...new Set(teilzaehlungsWithAnzahlPflanzen.map((tz) => tz.zaehlung_id)),
@@ -41,9 +41,9 @@ const buildData = async ({ artId }) => {
    * So need to recreate it for every usage
    */
   const zaehlungsObservableForZaehlungsDone = dexie.zaehlungs
-    .where('kultur_id')
-    .anyOf(kultursIds)
-    .and((z) => z._deleted === false && !!z.datum)
+    .where('[kultur_id+_deleted_indexable]')
+    .anyOf(kultursIds.map((id) => [id, 0]))
+    .and((z) => !!z.datum)
   const zaehlungsDone = await zaehlungsObservableForZaehlungsDone
     .and(
       (z) =>
@@ -53,9 +53,9 @@ const buildData = async ({ artId }) => {
     .toArray()
 
   const zaehlungsObservableForZaehlungsPlannedAll = dexie.zaehlungs
-    .where('kultur_id')
-    .anyOf(kultursIds)
-    .and((z) => z._deleted === false && !!z.datum)
+    .where('[kultur_id+_deleted_indexable]')
+    .anyOf(kultursIds.map((id) => [id, 0]))
+    .and((z) => !!z.datum)
   const zaehlungsPlannedAll = await zaehlungsObservableForZaehlungsPlannedAll
     .filter(
       (z) =>
