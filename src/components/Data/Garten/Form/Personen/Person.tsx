@@ -9,7 +9,6 @@ import MenuItem from '@mui/material/MenuItem'
 import StoreContext from '../../../../../storeContext'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
-import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;

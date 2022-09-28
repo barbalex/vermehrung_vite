@@ -4,7 +4,6 @@ import sortBy from 'lodash/sortBy'
 import { v1 as uuidv1 } from 'uuid'
 import md5 from 'blueimp-md5'
 import last from 'lodash/last'
-import set from 'lodash/set'
 import isUuid from 'is-uuid'
 
 import Tree, { defaultValue as defaultTree } from './Tree'
@@ -1186,7 +1185,10 @@ const myTypes = types
           revertValue: true,
           isInsert: true,
         })
-        addIndexableBooleans({ table: 'teilzaehlung', object: newObjectForStore })
+        addIndexableBooleans({
+          table: 'teilzaehlung',
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.teilzaehlungs.put(newObjectForStore)
       },

@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import IconButton from '@mui/material/IconButton'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -10,7 +10,6 @@ import { ReactComponent as AusLiDownSvg } from '../../../../svg/to_ausli_down.in
 import { ReactComponent as EvDownSvg } from '../../../../svg/to_ev_down.inline.svg'
 import { ReactComponent as TkDownSvg } from '../../../../svg/to_tk_down.inline.svg'
 import { ReactComponent as UpSvg } from '../../../../svg/to_up.inline.svg'
-import { dexie } from '../../../../dexieClient'
 
 const KulturNavButtons = ({ row }) => {
   const store = useContext(StoreContext)

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useContext } from 'react'
+import React, { useCallback, useState, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import { FaTimes } from 'react-icons/fa'
@@ -9,7 +9,6 @@ import { useLiveQuery } from 'dexie-react-hooks'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
-import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;

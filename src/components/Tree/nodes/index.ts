@@ -110,7 +110,6 @@ import getShowSammelLieferung from '../../../utils/showSammelLieferung'
 import getShowSammlung from '../../../utils/showSammlung'
 import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
-import { dexie } from '../../../dexieClient'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
 

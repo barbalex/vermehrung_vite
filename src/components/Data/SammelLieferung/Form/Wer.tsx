@@ -9,7 +9,6 @@ import Select from '../../../shared/Select'
 import TextField from '../../../shared/TextField'
 import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import personSort from '../../../../utils/personSort'
-import { dexie } from '../../../../dexieClient'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 

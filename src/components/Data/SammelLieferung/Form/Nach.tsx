@@ -10,7 +10,6 @@ import Checkbox2States from '../../../shared/Checkbox2States'
 import JesNo from '../../../shared/JesNo'
 import exists from '../../../../utils/exists'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
-import { dexie } from '../../../../dexieClient'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 

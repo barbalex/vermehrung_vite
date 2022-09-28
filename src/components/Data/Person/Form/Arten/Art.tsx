@@ -8,7 +8,6 @@ import MenuItem from '@mui/material/MenuItem'
 
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import StoreContext from '../../../../../storeContext'
-import { dexie } from '../../../../../dexieClient'
 
 const Container = styled.div`
   display: flex;

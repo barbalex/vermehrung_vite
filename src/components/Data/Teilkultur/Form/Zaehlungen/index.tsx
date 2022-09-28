@@ -7,7 +7,6 @@ import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import Teilzaehlungen from './Teilzaehlungen'
 import constants from '../../../../../utils/constants'
 import Spinner from '../../../../shared/Spinner'
-import { dexie } from '../../../../../dexieClient'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 

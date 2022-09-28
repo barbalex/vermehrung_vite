@@ -10,7 +10,6 @@ import exists from '../../../../../utils/exists'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
 import sammlungsSortedFromSammlungs from '../../../../../utils/sammlungsSortedFromSammlungs'
 import herkunftLabelFromHerkunft from '../../../../../utils/herkunftLabelFromHerkunft'
-import { dexie } from '../../../../../dexieClient'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 

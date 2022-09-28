@@ -11,7 +11,6 @@ import Select from '../../../shared/Select'
 import TextField from '../../../shared/TextField'
 import constants from '../../../../utils/constants'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
-import { dexie } from '../../../../dexieClient'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 

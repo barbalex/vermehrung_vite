@@ -14,7 +14,6 @@ import exists from '../../../../../../../utils/exists'
 import constants from '../../../../../../../utils/constants'
 import zaehlungSort from '../../../../../../../utils/zaehlungSort'
 import ErrorBoundary from '../../../../../../shared/ErrorBoundary'
-import { dexie } from '../../../../../../../dexieClient'
 import collectionFromTable from '../../../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../../../utils/addTotalCriteriaToWhere'
 
