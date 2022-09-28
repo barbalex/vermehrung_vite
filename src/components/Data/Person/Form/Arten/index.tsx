@@ -116,7 +116,7 @@ const PersonArten = ({ person }) => {
     [insertAvRev, person.id],
   )
 
-  console.log('Person Arten, avs:', avs)
+  // console.log('Person Arten, avs:', avs)
 
   return (
     <ErrorBoundary>

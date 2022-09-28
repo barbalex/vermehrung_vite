@@ -17,6 +17,10 @@ const addTotalCriteriaToWhere = ({ table, where = {}, store }) => {
   if (store.filter[table]?._deleted === true) {
     where._deleted_indexable = 1
   }
+  // some tables have no filter setting (av, gv...)
+  if (!(table in store.filter)) {
+    where._deleted_indexable = 0
+  }
   // Problem:
   // is possible to not have a where clause (depending on filter settings)
   // thus collectionFromTableAndWhere is needed

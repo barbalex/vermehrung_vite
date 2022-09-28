@@ -148,7 +148,7 @@ export class Herkunft implements IHerkunft {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`herkunft.${field}`)
+    unsetError(`herkunft`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -398,7 +398,7 @@ export class Sammlung implements ISammlung {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`sammlung.${field}`)
+    unsetError(`sammlung`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -638,7 +638,7 @@ export class Lieferung {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`lieferung.${field}`)
+    unsetError(`lieferung`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -825,7 +825,7 @@ export class Art implements IArt {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`art.${field}`)
+    unsetError(`art`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -1031,7 +1031,7 @@ export class Garten implements IGarten {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`garten.${field}`)
+    unsetError(`garten`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -1318,7 +1318,7 @@ export class Kultur implements IKultur {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`kultur.${field}`)
+    unsetError(`kultur`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -1494,7 +1494,7 @@ export class Teilkultur implements ITeilkultur {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`teilkultur.${field}`)
+    unsetError(`teilkultur`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -1676,7 +1676,7 @@ export class Zaehlung implements IZaehlung {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`zaehlung.${field}`)
+    unsetError(`zaehlung`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -1842,7 +1842,7 @@ export class Teilzaehlung implements ITeilzaehlung {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`teilzaehlung.${field}`)
+    unsetError(`teilzaehlung`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -2130,7 +2130,7 @@ export class Person implements IPerson {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`person.${field}`)
+    unsetError(`person`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -2395,7 +2395,7 @@ export class SammelLieferung implements ISammelLieferung {
     })
     const userPersonOption = await dexie.person_options.get(userPerson.id)
 
-    unsetError(`sammel_lieferung.${field}`)
+    unsetError(`sammel_lieferung`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -2602,7 +2602,7 @@ export class Event implements IEvent {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`event.${field}`)
+    unsetError(`event`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -2760,7 +2760,7 @@ export class Av implements IAv {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`av.${field}`)
+    unsetError(`av`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -2909,7 +2909,7 @@ export class Gv implements IGv {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`gv.${field}`)
+    unsetError('gv')
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -3915,7 +3915,7 @@ export class ArtQk implements IArtQk {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`art_qk.${field}`)
+    unsetError('art_qk')
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -4080,7 +4080,7 @@ export class KulturOption implements IKulturOption {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`kultur_option.${field}`)
+    unsetError(`kultur_option`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -4226,7 +4226,7 @@ export class KulturQk implements IKulturQk {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`kultur_qk.${field}`)
+    unsetError(`kultur_qk`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -4446,7 +4446,7 @@ export class PersonOption implements IPersonOption {
   async edit({ field, value, store }) {
     const { addQueuedQuery, user, unsetError } = store
 
-    unsetError(`person_option.${field}`)
+    unsetError(`person_option`)
     // first build the part that will be revisioned
     const newDepth = this._depth + 1
     const newObject = {
@@ -4654,7 +4654,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(68).stores({
+    this.version(71).stores({
       herkunfts:
         'id, nr, _deleted_indexable, [id+_deleted_indexable], [nr+_deleted_indexable]',
       sammlungs:
@@ -4664,7 +4664,7 @@ export class MySubClassedDexie extends Dexie {
       arts: 'id, _deleted_indexable, [id+_deleted_indexable]',
       ae_arts: 'id, name',
       gartens:
-        'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable], [id+aktiv_indexable+_deleted_indexable]',
+        'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable], [id+aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable]',
       kulturs:
         'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable], [garten_id+_deleted_indexable], [aktiv_indexable+_deleted_indexable], [art_id+herkunft_id], [art_id+herkunft_id+aktiv_indexable+_deleted_indexable], [id+art_id+aktiv_indexable+_deleted_indexable]',
       teilkulturs:
@@ -4679,8 +4679,8 @@ export class MySubClassedDexie extends Dexie {
         'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
       events:
         'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
-      avs: 'id, *art_id, *person_id, _deleted_indexable',
-      gvs: 'id, *garten_id, *person_id, _deleted_indexable',
+      avs: 'id, *art_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable]',
+      gvs: 'id, *garten_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable]',
       art_files: 'id, name',
       garten_files: 'id, name',
       herkunft_files: 'id, name',

@@ -21,9 +21,13 @@ const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
   // reason: indexedDB creates indexes right after a table was imported
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
-    console.log('processTable', { dexie, table, dexieTable: dexie[table] })
+    // console.log('processTable', {
+    //   table,
+    // })
     const data = dataIn.map((d) => stripTypename(d))
     data?.forEach((object) => addIndexableBooleans({ table, object }))
+
+    // console.log('processTable', { data, table })
 
     try {
       await dexie[`${table}s`].bulkPut(data)
