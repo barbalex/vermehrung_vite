@@ -52,10 +52,10 @@ const Gv = ({ gv }) => {
   useEffect(() => {
     if (!gv.person_id) return
 
-    dexie.persons
-      .get(gv.person_id)
-      .then((person) => setPersonLabel(personLabelFromPerson({ person })))
-  }, [gv.person_id])
+    gv.person().then((person) =>
+      setPersonLabel(personLabelFromPerson({ person })),
+    )
+  }, [gv, gv.person_id])
 
   const [delMenuAnchorEl, setDelMenuAnchorEl] = React.useState(null)
   const delMenuOpen = Boolean(delMenuAnchorEl)
