@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
@@ -21,18 +21,15 @@ const HerkunftFormTitleChooser = ({
   const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'herkunft',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'herkunft' })
 
     const [totalCount, filteredCount] = await Promise.all([
-      conditionAdder(
-        collectionFromTable({
-          table: 'herkunft',
-          where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'herkunft',
+        where: addTotalCriteriaToWhere({ store, table: 'herkunft'.where }),
+        filter,
+      }).count(),
       filteredObjectsFromTable({ store, table: 'herkunft', count: true }),
     ])
 
