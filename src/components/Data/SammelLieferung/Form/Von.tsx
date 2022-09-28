@@ -11,6 +11,8 @@ import sammlungsSortedFromSammlungs from '../../../../utils/sammlungsSortedFromS
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
 import { dexie } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const Title = styled.div`
   font-weight: bold;
@@ -60,8 +62,14 @@ const SammelLieferungVon = ({
 
   const data = useLiveQuery(async () => {
     const [kulturs, sammlungs] = await Promise.all([
-      dexie.kulturs.filter((k) => k._deleted === false).toArray(),
-      dexie.sammlungs.filter((k) => k._deleted === false).toArray(),
+      collectionFromTable({
+        table: 'kultur',
+        where: addTotalCriteriaToWhere({ store, table: 'kultur' }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'sammlung',
+        where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
+      }).toArray(),
     ])
 
     const herkunftLabel =
@@ -86,9 +94,7 @@ const SammelLieferungVon = ({
         return true
       })
 
-    const kultur = await dexie.kulturs.get(
-      row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const kultur = await row.vonKultur()
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
       'id',
@@ -106,9 +112,7 @@ const SammelLieferungVon = ({
         }
       }),
     )
-    const sammlung = await dexie.sammlungs.get(
-      row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const sammlung = await row.sammlung()
     const sammlungsIncludingChoosen = uniqBy(
       [...sammlungs, ...(sammlung && !showFilter ? [sammlung] : [])],
       'id',

@@ -11,6 +11,8 @@ import JesNo from '../../../shared/JesNo'
 import exists from '../../../../utils/exists'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
 import { dexie } from '../../../../dexieClient'
+import collectionFromTable from '../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
 const Title = styled.div`
   font-weight: bold;
@@ -48,21 +50,19 @@ const SammelLieferungNach = ({
   const { errors, filter } = store
 
   const nachKulturWerte = useLiveQuery(async () => {
-    const kulturs = await dexie.kulturs
-      .filter((k) => k._deleted === false)
-      .toArray()
+    const kulturs = await collectionFromTable({
+      table: 'kultur',
+      where: addTotalCriteriaToWhere({
+        store,
+        table: 'kultur',
+        where: {
+          ...(row.art_id ? { art_id: row.art_id } : {}),
+          ...(herkunft?.id ? { herkunft_id: herkunft.id } : {}),
+        },
+      }),
+    }).toArray()
 
     const kultursFiltered = kulturs
-      // show only kulturen of art_id
-      .filter((k) => {
-        if (row?.art_id) return k.art_id === row.art_id
-        return true
-      })
-      // show only kulturen with same herkunft
-      .filter((k) => {
-        if (herkunft?.id) return k.herkunft_id === herkunft.id
-        return true
-      })
       // shall not be delivered to same kultur it came from
       .filter((k) => {
         if (row?.von_kultur_id && row?.von_kultur_id !== row?.nach_kultur_id) {
@@ -71,9 +71,7 @@ const SammelLieferungNach = ({
         return true
       })
 
-    const kultur = await dexie.kulturs.get(
-      row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const kultur = await row.vonKultur()
 
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
@@ -120,7 +118,7 @@ const SammelLieferungNach = ({
                 })`
               : ''
           }`}
-          options={nachKulturWerte }
+          options={nachKulturWerte}
           saveToDb={saveToDb}
           error={errors?.sammel_lieferung?.nach_kultur_id}
         />
