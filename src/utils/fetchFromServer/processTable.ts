@@ -9,12 +9,12 @@ const stripTypename = (object) => {
 
 // TODO: do this in worker?
 const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
-  // console.log('processTable, data:', data)
   const { setInitiallyQueried, setLastUpdated, setInitiallyQuerying } = store
   if (!dataIn.length) {
     setInitiallyQueried({ table })
     return
   }
+  console.log('processTable, dataIn:', dataIn)
   setInitiallyQuerying(table)
 
   // use a timeout to stagger the imports

@@ -14,7 +14,6 @@ import gartensSortedFromGartens from '../../../../../utils/gartensSortedFromGart
 import gvsSortByGarten from '../../../../../utils/gvsSortByGarten'
 import constants from '../../../../../utils/constants'
 import { dexie } from '../../../../../dexieClient'
-import totalFilter from '../../../../../utils/totalFilter'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
@@ -87,9 +86,8 @@ const PersonArten = ({ person }) => {
     const gvGartenIds = gvs.map((v) => v.garten_id)
 
     const gartens = await dexie.gartens
-      .where('id')
-      .noneOf(gvGartenIds)
-      .filter((value) => totalFilter({ value, store, table: 'garten' }))
+      .where('[id+aktiv_indexable+_deleted_indexable]')
+      .noneOf(gvGartenIds.map((id) => [id, 1, 0]))
       .toArray()
     const gartensSorted = await gartensSortedFromGartens(gartens)
     const gartenWerte = await Promise.all(
