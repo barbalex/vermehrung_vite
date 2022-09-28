@@ -78,9 +78,8 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'lieferung',
         where: addTotalCriteriaToWhere({ store, table: 'lieferung', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const lieferungsSorted = lieferungs.sort(lieferungSort)

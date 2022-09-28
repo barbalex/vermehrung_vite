@@ -7,7 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const TeilkulturFormTitleChooser = ({
@@ -20,18 +20,15 @@ const TeilkulturFormTitleChooser = ({
   const { kulturIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'teilkultur',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'teilkultur' })
 
     const [totalCount, filteredCount] = await Promise.all([
-      conditionAdder(
-        collectionFromTable({
-          table: 'teilkultur',
-          where: addTotalCriteriaToWhere({ store, table: 'teilkultur' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'teilkultur',
+        where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),
+        filter,
+      }).count(),
       filteredObjectsFromTable({ store, table: 'teilkultur', count: true }),
     ])
 
