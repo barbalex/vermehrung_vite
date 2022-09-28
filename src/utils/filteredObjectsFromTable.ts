@@ -2,21 +2,21 @@ import camelCase from 'lodash/camelCase'
 
 import types from '../store/Filter/simpleTypes'
 import exists from './exists'
-import hierarchyConditionAdderForTable from './hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from './hierarchyWhereAndFilterForTable'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 import collectionFromTable from './collectionFromTable'
 
-const filteredObjectsFromTable = async ({
-  store,
-  table,
-  count = false,
-  filterByHierarchy = true,
-}) => {
+const filteredObjectsFromTable = async ({ store, table, count = false }) => {
   if (!table) throw `no table passed`
 
-  const conditionAdder = filterByHierarchy
-    ? await hierarchyConditionAdderForTable({ store, table })
-    : (c) => c
+  const whereAndFilterToAdd = await hierarchyWhereAndFilterForTable({
+    store,
+    table,
+  })
+
+  const defaultFilter = () => true
+  const whereToAdd = whereAndFilterToAdd.where ?? {}
+  const filterToAdd = whereAndFilterToAdd.filter ?? defaultFilter
 
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
@@ -88,11 +88,10 @@ const filteredObjectsFromTable = async ({
 
   const filteredCollection1 = collectionFromTable({
     table,
-    where: addTotalCriteriaToWhere({ table, store }),
-  }).filter(filterFunction)
-  const filteredCollection2 = filterByHierarchy
-    ? conditionAdder(filteredCollection1)
-    : filteredCollection1
+    where: addTotalCriteriaToWhere({ table, store, where: whereToAdd }),
+  })
+    .filter(filterFunction)
+    .and(filterToAdd)
 
   // if a url is opened, a dataset should always show
   // even if it was filtered away
@@ -102,11 +101,11 @@ const filteredObjectsFromTable = async ({
     tableIdInActiveNodeArray
       ? collection.or('id').equals(tableIdInActiveNodeArray)
       : collection
-  const filteredCollection3 = orIdInUrlAdder(filteredCollection2)
+  const filteredCollection2 = orIdInUrlAdder(filteredCollection1)
 
   return count
-    ? await filteredCollection3.count()
-    : await filteredCollection3.toArray()
+    ? await filteredCollection2.count()
+    : await filteredCollection2.toArray()
 }
 
 export default filteredObjectsFromTable
