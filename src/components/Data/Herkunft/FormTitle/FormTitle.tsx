@@ -68,7 +68,7 @@ const Herkunft = ({
 
   // herkunft is top node
   // never enable adding below that
-  const editingAllowed = activeNodeArray.length <= 2
+  const editingAllowed = activeNodeArray.length <= 3
 
   if (width < 520) {
     return (

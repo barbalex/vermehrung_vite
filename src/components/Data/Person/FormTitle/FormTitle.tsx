@@ -49,10 +49,14 @@ const PersonFormTitle = ({
   const { user } = store
 
   const userRole = useLiveQuery(async () => {
-    const person = await dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' })
+    const person = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
 
-    return person.user_role
+    return await person?.userRole()
   }, [user.uid])
+
+  console.log('Person FormTitle, userRole:', userRole)
 
   if (width < 568) {
     return (

@@ -46,9 +46,7 @@ const Person = ({
   const data = useLiveQuery(async () => {
     const [userRoles, userRole] = await Promise.all([
       dexie.user_roles.toArray(),
-      dexie.user_roles.get(
-        row.user_role_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      row.userRole(),
     ])
 
     const userRoleWerte = userRoles.sort(userRoleSort).map((el) => ({
