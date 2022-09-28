@@ -5,9 +5,9 @@ const kulturNodes = async ({ kultur, index }) => {
     nodeType: 'table',
     menuTitle: 'Kultur',
     table: 'kultur',
-    id: kultur.id,
+    id: kultur?.id,
     label,
-    url: ['Vermehrung', 'Kulturen', kultur.id],
+    url: ['Vermehrung', 'Kulturen', kultur?.id],
     sort: [1, 5, index],
     hasChildren: true,
   }
