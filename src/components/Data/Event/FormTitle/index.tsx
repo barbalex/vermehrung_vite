@@ -7,7 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
@@ -15,18 +15,15 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
   const { kulturIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'event',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'event' })
 
     const [totalCount, filteredCount] = await Promise.all([
-      conditionAdder(
-        collectionFromTable({
-          table: 'event',
-          where: addTotalCriteriaToWhere({ store, table: 'event' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'event',
+        where: addTotalCriteriaToWhere({ store, table: 'event', where }),
+        filter,
+      }).count(),
       filteredObjectsFromTable({ store, table: 'event', count: true }),
     ])
 

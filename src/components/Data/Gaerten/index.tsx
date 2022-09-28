@@ -67,9 +67,8 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'garten',
         where: addTotalCriteriaToWhere({ store, table: 'garten', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const gartensSorted = await gartensSortedFromGartens(gartens)
