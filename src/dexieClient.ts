@@ -4654,13 +4654,13 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(62).stores({
+    this.version(66).stores({
       herkunfts: 'id, nr, _deleted_indexable, [id+_deleted_indexable]',
       sammlungs:
         'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+herkunft_id], [nr+_deleted_indexable]',
       lieferungs:
-        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable, [von_kultur_id+_deleted_indexable], [nach_kultur_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+_deleted_indexable], [von_sammlung_id+_deleted_indexable], [sammel_lieferung_id+_deleted_indexable], [art_id+nach_ausgepflanzt_indexable+geplant_indexable+_deleted_indexable], [von_kultur_id+geplant_indexable+_deleted_indexable]',
-      arts: 'id, _deleted_indexable',
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable, [von_kultur_id+_deleted_indexable], [nach_kultur_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+_deleted_indexable], [von_sammlung_id+_deleted_indexable], [sammel_lieferung_id+_deleted_indexable], [art_id+nach_ausgepflanzt_indexable+geplant_indexable+_deleted_indexable], [von_kultur_id+geplant_indexable+_deleted_indexable], [nach_kultur_id+geplant_indexable+_deleted_indexable]',
+      arts: 'id, _deleted_indexable, [id+_deleted_indexable]',
       ae_arts: 'id, name',
       gartens:
         'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable], [id+aktiv_indexable+_deleted_indexable]',
@@ -4669,7 +4669,7 @@ export class MySubClassedDexie extends Dexie {
       teilkulturs:
         'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
       zaehlungs:
-        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [id+_deleted_indexable], [kultur_id+_deleted_indexable], [kultur_id+prognose_indexable+_deleted_indexable]',
+        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [id+_deleted_indexable], [kultur_id+_deleted_indexable], [kultur_id+prognose_indexable+_deleted_indexable], [id+kultur_id+_deleted_indexable]',
       teilzaehlungs:
         'id, *zaehlung_id, *teilkultur_id, _deleted_indexable, [id+_deleted_indexable], [zaehlung_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
       persons:
