@@ -11,7 +11,8 @@ import Select from '../../../../shared/Select'
 import TextField from '../../../../shared/TextField'
 import constants from '../../../../../utils/constants'
 import artsSortedFromArts from '../../../../../utils/artsSortedFromArts'
-import { dexie } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const Title = styled.div`
   font-weight: bold;
@@ -54,11 +55,14 @@ const LieferungWas = ({ showFilter, row, saveToDb, ifNeeded }) => {
   const { errors, filter } = store
 
   const artWerte = useLiveQuery(async () => {
-    const arts = await dexie.arts.filter((k) => k._deleted === false).toArray()
+    const [arts, art] = await Promise.all([
+      collectionFromTable({
+        table: 'art',
+        where: addTotalCriteriaToWhere({ store, table: 'art' }),
+      }).toArray(),
+      row.art(),
+    ])
 
-    const art = await dexie.arts.get(
-      row?.art_id ?? '99999999-9999-9999-9999-999999999999',
-    )
     const artsIncludingChoosen = uniqBy(
       [...arts, ...(art && !showFilter ? [art] : [])],
       'id',

@@ -62,10 +62,8 @@ const Av = ({ av }) => {
 
   const [artLabel, setArtLabel] = useState(null)
   useEffect(() => {
-    dexie.arts
-      .get(av.art_id ?? '99999999-9999-9999-9999-999999999999')
-      .then((art) => art?.label?.().then((label) => setArtLabel(label)))
-  }, [av.art_id])
+    av.art().then((art) => art?.label?.().then((label) => setArtLabel(label)))
+  }, [av])
 
   if (!av) return null
   if (!artLabel) return null
