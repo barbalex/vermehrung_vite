@@ -9,7 +9,7 @@ import collectionFromTable from './collectionFromTable'
 const filteredObjectsFromTable = async ({ store, table, count = false }) => {
   if (!table) throw `no table passed`
 
-  const { where = {}, filter } = await hierarchyWhereAndFilterForTable({
+  const { where: hierarchyWhere = {}, filter: hierarchyFilter } = await hierarchyWhereAndFilterForTable({
     store,
     table,
   })
@@ -25,8 +25,6 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
     if (key === '_deleted') break
     if (exists(value)) whereObject[key] = value
   }
-
-  // console.log('filteredObjectsFromTable', { table, whereObject })
 
   const filterFunction = (object) => {
     let returnValue = true
@@ -74,6 +72,8 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
         break
       } else if (type !== 'string' && !(objectValue === value)) {
         // console.log('filteredObjectsFromTable, false due to not equal')
+        // TODO: if is indexed field, add to where
+        // watch out for booleans (use _indexable field and convert value)
         returnValue = false
         break
       }
@@ -84,8 +84,8 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
 
   const filteredCollection1 = collectionFromTable({
     table,
-    where: addTotalCriteriaToWhere({ table, store, where }),
-    filter,
+    where: addTotalCriteriaToWhere({ table, store, where: hierarchyWhere }),
+    filter: hierarchyFilter,
   }).filter(filterFunction)
 
   // if a url is opened, a dataset should always show
