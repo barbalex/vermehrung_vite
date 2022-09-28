@@ -2114,6 +2114,10 @@ export class Person implements IPerson {
     return await dexie.person_options.get(this.id)
   }
 
+  async userRole() {
+    return await dexie.user_roles.get(this.user_role_id)
+  }
+
   fullname() {
     if (this.vorname && this.name) {
       return `${this.vorname} ${this.name}`
@@ -2345,7 +2349,7 @@ export class SammelLieferung implements ISammelLieferung {
     )
   }
 
-  async vonSammlung() {
+  async sammlung() {
     return await dexie.sammlungs.get(
       this.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
     )

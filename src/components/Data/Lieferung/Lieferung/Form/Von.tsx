@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import uniqBy from 'lodash/uniqBy'
-import { useLiveQuery } from 'dexie-react-hooks' 
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Select from '../../../../shared/Select'
@@ -11,6 +11,8 @@ import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKult
 import sammlungsSortedFromSammlungs from '../../../../../utils/sammlungsSortedFromSammlungs'
 import herkunftLabelFromHerkunft from '../../../../../utils/herkunftLabelFromHerkunft'
 import { dexie } from '../../../../../dexieClient'
+import collectionFromTable from '../../../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
 const Title = styled.div`
   font-weight: bold;
@@ -60,8 +62,14 @@ const LieferungVon = ({
 
   const data = useLiveQuery(async () => {
     const [kulturs, sammlungs] = await Promise.all([
-      dexie.kulturs.filter((k) => k._deleted === false).toArray(),
-      dexie.sammlungs.filter((k) => k._deleted === false).toArray(),
+      collectionFromTable({
+        table: 'kultur',
+        where: addTotalCriteriaToWhere({ store, table: 'kultur' }),
+      }).toArray(),
+      collectionFromTable({
+        table: 'sammlung',
+        where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
+      }).toArray(),
     ])
 
     const herkunftLabel =
@@ -86,9 +94,7 @@ const LieferungVon = ({
         return true
       })
 
-    const kultur = await dexie.kulturs.get(
-      row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const kultur = await row.vonKultur()
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
       'id',
@@ -106,9 +112,7 @@ const LieferungVon = ({
         }
       }),
     )
-    const sammlung = await dexie.sammlungs.get(
-      row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const sammlung = await row.sammlung()
     const sammlungsIncludingChoosen = uniqBy(
       [...sammlungs, ...(sammlung && !showFilter ? [sammlung] : [])],
       'id',
