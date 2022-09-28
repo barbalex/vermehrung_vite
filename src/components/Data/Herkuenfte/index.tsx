@@ -17,7 +17,7 @@ import herkunftSort from '../../../utils/herkunftSort'
 import constants from '../../../utils/constants'
 import { Herkunft } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -69,21 +69,19 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const activeNodeArray = anaRaw.toJSON()
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'herkunft',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'herkunft' })
     const [herkunfts, totalCount] = await Promise.all([
       filteredObjectsFromTable({
         store,
         table: 'herkunft',
       }),
-      conditionAdder(
-        collectionFromTable({
-          table: 'herkunft',
-          where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'herkunft',
+        where: addTotalCriteriaToWhere({ store, table: 'herkunft', where }),
+      })
+        .filter(filter)
+        .count(),
     ])
 
     const herkunftsSorted = herkunfts.sort(herkunftSort)

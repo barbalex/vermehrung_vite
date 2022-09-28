@@ -16,7 +16,7 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import eventSort from '../../../utils/eventSort'
 import constants from '../../../utils/constants'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -59,18 +59,16 @@ const Events = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'event',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'event' })
     const [events, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'event' }),
-      conditionAdder(
-        collectionFromTable({
-          table: 'event',
-          where: addTotalCriteriaToWhere({ store, table: 'event' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'event',
+        where: addTotalCriteriaToWhere({ store, table: 'event', where }),
+      })
+        .filter(filter)
+        .count(),
     ])
 
     const eventsSorted = events.sort(eventSort)
