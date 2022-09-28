@@ -111,16 +111,10 @@ const Lieferschein = ({ row }) => {
           where: { sammel_lieferung_id: row.id },
         }),
       }).toArray(),
-      dexie.kulturs.get(
-        row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
-      dexie.persons.get(
-        row.person_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      row.vonKultur(),
+      row.person(),
     ])
-    const vonKulturGarten = await dexie.gartens.get(
-      kultur?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const vonKulturGarten = await kultur?.garten()
 
     return {
       lieferungs: lieferungs.sort(lieferungSort),

@@ -43,14 +43,14 @@ const SammelLieferungWer = ({ showFilter, ifNeeded, saveToDb, row }) => {
   const { errors, filter } = store
 
   const data = useLiveQuery(async () => {
-    const persons = await collectionFromTable({
-      table: 'person',
-      where: addTotalCriteriaToWhere({ table: 'person', store }),
-    }).toArray()
+    const [persons, person] = await Promise.all([
+      collectionFromTable({
+        table: 'person',
+        where: addTotalCriteriaToWhere({ table: 'person', store }),
+      }).toArray(),
+      row.person(),
+    ])
 
-    const person = await dexie.persons.get(
-      row.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
