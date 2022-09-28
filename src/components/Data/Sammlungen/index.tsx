@@ -76,9 +76,8 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'sammlung',
         where: addTotalCriteriaToWhere({ store, table: 'sammlung', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const sammlungsSorted = await sammlungsSortedFromSammlungs(sammlungs)
