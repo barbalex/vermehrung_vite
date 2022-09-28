@@ -22,7 +22,7 @@ const hierarchyConditionAdderForTable = async ({ store, table }) => {
         )
 
         return (collection) =>
-          collection.and('id').equals(activeSammlung.herkunft_id)
+          collection.filter((h) => h.id === activeSammlung.herkunft_id)
       }
       if (artIdInActiveNodeArray) {
         const sammlungsOfArt = await collectionFromTable({
