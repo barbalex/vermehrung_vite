@@ -83,11 +83,10 @@ const PersonArten = ({ person }) => {
       }),
     }).toArray()
     const avsSorted = await avsSortByArt(avs)
-    const avArtIds = avs.map((v) => v.art_id)
+    const avArtIds = [...new Set(avs.map((v) => v.art_id))]
     const arts = await dexie.arts
-      .where('id')
-      .noneOf(avArtIds)
-      .filter((a) => a._deleted === false)
+      .where('[id+_deleted_indexable]')
+      .noneOf(avArtIds.map((id) => [id, 0]))
       .toArray()
     const artsSorted = await artsSortedFromArts(arts)
     const artWerte = await Promise.all(
@@ -116,6 +115,8 @@ const PersonArten = ({ person }) => {
     },
     [insertAvRev, person.id],
   )
+
+  console.log('Person Arten, avs:', avs)
 
   return (
     <ErrorBoundary>
