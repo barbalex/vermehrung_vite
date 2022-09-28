@@ -11,7 +11,6 @@ import Files from '../../../Files'
 import ConflictList from '../../../../shared/ConflictList'
 import personLabelFromPerson from '../../../../../utils/personLabelFromPerson'
 import personSort from '../../../../../utils/personSort'
-import { dexie } from '../../../../../dexieClient'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 
@@ -57,9 +56,7 @@ const LieferungWer = ({
       where: addTotalCriteriaToWhere({ table: 'person', store }),
     }).toArray()
 
-    const person = await dexie.persons.get(
-      row.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const person = await row.person()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',

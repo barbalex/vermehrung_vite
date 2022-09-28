@@ -9,7 +9,6 @@ import Select from '../../../../shared/Select'
 import Checkbox2States from '../../../../shared/Checkbox2States'
 import JesNo from '../../../../shared/JesNo'
 import exists from '../../../../../utils/exists'
-import { dexie } from '../../../../../dexieClient'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
@@ -68,9 +67,7 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
         return true
       })
 
-    const kultur = await dexie.kulturs.get(
-      row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const kultur = await row.vonKultur()
 
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
