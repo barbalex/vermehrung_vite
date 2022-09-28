@@ -37,7 +37,7 @@ const ChooseArtQkRow = ({ qk }) => {
     })
     const personOption = await dexie.person_options.get(person.id)
     const artQks = await dexie.art_qks
-      .filter((q) => q._deleted === false)
+      .where({ _deleted_indexable: 0 })
       .toArray()
 
     return { personOption, artQkChoosen: artQks.map((q) => q.id) }

@@ -2110,6 +2110,10 @@ export class Person implements IPerson {
     }).toArray()
   }
 
+  async personOption() {
+    return await dexie.person_options.get(this.id)
+  }
+
   fullname() {
     if (this.vorname && this.name) {
       return `${this.vorname} ${this.name}`
@@ -2569,6 +2573,12 @@ export class Event implements IEvent {
 
   async kultur() {
     return await dexie.kulturs.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
+  async kulturOption() {
+    return await dexie.kultur_options.get(
       this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
     )
   }
@@ -4433,6 +4443,10 @@ export class PersonOption implements IPersonOption {
     this._deleted = _deleted ?? false
     this._deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
+  }
+
+  async person() {
+    return await dexie.persons.get(this.id)
   }
 
   removeConflict(_rev: string) {

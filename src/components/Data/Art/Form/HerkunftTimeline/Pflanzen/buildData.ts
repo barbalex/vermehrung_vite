@@ -124,9 +124,7 @@ const buildData = async ({ artId, herkunftId }) => {
     .toArray()
   const allLieferungsDonePromises = await Promise.all(
     allLieferungsDone.map(async (l) => {
-      const vonKultur = await dexie.kulturs.get(
-        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const vonKultur = await l.vonKultur()
 
       return vonKultur?.herkunft_id === herkunftId
     }),
@@ -154,9 +152,7 @@ const buildData = async ({ artId, herkunftId }) => {
   // can't use Q.on here because there are two associations to kultur
   const allLieferungsPlannedPromises = await Promise.all(
     allLieferungsPlanned.map(async (l) => {
-      const vonKultur = await dexie.kulturs.get(
-        l.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const vonKultur = await l.vonKultur()
 
       return vonKultur?.herkunft_id === herkunftId
     }),
