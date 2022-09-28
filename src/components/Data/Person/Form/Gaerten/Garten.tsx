@@ -62,10 +62,8 @@ const Garten = ({ gv }) => {
   }, [gv, store])
 
   const gartenLabel = useLiveQuery(async () => {
-    const garten = await dexie.gartens.get(
-      gv.garten_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const label = await garten.label()
+    const garten = await gv?.garten()
+    const label = await garten?.label()
 
     return label
   }, [gv.garten_id])

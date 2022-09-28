@@ -47,16 +47,15 @@ const SammelLieferungForm = ({
 
   const data = useLiveQuery(async () => {
     const [person, vonSammlung] = await Promise.all([
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
-      dexie.sammlungs.get(
-        row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
+      row.sammlung(),
     ])
-
-    const personOption: PersonOption = await dexie.person_options.get(person.id)
-    const vonSammlungHerkunft = await dexie.herkunfts.get(
-      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const [personOption, vonSammlungHerkunft] = await Promise.all([
+      person?.personOption(),
+      vonSammlung?.herkunft(),
+    ])
 
     if (vonSammlungHerkunft) {
       return {
@@ -67,10 +66,8 @@ const SammelLieferungForm = ({
     }
 
     if (row.von_kultur_id) {
-      const vonKultur = await dexie.kulturs.get(row.von_kultur_id)
-      const herkunftByVonKultur = await dexie.herkunfts.get(
-        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const vonKultur = await row.vonKultur()
+      const herkunftByVonKultur = await vonKultur?.herkunft()
       if (herkunftByVonKultur) {
         return {
           herkunft: herkunftByVonKultur,
@@ -80,12 +77,8 @@ const SammelLieferungForm = ({
       }
     }
 
-    const nachKultur = await dexie.kulturs.get(
-      row?.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const herkunftByNachKultur = await dexie.herkunfts.get(
-      nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const nachKultur = await row.nachKultur()
+    const herkunftByNachKultur = await nachKultur?.herkunft()
 
     return {
       herkunft: herkunftByNachKultur,
