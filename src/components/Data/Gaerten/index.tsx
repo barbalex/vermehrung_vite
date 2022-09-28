@@ -17,7 +17,7 @@ import gartensSortedFromGartens from '../../../utils/gartensSortedFromGartens'
 import constants from '../../../utils/constants'
 import { Garten } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
-import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -60,18 +60,16 @@ const Gaerten = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'garten',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'garten' })
     const [gartens, totalCount] = await Promise.all([
       filteredObjectsFromTable({ store, table: 'garten' }),
-      conditionAdder(
-        collectionFromTable({
-          table: 'garten',
-          where: addTotalCriteriaToWhere({ store, table: 'garten' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'garten',
+        where: addTotalCriteriaToWhere({ store, table: 'garten', where }),
+      })
+        .filter(filter)
+        .count(),
     ])
 
     const gartensSorted = await gartensSortedFromGartens(gartens)
