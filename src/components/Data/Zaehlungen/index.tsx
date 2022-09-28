@@ -71,9 +71,8 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'zaehlung',
         where: addTotalCriteriaToWhere({ store, table: 'zaehlung', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const zaehlungsSorted = zaehlungs.sort(zaehlungSort)

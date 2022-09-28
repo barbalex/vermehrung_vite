@@ -9,14 +9,10 @@ import collectionFromTable from './collectionFromTable'
 const filteredObjectsFromTable = async ({ store, table, count = false }) => {
   if (!table) throw `no table passed`
 
-  const whereAndFilterToAdd = await hierarchyWhereAndFilterForTable({
+  const { where = {}, filter } = await hierarchyWhereAndFilterForTable({
     store,
     table,
   })
-
-  const defaultFilter = () => true
-  const whereToAdd = whereAndFilterToAdd.where ?? {}
-  const filterToAdd = whereAndFilterToAdd.filter ?? defaultFilter
 
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
@@ -88,10 +84,9 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
 
   const filteredCollection1 = collectionFromTable({
     table,
-    where: addTotalCriteriaToWhere({ table, store, where: whereToAdd }),
-  })
-    .filter(filterFunction)
-    .and(filterToAdd)
+    where: addTotalCriteriaToWhere({ table, store, where }),
+    filter,
+  }).filter(filterFunction)
 
   // if a url is opened, a dataset should always show
   // even if it was filtered away
