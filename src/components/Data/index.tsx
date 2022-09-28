@@ -27,7 +27,6 @@ import Teilkultur from './Teilkultur'
 import Teilkulturen from './Teilkulturen'
 import Root from './Root'
 import StoreContext from '../../storeContext'
-import ErrorBondary from '../shared/ErrorBoundary'
 
 const Data = () => {
   const store = useContext(StoreContext)
