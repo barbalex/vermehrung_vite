@@ -18,16 +18,16 @@ const buildData = async ({ artId, herkunftId }) => {
   }).toArray()
   const idsOfKultursOfArt = kultursOfArt.map((k) => k.id)
   const zaehlungsDoneAll = await dexie.zaehlungs
-    .where('kultur_id')
-    .anyOf(idsOfKultursOfArt)
-    .filter((z) => z._deleted === false && z.prognose === false && !!z.datum)
+    .where('[kultur_id+prognose_indexable+_deleted_indexable]')
+    .anyOf(idsOfKultursOfArt.map((id) => [id, 0, 0]))
+    .filter((z) => !!z.datum)
     .toArray()
   const idsOfZaehlungsDoneAll = zaehlungsDoneAll.map((z) => z.id)
   const teilzaehlungsOfZaehlungsDoneWithAnzahlPflanzen =
     await dexie.teilzaehlungs
-      .where('zaehlung_id')
-      .anyOf(idsOfZaehlungsDoneAll)
-      .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
+      .where('[zaehlung_id+_deleted_indexable]')
+      .anyOf(idsOfZaehlungsDoneAll.map((id) => [id, 0]))
+      .filter((tz) => exists(tz.anzahl_pflanzen))
       .toArray()
   const zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen = [
     ...new Set(
@@ -37,21 +37,23 @@ const buildData = async ({ artId, herkunftId }) => {
     ),
   ]
   const zaehlungsDone = await dexie.zaehlungs
-    .where('id')
-    .anyOf(zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen)
+    .where('[zaehlung_id+_deleted_indexable]')
+    .anyOf(
+      zaehlungIdsOfTzOfZaehlungsDoneWithAnzahlPflanzen.map((id) => [id, 0]),
+    )
     .toArray()
   // same for planned
   const zaehlungsPlannedAll1 = await dexie.zaehlungs
-    .where('kultur_id')
-    .anyOf(idsOfKultursOfArt)
-    .filter((z) => z._deleted === false && z.prognose === true && !!z.datum)
+    .where('[kultur_id+prognose_indexable+_deleted_indexable]')
+    .anyOf(idsOfKultursOfArt.map((id) => [id, 1, 0]))
+    .filter((z) => !!z.datum)
     .toArray()
   const idsOfZaehlungsPlannedAll1 = zaehlungsPlannedAll1.map((z) => z.id)
   const teilzaehlungsOfZaehlungsPlannedWithAnzahlPflanzen =
     await dexie.teilzaehlungs
-      .where('zaehlung_id')
-      .anyOf(idsOfZaehlungsPlannedAll1)
-      .filter((tz) => exists(tz.anzahl_pflanzen) && tz._deleted === false)
+      .where('[zaehlung_id+_deleted_indexable]')
+      .anyOf(idsOfZaehlungsPlannedAll1.map((id) => [id, 0]))
+      .filter((tz) => exists(tz.anzahl_pflanzen))
       .toArray()
   const zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen = [
     ...new Set(
@@ -61,8 +63,10 @@ const buildData = async ({ artId, herkunftId }) => {
     ),
   ]
   const zaehlungsPlannedAll = await dexie.zaehlungs
-    .where('id')
-    .anyOf(zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen)
+    .where('[id+_deleted_indexable]')
+    .anyOf(
+      zaehlungIdsOfTzOfZaehlungsPlannedWithAnzahlPflanzen.map((id) => [id, 0]),
+    )
     .toArray()
   const zaehlungsPlannedIgnored = zaehlungsPlannedAll.filter((zg) =>
     // check if more recent zaehlungsDone exists
@@ -227,16 +231,16 @@ const buildData = async ({ artId, herkunftId }) => {
             .toArray()
           const idsOfAllZaehlungs = allZaehlungs.map((z) => z.id)
           const tzsOfAllZaehlungs = await dexie.teilzaehlungs
-            .where('zaehlung_id')
-            .anyOf(idsOfAllZaehlungs)
-            .filter((tz) => tz._deleted === false && exists(tz.anzahl_pflanzen))
+            .where('[zaehlung_id,_deleted_indexable]')
+            .anyOf(idsOfAllZaehlungs.map((id) => [id, 0]))
+            .filter((tz) => exists(tz.anzahl_pflanzen))
             .toArray()
           const zaehlungIdsOfTzsOfAllZaehlungs = [
             ...new Set(tzsOfAllZaehlungs.map((tz) => tz.zaehlung_id)),
           ]
           const zaehlungs = await dexie.zaehlungs
-            .where('id')
-            .anyOf(zaehlungIdsOfTzsOfAllZaehlungs)
+            .where('[id+_deleted_indexable]')
+            .anyOf(zaehlungIdsOfTzsOfAllZaehlungs.map((z) => [z.id, 0]))
             .toArray()
           const lastZaehlungDatum = max(
             zaehlungs.map((z) => z.datum).filter((d) => d <= date),
