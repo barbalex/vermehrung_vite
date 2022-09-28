@@ -22,16 +22,15 @@ const buildExceljsWorksheetsForTzSums = async ({
   const allKulturs: Kultur[] = await garten?.kulturs({ store })
   const idsOfAllKulturs = allKulturs.map((k) => k.id)
   const allZaehlungs: Zaehlung[] = await dexie?.zaehlungs
-    .where('kultur_id')
-    .anyOf(idsOfAllKulturs)
-    .filter((z) => z._deleted === false)
+    .where('[kultur_id+_deleted_indexable]')
+    .anyOf(idsOfAllKulturs.map((id) => [id, 0]))
     .toArray()
   const idsOfAllZaehlungs = allZaehlungs.map((z) => z.id)
 
   const teilzaehlungs: Teilzaehlung[] = await dexie.teilzaehlungs
-    .where('zaehlung_id')
-    .anyOf(idsOfAllZaehlungs)
-    .filter((tz) => tz._deleted === false /*&& exists(tz.anzahl_pflanzen)*/)
+    .where('[zaehlung_id+_deleted_indexable]')
+    .anyOf(idsOfAllZaehlungs.map((id) => [id, 0]))
+    // .filter((tz) => exists(tz.anzahl_pflanzen))
     .toArray()
   const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
   const teilzaehlungsData = await Promise.all(
