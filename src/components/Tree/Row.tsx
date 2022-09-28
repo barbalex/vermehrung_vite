@@ -9,6 +9,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu'
 import last from 'lodash/last'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import StoreContext from '../../storeContext'
 import isNodeInActiveNodePath from './isNodeInActiveNodePath'
@@ -189,6 +190,7 @@ const SymbolSpan = styled.span`
   width: ${(props) => (props['data-mobile'] ? '12px' : '9px')};
 `
 const TextSpan = styled.span`
+  position: relative;
   margin-left: 0;
   padding-right: 4px;
   font-family: ${(props) => (props['data-mono'] ? 'Roboto Mono' : 'Roboto')};
@@ -212,12 +214,19 @@ const MenuExplainerItem = styled(MenuItem)`
     border-color: rgb(255, 255, 255) !important;
   }
 `
+const StyledCircularProgress = styled(CircularProgress)`
+  position: absolute;
+  bottom: -10px;
+  svg {
+    transform: scale(0.4);
+  }
+`
 
 const Row = ({ style, node, nodes, userRole }) => {
   const store = useContext(StoreContext)
 
   const { showTreeInSingleColumnView, singleColumnView, tree } = store
-  const { activeNodeArray, singleRowHeight } = tree
+  const { activeNodeArray, singleRowHeight, loadingNode } = tree
 
   const isMobile = showTreeInSingleColumnView && singleColumnView
   let fontSize = node?.mono ? 15 : 16
@@ -260,21 +269,22 @@ const Row = ({ style, node, nodes, userRole }) => {
     }
   }, [node?.nodeType, node.table, node.url])
 
+  const loading = node.id === loadingNode
+
   const accountId = person?.account_id ?? null
 
-  const onClickNode = useCallback(
-    () =>
+  const onClickNode = useCallback(() => {
+    setTimeout(() =>
       toggleNode({
         nodes,
         node,
         store,
       }),
-    [node, nodes, store],
-  )
-  const onClickNodeSymbol = useCallback(
-    () => toggleNodeSymbol({ node, store }),
-    [node, store],
-  )
+    )
+  }, [node, nodes, store])
+  const onClickNodeSymbol = useCallback(() => {
+    toggleNodeSymbol({ node, store })
+  }, [node, store])
   const onClickNeu = useCallback(
     () => createNew({ node, store }),
     [node, store],
@@ -352,6 +362,7 @@ const Row = ({ style, node, nodes, userRole }) => {
             data-font-size={fontSize}
           >
             {node?.label ?? '(kein Label)'}
+            <>{loading && <StyledCircularProgress />}</>
           </TextSpan>
           {accountId && <StyledAccountIcon title="hat ein Konto" />}
         </StyledNode>

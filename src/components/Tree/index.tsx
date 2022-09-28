@@ -40,7 +40,9 @@ const Tree = () => {
   const [nodes, setNodes] = useState([])
 
   const data = useLiveQuery(async () => {
-    const person = await dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' })
+    const person = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
     const personOption: PersonOption = await dexie.person_options.get(person.id)
 
     return { personOption, userRole: person.user_role }
@@ -60,6 +62,8 @@ const Tree = () => {
   }, [store, userPersonOption, userRole])
 
   const buildMyNodesDebounced = useDebouncedCallback(buildMyNodes, 100)
+
+  // console.log('buildNodes, openNodes:', openNodes)
 
   useEffect(() => {
     //console.log('Tree second useEffect ordering nodes build')
