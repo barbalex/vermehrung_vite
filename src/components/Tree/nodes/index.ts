@@ -124,6 +124,7 @@ const compare = (a, b) => {
 }
 
 const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
+  console.log('building nodes')
   const { openNodes: openNodesRaw, activeNodeArray: activeNodeArrayRaw } =
     store.tree
   const openNodes = getSnapshot(openNodesRaw)
@@ -1238,7 +1239,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 5 kultur
   if (showKultur) {
-    const kulturCollection = collectionFromTable({ table: 'kultur' })
+    const kulturCollection = collectionFromTable({
+      table: 'kultur',
+      where: addTotalCriteriaToWhere({ store, table: 'kultur' }),
+    })
     const kulturCount = await kulturCollection.count()
     kulturFolderNodes = buildKulturFolder({ count: kulturCount })
     if (openNodes.some((n) => n.length === 2 && n[1] === 'Kulturen')) {
@@ -1246,7 +1250,8 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
       const kultursSorted = await kultursSortedFromKulturs(kulturs)
       kulturNodes = await Promise.all(
         kultursSorted.map(
-          async (kultur, index) => await buildKultur({ kultur, index }),
+          async (kultur, index) =>
+            await buildKultur({ kultur, index }),
         ),
       )
 
