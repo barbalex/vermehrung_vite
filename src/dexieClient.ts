@@ -1,4 +1,4 @@
-import Dexie, { DexieTable } from 'dexie'
+import { Dexie, DexieTable } from 'dexie'
 import { v1 as uuidv1 } from 'uuid'
 import { DateTime } from 'luxon'
 import gql from 'graphql-tag'
