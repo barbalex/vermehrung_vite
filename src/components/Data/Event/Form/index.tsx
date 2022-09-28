@@ -65,31 +65,29 @@ const EventForm = ({
   const kulturId = row?.kultur_id
 
   const data = useLiveQuery(async () => {
-    const [kulturs, teilkulturs, persons, kulturOption] = await Promise.all([
-      collectionFromTable({
-        table: 'kultur',
-        where: addTotalCriteriaToWhere({ table: 'kultur', store }),
-      }).toArray(),
-      collectionFromTable({
-        table: 'teilkultur',
-        where: addTotalCriteriaToWhere({
+    const [kulturs, teilkulturs, persons, kulturOption, kultur, person] =
+      await Promise.all([
+        collectionFromTable({
+          table: 'kultur',
+          where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+        }).toArray(),
+        collectionFromTable({
           table: 'teilkultur',
-          store,
-          where: showFilter ? { where: { kultur_id: kulturId } } : {},
-        }),
-      }).toArray(),
-      collectionFromTable({
-        table: 'person',
-        where: addTotalCriteriaToWhere({ store, table: 'person' }),
-      }).toArray(),
-      dexie.kultur_options.get(
-        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
-    ])
+          where: addTotalCriteriaToWhere({
+            table: 'teilkultur',
+            store,
+            where: showFilter ? { where: { kultur_id: kulturId } } : {},
+          }),
+        }).toArray(),
+        collectionFromTable({
+          table: 'person',
+          where: addTotalCriteriaToWhere({ store, table: 'person' }),
+        }).toArray(),
+        row.kulturOption(),
+        row.kultur(),
+        row.person(),
+      ])
     // need to show a choosen kultur even if inactive but not if deleted
-    const kultur = await dexie.kulturs.get(
-      row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
     const kultursIncludingChoosen = uniqBy(
       [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],
       'id',
@@ -108,9 +106,7 @@ const EventForm = ({
       }),
     )
 
-    const teilkultur = await dexie.teilkulturs.get(
-      row.teilkultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const teilkultur = await row.teilkultur()
     const teilkultursIncludingChoosen = uniqBy(
       [...teilkulturs, ...(teilkultur && !showFilter ? [teilkultur] : [])],
       'id',
@@ -123,9 +119,6 @@ const EventForm = ({
       }))
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = await dexie.persons.get(
-      row.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
