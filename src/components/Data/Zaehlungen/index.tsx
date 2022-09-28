@@ -19,7 +19,7 @@ import { Zaehlung } from '../../../dexieClient'
 import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
 import Spinner from '../../shared/Spinner'
 import collectionFromTable from '../../../utils/collectionFromTable'
-import hierarchyConditionAdderForTable from '../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 
 const Container = styled.div`
@@ -60,21 +60,20 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'zaehlung',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'zaehlung' })
+
     const [zaehlungs, totalCount] = await Promise.all([
       filteredObjectsFromTable({
         store,
         table: 'zaehlung',
       }),
-      conditionAdder(
-        collectionFromTable({
-          table: 'zaehlung',
-          where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'zaehlung',
+        where: addTotalCriteriaToWhere({ store, table: 'zaehlung', where }),
+      })
+        .filter(filter)
+        .count(),
     ])
 
     const zaehlungsSorted = zaehlungs.sort(zaehlungSort)
