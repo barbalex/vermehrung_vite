@@ -41,15 +41,11 @@ const buildData = async ({ artId }) => {
    * So need to recreate it for every usage
    */
   const zaehlungsObservableForZaehlungsDone = dexie.zaehlungs
-    .where('[kultur_id+_deleted_indexable]')
-    .anyOf(kultursIds.map((id) => [id, 0]))
+    .where('[kultur_id+prognose_indexable+_deleted_indexable]')
+    .anyOf(kultursIds.map((id) => [id, 0, 0]))
     .and((z) => !!z.datum)
   const zaehlungsDone = await zaehlungsObservableForZaehlungsDone
-    .and(
-      (z) =>
-        z.prognose === false &&
-        zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id),
-    )
+    .and((z) => zaehlungIdsOfTzWithAnzahlPflanzen.includes(z.id))
     .toArray()
 
   const zaehlungsObservableForZaehlungsPlannedAll = dexie.zaehlungs
