@@ -17,9 +17,13 @@ export default types
     openNodes: types.array(
       types.array(types.union(types.string, types.number)),
     ),
+    loadingNode: types.maybeNull(types.union(types.string, types.number), null),
     widthInPercentOfScreen: types.optional(types.number, 33),
   })
   .actions((self) => ({
+    setLoadingNode(val) {
+      self.loadingNode = val
+    },
     setLastTouchedNode(val) {
       self.lastTouchedNode = val
     },

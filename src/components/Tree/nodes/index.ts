@@ -124,7 +124,7 @@ const compare = (a, b) => {
 }
 
 const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
-  console.log('building nodes')
+  // console.log('building nodes')
   const { openNodes: openNodesRaw, activeNodeArray: activeNodeArrayRaw } =
     store.tree
   const openNodes = getSnapshot(openNodesRaw)
@@ -1250,8 +1250,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
       const kultursSorted = await kultursSortedFromKulturs(kulturs)
       kulturNodes = await Promise.all(
         kultursSorted.map(
-          async (kultur, index) =>
-            await buildKultur({ kultur, index }),
+          async (kultur, index) => await buildKultur({ kultur, index }),
         ),
       )
 
@@ -2246,6 +2245,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
       compare(a.sort[11], b.sort[11]),
   )
   //console.log('buildNodes, nodes:', nodesSorted)
+  store.tree.setLoadingNode(null)
   return nodesSorted
 }
 
