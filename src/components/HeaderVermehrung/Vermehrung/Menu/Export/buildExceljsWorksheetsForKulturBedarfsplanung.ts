@@ -7,7 +7,6 @@ import exists from '../../../../../utils/exists'
 import kultursSortedFromKulturs from '../../../../../utils/kultursSortedFromKulturs'
 import zaehlungSort from '../../../../../utils/zaehlungSort'
 import lieferungSort from '../../../../../utils/lieferungSort'
-import totalFilter from '../../../../../utils/totalFilter'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 import { dexie, Kultur } from '../../../../../dexieClient'
@@ -22,9 +21,8 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
   }).toArray()
   const gartenIds = gartens.map((g) => g.id)
   const kulturs = await dexie.kulturs
-    .where('garten_id')
-    .anyOf(gartenIds)
-    .filter((value) => totalFilter({ value, store, table: 'kultur' }))
+    .where('[garten_id+aktiv_indexable+_deleted_indexable]')
+    .anyOf(gartenIds.map((id) => [id, 1, 0]))
     .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
   const kultursData = await Promise.all(
@@ -45,19 +43,16 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
       }).toArray()
       const idsOfZaehlungsOfKultur = zaehlungsOfKultur.map((z) => z.id)
       const tzsWithAnzahlPflanzen = await dexie.teilzaehlungs
-        .where('zaehlung_id')
-        .anyOf(idsOfZaehlungsOfKultur)
-        .filter((t) => t._deleted === false && exists(t.anzahl_pflanzen))
+        .where('[zaehlung_id+_deleted_indexable]')
+        .anyOf(idsOfZaehlungsOfKultur.map((id) => [id, 0]))
+        .filter((t) => exists(t.anzahl_pflanzen))
         .toArray()
       const idsOfZaehlungsWithTzsWithAnzahlPflanzen = [
         ...new Set(tzsWithAnzahlPflanzen.map((t) => t.zaehlung_id)),
       ]
       const ownZaehlungen = await dexie.zaehlungs
-        .where('id')
-        .anyOf(idsOfZaehlungsWithTzsWithAnzahlPflanzen)
-        .filter(
-          (z) => z._deleted === false && !!z.datum && z.kultur_id === kultur.id,
-        )
+        .where('[id+kultur_id+_deleted_indexable]')
+        .anyOf(idsOfZaehlungsWithTzsWithAnzahlPflanzen.map(id=>[id,kultur.id,0]))
         .toArray()
       const ownZaehlungenSorted = ownZaehlungen.sort(zaehlungSort)
       const lastZaehlung = ownZaehlungenSorted[ownZaehlungenSorted.length - 1]
