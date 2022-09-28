@@ -67,9 +67,8 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'teilkultur',
         where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const teilkultursSorted = teilkulturs.sort(teilkulturSort)

@@ -5,11 +5,14 @@ import { dexie } from '../dexieClient'
 // thus need to be able to not call .where()
 // that is what this function is for
 
-const collectionFromTable = ({ table, where }) => {
+const collectionFromTable = ({ table, where, filter }) => {
+  let collection
   if (where && Object.keys(where) && Object.keys(where).length) {
-    return dexie[`${table}s`].where(where)
+    collection = dexie[`${table}s`].where(where)
+  } else {
+    collection = dexie[`${table}s`].toCollection()
   }
-  return dexie[`${table}s`].toCollection()
+  return filter ? collection.filter(filter) : collection
 }
 
 export default collectionFromTable
