@@ -18,9 +18,7 @@ const buildExceljsWorksheetsForDaten = async ({
 }) => {
   // 1. Get Garten
   const garten = await dexie.gartens.get(garten_id)
-  const person = await dexie.persons.get(
-    garten?.person_id ?? '99999999-9999-9999-9999-999999999999',
-  )
+  const person = await garten?.person()
   const newGarten = {
     id: garten.id,
     name: garten.name,
@@ -57,16 +55,10 @@ const buildExceljsWorksheetsForDaten = async ({
   const kultursOfGartenSorted = await kultursSortedFromKulturs(kultursOfGarten)
   const kulturData = await Promise.all(
     kultursOfGartenSorted.map(async (kultur) => {
-      const art = await dexie.arts.get(
-        kultur.art_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const art = await kultur?.art()
       const artLabel = await art?.label()
-      const aeArt = await dexie.ae_arts.get(
-        art?.ae_id ?? '99999999-9999-9999-9999-999999999999',
-      )
-      const herkunft = await dexie.herkunfts.get(
-        kultur.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const aeArt = await art?.aeArt()
+      const herkunft = await kultur?.herkunft()
 
       const newK = {
         id: kultur.id,
