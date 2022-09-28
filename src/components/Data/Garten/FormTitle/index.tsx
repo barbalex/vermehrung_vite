@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
@@ -15,18 +15,15 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const { personIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'garten',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'garten' })
 
     const [totalCount, filteredCount] = await Promise.all([
-      conditionAdder(
-        collectionFromTable({
-          table: 'garten',
-          where: addTotalCriteriaToWhere({ store, table: 'garten' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'garten',
+        where: addTotalCriteriaToWhere({ store, table: 'garten', where }),
+        filter,
+      }).count(),
       filteredObjectsFromTable({ store, table: 'garten', count: true }),
     ])
 
