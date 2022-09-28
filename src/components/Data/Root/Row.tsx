@@ -2,9 +2,12 @@ import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 import camelCase from 'lodash/camelCase'
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../storeContext'
 import constants from '../../../utils/constants'
+import collectionFromTable from '../../../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 
 const Row = styled.div`
   display: flex;
@@ -32,7 +35,13 @@ const RootRow = ({ row, style, last }) => {
   const store = useContext(StoreContext)
   const { setActiveNodeArray } = store.tree
 
-  const count = store[`${camelCase(row.table)}sFilteredCount`] ?? '...'
+  const count = useLiveQuery(
+    async () =>
+      await collectionFromTable({
+        table: row.table,
+        where: addTotalCriteriaToWhere({ store, table: row.table }),
+      }).count(),
+  )
 
   const onClickRow = useCallback(() => {
     setActiveNodeArray(row.url)
@@ -40,7 +49,7 @@ const RootRow = ({ row, style, last }) => {
 
   return (
     <Row key={row.id} onClick={onClickRow} style={style} data-last={last}>
-      <div>{`${row.name} (${count})`}</div>
+      <div>{`${row.name} (${count ?? '...'})`}</div>
     </Row>
   )
 }
