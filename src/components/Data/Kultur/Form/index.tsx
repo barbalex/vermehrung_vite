@@ -81,9 +81,7 @@ const KulturForm = ({
         table: 'garten',
         where: addTotalCriteriaToWhere({ table: 'garten', store }),
       }).toArray(),
-      dexie.gartens.get(
-        row?.garten_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      row.garten(),
       collectionFromTable({
         table: 'sammlung',
         where: addTotalCriteriaToWhere({ table: 'sammlung', store }),
@@ -185,9 +183,7 @@ const KulturForm = ({
       .anyOf(artsToChoose.map((id) => [id, 0]))
       .filter((a) => !!a.ae_id)
       .toArray()
-    const art = await dexie.arts.get({
-      id: row.art_id ?? '99999999-9999-9999-9999-999999999999',
-    })
+    const art = await row?.art()
     const artsIncludingChoosen = uniqBy(
       [...(arts ?? []), ...(art && !showFilter ? [art] : [])],
       'id',
@@ -207,9 +203,7 @@ const KulturForm = ({
       .where('[id+_deleted_indexable]')
       .anyOf(herkunftsToChoose.map((id) => [id, 0]))
       .toArray()
-    const herkunft = await dexie.herkunfts.get({
-      id: row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    })
+    const herkunft = await row?.herkunft()
     const herkunftsIncludingChoosen = uniqBy(
       [...(herkunfts ?? []), ...(herkunft && !showFilter ? [herkunft] : [])],
       'id',

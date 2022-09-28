@@ -41,9 +41,7 @@ const KulturNavButtons = ({ row }) => {
     [activeNodeArray, setActiveNodeArray],
   )
 
-  const kulturOption = useLiveQuery(
-    async () => await dexie.kultur_options.get(row.id),
-  )
+  const kulturOption = useLiveQuery(async () => await row.kulturOption())
 
   return (
     <>
