@@ -68,9 +68,8 @@ const Kulturen = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'kultur',
         where: addTotalCriteriaToWhere({ store, table: 'kultur', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const kultursSorted = await kultursSortedFromKulturs(kulturs)

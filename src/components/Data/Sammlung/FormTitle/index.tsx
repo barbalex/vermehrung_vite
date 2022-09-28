@@ -7,7 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import hierarchyConditionAdderForTable from '../../../../utils/hierarchyConditionAdderForTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
 
 const SammlungFormTitleChooser = ({
@@ -24,18 +24,15 @@ const SammlungFormTitleChooser = ({
   } = store
 
   const data = useLiveQuery(async () => {
-    const conditionAdder = await hierarchyConditionAdderForTable({
-      store,
-      table: 'sammlung',
-    })
+    const { filter = () => true, where = {} } =
+      await hierarchyWhereAndFilterForTable({ store, table: 'sammlung' })
 
     const [totalCount, filteredCount] = await Promise.all([
-      conditionAdder(
-        collectionFromTable({
-          table: 'sammlung',
-          where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
-        }),
-      ).count(),
+      collectionFromTable({
+        table: 'sammlung',
+        where: addTotalCriteriaToWhere({ store, table: 'sammlung', where }),
+        filter,
+      }).count(),
       filteredObjectsFromTable({ store, table: 'sammlung', count: true }),
     ])
 
