@@ -38,9 +38,13 @@ const Root = ({ filter: showFilter }) => {
   const activeNodeArray = activeNodeArrayRaw.toJSON()
 
   const data = useLiveQuery(async () => {
-    const person: Person = await dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' })
-    const userRole = await dexie.user_roles.get(person.user_role_id)
-    const personOption = await dexie.person_options.get(person.id)
+    const person: Person = await dexie.persons.get({
+      account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+    })
+    const [userRole, personOption] = await Promise.all([
+      person?.userRole(),
+      person?.personOption(),
+    ])
 
     return { userRole, personOption }
   }, [user.uid])
@@ -85,7 +89,14 @@ const Root = ({ filter: showFilter }) => {
       ? [{ name: 'Arten', url: ['Vermehrung', 'Arten'], table: 'art', sort: 1 }]
       : []),
     ...(showHerkunft
-      ? [{ name: 'Herkünfte', url: ['Vermehrung', 'Herkuenfte'], table: 'herkunft', sort: 2 }]
+      ? [
+          {
+            name: 'Herkünfte',
+            url: ['Vermehrung', 'Herkuenfte'],
+            table: 'herkunft',
+            sort: 2,
+          },
+        ]
       : []),
     ...(showSammlung
       ? [
@@ -98,10 +109,24 @@ const Root = ({ filter: showFilter }) => {
         ]
       : []),
     ...(showGarten
-      ? [{ name: 'Gärten', url: ['Vermehrung', 'Gaerten'], table: 'garten', sort: 4 }]
+      ? [
+          {
+            name: 'Gärten',
+            url: ['Vermehrung', 'Gaerten'],
+            table: 'garten',
+            sort: 4,
+          },
+        ]
       : []),
     ...(showKultur
-      ? [{ name: 'Kulturen', url: ['Vermehrung', 'Kulturen'], table: 'kultur', sort: 5 }]
+      ? [
+          {
+            name: 'Kulturen',
+            url: ['Vermehrung', 'Kulturen'],
+            table: 'kultur',
+            sort: 5,
+          },
+        ]
       : []),
     ...(showTeilkultur
       ? [
@@ -114,7 +139,14 @@ const Root = ({ filter: showFilter }) => {
         ]
       : []),
     ...(showZaehlung
-      ? [{ name: 'Zählungen', url: ['Vermehrung', 'Zaehlungen'], table: 'zaehlung', sort: 7 }]
+      ? [
+          {
+            name: 'Zählungen',
+            url: ['Vermehrung', 'Zaehlungen'],
+            table: 'zaehlung',
+            sort: 7,
+          },
+        ]
       : []),
     ...(showLieferung
       ? [
@@ -137,10 +169,24 @@ const Root = ({ filter: showFilter }) => {
         ]
       : []),
     ...(showEvent
-      ? [{ name: 'Events', url: ['Vermehrung', 'Events'], table: 'event', sort: 10 }]
+      ? [
+          {
+            name: 'Events',
+            url: ['Vermehrung', 'Events'],
+            table: 'event',
+            sort: 10,
+          },
+        ]
       : []),
     ...(showPerson
-      ? [{ name: 'Personen', url: ['Vermehrung', 'Personen'], table: 'person', sort: 11 }]
+      ? [
+          {
+            name: 'Personen',
+            url: ['Vermehrung', 'Personen'],
+            table: 'person',
+            sort: 11,
+          },
+        ]
       : []),
   ]
 
