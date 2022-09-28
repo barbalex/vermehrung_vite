@@ -66,9 +66,8 @@ const Events = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'event',
         where: addTotalCriteriaToWhere({ store, table: 'event', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const eventsSorted = events.sort(eventSort)

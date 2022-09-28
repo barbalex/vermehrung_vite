@@ -79,9 +79,8 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
       collectionFromTable({
         table: 'herkunft',
         where: addTotalCriteriaToWhere({ store, table: 'herkunft', where }),
-      })
-        .filter(filter)
-        .count(),
+        filter,
+      }).count(),
     ])
 
     const herkunftsSorted = herkunfts.sort(herkunftSort)
