@@ -23,7 +23,6 @@ import personLabelFromPerson from '../../../../utils/personLabelFromPerson'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
 import personSort from '../../../../utils/personSort'
 import herkunftSort from '../../../../utils/herkunftSort'
-import { dexie } from '../../../../dexieClient'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -80,7 +79,7 @@ const SammlungForm = ({
     ])
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = row.person_id ? await dexie.persons.get(row.person_id) : {}
+    const person = await row.person()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
@@ -92,9 +91,7 @@ const SammlungForm = ({
         label: personLabelFromPerson({ person }),
       }))
 
-    const herkunft = await dexie.herkunfts.get(
-      row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const herkunft = await row.herkunft()
     const herkunftsIncludingChoosen = uniqBy(
       [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
       'id',
@@ -106,9 +103,7 @@ const SammlungForm = ({
         label: herkunftLabelFromHerkunft({ herkunft }),
       }))
 
-    const art = await dexie.arts.get(
-      row.art_id ?? '99999999-9999-9999-99999999',
-    )
+    const art = await row.art()
     const artsIncludingChoosen = uniqBy(
       [...arts, ...(art && !showFilter ? [art] : [])],
       'id',

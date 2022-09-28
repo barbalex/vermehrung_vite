@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import herkunftLabelFromHerkunft from '../../../../utils/herkunftLabelFromHerkunft'
-import { dexie } from '../../../../dexieClient'
 
 const StyledTableCell = styled(TableCell)`
   vertical-align: top !important;
@@ -15,21 +14,13 @@ const Zeile = ({ value }) => <div>{value}</div>
 
 const LieferungForLieferschein = ({ lieferung: row }) => {
   const data = useLiveQuery(async () => {
-    const [art, kultur] = await Promise.all([
-      dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
-      dexie.kulturs.get(
-        row.von_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+    const [art, kultur, vonSammlung] = await Promise.all([
+      row.art(),
+      row.vonKultur(),
+      row.sammlung(),
     ])
-    const vonKulturHerkunft = await dexie.herkunfts.get(
-      kultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const vonSammlung = await dexie.sammlungs.get(
-      row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const vonSammlungHerkunft = await dexie.herkunfts.get(
-      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const vonKulturHerkunft = await kultur?.herkunft()
+    const vonSammlungHerkunft = await vonSammlung?.herkunft()
     const artLabel = await art.label()
     const herkunftLabel = vonKulturHerkunft
       ? herkunftLabelFromHerkunft({

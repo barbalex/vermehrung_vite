@@ -49,10 +49,7 @@ const PrognoseMenu = ({
   const { addNotification, insertZaehlungRev } = store
 
   const zaehlung = useLiveQuery(
-    async () =>
-      await dexie.zaehlungs.get(
-        teilzaehlung?.zaehlung_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+    async () => await teilzaehlung?.zaehlung(),
     [teilzaehlung?.zaehlung_id],
   )
 

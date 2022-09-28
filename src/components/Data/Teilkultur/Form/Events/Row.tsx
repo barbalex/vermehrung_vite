@@ -4,7 +4,6 @@ import format from 'date-fns/format'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import personFullname from '../../../../../utils/personFullname'
-import { dexie } from '../../../../../dexieClient'
 
 const Row = styled.div`
   ${(props) =>
@@ -45,9 +44,7 @@ const Geplant = styled.div`
 
 const TkEventRow = ({ event, last }) => {
   const personName = useLiveQuery(async () => {
-    const person = await dexie.persons.get(
-      event.person_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const person = await event.person()
 
     return personFullname(person)
   }, [])

@@ -55,12 +55,8 @@ const TeilkulturForm = ({
         table: 'kultur',
         where: addTotalCriteriaToWhere({ table: 'kultur', store }),
       }).toArray(),
-      dexie.kulturs.get(
-        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
-      dexie.kultur_options.get(
-        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      row.kultur(),
+      row.kulturOption(),
     ])
 
     // need to show a choosen kultur even if inactive but not if deleted

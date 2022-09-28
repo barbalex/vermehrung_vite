@@ -1461,6 +1461,12 @@ export class Teilkultur implements ITeilkultur {
     )
   }
 
+  async kulturOption() {
+    return await dexie.kultur_options.get(
+      this.kultur_id ?? '99999999-9999-9999-9999-999999999999',
+    )
+  }
+
   async events({ store }) {
     return await collectionFromTable({
       table: 'event',
