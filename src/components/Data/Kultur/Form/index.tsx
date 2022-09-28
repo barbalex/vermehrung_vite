@@ -24,7 +24,6 @@ import constants from '../../../../utils/constants'
 import gartensSortedFromGartens from '../../../../utils/gartensSortedFromGartens'
 import herkunftSort from '../../../../utils/herkunftSort'
 import { dexie } from '../../../../dexieClient'
-import { kultur } from '../../../../utils/fragments'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -182,9 +181,9 @@ const KulturForm = ({
     )
 
     const arts = await dexie.arts
-      .where('id')
-      .anyOf(artsToChoose)
-      .filter((a) => a._deleted === false && !!a.ae_id)
+      .where('[id+_deleted_indexable]')
+      .anyOf(artsToChoose.map((id) => [id, 0]))
+      .filter((a) => !!a.ae_id)
       .toArray()
     const art = await dexie.arts.get({
       id: row.art_id ?? '99999999-9999-9999-9999-999999999999',
@@ -205,9 +204,8 @@ const KulturForm = ({
     )
 
     const herkunfts = await dexie.herkunfts
-      .where('id')
-      .anyOf(herkunftsToChoose)
-      .filter((a) => a._deleted === false)
+      .where('[id+_deleted_indexable]')
+      .anyOf(herkunftsToChoose.map((id) => [id, 0]))
       .toArray()
     const herkunft = await dexie.herkunfts.get({
       id: row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
