@@ -18,7 +18,6 @@ import constants from '../../../../utils/constants'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import kultursSortedFromKulturs from '../../../../utils/kultursSortedFromKulturs'
-import { dexie } from '../../../../dexieClient'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -61,10 +60,8 @@ const ZaehlungForm = ({
         table: 'kultur',
         where: addTotalCriteriaToWhere({ table: 'kultur', store }),
       }).toArray(),
-      dexie.kulturs.get(
-        row.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
-      dexie.kultur_options.get(row.id),
+      row.kultur(),
+      row.kulturOption(),
     ])
     const kultursIncludingChoosen = uniqBy(
       [...kulturs, ...(kultur && !showFilter ? [kultur] : [])],

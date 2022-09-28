@@ -4,7 +4,6 @@ import format from 'date-fns/format'
 import { useLiveQuery } from 'dexie-react-hooks'
 
 import exists from '../../../../../utils/exists'
-import { dexie } from '../../../../../dexieClient'
 import Spinner from '../../../../shared/Spinner'
 
 const Row = styled.div`
@@ -52,10 +51,7 @@ const Other = styled.div`
 
 const TkTeilzaehlung = ({ tz, last }) => {
   const zaehlung = useLiveQuery(
-    async () =>
-      await dexie.zaehlungs.get(
-        tz.zaehlung_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+    async () => await tz.zaehlung(),
     [tz.zaehlung_id],
   )
 

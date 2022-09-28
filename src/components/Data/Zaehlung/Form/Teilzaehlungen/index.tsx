@@ -11,7 +11,6 @@ import Settings from './Settings'
 import ErrorBoundary from '../../../../shared/ErrorBoundary'
 import teilzaehlungsSortByTk from '../../../../../utils/teilzaehlungsSortByTk'
 import constants from '../../../../../utils/constants'
-import { dexie } from '../../../../../dexieClient'
 import Spinner from '../../../../shared/Spinner'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
@@ -53,9 +52,7 @@ const Teilzaehlungen = ({ zaehlung }) => {
           where: { zaehlung_id: zaehlung.id },
         }),
       }).toArray(),
-      dexie.kultur_options.get(
-        zaehlung.kultur_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      zaehlung?.kulturOption(),
     ])
     const teilzaehlungs = await teilzaehlungsSortByTk(tzs)
 
