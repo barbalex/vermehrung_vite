@@ -15,7 +15,6 @@ import {
   Kultur,
   Herkunft,
 } from '../../../../dexieClient'
-import totalFilter from '../../../../utils/totalFilter'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -130,9 +129,8 @@ const buildExceljsWorksheets = async ({
 
     // 3. Get Teil-Zählungen
     const teilzaehlungs = await dexie.teilzaehlungs
-      .where('zaehlung_id')
-      .anyOf(idsOfZaehlungs)
-      .filter((value) => totalFilter({ value, store, table: 'teilzaehlung' }))
+      .where('[zaehlung_id+_deleted_indexable]')
+      .anyOf(idsOfZaehlungs.map((id) => [id, 0]))
       .toArray()
     const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)
     const teilzaehlungData = await Promise.all(
