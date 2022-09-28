@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
-import { useLiveQuery } from 'dexie-react-hooks' 
+import { useLiveQuery } from 'dexie-react-hooks'
 
 import StoreContext from '../../../../../storeContext'
 import Checkbox2States from '../../../../shared/Checkbox2States'
@@ -46,19 +46,15 @@ const LierferungForm = ({
 
   const data = useLiveQuery(async () => {
     const [person, sammelLieferung, vonSammlung] = await Promise.all([
-      dexie.persons.get({ account_id: user.uid ?? '99999999-9999-9999-9999-999999999999' }),
-      dexie.sammel_lieferungs.get(
-        row.sammel_lieferung_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
-      dexie.sammlungs.get(
-        row.von_sammlung_id ?? '99999999-9999-9999-9999-999999999999',
-      ),
+      dexie.persons.get({
+        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
+      }),
+      row.sammelLieferung(),
+      row.sammlung(),
     ])
 
-    const personOption: PersonOption = await dexie.person_options.get(person.id)
-    const vonSammlungHerkunft = await dexie.herkunfts.get(
-      vonSammlung?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const personOption: PersonOption = await person?.personOption()
+    const vonSammlungHerkunft = await vonSammlung?.herkunft()
 
     if (vonSammlungHerkunft) {
       return {
@@ -70,10 +66,8 @@ const LierferungForm = ({
     }
 
     if (row.von_kultur_id) {
-      const vonKultur = await dexie.kulturs.get(row.von_kultur_id)
-      const herkunftByVonKultur = await dexie.herkunfts.get(
-        vonKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-      )
+      const vonKultur = await row.vonKultur()
+      const herkunftByVonKultur = await vonKultur?.herkunft()
       if (herkunftByVonKultur) {
         return {
           herkunft: herkunftByVonKultur,
@@ -84,12 +78,8 @@ const LierferungForm = ({
       }
     }
 
-    const nachKultur = await dexie.kulturs.get(
-      row?.nach_kultur_id ?? '99999999-9999-9999-9999-999999999999',
-    )
-    const herkunftByNachKultur = await dexie.herkunfts.get(
-      nachKultur?.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-    )
+    const nachKultur = await row.nachKultur()
+    const herkunftByNachKultur = await nachKultur?.herkunft()
 
     return {
       herkunft: herkunftByNachKultur,
