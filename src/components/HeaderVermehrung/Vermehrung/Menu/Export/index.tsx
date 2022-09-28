@@ -1,10 +1,11 @@
-import React, { useContext, useCallback } from 'react'
+import React, { useContext, useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
 import * as ExcelJs from 'exceljs/dist/exceljs.min.js'
 import styled from 'styled-components'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import StoreContext from '../../../../../storeContext'
 import buildExceljsWorksheetsForLieferungenOfYear from './buildExceljsWorksheetsForLieferungenOfYear'
@@ -13,6 +14,14 @@ import downloadExceljsWorkbook from '../../../../../utils/downloadExceljsWorkboo
 
 const FirstMenuItem = styled(MenuItem)`
   margin-top: -5px !important;
+`
+const StyledMenuItem = styled(MenuItem)`
+  min-height: 54px !important;
+`
+const StyledCircularProgress = styled(CircularProgress)`
+  svg {
+    transform: scale(0.4);
+  }
 `
 
 const SettingsOverallMenu = ({
@@ -33,17 +42,21 @@ const SettingsOverallMenu = ({
     },
     [setGrandParentAnchorEl, setParentAnchorEl, store],
   )
+
+  const [bedarfsplanungLoading, setBedarfsplanungLoading] = useState(false)
   const onClickKulturenFuerBedarfsplanung = useCallback(async () => {
+    setBedarfsplanungLoading(true)
     const workbook = new ExcelJs.Workbook()
     await buildExceljsWorksheetsForKulturBedarfsplanung({
       store,
       workbook,
     })
-    downloadExceljsWorkbook({
+    await downloadExceljsWorkbook({
       store,
       fileName: `kulturenFuerBedarfsplanung`,
       workbook,
     })
+    setBedarfsplanungLoading(false)
     setParentAnchorEl(null)
     setGrandParentAnchorEl(null)
   }, [setGrandParentAnchorEl, setParentAnchorEl, store])
@@ -67,9 +80,10 @@ const SettingsOverallMenu = ({
           variant="standard"
         />
       </FirstMenuItem>
-      <MenuItem onClick={onClickKulturenFuerBedarfsplanung}>
+      <StyledMenuItem onClick={onClickKulturenFuerBedarfsplanung}>
         aktueller Stand Kulturen für die Bedarfsplanung
-      </MenuItem>
+        <>{bedarfsplanungLoading && <StyledCircularProgress />}</>
+      </StyledMenuItem>
     </Menu>
   )
 }

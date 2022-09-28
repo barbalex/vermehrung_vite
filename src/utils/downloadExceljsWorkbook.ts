@@ -20,6 +20,7 @@ const downloadExceljsWorkbook = async ({ store, fileName, workbook }) => {
     new Blob([buffer], { type: 'application/octet-stream' }),
     `${file}.xlsx`,
   )
+  return
 }
 
 export default downloadExceljsWorkbook

@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { FaDownload } from 'react-icons/fa'
 import styled from 'styled-components'
 import * as ExcelJs from 'exceljs/dist/exceljs.min.js'
+import CircularProgress from '@mui/material/CircularProgress'
 
 import StoreContext from '../../../../../storeContext'
 import buildExceljsWorksheetsForDaten from './buildExceljsWorksheetsForDaten'
@@ -25,36 +26,51 @@ const Title = styled.div`
   font-weight: 700;
   user-select: none;
 `
+const StyledCircularProgress = styled(CircularProgress)`
+  svg {
+    transform: scale(0.4);
+  }
+`
+const StyledMenuItem = styled(MenuItem)`
+  min-height: 54px !important;
+`
 
 const GartenDownload = ({ gartenId }) => {
   const store = useContext(StoreContext)
 
+  const [loadingData, setLoadingData] = useState(false)
   const onClickData = useCallback(async () => {
+    setLoadingData(true)
     const workbook = new ExcelJs.Workbook()
     await buildExceljsWorksheetsForDaten({
       store,
       garten_id: gartenId,
       workbook,
     })
-    downloadExceljsWorkbook({
+    await downloadExceljsWorkbook({
       store,
       fileName: `Garten_${gartenId}_rohdaten`,
       workbook,
     })
+    setLoadingData(false)
     setAnchorEl(null)
   }, [gartenId, store])
+
+  const [loadingTzsSums, setLoadingTzsSums] = useState(false)
   const onClickTzSums = useCallback(async () => {
+    setLoadingTzsSums(true)
     const workbook = new ExcelJs.Workbook()
     await buildExceljsWorksheetsForTzSums({
       store,
       garten_id: gartenId,
       workbook,
     })
-    downloadExceljsWorkbook({
+    await downloadExceljsWorkbook({
       store,
       fileName: `Garten_${gartenId}_teilzaehlungen_summen`,
       workbook,
     })
+    setLoadingTzsSums(false)
     setAnchorEl(null)
   }, [gartenId, store])
 
@@ -73,7 +89,8 @@ const GartenDownload = ({ gartenId }) => {
         aria-haspopup="true"
         title="Daten herunterladen"
         onClick={onClickOpenMenu}
-        size="large">
+        size="large"
+      >
         <FaDownload />
       </IconButton>
       <Menu
@@ -85,13 +102,17 @@ const GartenDownload = ({ gartenId }) => {
         <TitleRow>
           <Title>herunterladen:</Title>
         </TitleRow>
-        <MenuItem onClick={onClickData}>{`(Roh-)Daten`}</MenuItem>
-        <MenuItem
-          onClick={onClickTzSums}
-        >{`Auswertung der Teil-Zählungen`}</MenuItem>
+        <StyledMenuItem onClick={onClickData}>
+          {`(Roh-)Daten`}
+          <>{loadingData && <StyledCircularProgress />}</>
+        </StyledMenuItem>
+        <StyledMenuItem onClick={onClickTzSums}>
+          {`Auswertung der Teil-Zählungen`}
+          <>{loadingTzsSums && <StyledCircularProgress />}</>
+        </StyledMenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(GartenDownload)
