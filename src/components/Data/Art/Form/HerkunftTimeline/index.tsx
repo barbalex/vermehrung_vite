@@ -50,10 +50,10 @@ const TimelineArea = ({ artId = '99999999-9999-9999-9999-999999999999' }) => {
       }),
     }).toArray()
     const herkunftIds = [...new Set(sammlungs.map((s) => s.herkunft_id))]
+    const anyOfs = herkunftIds.map((id) => [id, 0])
     const herkunfts = await dexie.herkunfts
-      .where('id')
-      .anyOf(herkunftIds)
-      .filter((h) => h._deleted === false)
+      .where('[id+_deleted_indexable]')
+      .anyOf(anyOfs)
       .toArray()
     const herkunftsSorted = herkunfts.sort(herkunftSort)
     return herkunftsSorted
