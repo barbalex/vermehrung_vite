@@ -4654,7 +4654,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(54).stores({
+    this.version(62).stores({
       herkunfts: 'id, nr, _deleted_indexable, [id+_deleted_indexable]',
       sammlungs:
         'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+herkunft_id], [nr+_deleted_indexable]',
@@ -4663,15 +4663,15 @@ export class MySubClassedDexie extends Dexie {
       arts: 'id, _deleted_indexable',
       ae_arts: 'id, name',
       gartens:
-        'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable]',
+        'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable], [id+aktiv_indexable+_deleted_indexable]',
       kulturs:
-        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable], [garten_id+_deleted_indexable], [aktiv_indexable+_deleted_indexable], [art_id+herkunft_id], [art_id+herkunft_id+aktiv_indexable+_deleted_indexable]',
+        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable], [garten_id+_deleted_indexable], [aktiv_indexable+_deleted_indexable], [art_id+herkunft_id], [art_id+herkunft_id+aktiv_indexable+_deleted_indexable], [id+art_id+aktiv_indexable+_deleted_indexable]',
       teilkulturs:
         'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
       zaehlungs:
-        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [kultur_id+_deleted_indexable]',
+        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [id+_deleted_indexable], [kultur_id+_deleted_indexable], [kultur_id+prognose_indexable+_deleted_indexable]',
       teilzaehlungs:
-        'id, *zaehlung_id, *teilkultur_id, _deleted_indexable, [zaehlung_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
+        'id, *zaehlung_id, *teilkultur_id, _deleted_indexable, [id+_deleted_indexable], [zaehlung_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
       persons:
         'id, &account_id, aktiv, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable]',
       sammel_lieferungs:
