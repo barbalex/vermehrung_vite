@@ -58,10 +58,11 @@ const Person = ({
   const store = useContext(StoreContext)
   const { filter, online } = store
 
-  const row = useLiveQuery(
+  let row = useLiveQuery(
     async () => await dexie.persons.get(id),
     [filter.person, id, showFilter],
   )
+  if (showFilter) row = filter.herkunft
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(
