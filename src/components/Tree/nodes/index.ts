@@ -110,8 +110,6 @@ import getShowSammelLieferung from '../../../utils/showSammelLieferung'
 import getShowSammlung from '../../../utils/showSammlung'
 import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
-import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
-import collectionFromTable from '../../../utils/collectionFromTable'
 import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 
 const compare = (a, b) => {
@@ -1618,13 +1616,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > garten
-        const personGartenCollection = collectionFromTable({
+        const personGartenCollection = filteredCollectionFromTable({
+          store,
           table: 'garten',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'garten',
-            where: { person_id: person.id },
-          }),
+          where: { person_id: person.id },
         })
         const personGartenCount = await personGartenCollection.count()
         personGartenFolderNodes.push(
@@ -1673,13 +1668,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             )
 
             // person > garten > kultur nodes
-            const gartenKulturCollection = collectionFromTable({
+            const gartenKulturCollection = filteredCollectionFromTable({
+              store,
               table: 'kultur',
-              where: addTotalCriteriaToWhere({
-                store,
-                table: 'kultur',
-                where: { garten_id: garten.id },
-              }),
+              where: { garten_id: garten.id },
             })
             const gartenKulturCount = await gartenKulturCollection.count()
             personGartenKulturFolderNodes.push(
@@ -1738,13 +1730,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 // teilkultur nodes
                 const kulturOption = await kultur.kulturOption()
                 if (kulturOption?.tk) {
-                  const teilkulturCollection = collectionFromTable({
+                  const teilkulturCollection = filteredCollectionFromTable({
+                    store,
                     table: 'teilkultur',
-                    where: addTotalCriteriaToWhere({
-                      store,
-                      table: 'teilkultur',
-                      where: { kultur_id: kultur.id },
-                    }),
+                    where: { kultur_id: kultur.id },
                   })
                   const teilkulturCount = await teilkulturCollection.count()
                   personGartenKulturTeilkulturFolderNodes.push(
@@ -1794,13 +1783,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // zaehlung nodes
-                const zaehlungCollection = collectionFromTable({
+                const zaehlungCollection = filteredCollectionFromTable({
+                  store,
                   table: 'zaehlung',
-                  where: addTotalCriteriaToWhere({
-                    store,
-                    table: 'zaehlung',
-                    where: { kultur_id: kultur.id },
-                  }),
+                  where: { kultur_id: kultur.id },
                 })
                 const zaehlungCount = await zaehlungCollection.count()
                 personGartenKulturZaehlungFolderNodes.push(
@@ -1851,13 +1837,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // anlieferung nodes
-                const anlieferungCollection = collectionFromTable({
+                const anlieferungCollection = filteredCollectionFromTable({
+                  store,
                   table: 'lieferung',
-                  where: addTotalCriteriaToWhere({
-                    store,
-                    table: 'lieferung',
-                    where: { nach_kultur_id: kultur.id },
-                  }),
+                  where: { nach_kultur_id: kultur.id },
                 })
                 const anlieferungCount = await anlieferungCollection.count()
                 personGartenKulturAnlieferungFolderNodes.push(
@@ -1906,13 +1889,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // auslieferung nodes
-                const auslieferungCollection = collectionFromTable({
+                const auslieferungCollection = filteredCollectionFromTable({
+                  store,
                   table: 'lieferung',
-                  where: addTotalCriteriaToWhere({
-                    store,
-                    table: 'lieferung',
-                    where: { von_kultur_id: kultur.id },
-                  }),
+                  where: { von_kultur_id: kultur.id },
                 })
                 const auslieferungCount = await auslieferungCollection.count()
                 personGartenKulturAuslieferungFolderNodes.push(
@@ -1961,13 +1941,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
                 }
 
                 // event nodes
-                const eventCollection = collectionFromTable({
+                const eventCollection = filteredCollectionFromTable({
+                  store,
                   table: 'event',
-                  where: addTotalCriteriaToWhere({
-                    store,
-                    table: 'event',
-                    where: { kultur_id: kultur.id },
-                  }),
+                  where: { kultur_id: kultur.id },
                 })
                 const eventCount = await eventCollection.count()
                 personGartenKulturEventFolderNodes.push(
@@ -2019,13 +1996,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // person > lieferung
-        const personLieferungCollection = collectionFromTable({
+        const personLieferungCollection = filteredCollectionFromTable({
+          store,
           table: 'lieferung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'lieferung',
-            where: { person_id: person.id },
-          }),
+          where: { person_id: person.id },
         })
         const personLieferungCount = await personLieferungCollection.count()
         personLieferungFolderNodes.push(
