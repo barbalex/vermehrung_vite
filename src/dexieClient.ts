@@ -4674,7 +4674,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(73).stores({
+    this.version(75).stores({
       herkunfts:
         'id, nr, _deleted_indexable, [id+_deleted_indexable], [nr+_deleted_indexable]',
       sammlungs:
