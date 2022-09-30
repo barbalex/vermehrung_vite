@@ -25,11 +25,7 @@ const Title = styled.div`
 const HerkunftDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,14 +40,11 @@ const HerkunftDeleteButton = ({ row }) => {
     await row.delete({ store })
     setAnchorEl(null)
     if (filter.herkunft._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
   }, [
     row,
     filter.herkunft._deleted,
-    removeOpenNodeWithChildren,
     activeNodeArray,
     setActiveNodeArray,
     store,
@@ -66,7 +59,8 @@ const HerkunftDeleteButton = ({ row }) => {
         title="Herkunft löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +77,7 @@ const HerkunftDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(HerkunftDeleteButton)

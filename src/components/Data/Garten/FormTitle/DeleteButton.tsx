@@ -25,11 +25,7 @@ const Title = styled.div`
 const GartenDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,18 +40,9 @@ const GartenDeleteButton = ({ row }) => {
     row.delete({ store })
     setAnchorEl(null)
     if (filter.garten._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
-  }, [
-    row,
-    store,
-    filter.garten._deleted,
-    removeOpenNodeWithChildren,
-    activeNodeArray,
-    setActiveNodeArray,
-  ])
+  }, [row, store, filter.garten._deleted, activeNodeArray, setActiveNodeArray])
 
   return (
     <ErrorBoundary>
@@ -66,7 +53,8 @@ const GartenDeleteButton = ({ row }) => {
         title="Garten löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +71,7 @@ const GartenDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(GartenDeleteButton)

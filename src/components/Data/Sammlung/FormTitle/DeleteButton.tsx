@@ -25,11 +25,7 @@ const Title = styled.div`
 const SammlungDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,15 +40,12 @@ const SammlungDeleteButton = ({ row }) => {
     row.delete({ store })
     setAnchorEl(null)
     if (filter.sammlung._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
   }, [
     row,
     store,
     filter.sammlung._deleted,
-    removeOpenNodeWithChildren,
     activeNodeArray,
     setActiveNodeArray,
   ])
@@ -66,7 +59,8 @@ const SammlungDeleteButton = ({ row }) => {
         title="Sammlung löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +77,7 @@ const SammlungDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(SammlungDeleteButton)

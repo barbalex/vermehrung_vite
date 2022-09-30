@@ -25,11 +25,7 @@ const Title = styled.div`
 const LieferungDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,15 +40,12 @@ const LieferungDeleteButton = ({ row }) => {
     row.delete({ store })
     setAnchorEl(null)
     if (filter.lieferung._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
   }, [
     row,
     store,
     filter.lieferung._deleted,
-    removeOpenNodeWithChildren,
     activeNodeArray,
     setActiveNodeArray,
   ])
@@ -66,7 +59,8 @@ const LieferungDeleteButton = ({ row }) => {
         title="Lieferung löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +77,7 @@ const LieferungDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(LieferungDeleteButton)

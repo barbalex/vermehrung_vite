@@ -28,7 +28,7 @@ const initiateApp = async () => {
       on: {
         ...options.on,
         opened: (socket) => {
-          options.on?.opened?.(socket)
+          options.on?.opened?.(socket) 
 
           restart = () => {
             if (socket.readyState === WebSocket.OPEN) {

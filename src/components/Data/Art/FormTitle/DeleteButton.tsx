@@ -25,11 +25,7 @@ const Title = styled.div`
 const ArtDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,18 +40,9 @@ const ArtDeleteButton = ({ row }) => {
     row.delete({ store })
     setAnchorEl(null)
     if (filter.art._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
-  }, [
-    activeNodeArray,
-    filter.art._deleted,
-    removeOpenNodeWithChildren,
-    row,
-    setActiveNodeArray,
-    store,
-  ])
+  }, [activeNodeArray, filter.art._deleted, row, setActiveNodeArray, store])
 
   return (
     <ErrorBoundary>
@@ -66,7 +53,8 @@ const ArtDeleteButton = ({ row }) => {
         title="Art löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +71,7 @@ const ArtDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(ArtDeleteButton)

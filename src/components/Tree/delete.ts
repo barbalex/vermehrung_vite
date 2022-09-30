@@ -1,8 +1,10 @@
 import tableFromTitleHash from '../../utils/tableFromTitleHash'
+import { dexie } from '../../dexieClient'
 
 const deleteModule = async ({ node, store }) => {
-  const { activeNodeArray, setActiveNodeArray, removeOpenNodeWithChildren } =
-    store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
+
+  // console.log('deleteModule', { node })
 
   // get table and id from url
   const title = node.url.slice(-2)[0]
@@ -10,12 +12,10 @@ const deleteModule = async ({ node, store }) => {
   if (!id) throw new Error(`Keine id gefunden`)
   const table = tableFromTitleHash[title]
 
-  const me = dexie[`${table}s`]?.get(id)
-  if (!me?.delete) throw new Error(`Kein Modell für Tabelle ${table} gefunden`)
+  const me = await dexie[`${table}s`]?.get(id)
+  if (!me?.delete) throw new Error(`Kein Modell für Tabelle ${table}s gefunden`)
   me.delete({ store })
   setActiveNodeArray(activeNodeArray.slice(0, -1))
-  // need to remove openNode from openNodes
-  removeOpenNodeWithChildren(node.url)
 }
 
 export default deleteModule

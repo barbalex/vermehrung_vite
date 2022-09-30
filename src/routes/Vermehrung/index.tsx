@@ -17,7 +17,7 @@ import Header from '../../components/HeaderVermehrung'
 // because it pops a request window
 async function persist() {
   return (
-    (await navigator.storage) &&
+    (await navigator.storage) && 
     navigator.storage.persist &&
     navigator.storage.persist()
   )

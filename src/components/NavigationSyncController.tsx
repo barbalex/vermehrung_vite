@@ -19,9 +19,12 @@ const NavigationSyncController = () => {
     addNode,
     activeNodeArray: aNARaw,
     setLastActiveNodeArray,
-    lastActiveNodeArray,
+    lastActiveNodeArray: lastANARaw,
+    removeOpenNodeWithChildren,
+    addOpenNode,
   } = store.tree
   const aNA = aNARaw.slice()
+  const lastANA = lastANARaw.slice()
 
   // enable navigating in store > set this as store value
   // (can't be passed when creating store yet)
@@ -42,28 +45,35 @@ const NavigationSyncController = () => {
   useEffect(() => {
     const activeNodeArrayFromUrl = getActiveNodeArrayFromUrl(pathname)
 
-    console.log('NavigationSyncController', {
-      aNA,
-      activeNodeArrayFromUrl,
-      lastActiveNodeArray: lastActiveNodeArray.slice(),
-    })
-
     if (!isEqual(activeNodeArrayFromUrl, aNA)) {
       console.log(
         'NavigationSyncController, setting activeNodeArray to',
         activeNodeArrayFromUrl,
       )
       setActiveNodeArray(activeNodeArrayFromUrl)
-      addNode(activeNodeArrayFromUrl)
+      // addNode(activeNodeArrayFromUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
-  // setting last touched node on every change of activeNodeArray
-  // to ensure tree follows navigation in form lists
   useEffect(() => {
+    // edit openNodes
+    // Three cases:
+    // 1. new aNA longer
+    // 2. new aNA shorter
+    // 3. new aNA changed
+    if (aNA.length > lastANA.length) {
+      // new aNA is longer or simply changed
+      addOpenNode(aNA)
+    } else if (aNA.length < lastANA.length) {
+      // 2. new aNA shorter
+      removeOpenNodeWithChildren([...aNA, lastANA[aNA.length]])
+    }
+    // BEWARE: this should not make this effect fire again, so do not add lastANA as dependency
     setLastActiveNodeArray(aNA)
-  }, [aNA, setLastActiveNodeArray])
+    // DO NOT add lastANA as that causes this effect to run twice and fail
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [aNA, addOpenNode, removeOpenNodeWithChildren, setLastActiveNodeArray])
 
   return null
 }

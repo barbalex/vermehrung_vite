@@ -25,11 +25,7 @@ const Title = styled.div`
 const EventDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -45,17 +41,9 @@ const EventDeleteButton = ({ row }) => {
     setAnchorEl(null)
     if (filter.event._deleted === false) {
       // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
-  }, [
-    row,
-    store,
-    filter.event._deleted,
-    removeOpenNodeWithChildren,
-    activeNodeArray,
-    setActiveNodeArray,
-  ])
+  }, [row, store, filter.event._deleted, activeNodeArray, setActiveNodeArray])
 
   return (
     <ErrorBoundary>
@@ -66,7 +54,8 @@ const EventDeleteButton = ({ row }) => {
         title="Event löschen"
         onClick={onClickButton}
         disabled={row._deleted}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -83,7 +72,7 @@ const EventDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(EventDeleteButton)

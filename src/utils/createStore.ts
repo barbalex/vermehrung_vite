@@ -11,6 +11,7 @@ const createStore = async () => {
     // reset some values
     if (!dbStore?.store?.showMap) dbStore.store.mapInitiated = false
     dbStore.store.notifications = {}
+    dbStore.store.lastActiveNodeArray = ['vermehrung']
     // need to blacklist authorizing or mst-persist will set it to false
     // and login form appears for a short moment until auth state changed
     dbStore.store.authorizing = true

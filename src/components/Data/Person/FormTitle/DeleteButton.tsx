@@ -25,11 +25,7 @@ const Title = styled.div`
 const PersonDeleteButton = ({ row }) => {
   const store = useContext(StoreContext)
   const { filter } = store
-  const {
-    activeNodeArray,
-    setActiveNodeArray,
-    removeOpenNodeWithChildren,
-  } = store.tree
+  const { activeNodeArray, setActiveNodeArray } = store.tree
 
   const [anchorEl, setAnchorEl] = useState(null)
   const closeMenu = useCallback(() => {
@@ -44,18 +40,9 @@ const PersonDeleteButton = ({ row }) => {
     row.delete({ store })
     setAnchorEl(null)
     if (filter.person._deleted === false) {
-      // need to remove openNode from openNodes
-      removeOpenNodeWithChildren(activeNodeArray)
       setActiveNodeArray(activeNodeArray.slice(0, -1))
     }
-  }, [
-    activeNodeArray,
-    filter.person._deleted,
-    removeOpenNodeWithChildren,
-    row,
-    setActiveNodeArray,
-    store,
-  ])
+  }, [activeNodeArray, filter.person._deleted, row, setActiveNodeArray, store])
 
   return (
     <ErrorBoundary>
@@ -65,7 +52,8 @@ const PersonDeleteButton = ({ row }) => {
         aria-label="Person löschen"
         title="Person löschen"
         onClick={onClickDelete}
-        size="large">
+        size="large"
+      >
         <FaMinus />
       </IconButton>
       <Menu
@@ -82,7 +70,7 @@ const PersonDeleteButton = ({ row }) => {
         <MenuItem onClick={closeMenu}>Nein, abbrechen!</MenuItem>
       </Menu>
     </ErrorBoundary>
-  );
+  )
 }
 
 export default observer(PersonDeleteButton)
