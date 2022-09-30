@@ -247,7 +247,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
     })
     const artCount = await artCollection.count()
     artFolderNodes = buildArtFolder({ count: artCount })
-    console.log('buildNodes, openNodes:', openNodes)
+    // console.log('buildNodes, openNodes:', openNodes)
     const artFolderIsOpen = openNodes.some(
       (n) => n.length === 2 && n[1] === 'Arten',
     )

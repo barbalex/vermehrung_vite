@@ -12,7 +12,11 @@ const toggleNode = ({ node, nodes, store }) => {
       message: 'Fehler: Dem Knoten im Navigationsbaum fehlt die url',
     })
   }
-  const { setActiveNodeArray, activeNodeArray: aNAProxy, setLoadingNode } = store.tree
+  const {
+    setActiveNodeArray,
+    activeNodeArray: aNAProxy,
+    setLoadingNode,
+  } = store.tree
   const aNA = getSnapshot(aNAProxy)
   const activeNode = nodes.find((n) => isEqual(n.url, aNA))
 
@@ -21,7 +25,7 @@ const toggleNode = ({ node, nodes, store }) => {
     // node is closed
     // open it and make it the active node
     setLoadingNode(node.id)
-    addOpenNode(node.url) 
+    addOpenNode(node.url)
     const newActiveNodeArray = [...node.url]
     setActiveNodeArray(newActiveNodeArray)
   } else if (node.id === activeNode?.id) {

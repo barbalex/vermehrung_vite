@@ -21,17 +21,15 @@ const toggleNodeSymbol = ({ node, store }) => {
   store.filter.setShow(false)
   // TODO: tell user if childrenCount is 0 he can create
   if (isNodeOpen({ store, url: node.url })) {
-    // removeOpenNodeWithChildren(node.url)
     if (isNodeInActiveNodePath({ node, activeNodeArray })) {
       // when a user closes a folder in the active node path
       // the active node should swith to the node's parent
       const newActiveNodeArray = [...node.url]
       newActiveNodeArray.pop()
       setActiveNodeArray(newActiveNodeArray)
-    } else {
-      // need to explicitly remove open node as activeNodeArray is not changed
-      removeOpenNodeWithChildren(node.url)
     }
+    // need to explicitly remove open node as activeNodeArray is not changed
+    removeOpenNodeWithChildren(node.url)
   } else {
     setLoadingNode(node.id)
     // need to explicitly add open node as activeNodeArray is not changed
