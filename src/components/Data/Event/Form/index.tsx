@@ -85,7 +85,7 @@ const EventForm = ({
         }).toArray(),
         row.kulturOption(),
         row.kultur(),
-        row.person(),
+        row?.person?.(),
       ])
     // need to show a choosen kultur even if inactive but not if deleted
     const kultursIncludingChoosen = uniqBy(

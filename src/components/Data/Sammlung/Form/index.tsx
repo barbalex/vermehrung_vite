@@ -79,7 +79,7 @@ const SammlungForm = ({
     ])
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = await row.person()
+    const person = await row?.person?.()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',
@@ -91,7 +91,7 @@ const SammlungForm = ({
         label: personLabelFromPerson({ person }),
       }))
 
-    const herkunft = await row.herkunft()
+    const herkunft = await row.herkunft?.()
     const herkunftsIncludingChoosen = uniqBy(
       [...herkunfts, ...(herkunft && !showFilter ? [herkunft] : [])],
       'id',
@@ -103,7 +103,7 @@ const SammlungForm = ({
         label: herkunftLabelFromHerkunft({ herkunft }),
       }))
 
-    const art = await row.art()
+    const art = await row.art?.()
     const artsIncludingChoosen = uniqBy(
       [...arts, ...(art && !showFilter ? [art] : [])],
       'id',
@@ -111,7 +111,7 @@ const SammlungForm = ({
     const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
     const artWerte = await Promise.all(
       artsSorted.map(async (art) => {
-        const label = await art.label()
+        const label = await art.label?.()
 
         return {
           value: art.id,

@@ -18,7 +18,7 @@ const buildExceljsWorksheetsForDaten = async ({
 }) => {
   // 1. Get Garten
   const garten = await dexie.gartens.get(garten_id)
-  const person = await garten?.person()
+  const person = await garten?.person?.()
   const newGarten = {
     id: garten.id,
     name: garten.name,
@@ -58,7 +58,7 @@ const buildExceljsWorksheetsForDaten = async ({
       const art = await kultur?.art()
       const artLabel = await art?.label()
       const aeArt = await art?.aeArt()
-      const herkunft = await kultur?.herkunft()
+      const herkunft = await kultur?.herkunft?.()
 
       const newK = {
         id: kultur.id,

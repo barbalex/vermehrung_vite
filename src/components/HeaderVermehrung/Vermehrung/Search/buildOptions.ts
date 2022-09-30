@@ -105,7 +105,7 @@ const buildOptions = async ({ store, cb, val }) => {
   const searchGartenSuggestions = await Promise.all(
     gartensSorted.map(async (g) => {
       const label = await g.label()
-      const person = await g.person()
+      const person = await g?.person?.()
 
       return {
         value: g.id,
@@ -170,10 +170,10 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchKulturSuggestions = await Promise.all(
     kultursSorted.map(async (k) => {
-      const label = await k.label()
-      const garten = await k.garten()
-      const gartenPerson = await garten?.person()
-      const herkunft = await k.herkunft()
+      const label = await k.label?.()
+      const garten = await k.garten?.()
+      const gartenPerson = await garten?.person?.()
+      const herkunft = await k.herkunft?.()
 
       return {
         value: k.id,
@@ -210,7 +210,7 @@ const buildOptions = async ({ store, cb, val }) => {
     const art: Art = await kultur?.art()
     const artname = await art?.label?.()
     const garten: Garten = await kultur?.garten()
-    const gartenPerson = await garten?.person()
+    const gartenPerson = await garten?.person?.()
 
     return {
       value: e.id,
@@ -243,17 +243,17 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchLieferungSuggestions = await Promise.all(
     lieferungsSorted.map(async (l) => {
-      const person = await l.person()
-      const sammlung = await l.sammlung()
-      const sammlungPerson = await sammlung?.person()
-      const sammlungHerkunft = await sammlung?.herkunft()
-      const vonKultur = await l.vonKultur()
-      const vonKulturGarten = await vonKultur?.garten()
-      const vonKulturGartenPerson = await vonKulturGarten?.person()
-      const nachKultur = await l.nachKultur()
-      const nachKulturGarten = await nachKultur?.garten()
-      const nachKulturGartenPerson = nachKulturGarten?.person()
-      const art = await l.art()
+      const person = await l?.person?.()
+      const sammlung = await l.sammlung?.()
+      const sammlungPerson = await sammlung?.person?.()
+      const sammlungHerkunft = await sammlung?.herkunft?.()
+      const vonKultur = await l.vonKultur?.()
+      const vonKulturGarten = await vonKultur?.garten?.()
+      const vonKulturGartenPerson = await vonKulturGarten?.person?.()
+      const nachKultur = await l.nachKultur?.()
+      const nachKulturGarten = await nachKultur?.garten?.()
+      const nachKulturGartenPerson = nachKulturGarten?.person?.()
+      const art = await l.art?.()
       const artname = (await art?.label?.()) ?? ''
 
       return {
@@ -344,8 +344,8 @@ const buildOptions = async ({ store, cb, val }) => {
   }
   const searchSammlungSuggestions = await Promise.all(
     sammlungsSorted.map(async (s) => {
-      const label = await s.label()
-      const herkunft = await s.herkunft()
+      const label = await s.label?.()
+      const herkunft = await s.herkunft?.()
 
       return {
         value: s.id,

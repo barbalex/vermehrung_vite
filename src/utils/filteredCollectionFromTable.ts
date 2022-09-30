@@ -5,11 +5,7 @@ import exists from './exists'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 import collectionFromTable from './collectionFromTable'
 
-const filteredCollectionFromTable = ({
-  store,
-  table,
-  where={},filter
-}) => {
+const filteredCollectionFromTable = ({ store, table, where = {}, filter }) => {
   if (!table) throw `no table passed`
 
   const storeFilter = store.filter[table]
@@ -32,7 +28,7 @@ const filteredCollectionFromTable = ({
       const objectValue = object[key]
       // console.log('filteredCollectionFromTable, objectValue:', objectValue)
       if (objectValue === undefined /*&& value !== undefined*/) {
-        console.log('filteredCollectionFromTable, false due to undefined')
+        // console.log('filteredCollectionFromTable, false due to undefined')
         returnValue = false
         break
       }
@@ -56,7 +52,7 @@ const filteredCollectionFromTable = ({
       if (
         type === 'string' &&
         !!objectValue?.includes &&
-        value?.toString()?.toLowerCase() &&
+        value?.toString?.()?.toLowerCase?.() &&
         !objectValue?.includes?.(value?.toString()?.toLowerCase())
       ) {
         // console.log(

@@ -203,7 +203,7 @@ const KulturForm = ({
       .where('[id+_deleted_indexable]')
       .anyOf(herkunftsToChoose.map((id) => [id, 0]))
       .toArray()
-    const herkunft = await row?.herkunft()
+    const herkunft = await row?.herkunft?.()
     const herkunftsIncludingChoosen = uniqBy(
       [...(herkunfts ?? []), ...(herkunft && !showFilter ? [herkunft] : [])],
       'id',

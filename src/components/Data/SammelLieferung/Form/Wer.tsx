@@ -47,7 +47,7 @@ const SammelLieferungWer = ({ showFilter, ifNeeded, saveToDb, row }) => {
         table: 'person',
         where: addTotalCriteriaToWhere({ table: 'person', store }),
       }).toArray(),
-      row.person(),
+      row?.person?.(),
     ])
 
     const personsIncludingChoosen = uniqBy(

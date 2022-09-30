@@ -19,9 +19,9 @@ const LieferungForLieferschein = ({ lieferung: row }) => {
       row.vonKultur(),
       row.sammlung(),
     ])
-    const vonKulturHerkunft = await kultur?.herkunft()
-    const vonSammlungHerkunft = await vonSammlung?.herkunft()
-    const artLabel = await art.label()
+    const vonKulturHerkunft = await kultur?.herkunft?.()
+    const vonSammlungHerkunft = await vonSammlung?.herkunft?.()
+    const artLabel = await art.label?.()
     const herkunftLabel = vonKulturHerkunft
       ? herkunftLabelFromHerkunft({
           herkunft: vonKulturHerkunft,

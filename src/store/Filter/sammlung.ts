@@ -73,7 +73,7 @@ export const empty = {
   _deleted: false,
 }
 
-export const simpleTypes = {
+export const simpleTypes = { 
   id: 'uuid',
   art_id: 'uuid',
   person_id: 'uuid',

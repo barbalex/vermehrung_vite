@@ -27,12 +27,12 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
   const kultursData = await Promise.all(
     kultursSorted.map(async (kultur: Kultur) => {
-      const kulturLabel = await kultur.label()
-      const art = await kultur.art()
-      const artname = await art?.label()
-      const herkunft = await kultur.herkunft()
-      const garten = await kultur.garten()
-      const garten_label = await garten.label()
+      const kulturLabel = await kultur.label?.()
+      const art = await kultur.art?.()
+      const artname = await art?.label?.()
+      const herkunft = await kultur.herkunft?.()
+      const garten = await kultur.garten?.()
+      const garten_label = await garten.label?.()
       const zaehlungsOfKultur = await collectionFromTable({
         table: 'zaehlung',
         where: addTotalCriteriaToWhere({
@@ -52,7 +52,13 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
       ]
       const ownZaehlungen = await dexie.zaehlungs
         .where('[id+kultur_id+_deleted_indexable]')
-        .anyOf(idsOfZaehlungsWithTzsWithAnzahlPflanzen.map(id=>[id,kultur.id,0]))
+        .anyOf(
+          idsOfZaehlungsWithTzsWithAnzahlPflanzen.map((id) => [
+            id,
+            kultur.id,
+            0,
+          ]),
+        )
         .toArray()
       const ownZaehlungenSorted = ownZaehlungen.sort(zaehlungSort)
       const lastZaehlung = ownZaehlungenSorted[ownZaehlungenSorted.length - 1]

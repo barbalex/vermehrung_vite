@@ -6,14 +6,14 @@ import { Kultur } from '../dexieClient'
 const kultursSortedFromKulturs = async (kulturs) => {
   const kulturSorters = await Promise.all(
     kulturs.map(async (kultur: Kultur) => {
-      const art = await kultur.art()
-      const artLabel = await art?.label()
-      const herkunft = await kultur.herkunft()
+      const art = await kultur.art?.()
+      const artLabel = await art?.label?.()
+      const herkunft = await kultur.herkunft?.()
       const herkunftNr = herkunft?.nr
       const herkunftGemeinde = herkunft?.gemeinde
       const herkunftLokalname = herkunft?.lokalname
-      const garten = await kultur.garten()
-      const gartenPerson = await kultur.gartenPerson()
+      const garten = await kultur.garten?.()
+      const gartenPerson = await kultur.gartenPerson?.()
       const gartenLabel = await gartenLabelFromGarten({
         garten,
         person: gartenPerson,

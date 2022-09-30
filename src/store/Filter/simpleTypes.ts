@@ -11,7 +11,7 @@ import { simpleTypes as zaehlung } from './zaehlung'
 import { simpleTypes as teilkultur } from './teilkultur'
 import { simpleTypes as teilzaehlung } from './teilzaehlung'
 
-export default {
+export default { 
   art,
   event,
   garten,

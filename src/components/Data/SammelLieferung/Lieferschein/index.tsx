@@ -109,7 +109,7 @@ const Lieferschein = ({ row }) => {
         }),
       }).toArray(),
       row.vonKultur(),
-      row.person(),
+      row?.person?.(),
     ])
     const vonKulturGarten = await kultur?.garten()
 

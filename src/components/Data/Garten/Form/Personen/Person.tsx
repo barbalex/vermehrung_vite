@@ -51,7 +51,7 @@ const Gv = ({ gv }) => {
   useEffect(() => {
     if (!gv.person_id) return
 
-    gv.person().then((person) =>
+    gv?.person?.().then((person) =>
       setPersonLabel(personLabelFromPerson({ person })),
     )
   }, [gv, gv.person_id])

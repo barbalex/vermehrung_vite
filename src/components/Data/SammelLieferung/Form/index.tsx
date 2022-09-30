@@ -53,8 +53,8 @@ const SammelLieferungForm = ({
       row.sammlung(),
     ])
     const [personOption, vonSammlungHerkunft] = await Promise.all([
-      person?.personOption(),
-      vonSammlung?.herkunft(),
+      person?.personOption?.(),
+      vonSammlung?.herkunft?.(),
     ])
 
     if (vonSammlungHerkunft) {
@@ -66,8 +66,8 @@ const SammelLieferungForm = ({
     }
 
     if (row.von_kultur_id) {
-      const vonKultur = await row.vonKultur()
-      const herkunftByVonKultur = await vonKultur?.herkunft()
+      const vonKultur = await row.vonKultur?.()
+      const herkunftByVonKultur = await vonKultur?.herkunft?.()
       if (herkunftByVonKultur) {
         return {
           herkunft: herkunftByVonKultur,
@@ -77,8 +77,8 @@ const SammelLieferungForm = ({
       }
     }
 
-    const nachKultur = await row.nachKultur()
-    const herkunftByNachKultur = await nachKultur?.herkunft()
+    const nachKultur = await row.nachKultur?.()
+    const herkunftByNachKultur = await nachKultur?.herkunft?.()
 
     return {
       herkunft: herkunftByNachKultur,

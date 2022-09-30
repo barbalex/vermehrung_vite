@@ -56,7 +56,7 @@ const LieferungWer = ({
       where: addTotalCriteriaToWhere({ table: 'person', store }),
     }).toArray()
 
-    const person = await row.person()
+    const person = await row?.person?.()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',

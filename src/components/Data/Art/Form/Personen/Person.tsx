@@ -63,7 +63,7 @@ const Av = ({ av }) => {
   }, [av, store])
 
   const personLabel = useLiveQuery(async () => {
-    const person: Person = await av?.person()
+    const person: Person = await av?.person?.()
     return personLabelFromPerson({ person })
   })
 

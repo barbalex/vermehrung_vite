@@ -44,7 +44,7 @@ const Geplant = styled.div`
 
 const TkEventRow = ({ event, last }) => {
   const personName = useLiveQuery(async () => {
-    const person = await event.person()
+    const person = await event?.person?.()
 
     return personFullname(person)
   }, [])

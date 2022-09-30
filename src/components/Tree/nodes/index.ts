@@ -271,21 +271,18 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const artIndex = artNodes.findIndex((a) => a.id === artId)
 
         // 1.1 art > Herkunft
-        const sammlungsOfArt = await collectionFromTable({
+        const sammlungsOfArt = await filteredCollectionFromTable({
+          store,
           table: 'sammlung',
-          where: addTotalCriteriaToWhere({
-            table: 'sammlung',
-            store,
-            where: { art_id: artId },
-          }),
+          where: { art_id: artId },
         }).toArray()
         const sammlungsOfArtHerkunftIds = sammlungsOfArt.map(
           (s) => s.herkunft_id,
         )
         // somehow using where('id')anyOf(sammlungsOfArtHerkunftIds) gives to few results ???!!!
-        const herkunftsCollection = collectionFromTable({
+        const herkunftsCollection = filteredCollectionFromTable({
           table: 'herkunft',
-          where: addTotalCriteriaToWhere({ table: 'herkunft', store }),
+          store,
         }).filter((value) => sammlungsOfArtHerkunftIds.includes(value.id))
         const herkunftCount = await herkunftsCollection.count()
         artHerkunftFolderNodes.push(
@@ -367,13 +364,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newArtSammlungNodes.findIndex(
               (s) => s.id === `${artId}${sammlungId}`,
             )
-            const lieferungs = await collectionFromTable({
+            const lieferungs = await filteredCollectionFromTable({
+              store,
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                where: { von_sammlung_id: sammlungId },
-                store,
-                table: 'lieferung',
-              }),
+              where: { von_sammlung_id: sammlungId },
             }).toArray()
             artSammlungAuslieferungFolderNodes.push(
               buildArtSammlungAuslieferungFolder({
@@ -852,7 +846,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammlung > herkunft
-        const herkunft = await sammlung?.herkunft()
+        const herkunft = await sammlung?.herkunft?.()
         sammlungHerkunftFolderNodes.push(
           buildSammlungHerkunftFolder({
             count: [herkunft].length,

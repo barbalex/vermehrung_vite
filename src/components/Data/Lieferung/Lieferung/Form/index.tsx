@@ -54,7 +54,7 @@ const LierferungForm = ({
     ])
 
     const personOption: PersonOption = await person?.personOption()
-    const vonSammlungHerkunft = await vonSammlung?.herkunft()
+    const vonSammlungHerkunft = await vonSammlung?.herkunft?.()
 
     if (vonSammlungHerkunft) {
       return {
@@ -67,7 +67,7 @@ const LierferungForm = ({
 
     if (row.von_kultur_id) {
       const vonKultur = await row.vonKultur()
-      const herkunftByVonKultur = await vonKultur?.herkunft()
+      const herkunftByVonKultur = await vonKultur?.herkunft?.()
       if (herkunftByVonKultur) {
         return {
           herkunft: herkunftByVonKultur,
@@ -79,7 +79,7 @@ const LierferungForm = ({
     }
 
     const nachKultur = await row.nachKultur()
-    const herkunftByNachKultur = await nachKultur?.herkunft()
+    const herkunftByNachKultur = await nachKultur?.herkunft?.()
 
     return {
       herkunft: herkunftByNachKultur,
