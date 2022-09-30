@@ -106,7 +106,7 @@ const Filter = () => {
             indicatorColor="primary"
             textColor="primary"
             variant="scrollable"
-            scrollButtons="auto"
+            scrollButtons="auto" 
           >
             <StyledTab label="Art" value="art" data-id="art" />
             <StyledTab label="Herkunft" value="herkunft" data-id="herkunft" />

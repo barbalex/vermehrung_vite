@@ -23,6 +23,7 @@ const TitleRow = styled.div`
   justify-content: center;
   align-items: center;
   user-select: none;
+  height: 40px;
 `
 const FilterNumbers = styled.div`
   padding-right: 8px;
@@ -68,11 +69,14 @@ const FilterTitle = ({ title, table, totalCount, filteredCount }) => {
           </IconButton>
         )}
         {filtered && (
-          <StyledDeleteFilterIcon
+          <IconButton
             aria-label="Alle Filter entfernen"
             title="Alle Filter entfernen"
             onClick={empty}
-          />
+            size="medium"
+          >
+            <StyledDeleteFilterIcon />
+          </IconButton>
         )}
       </TitleRow>
     </Container>
