@@ -1188,9 +1188,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 5 kultur
   if (showKultur) {
-    const kulturCollection = collectionFromTable({
+    const kulturCollection = filteredCollectionFromTable({
+      store,
       table: 'kultur',
-      where: addTotalCriteriaToWhere({ store, table: 'kultur' }),
     })
     const kulturCount = await kulturCollection.count()
     kulturFolderNodes = buildKulturFolder({ count: kulturCount })
@@ -1216,13 +1216,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         // 2.1 kultur > teilkultur
         const kulturOption = await kultur.kulturOption()
         if (kulturOption?.tk) {
-          const kulturTeilkulturCollection = collectionFromTable({
+          const kulturTeilkulturCollection = filteredCollectionFromTable({
+            store,
             table: 'teilkultur',
-            where: addTotalCriteriaToWhere({
-              store,
-              table: 'teilkultur',
-              where: { kultur_id: kultur.id },
-            }),
+            where: { kultur_id: kultur.id },
           })
           const kulturTeilkulturCount = await kulturTeilkulturCollection.count()
           kulturTeilkulturFolderNodes.push(
@@ -1257,13 +1254,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 2.1 kultur > zaehlung
-        const kulturZaehlungCollection = collectionFromTable({
+        const kulturZaehlungCollection = filteredCollectionFromTable({
+          store,
           table: 'zaehlung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'zaehlung',
-            where: { kultur_id: kultur.id },
-          }),
+          where: { kultur_id: kultur.id },
         })
         const kulturZaehlungCount = await kulturZaehlungCollection.count()
         kulturZaehlungFolderNodes.push(
@@ -1300,13 +1294,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > anlieferung
-        const kulturAnlieferungCollection = collectionFromTable({
+        const kulturAnlieferungCollection = filteredCollectionFromTable({
+          store,
           table: 'lieferung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'lieferung',
-            where: { nach_kultur_id: kultur.id },
-          }),
+          where: { nach_kultur_id: kultur.id },
         })
         const kulturAnlieferungCount = await kulturAnlieferungCollection.count()
         kulturAnlieferungFolderNodes.push(
@@ -1339,13 +1330,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > auslieferung
-        const kulturAuslieferungCollection = collectionFromTable({
+        const kulturAuslieferungCollection = filteredCollectionFromTable({
+          store,
           table: 'lieferung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'lieferung',
-            where: { von_kultur_id: kultur.id },
-          }),
+          where: { von_kultur_id: kultur.id },
         })
         const kulturAuslieferungCount =
           await kulturAuslieferungCollection.count()
@@ -1379,13 +1367,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // kultur > event
-        const kulturEventCollection = collectionFromTable({
+        const kulturEventCollection = filteredCollectionFromTable({
+          store,
           table: 'event',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'event',
-            where: { kultur_id: kultur.id },
-          }),
+          where: { kultur_id: kultur.id },
         })
         const kulturEventCount = await kulturEventCollection.count()
         kulturEventFolderNodes.push(
@@ -1421,9 +1406,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 6 teilkultur
   if (showTeilkultur) {
-    const teilkulturCollection = collectionFromTable({
+    const teilkulturCollection = filteredCollectionFromTable({
+      store,
       table: 'teilkultur',
-      where: addTotalCriteriaToWhere({ store, table: 'teilkultur' }),
     })
     const teilkulturCount = await teilkulturCollection.count()
     teilkulturFolderNodes = buildTeilkulturFolder({ count: teilkulturCount })
@@ -1438,9 +1423,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 7 zaehlung
   if (showZaehlung) {
-    const zaehlungCollection = collectionFromTable({
+    const zaehlungCollection = filteredCollectionFromTable({
+      store,
       table: 'zaehlung',
-      where: addTotalCriteriaToWhere({ store, table: 'zaehlung' }),
     })
     const zaehlungCount = await zaehlungCollection.count()
     zaehlungFolderNodes = buildZaehlungFolder({ count: zaehlungCount })
@@ -1458,9 +1443,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 8 lieferung
   if (showLieferung) {
-    const lieferungCollection = collectionFromTable({
+    const lieferungCollection = filteredCollectionFromTable({
+      store,
       table: 'lieferung',
-      where: addTotalCriteriaToWhere({ store, table: 'lieferung' }),
     })
     const lieferungCount = await lieferungCollection.count()
     lieferungFolderNodes = buildLieferungFolder({ count: lieferungCount })
@@ -1475,9 +1460,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 9 sammelLieferung
   if (showSammelLieferung) {
-    const sammelLieferungCollection = collectionFromTable({
+    const sammelLieferungCollection = filteredCollectionFromTable({
+      store,
       table: 'sammel_lieferung',
-      where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),
     })
     const sammelLieferungCount = await sammelLieferungCollection.count()
     sammelLieferungFolderNodes = buildSammelLieferungFolder({
@@ -1513,13 +1498,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 sammelLieferung > lieferung
-        const lieferungs = await collectionFromTable({
+        const lieferungs = await filteredCollectionFromTable({
+          store,
           table: 'lieferung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'lieferung',
-            where: { sammel_lieferung_id: sammelLieferung.id },
-          }),
+          where: { sammel_lieferung_id: sammelLieferung.id },
         }).toArray()
         const lieferungsSorted = lieferungs.sort(lieferungSort)
         sammelLieferungLieferungFolderNodes.push(
@@ -1556,9 +1538,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 10 event
   if (showEvent) {
-    const eventCollection = collectionFromTable({
+    const eventCollection = filteredCollectionFromTable({
+      store,
       table: 'event',
-      where: addTotalCriteriaToWhere({ store, table: 'event' }),
     })
     const eventCount = await eventCollection.count()
     eventFolderNodes = buildEventFolder({ count: eventCount })
@@ -1573,9 +1555,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 11 person
   if (showPerson) {
-    const personCollection = collectionFromTable({
+    const personCollection = filteredCollectionFromTable({
+      store,
       table: 'person',
-      where: addTotalCriteriaToWhere({ store, table: 'person' }),
     })
     const personCount = await personCollection.count()
     personFolderNodes = buildPersonFolder({ count: personCount })
@@ -1597,13 +1579,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const personIndex = personNodes.findIndex((a) => a.id === personId)
 
         // person > sammlung
-        const personSammlungCollection = collectionFromTable({
+        const personSammlungCollection = filteredCollectionFromTable({
+          store,
           table: 'sammlung',
-          where: addTotalCriteriaToWhere({
-            store,
-            table: 'sammlung',
-            where: { person_id: person.id },
-          }),
+          where: { person_id: person.id },
         })
         const personSammlungCount = await personSammlungCollection.count()
         personSammlungFolderNodes.push(
