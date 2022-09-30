@@ -14,7 +14,7 @@ const toggleNodeSymbol = ({ node, store }) => {
     setActiveNodeArray,
     activeNodeArray,
     removeOpenNodeWithChildren,
-    setLastTouchedNode,setLoadingNode
+    setLastActiveNodeArray,setLoadingNode
   } = store.tree
 
   store.filter.setShow(false)
@@ -32,7 +32,7 @@ const toggleNodeSymbol = ({ node, store }) => {
     setLoadingNode(node.id)
     addOpenNode(node.url)
   }
-  setLastTouchedNode(node.url)
+  setLastActiveNodeArray(node.url)
 }
 
 export default toggleNodeSymbol

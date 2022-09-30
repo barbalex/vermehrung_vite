@@ -128,6 +128,8 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   const openNodes = getSnapshot(openNodesRaw)
   const activeNodeArray = activeNodeArrayRaw.toJSON()
 
+  console.log('buildNodes, activeNodeArray:', activeNodeArray)
+
   const showArt = getShowArt({ userRole, activeNodeArray })
   const showEvent = getShowEvent({ userPersonOption, activeNodeArray })
   const showGarten = getShowGarten()
@@ -245,6 +247,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
     })
     const artCount = await artCollection.count()
     artFolderNodes = buildArtFolder({ count: artCount })
+    console.log('buildNodes, openNodes:', openNodes)
     const artFolderIsOpen = openNodes.some(
       (n) => n.length === 2 && n[1] === 'Arten',
     )

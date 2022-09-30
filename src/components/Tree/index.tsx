@@ -52,7 +52,6 @@ const Tree = () => {
   const userRole = data?.userRole
 
   const buildMyNodes = useCallback(async () => {
-    //console.log('buildNodes building tree nodes')
     const nodes = await buildNodes({
       store,
       userPersonOption,
@@ -62,8 +61,6 @@ const Tree = () => {
   }, [store, userPersonOption, userRole])
 
   const buildMyNodesDebounced = useDebouncedCallback(buildMyNodes, 100)
-
-  // console.log('buildNodes, openNodes:', openNodes)
 
   useEffect(() => {
     //console.log('Tree second useEffect ordering nodes build')

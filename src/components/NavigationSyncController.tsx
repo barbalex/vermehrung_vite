@@ -18,7 +18,8 @@ const NavigationSyncController = () => {
     setActiveNodeArray,
     addNode,
     activeNodeArray: aNARaw,
-    setLastTouchedNode,
+    setLastActiveNodeArray,
+    lastActiveNodeArray,
   } = store.tree
   const aNA = aNARaw.slice()
 
@@ -29,17 +30,23 @@ const NavigationSyncController = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // when user clicks back or foward button, need to set lastTouchedNode
+  // when user clicks back or foward button, need to set lastActiveNodeArray
   useEffect(() => {
     window.onpopstate = () => {
-      setLastTouchedNode(getActiveNodeArrayFromUrl(pathname))
+      setLastActiveNodeArray(getActiveNodeArrayFromUrl(pathname))
     }
     // do not need to remove, see: https://stackoverflow.com/a/47997544/712005
-  }, [pathname, setLastTouchedNode])
+  }, [pathname, setLastActiveNodeArray])
 
   // need to update activeNodeArray on every navigation
   useEffect(() => {
     const activeNodeArrayFromUrl = getActiveNodeArrayFromUrl(pathname)
+
+    console.log('NavigationSyncController', {
+      aNA,
+      activeNodeArrayFromUrl,
+      lastActiveNodeArray: lastActiveNodeArray.slice(),
+    })
 
     if (!isEqual(activeNodeArrayFromUrl, aNA)) {
       console.log(
@@ -55,8 +62,8 @@ const NavigationSyncController = () => {
   // setting last touched node on every change of activeNodeArray
   // to ensure tree follows navigation in form lists
   useEffect(() => {
-    setLastTouchedNode(aNA)
-  }, [aNA, setLastTouchedNode])
+    setLastActiveNodeArray(aNA)
+  }, [aNA, setLastActiveNodeArray])
 
   return null
 }
