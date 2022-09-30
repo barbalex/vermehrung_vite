@@ -33,7 +33,7 @@ const SammlungFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'sammlung', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'sammlung', count: true }),
+      filteredObjectsFromTable({ store, table: 'sammlung' }).count(),
     ])
 
     return { totalCount, filteredCount }

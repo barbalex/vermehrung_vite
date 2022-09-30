@@ -62,7 +62,7 @@ const Events = ({ filter: showFilter, width, height }) => {
     const { filter = () => true, where = {} } =
       await hierarchyWhereAndFilterForTable({ store, table: 'event' })
     const [events, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'event' }),
+      filteredObjectsFromTable({ store, table: 'event' }).toArray(),
       collectionFromTable({
         table: 'event',
         where: addTotalCriteriaToWhere({ store, table: 'event', where }),

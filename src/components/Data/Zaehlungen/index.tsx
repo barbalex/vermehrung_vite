@@ -67,7 +67,7 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
       filteredObjectsFromTable({
         store,
         table: 'zaehlung',
-      }),
+      }).toArray(),
       collectionFromTable({
         table: 'zaehlung',
         where: addTotalCriteriaToWhere({ store, table: 'zaehlung', where }),

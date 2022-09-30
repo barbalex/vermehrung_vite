@@ -35,7 +35,7 @@ const LieferungTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'lieferung', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'lieferung', count: true }),
+      filteredObjectsFromTable({ store, table: 'lieferung' }).count(),
     ])
 
     return { totalCount, filteredCount }

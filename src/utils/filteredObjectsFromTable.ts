@@ -98,9 +98,7 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
       : collection
   const filteredCollection2 = orIdInUrlAdder(filteredCollection1)
 
-  return count
-    ? await filteredCollection2.count()
-    : await filteredCollection2.toArray()
+  return filteredCollection2
 }
 
 export default filteredObjectsFromTable

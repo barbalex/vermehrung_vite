@@ -60,7 +60,7 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [sammelLieferungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'sammel_lieferung' }),
+      filteredObjectsFromTable({ store, table: 'sammel_lieferung' }).toArray(),
       collectionFromTable({
         table: 'sammel_lieferung',
         where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),

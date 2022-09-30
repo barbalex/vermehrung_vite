@@ -72,7 +72,7 @@ const Sammlungen = ({ filter: showFilter, width, height }) => {
       filteredObjectsFromTable({
         store,
         table: 'sammlung',
-      }),
+      }).toArray(),
       collectionFromTable({
         table: 'sammlung',
         where: addTotalCriteriaToWhere({ store, table: 'sammlung', where }),

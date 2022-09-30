@@ -29,7 +29,7 @@ const KulturFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'kultur', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'kultur', count: true }),
+      filteredObjectsFromTable({ store, table: 'kultur' }).count(),
     ])
 
     return { totalCount, filteredCount }

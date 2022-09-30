@@ -61,7 +61,7 @@ const Personen = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [persons, totalCount, userRole] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'person' }),
+      filteredObjectsFromTable({ store, table: 'person' }).toArray(),
       collectionFromTable({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'evepersonnt' }),

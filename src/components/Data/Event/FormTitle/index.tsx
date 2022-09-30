@@ -24,7 +24,7 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
         where: addTotalCriteriaToWhere({ store, table: 'event', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'event', count: true }),
+      filteredObjectsFromTable({ store, table: 'event' }).count(),
     ])
 
     return { totalCount, filteredCount }

@@ -29,7 +29,7 @@ const ZaehlungFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'zaehlung', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'zaehlung', count: true }),
+      filteredObjectsFromTable({ store, table: 'zaehlung' }).count(),
     ])
 
     return { totalCount, filteredCount }

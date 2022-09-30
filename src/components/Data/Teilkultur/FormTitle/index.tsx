@@ -29,7 +29,7 @@ const TeilkulturFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'teilkultur', count: true }),
+      filteredObjectsFromTable({ store, table: 'teilkultur' }).count(),
     ])
 
     return { totalCount, filteredCount }

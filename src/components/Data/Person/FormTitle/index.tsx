@@ -23,7 +23,7 @@ const PersonFormTitleChooser = ({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'person' }),
       }).count(),
-      filteredObjectsFromTable({ store, table: 'person', count: true }),
+      filteredObjectsFromTable({ store, table: 'person' }).count(),
     ])
 
     return { totalCount, filteredCount }

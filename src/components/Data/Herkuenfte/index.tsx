@@ -75,7 +75,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
       filteredObjectsFromTable({
         store,
         table: 'herkunft',
-      }),
+      }).toArray(),
       collectionFromTable({
         table: 'herkunft',
         where: addTotalCriteriaToWhere({ store, table: 'herkunft', where }),

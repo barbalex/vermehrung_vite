@@ -27,10 +27,10 @@ const HerkunftFormTitleChooser = ({
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
         table: 'herkunft',
-        where: addTotalCriteriaToWhere({ store, table: 'herkunft'.where }),
+        where: addTotalCriteriaToWhere({ store, table: 'herkunft', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'herkunft', count: true }),
+      filteredObjectsFromTable({ store, table: 'herkunft' }).count(),
     ])
 
     return { totalCount, filteredCount }

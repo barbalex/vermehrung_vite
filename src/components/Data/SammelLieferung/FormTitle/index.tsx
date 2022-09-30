@@ -31,8 +31,7 @@ const SammelLieferungFormTitleChooser = ({
       filteredObjectsFromTable({
         store,
         table: 'sammel_lieferung',
-        count: true,
-      }),
+      }).count(),
     ])
 
     return { totalCount, filteredCount }

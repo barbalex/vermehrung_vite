@@ -74,7 +74,7 @@ const Lieferungen = ({ filter: showFilter, width, height }) => {
       filteredObjectsFromTable({
         store,
         table: 'lieferung',
-      }),
+      }).toArray(),
       collectionFromTable({
         table: 'lieferung',
         where: addTotalCriteriaToWhere({ store, table: 'lieferung', where }),

@@ -24,7 +24,7 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
         where: addTotalCriteriaToWhere({ store, table: 'garten', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'garten', count: true }),
+      filteredObjectsFromTable({ store, table: 'garten' }).count(),
     ])
 
     return { totalCount, filteredCount }
