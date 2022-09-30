@@ -49,8 +49,8 @@ const LierferungForm = ({
       dexie.persons.get({
         account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
       }),
-      row.sammelLieferung(),
-      row.sammlung(),
+      row.sammelLieferung?.(),
+      row.sammlung?.(),
     ])
 
     const personOption: PersonOption = await person?.personOption()
@@ -66,7 +66,7 @@ const LierferungForm = ({
     }
 
     if (row.von_kultur_id) {
-      const vonKultur = await row.vonKultur()
+      const vonKultur = await row.vonKultur?.()
       const herkunftByVonKultur = await vonKultur?.herkunft?.()
       if (herkunftByVonKultur) {
         return {
@@ -78,7 +78,7 @@ const LierferungForm = ({
       }
     }
 
-    const nachKultur = await row.nachKultur()
+    const nachKultur = await row.nachKultur?.()
     const herkunftByNachKultur = await nachKultur?.herkunft?.()
 
     return {

@@ -108,7 +108,7 @@ const Lieferschein = ({ row }) => {
           where: { sammel_lieferung_id: row.id },
         }),
       }).toArray(),
-      row.vonKultur(),
+      row.vonKultur?.(),
       row?.person?.(),
     ])
     const vonKulturGarten = await kultur?.garten()

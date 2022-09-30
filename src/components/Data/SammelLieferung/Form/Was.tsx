@@ -59,7 +59,7 @@ const SammelLieferungWas = ({ showFilter, row, ifNeeded, saveToDb }) => {
         table: 'art',
         where: addTotalCriteriaToWhere({ store, table: 'art' }),
       }).toArray(),
-      row.art(),
+      row.art?.(),
     ])
 
     const artsIncludingChoosen = uniqBy(

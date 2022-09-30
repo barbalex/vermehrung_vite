@@ -60,7 +60,7 @@ const ZaehlungForm = ({
         table: 'kultur',
         where: addTotalCriteriaToWhere({ table: 'kultur', store }),
       }).toArray(),
-      row.kultur(),
+      row.kultur?.(),
       row.kulturOption(),
     ])
     const kultursIncludingChoosen = uniqBy(

@@ -93,7 +93,7 @@ const LieferungVon = ({
         return true
       })
 
-    const kultur = await row.vonKultur()
+    const kultur = await row.vonKultur?.()
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
       'id',
@@ -111,7 +111,7 @@ const LieferungVon = ({
         }
       }),
     )
-    const sammlung = await row.sammlung()
+    const sammlung = await row.sammlung?.()
     const sammlungsIncludingChoosen = uniqBy(
       [...sammlungs, ...(sammlung && !showFilter ? [sammlung] : [])],
       'id',

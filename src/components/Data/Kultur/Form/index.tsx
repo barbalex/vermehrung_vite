@@ -81,7 +81,7 @@ const KulturForm = ({
         table: 'garten',
         where: addTotalCriteriaToWhere({ table: 'garten', store }),
       }).toArray(),
-      row.garten(),
+      row.garten?.(),
       collectionFromTable({
         table: 'sammlung',
         where: addTotalCriteriaToWhere({ table: 'sammlung', store }),

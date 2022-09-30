@@ -67,7 +67,7 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
         return true
       })
 
-    const kultur = await row.vonKultur()
+    const kultur = await row.vonKultur?.()
 
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],

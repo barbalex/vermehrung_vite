@@ -103,7 +103,7 @@ const TeilzaehlungForm = ({
           where: { kultur_id: kulturId },
         }),
       }).toArray(),
-      row.teilkultur(),
+      row.teilkultur?.(),
       dexie.kultur_options.get(
         kulturId ?? '99999999-9999-9999-9999-999999999999',
       ),

@@ -50,7 +50,7 @@ const SammelLieferungForm = ({
       dexie.persons.get({
         account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
       }),
-      row.sammlung(),
+      row.sammlung?.(),
     ])
     const [personOption, vonSammlungHerkunft] = await Promise.all([
       person?.personOption?.(),

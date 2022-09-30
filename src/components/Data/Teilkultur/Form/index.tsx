@@ -54,7 +54,7 @@ const TeilkulturForm = ({
         table: 'kultur',
         where: addTotalCriteriaToWhere({ table: 'kultur', store }),
       }).toArray(),
-      row.kultur(),
+      row.kultur?.(),
       row.kulturOption(),
     ])
 

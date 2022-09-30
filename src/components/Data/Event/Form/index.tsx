@@ -84,7 +84,7 @@ const EventForm = ({
           where: addTotalCriteriaToWhere({ store, table: 'person' }),
         }).toArray(),
         row.kulturOption(),
-        row.kultur(),
+        row.kultur?.(),
         row?.person?.(),
       ])
     // need to show a choosen kultur even if inactive but not if deleted
@@ -106,7 +106,7 @@ const EventForm = ({
       }),
     )
 
-    const teilkultur = await row.teilkultur()
+    const teilkultur = await row.teilkultur?.()
     const teilkultursIncludingChoosen = uniqBy(
       [...teilkulturs, ...(teilkultur && !showFilter ? [teilkultur] : [])],
       'id',

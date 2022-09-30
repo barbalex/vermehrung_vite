@@ -15,9 +15,9 @@ const Zeile = ({ value }) => <div>{value}</div>
 const LieferungForLieferschein = ({ lieferung: row }) => {
   const data = useLiveQuery(async () => {
     const [art, kultur, vonSammlung] = await Promise.all([
-      row.art(),
-      row.vonKultur(),
-      row.sammlung(),
+      row.art?.(),
+      row.vonKultur?.(),
+      row.sammlung?.(),
     ])
     const vonKulturHerkunft = await kultur?.herkunft?.()
     const vonSammlungHerkunft = await vonSammlung?.herkunft?.()

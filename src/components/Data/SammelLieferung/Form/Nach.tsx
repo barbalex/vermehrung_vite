@@ -70,7 +70,7 @@ const SammelLieferungNach = ({
         return true
       })
 
-    const kultur = await row.vonKultur()
+    const kultur = await row.vonKultur?.()
 
     const kultursIncludingChoosen = uniqBy(
       [...kultursFiltered, ...(kultur && !showFilter ? [kultur] : [])],
