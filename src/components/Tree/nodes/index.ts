@@ -408,13 +408,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 1.3 art > kultur
-        const artKulturCollection = collectionFromTable({
+        const artKulturCollection = filteredCollectionFromTable({
+          where: { art_id: artId },
+          store,
           table: 'kultur',
-          where: addTotalCriteriaToWhere({
-            where: { art_id: artId },
-            store,
-            table: 'kultur',
-          }),
         })
         const kulturCount = await artKulturCollection.count()
         artKulturFolderNodes.push(
@@ -459,13 +456,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             // teilkultur nodes
             const kulturOption = await kultur.kulturOption()
             if (kulturOption?.tk) {
-              const teilkulturs = await collectionFromTable({
+              const teilkulturs = await filteredCollectionFromTable({
+                where: { kultur_id: kultur.id },
+                store,
                 table: 'teilkultur',
-                where: addTotalCriteriaToWhere({
-                  where: { kultur_id: kultur.id },
-                  store,
-                  table: 'teilkultur',
-                }),
               }).toArray()
               artKulturTeilkulturFolderNodes.push(
                 buildArtKulturTeilkulturFolder({
@@ -503,13 +497,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // zaehlung nodes
-            const artKulturZaehlungCollection = collectionFromTable({
+            const artKulturZaehlungCollection = filteredCollectionFromTable({
+              where: { kultur_id: kultur.id },
+              store,
               table: 'zaehlung',
-              where: addTotalCriteriaToWhere({
-                where: { kultur_id: kultur.id },
-                store,
-                table: 'zaehlung',
-              }),
             })
             const zaehlungsCount = await artKulturZaehlungCollection.count()
             artKulturZaehlungFolderNodes.push(
@@ -551,13 +542,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // anlieferung nodes
-            const anlieferungs = await collectionFromTable({
+            const anlieferungs = await filteredCollectionFromTable({
+              where: { von_kultur_id: kultur.id },
+              store,
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                where: { von_kultur_id: kultur.id },
-                store,
-                table: 'lieferung',
-              }),
             }).toArray()
             artKulturAnlieferungFolderNodes.push(
               buildArtKulturAnlieferungFolder({
@@ -594,13 +582,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // auslieferung nodes
-            const auslieferungs = await collectionFromTable({
+            const auslieferungs = await filteredCollectionFromTable({
+              where: { nach_kultur_id: kultur.id },
+              store,
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                where: { nach_kultur_id: kultur.id },
-                store,
-                table: 'lieferung',
-              }),
             }).toArray()
             artKulturAuslieferungFolderNodes.push(
               buildArtKulturAuslieferungFolder({
@@ -637,13 +622,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // event nodes
-            const eventsCollection = collectionFromTable({
+            const eventsCollection = filteredCollectionFromTable({
+              where: { kultur_id: kultur.id },
+              store,
               table: 'event',
-              where: addTotalCriteriaToWhere({
-                where: { kultur_id: kultur.id },
-                store,
-                table: 'event',
-              }),
             })
             const eventsCount = await eventsCollection.count()
             artKulturEventFolderNodes.push(
@@ -688,9 +670,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 2 herkunft
   if (showHerkunft) {
-    const herkunftCollection = collectionFromTable({
+    const herkunftCollection = filteredCollectionFromTable({
+      store,
       table: 'herkunft',
-      where: addTotalCriteriaToWhere({ store, table: 'herkunft' }),
     })
     const herkunftCount = await herkunftCollection.count()
     herkunftFolderNodes = buildHerkunftFolder({ count: herkunftCount })
@@ -715,13 +697,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         )
 
         // 2.1 herkunft > sammlung
-        const herkunftSammlungCollection = collectionFromTable({
+        const herkunftSammlungCollection = filteredCollectionFromTable({
+          where: { herkunft_id: herkunft.id },
+          store,
           table: 'sammlung',
-          where: addTotalCriteriaToWhere({
-            where: { herkunft_id: herkunft.id },
-            store,
-            table: 'sammlung',
-          }),
         })
         const sammlungsCount = await herkunftSammlungCollection.count()
         herkunftSammlungFolderNodes.push(
@@ -767,13 +746,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             const sammlungIndex = newHerkunftSammlungNodes.findIndex(
               (s) => s.id === `${herkunftId}${sammlungId}`,
             )
-            const lieferungs = await collectionFromTable({
+            const lieferungs = await filteredCollectionFromTable({
+              where: { von_sammlung_id: sammlung.id },
+              store,
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                where: { von_sammlung_id: sammlung.id },
-                store,
-                table: 'lieferung',
-              }),
             }).toArray()
             herkunftSammlungAuslieferungFolderNodes.push(
               buildHerkunftSammlungAuslieferungFolder({
@@ -818,9 +794,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 3 sammlung
   if (showSammlung) {
-    const sammlungCollection = collectionFromTable({
+    const sammlungCollection = filteredCollectionFromTable({
+      store,
       table: 'sammlung',
-      where: addTotalCriteriaToWhere({ store, table: 'sammlung' }),
     })
     const sammlungCount = await sammlungCollection.count()
     sammlungFolderNodes = buildSammlungFolder({ count: sammlungCount })
@@ -872,13 +848,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         }
 
         // 2.1 sammlung > auslieferung
-        const sammlungLieferungCollection = collectionFromTable({
+        const sammlungLieferungCollection = filteredCollectionFromTable({
+          where: { von_sammlung_id: sammlung.id },
+          store,
           table: 'lieferung',
-          where: addTotalCriteriaToWhere({
-            where: { von_sammlung_id: sammlung.id },
-            store,
-            table: 'lieferung',
-          }),
         })
         const sammlungLieferungCount = await sammlungLieferungCollection.count()
         sammlungAuslieferungFolderNodes.push(
@@ -915,9 +888,9 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 4 garten
   if (showGarten) {
-    const gartenCollection = collectionFromTable({
+    const gartenCollection = filteredCollectionFromTable({
       table: 'garten',
-      where: addTotalCriteriaToWhere({ table: 'garten', store }),
+      store,
     })
     const gartenCount = await gartenCollection.count()
     gartenFolderNodes = buildGartenFolder({ count: gartenCount })
@@ -941,13 +914,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
         const gartenIndex = gartenNodes.findIndex((a) => a.id === gartenId)
 
         // 2.1 garten > kultur
-        const gartenKulturCollection = collectionFromTable({
+        const gartenKulturCollection = filteredCollectionFromTable({
           table: 'kultur',
-          where: addTotalCriteriaToWhere({
-            table: 'kultur',
-            store,
-            where: { garten_id: garten.id },
-          }),
+          store,
+          where: { garten_id: garten.id },
         })
         const gartenKulturCount = await gartenKulturCollection.count()
         gartenKulturFolderNodes.push(
@@ -999,13 +969,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             // garten > kultur > teilkultur
             const kulturOption = await kultur.kulturOption()
             if (kulturOption?.tk) {
-              const teilkulturs = await collectionFromTable({
+              const teilkulturs = await filteredCollectionFromTable({
+                store,
+                where: { kultur_id: kultur.id },
                 table: 'teilkultur',
-                where: addTotalCriteriaToWhere({
-                  store,
-                  where: { kultur_id: kultur.id },
-                  table: 'teilkultur',
-                }),
               }).toArray()
               gartenKulturTeilkulturFolderNodes.push(
                 buildGartenKulturTeilkulturFolder({
@@ -1045,13 +1012,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > zaehlung
-            const zaehlungs = await collectionFromTable({
+            const zaehlungs = await filteredCollectionFromTable({
               table: 'zaehlung',
-              where: addTotalCriteriaToWhere({
-                table: 'zaehlung',
-                store,
-                where: { kultur_id: kultur.id },
-              }),
+              store,
+              where: { kultur_id: kultur.id },
             }).toArray()
             gartenKulturZaehlungFolderNodes.push(
               buildGartenKulturZaehlungFolder({
@@ -1091,13 +1055,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > anlieferung
-            const anlieferungs = await collectionFromTable({
+            const anlieferungs = await filteredCollectionFromTable({
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                table: 'lieferung',
-                store,
-                where: { nach_kultur_id: kultur.id },
-              }),
+              store,
+              where: { nach_kultur_id: kultur.id },
             }).toArray()
             gartenKulturAnlieferungFolderNodes.push(
               buildGartenKulturAnlieferungFolder({
@@ -1136,13 +1097,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > auslieferung
-            const auslieferungs = await collectionFromTable({
+            const auslieferungs = await filteredCollectionFromTable({
               table: 'lieferung',
-              where: addTotalCriteriaToWhere({
-                table: 'lieferung',
-                store,
-                where: { von_kultur_id: kultur.id },
-              }),
+              store,
+              where: { von_kultur_id: kultur.id },
             }).toArray()
             gartenKulturAuslieferungFolderNodes.push(
               buildGartenKulturAuslieferungFolder({
@@ -1181,13 +1139,10 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
             }
 
             // garten > kultur > event
-            const gartenKulturEventCollection = collectionFromTable({
+            const gartenKulturEventCollection = filteredCollectionFromTable({
+              store,
+              where: { kultur_id: kultur.id },
               table: 'event',
-              where: addTotalCriteriaToWhere({
-                store,
-                where: { kultur_id: kultur.id },
-                table: 'event',
-              }),
             })
             const gartenKulturEventCount =
               await gartenKulturEventCollection.count()

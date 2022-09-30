@@ -169,7 +169,7 @@ const KulturForm = ({
     )
     const gartenWerte = await Promise.all(
       gartensIncludingChoosen.map(async (garten) => {
-        const label = await garten.label()
+        const label = await garten.label?.()
 
         return {
           value: garten.id,
@@ -183,14 +183,14 @@ const KulturForm = ({
       .anyOf(artsToChoose.map((id) => [id, 0]))
       .filter((a) => !!a.ae_id)
       .toArray()
-    const art = await row?.art()
+    const art = await row?.art?.()
     const artsIncludingChoosen = uniqBy(
       [...(arts ?? []), ...(art && !showFilter ? [art] : [])],
       'id',
     )
     const artWerte = await Promise.all(
       artsIncludingChoosen.map(async (art) => {
-        const label = await art.label()
+        const label = await art.label?.()
 
         return {
           value: art.id,
