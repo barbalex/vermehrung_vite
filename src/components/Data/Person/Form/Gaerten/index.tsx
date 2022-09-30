@@ -86,7 +86,7 @@ const PersonArten = ({ person }) => {
     const gvGartenIds = gvs.map((v) => v.garten_id)
 
     const gartens = await dexie.gartens
-      .where('[id+aktiv_indexable+_deleted_indexable]')
+      .where('[id+__aktiv_indexable+__deleted_indexable]')
       .noneOf(gvGartenIds.map((id) => [id, 1, 0]))
       .toArray()
     const gartensSorted = await gartensSortedFromGartens(gartens)

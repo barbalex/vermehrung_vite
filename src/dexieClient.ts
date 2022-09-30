@@ -57,7 +57,7 @@ export interface IHerkunft {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -81,7 +81,7 @@ export class Herkunft implements IHerkunft {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -104,7 +104,7 @@ export class Herkunft implements IHerkunft {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -126,7 +126,7 @@ export class Herkunft implements IHerkunft {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -231,7 +231,7 @@ export interface ISammlung {
   lv95_x?: number
   lv95_y?: number
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -240,7 +240,7 @@ export interface ISammlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -261,7 +261,7 @@ export class Sammlung implements ISammlung {
   lv95_x?: number
   lv95_y?: number
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -270,7 +270,7 @@ export class Sammlung implements ISammlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -290,7 +290,7 @@ export class Sammlung implements ISammlung {
     lv95_x?: number,
     lv95_y?: number,
     geplant?: boolean,
-    geplant_indexable?: number,
+    __geplant_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
@@ -299,7 +299,7 @@ export class Sammlung implements ISammlung {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -318,7 +318,7 @@ export class Sammlung implements ISammlung {
     this.lv95_x = lv95_x ?? null
     this.lv95_y = lv95_y ?? null
     this.geplant = geplant ?? false
-    this.geplant_indexable = geplant ? 1 : 0
+    this.__geplant_indexable = geplant ? 1 : 0
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -327,7 +327,7 @@ export class Sammlung implements ISammlung {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -480,14 +480,14 @@ export interface ILieferung {
   datum?: Date
   nach_kultur_id?: string
   nach_ausgepflanzt?: boolean
-  nach_ausgepflanzt_indexable?: number
+  __nach_ausgepflanzt_indexable?: number
   von_anzahl_individuen?: number
   anzahl_pflanzen?: number
   anzahl_auspflanzbereit?: number
   gramm_samen?: number
   andere_menge?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -496,7 +496,7 @@ export interface ILieferung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -510,14 +510,14 @@ export class Lieferung {
   datum?: Date
   nach_kultur_id?: string
   nach_ausgepflanzt?: boolean
-  nach_ausgepflanzt_indexable?: number
+  __nach_ausgepflanzt_indexable?: number
   von_anzahl_individuen?: number
   anzahl_pflanzen?: number
   anzahl_auspflanzbereit?: number
   gramm_samen?: number
   andere_menge?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -526,7 +526,7 @@ export class Lieferung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -539,14 +539,14 @@ export class Lieferung {
     datum?: Date,
     nach_kultur_id?: string,
     nach_ausgepflanzt?: boolean,
-    nach_ausgepflanzt_indexable?: number,
+    __nach_ausgepflanzt_indexable?: number,
     von_anzahl_individuen?: number,
     anzahl_pflanzen?: number,
     anzahl_auspflanzbereit?: number,
     gramm_samen?: number,
     andere_menge?: string,
     geplant?: boolean,
-    geplant_indexable?: number,
+    __geplant_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
@@ -555,7 +555,7 @@ export class Lieferung {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -567,14 +567,14 @@ export class Lieferung {
     this.datum = datum ?? null
     this.nach_kultur_id = nach_kultur_id ?? null
     this.nach_ausgepflanzt = nach_ausgepflanzt ?? false
-    this.nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
+    this.__nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
     this.von_anzahl_individuen = von_anzahl_individuen ?? null
     this.anzahl_pflanzen = anzahl_pflanzen ?? null
     this.anzahl_auspflanzbereit = anzahl_auspflanzbereit ?? null
     this.gramm_samen = gramm_samen ?? null
     this.andere_menge = andere_menge ?? null
     this.geplant = geplant ?? false
-    this.geplant_indexable = geplant ? 1 : 0
+    this.__geplant_indexable = geplant ? 1 : 0
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -583,7 +583,7 @@ export class Lieferung {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -728,7 +728,7 @@ export interface IArt {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -742,7 +742,7 @@ export class Art implements IArt {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -755,7 +755,7 @@ export class Art implements IArt {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -767,7 +767,7 @@ export class Art implements IArt {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -904,7 +904,7 @@ export interface IGarten {
   lv95_x?: string
   lv95_y?: string
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -913,7 +913,7 @@ export interface IGarten {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -930,7 +930,7 @@ export class Garten implements IGarten {
   lv95_x?: string
   lv95_y?: string
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -939,7 +939,7 @@ export class Garten implements IGarten {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -955,7 +955,7 @@ export class Garten implements IGarten {
     lv95_x?: string,
     lv95_y?: string,
     aktiv?: boolean,
-    aktiv_indexable?: number,
+    __aktiv_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
@@ -964,7 +964,7 @@ export class Garten implements IGarten {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -979,7 +979,7 @@ export class Garten implements IGarten {
     this.lv95_x = lv95_x ?? null
     this.lv95_y = lv95_y ?? null
     this.aktiv = aktiv ?? true
-    this.aktiv_indexable = aktiv === false ? 0 : 1
+    this.__aktiv_indexable = aktiv === false ? 0 : 1
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -988,7 +988,7 @@ export class Garten implements IGarten {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -1099,13 +1099,13 @@ export interface IKultur {
   herkunft_id?: string
   garten_id?: string
   zwischenlager?: boolean
-  zwischenlager_indexable?: number
+  __zwischenlager_indexable?: number
   erhaltungskultur?: boolean
-  erhaltungskultur_indexable?: number
+  __erhaltungskultur_indexable?: number
   von_anzahl_individuen?: number
   bemerkungen?: string
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   changed?: Date
   changed_by?: string
   _rev?: string
@@ -1113,7 +1113,7 @@ export interface IKultur {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -1123,13 +1123,13 @@ export class Kultur implements IKultur {
   herkunft_id?: string
   garten_id?: string
   zwischenlager?: boolean
-  zwischenlager_indexable?: number
+  __zwischenlager_indexable?: number
   erhaltungskultur?: boolean
-  erhaltungskultur_indexable?: number
+  __erhaltungskultur_indexable?: number
   von_anzahl_individuen?: number
   bemerkungen?: string
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   changed?: Date
   changed_by?: string
   _rev?: string
@@ -1137,7 +1137,7 @@ export class Kultur implements IKultur {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -1146,13 +1146,13 @@ export class Kultur implements IKultur {
     herkunft_id?: string,
     garten_id?: string,
     zwischenlager?: boolean,
-    zwischenlager_indexable?: number,
+    __zwischenlager_indexable?: number,
     erhaltungskultur?: boolean,
-    erhaltungskultur_indexable?: number,
+    __erhaltungskultur_indexable?: number,
     von_anzahl_individuen?: number,
     bemerkungen?: string,
     aktiv?: boolean,
-    aktiv_indexable?: number,
+    __aktiv_indexable?: number,
     changed?: Date,
     changed_by?: string,
     _rev?: string,
@@ -1160,7 +1160,7 @@ export class Kultur implements IKultur {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -1168,13 +1168,13 @@ export class Kultur implements IKultur {
     this.herkunft_id = herkunft_id ?? null
     this.garten_id = garten_id ?? null
     this.zwischenlager = zwischenlager ?? false
-    this.zwischenlager_indexable = zwischenlager ? 1 : 0
+    this.__zwischenlager_indexable = zwischenlager ? 1 : 0
     this.erhaltungskultur = erhaltungskultur ?? false
-    this.erhaltungskultur_indexable = erhaltungskultur ? 1 : 0
+    this.__erhaltungskultur_indexable = erhaltungskultur ? 1 : 0
     this.von_anzahl_individuen = von_anzahl_individuen ?? null
     this.bemerkungen = bemerkungen ?? null
     this.aktiv = aktiv ?? true
-    this.aktiv_indexable = aktiv === false ? 0 : 1
+    this.__aktiv_indexable = aktiv === false ? 0 : 1
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
     this._rev = _rev ?? null
@@ -1182,7 +1182,7 @@ export class Kultur implements IKultur {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -1397,7 +1397,7 @@ export interface ITeilkultur {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -1416,7 +1416,7 @@ export class Teilkultur implements ITeilkultur {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -1434,7 +1434,7 @@ export class Teilkultur implements ITeilkultur {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -1451,7 +1451,7 @@ export class Teilkultur implements ITeilkultur {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -1565,7 +1565,7 @@ export interface IZaehlung {
   kultur_id?: string
   datum?: Date
   prognose?: boolean
-  prognose_indexable?: number
+  __prognose_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -1574,7 +1574,7 @@ export interface IZaehlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -1583,7 +1583,7 @@ export class Zaehlung implements IZaehlung {
   kultur_id?: string
   datum?: Date
   prognose?: boolean
-  prognose_indexable?: number
+  __prognose_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -1592,7 +1592,7 @@ export class Zaehlung implements IZaehlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -1600,7 +1600,7 @@ export class Zaehlung implements IZaehlung {
     kultur_id?: string,
     datum?: Date,
     prognose?: boolean,
-    prognose_indexable?: number,
+    __prognose_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
@@ -1609,14 +1609,14 @@ export class Zaehlung implements IZaehlung {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
     this.kultur_id = kultur_id ?? null
     this.datum = datum ?? null
     this.prognose = prognose ?? false
-    this.prognose_indexable = prognose ? 1 : 0
+    this.__prognose_indexable = prognose ? 1 : 0
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -1625,7 +1625,7 @@ export class Zaehlung implements IZaehlung {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -1758,7 +1758,7 @@ export interface ITeilzaehlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -1780,7 +1780,7 @@ export class Teilzaehlung implements ITeilzaehlung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -1801,7 +1801,7 @@ export class Teilzaehlung implements ITeilzaehlung {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -1821,7 +1821,7 @@ export class Teilzaehlung implements ITeilzaehlung {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -1938,24 +1938,24 @@ export interface IPerson {
   telefon_mobile?: string
   email?: string
   kein_email?: boolean
-  kein_email_indexable?: number
+  __kein_email_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
   account_id?: string
   user_role_id?: string
   kommerziell?: boolean
-  kommerziell_indexable?: number
+  __kommerziell_indexable?: number
   info?: boolean
-  info_indexable?: number
+  __info_indexable?: number
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   _rev?: string
   _parent_rev?: string
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -1973,24 +1973,24 @@ export class Person implements IPerson {
   telefon_mobile?: string
   email?: string
   kein_email?: boolean
-  kein_email_indexable?: number
+  __kein_email_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
   account_id?: string
   user_role_id?: string
   kommerziell?: boolean
-  kommerziell_indexable?: number
+  __kommerziell_indexable?: number
   info?: boolean
-  info_indexable?: number
+  __info_indexable?: number
   aktiv?: boolean
-  aktiv_indexable?: number
+  __aktiv_indexable?: number
   _rev?: string
   _parent_rev?: string
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -2007,24 +2007,24 @@ export class Person implements IPerson {
     telefon_mobile?: string,
     email?: string,
     kein_email?: boolean,
-    kein_email_indexable?: number,
+    __kein_email_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
     account_id?: string,
     user_role_id?: string,
     kommerziell?: boolean,
-    kommerziell_indexable?: number,
+    __kommerziell_indexable?: number,
     info?: boolean,
-    info_indexable?: number,
+    __info_indexable?: number,
     aktiv?: boolean,
-    aktiv_indexable?: number,
+    __aktiv_indexable?: number,
     _rev?: string,
     _parent_rev?: string,
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -2040,24 +2040,24 @@ export class Person implements IPerson {
     this.telefon_mobile = telefon_mobile ?? null
     this.email = email ?? null
     this.kein_email = kein_email ?? false
-    this.kein_email_indexable = kein_email === false ? 0 : 1
+    this.__kein_email_indexable = kein_email === false ? 0 : 1
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
     this.account_id = account_id ?? null
     this.user_role_id = user_role_id ?? null
     this.kommerziell = kommerziell ?? false
-    this.kommerziell_indexable = kommerziell === false ? 0 : 1
+    this.__kommerziell_indexable = kommerziell === false ? 0 : 1
     this.info = info ?? false
-    this.info_indexable = info ? 1 : 0
+    this.__info_indexable = info ? 1 : 0
     this.aktiv = aktiv ?? true
-    this.aktiv_indexable = aktiv === false ? 0 : 1
+    this.__aktiv_indexable = aktiv === false ? 0 : 1
     this._rev = _rev ?? null
     this._parent_rev = _parent_rev ?? null
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -2239,14 +2239,14 @@ export interface ISammelLieferung {
   datum?: Date
   nach_kultur_id?: string
   nach_ausgepflanzt?: boolean
-  nach_ausgepflanzt_indexable?: number
+  __nach_ausgepflanzt_indexable?: number
   von_anzahl_individuen?: number
   anzahl_pflanzen?: number
   anzahl_auspflanzbereit?: number
   gramm_samen?: number
   andere_menge?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -2255,7 +2255,7 @@ export interface ISammelLieferung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -2268,14 +2268,14 @@ export class SammelLieferung implements ISammelLieferung {
   datum?: Date
   nach_kultur_id?: string
   nach_ausgepflanzt?: boolean
-  nach_ausgepflanzt_indexable?: number
+  __nach_ausgepflanzt_indexable?: number
   von_anzahl_individuen?: number
   anzahl_pflanzen?: number
   anzahl_auspflanzbereit?: number
   gramm_samen?: number
   andere_menge?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   bemerkungen?: string
   changed?: Date
   changed_by?: string
@@ -2284,7 +2284,7 @@ export class SammelLieferung implements ISammelLieferung {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -2296,14 +2296,14 @@ export class SammelLieferung implements ISammelLieferung {
     datum?: Date,
     nach_kultur_id?: string,
     nach_ausgepflanzt?: boolean,
-    nach_ausgepflanzt_indexable?: number,
+    __nach_ausgepflanzt_indexable?: number,
     von_anzahl_individuen?: number,
     anzahl_pflanzen?: number,
     anzahl_auspflanzbereit?: number,
     gramm_samen?: number,
     andere_menge?: string,
     geplant?: boolean,
-    geplant_indexable?: number,
+    __geplant_indexable?: number,
     bemerkungen?: string,
     changed?: Date,
     changed_by?: string,
@@ -2312,7 +2312,7 @@ export class SammelLieferung implements ISammelLieferung {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -2323,14 +2323,14 @@ export class SammelLieferung implements ISammelLieferung {
     this.datum = datum ?? null
     this.nach_kultur_id = nach_kultur_id ?? null
     this.nach_ausgepflanzt = nach_ausgepflanzt ?? false
-    this.nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
+    this.__nach_ausgepflanzt_indexable = nach_ausgepflanzt ? 1 : 0
     this.von_anzahl_individuen = von_anzahl_individuen ?? null
     this.anzahl_pflanzen = anzahl_pflanzen ?? null
     this.anzahl_auspflanzbereit = anzahl_auspflanzbereit ?? null
     this.gramm_samen = gramm_samen ?? null
     this.andere_menge = andere_menge ?? null
     this.geplant = geplant ?? false
-    this.geplant_indexable = geplant ? 1 : 0
+    this.__geplant_indexable = geplant ? 1 : 0
     this.bemerkungen = bemerkungen ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -2339,7 +2339,7 @@ export class SammelLieferung implements ISammelLieferung {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -2511,7 +2511,7 @@ export interface IEvent {
   person_id?: string
   beschreibung?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   datum?: Date
   changed?: Date
   changed_by?: string
@@ -2520,7 +2520,7 @@ export interface IEvent {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -2531,7 +2531,7 @@ export class Event implements IEvent {
   person_id?: string
   beschreibung?: string
   geplant?: boolean
-  geplant_indexable?: number
+  __geplant_indexable?: number
   datum?: Date
   changed?: Date
   changed_by?: string
@@ -2540,7 +2540,7 @@ export class Event implements IEvent {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -2550,7 +2550,7 @@ export class Event implements IEvent {
     person_id?: string,
     beschreibung?: string,
     geplant?: boolean,
-    geplant_indexable?: number,
+    __geplant_indexable?: number,
     datum?: Date,
     changed?: Date,
     changed_by?: string,
@@ -2559,7 +2559,7 @@ export class Event implements IEvent {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -2568,7 +2568,7 @@ export class Event implements IEvent {
     this.person_id = person_id ?? null
     this.beschreibung = beschreibung ?? null
     this.geplant = geplant ?? false
-    this.geplant_indexable = geplant ? 1 : 0
+    this.__geplant_indexable = geplant ? 1 : 0
     this.datum = datum ?? null
     this.changed = changed ?? new window.Date().toISOString()
     this.changed_by = changed_by ?? null
@@ -2577,7 +2577,7 @@ export class Event implements IEvent {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? null
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -2695,7 +2695,7 @@ export interface IAv {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -2710,7 +2710,7 @@ export class Av implements IAv {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -2724,7 +2724,7 @@ export class Av implements IAv {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -2737,7 +2737,7 @@ export class Av implements IAv {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -2846,7 +2846,7 @@ export interface IGv {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -2861,7 +2861,7 @@ export class Gv implements IGv {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -2875,7 +2875,7 @@ export class Gv implements IGv {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -2888,7 +2888,7 @@ export class Gv implements IGv {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -3872,7 +3872,7 @@ export interface IArtQk {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -3889,7 +3889,7 @@ export class ArtQk implements IArtQk {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -3905,7 +3905,7 @@ export class ArtQk implements IArtQk {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -3920,7 +3920,7 @@ export class ArtQk implements IArtQk {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -4015,7 +4015,7 @@ export interface IKulturOption {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -4039,7 +4039,7 @@ export class KulturOption implements IKulturOption {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -4062,7 +4062,7 @@ export class KulturOption implements IKulturOption {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -4085,7 +4085,7 @@ export class KulturOption implements IKulturOption {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -4183,7 +4183,7 @@ export interface IKulturQk {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -4200,7 +4200,7 @@ export class KulturQk implements IKulturQk {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -4216,7 +4216,7 @@ export class KulturQk implements IKulturQk {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? uuidv1()
@@ -4231,7 +4231,7 @@ export class KulturQk implements IKulturQk {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -4340,7 +4340,7 @@ export interface IPersonOption {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 }
 
@@ -4378,7 +4378,7 @@ export class PersonOption implements IPersonOption {
   _revisions?: string[]
   _depth?: number
   _deleted?: boolean
-  _deleted_indexable?: number
+  __deleted_indexable?: number
   _conflicts?: string[]
 
   constructor(
@@ -4415,7 +4415,7 @@ export class PersonOption implements IPersonOption {
     _revisions?: string[],
     _depth?: number,
     _deleted?: boolean,
-    _deleted_indexable?: number,
+    __deleted_indexable?: number,
     _conflicts?: string[],
   ) {
     this.id = id ?? null
@@ -4451,7 +4451,7 @@ export class PersonOption implements IPersonOption {
     this._revisions = _revisions ?? null
     this._depth = _depth ?? 1
     this._deleted = _deleted ?? false
-    this._deleted_indexable = _deleted ? 1 : 0
+    this.__deleted_indexable = _deleted ? 1 : 0
     this._conflicts = _conflicts ?? null
   }
 
@@ -4674,33 +4674,33 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super('vermehrung')
-    this.version(75).stores({
+    this.version(77).stores({
       herkunfts:
-        'id, nr, _deleted_indexable, [id+_deleted_indexable], [nr+_deleted_indexable]',
+        'id, nr, __deleted_indexable, [id+__deleted_indexable], [nr+__deleted_indexable]',
       sammlungs:
-        'id, *herkunft_id, *art_id, *person_id, _deleted_indexable, geplant_indexable, [art_id+herkunft_id+_deleted_indexable], [art_id+_deleted_indexable], [herkunft_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+herkunft_id], [nr+_deleted_indexable]',
+        'id, *herkunft_id, *art_id, *person_id, __deleted_indexable, __geplant_indexable, [art_id+herkunft_id+__deleted_indexable], [art_id+__deleted_indexable], [herkunft_id+__deleted_indexable], [person_id+__deleted_indexable], [art_id+herkunft_id], [nr+__deleted_indexable]',
       lieferungs:
-        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable, [von_kultur_id+_deleted_indexable], [nach_kultur_id+_deleted_indexable], [person_id+_deleted_indexable], [art_id+_deleted_indexable], [von_sammlung_id+_deleted_indexable], [sammel_lieferung_id+_deleted_indexable], [art_id+nach_ausgepflanzt_indexable+geplant_indexable+_deleted_indexable], [von_kultur_id+geplant_indexable+_deleted_indexable], [nach_kultur_id+geplant_indexable+_deleted_indexable]',
-      arts: 'id, _deleted_indexable, [id+_deleted_indexable]',
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *sammel_lieferung_id, *person_id, *von_sammlung_id, __deleted_indexable, __nach_ausgepflanzt_indexable, __geplant_indexable, [von_kultur_id+__deleted_indexable], [nach_kultur_id+__deleted_indexable], [person_id+__deleted_indexable], [art_id+__deleted_indexable], [von_sammlung_id+__deleted_indexable], [sammel_lieferung_id+__deleted_indexable], [art_id+__nach_ausgepflanzt_indexable+__geplant_indexable+__deleted_indexable], [von_kultur_id+__geplant_indexable+__deleted_indexable], [nach_kultur_id+__geplant_indexable+__deleted_indexable]',
+      arts: 'id, __deleted_indexable, [id+__deleted_indexable]',
       ae_arts: 'id, name',
       gartens:
-        'id, *person_id, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable+_deleted_indexable], [id+aktiv_indexable+_deleted_indexable], [person_id+aktiv_indexable]',
+        'id, *person_id, __deleted_indexable, __aktiv_indexable, [__aktiv_indexable+__deleted_indexable], [person_id+__aktiv_indexable+__deleted_indexable], [id+__aktiv_indexable+__deleted_indexable], [person_id+__aktiv_indexable]',
       kulturs:
-        'id, *garten_id, *art_id, *herkunft_id, _deleted_indexable, aktiv_indexable, [art_id+aktiv_indexable+_deleted_indexable], [garten_id+aktiv_indexable+_deleted_indexable], [garten_id+_deleted_indexable], [aktiv_indexable+_deleted_indexable], [art_id+herkunft_id], [art_id+herkunft_id+aktiv_indexable+_deleted_indexable], [id+art_id+aktiv_indexable+_deleted_indexable]',
+        'id, *garten_id, *art_id, *herkunft_id, __deleted_indexable, __aktiv_indexable, [art_id+__aktiv_indexable+__deleted_indexable], [garten_id+__aktiv_indexable+__deleted_indexable], [garten_id+__deleted_indexable], [__aktiv_indexable+__deleted_indexable], [art_id+herkunft_id], [art_id+herkunft_id+__aktiv_indexable+__deleted_indexable], [id+art_id+__aktiv_indexable+__deleted_indexable]',
       teilkulturs:
-        'id, *kultur_id, _deleted_indexable, [kultur_id+_deleted_indexable]',
+        'id, *kultur_id, __deleted_indexable, [kultur_id+__deleted_indexable]',
       zaehlungs:
-        'id, *kultur_id, datum, _deleted_indexable, prognose_indexable, [id+_deleted_indexable], [kultur_id+_deleted_indexable], [kultur_id+prognose_indexable+_deleted_indexable], [id+kultur_id+_deleted_indexable]',
+        'id, *kultur_id, datum, __deleted_indexable, __prognose_indexable, [id+__deleted_indexable], [kultur_id+__deleted_indexable], [kultur_id+__prognose_indexable+__deleted_indexable], [id+kultur_id+__deleted_indexable]',
       teilzaehlungs:
-        'id, *zaehlung_id, *teilkultur_id, _deleted_indexable, [id+_deleted_indexable], [zaehlung_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
+        'id, *zaehlung_id, *teilkultur_id, __deleted_indexable, [id+__deleted_indexable], [zaehlung_id+__deleted_indexable], [teilkultur_id+__deleted_indexable]',
       persons:
-        'id, &account_id, aktiv, _deleted_indexable, aktiv_indexable, [aktiv_indexable+_deleted_indexable], [nr+aktiv_indexable+_deleted_indexable]',
+        'id, &account_id, aktiv, __deleted_indexable, __aktiv_indexable, [__aktiv_indexable+__deleted_indexable], [nr+__aktiv_indexable+__deleted_indexable]',
       sammel_lieferungs:
-        'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, _deleted_indexable, nach_ausgepflanzt_indexable, geplant_indexable',
+        'id, *art_id, *nach_kultur_id, *von_kultur_id, *person_id, *von_sammlung_id, __deleted_indexable, __nach_ausgepflanzt_indexable, __geplant_indexable',
       events:
-        'id, *kultur_id, *teilkultur_id, _deleted_indexable, geplant_indexable, [kultur_id+_deleted_indexable], [teilkultur_id+_deleted_indexable]',
-      avs: 'id, *art_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable], [art_id+_deleted_indexable]',
-      gvs: 'id, *garten_id, *person_id, _deleted_indexable, [person_id+_deleted_indexable], [garten_id+_deleted_indexable]',
+        'id, *kultur_id, *teilkultur_id, __deleted_indexable, __geplant_indexable, [kultur_id+__deleted_indexable], [teilkultur_id+__deleted_indexable]',
+      avs: 'id, *art_id, *person_id, __deleted_indexable, [person_id+__deleted_indexable], [art_id+__deleted_indexable]',
+      gvs: 'id, *garten_id, *person_id, __deleted_indexable, [person_id+__deleted_indexable], [garten_id+__deleted_indexable]',
       art_files: 'id, name',
       garten_files: 'id, name',
       herkunft_files: 'id, name',
@@ -4708,10 +4708,10 @@ export class MySubClassedDexie extends Dexie {
       lieferung_files: 'id, name',
       person_files: 'id, name',
       sammlung_files: 'id, name',
-      art_qks: 'id, name, _deleted_indexable',
-      kultur_options: 'id, _deleted_indexable',
-      kultur_qks: 'id, _deleted_indexable',
-      person_options: 'id, _deleted_indexable',
+      art_qks: 'id, name, __deleted_indexable',
+      kultur_options: 'id, __deleted_indexable',
+      kultur_qks: 'id, __deleted_indexable',
+      person_options: 'id, __deleted_indexable',
       user_roles: 'id',
       stores: 'id',
       queued_updates: '++id',

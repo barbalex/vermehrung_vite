@@ -68,25 +68,25 @@ const createMessageFunctions = async ({ artId, store }) => {
   const sammlungsOfArt = await art.sammlungs({ store })
 
   const zaehlungsOfArt = await dexie.zaehlungs
-    .where('[kultur_id+_deleted_indexable]')
+    .where('[kultur_id+__deleted_indexable]')
     .anyOf(kulturIds.map((id) => [id, 0]))
     .toArray()
   const zaehlungsOfArtSorted = zaehlungsOfArt.sort(zaehlungSort)
   const zaehlungIds = zaehlungsOfArtSorted.map((z) => z.id)
 
   const teilzaehlungsOfArt = await dexie.teilzaehlungs
-    .where('[zaehlung_id+_deleted_indexable]')
+    .where('[zaehlung_id+__deleted_indexable]')
     .anyOf(zaehlungIds.map((id) => [id, 0]))
     .toArray()
 
   const teilkulturs = await dexie.teilkulturs
-    .where('[kultur_id+_deleted_indexable]')
+    .where('[kultur_id+__deleted_indexable]')
     .anyOf(kulturIds.map((id) => [id, 0]))
     .toArray()
   const teilkultursSorted = teilkulturs.sort(teilkulturSort)
 
   const events = await dexie.events
-    .where('[kultur_id+_deleted_indexable]')
+    .where('[kultur_id+__deleted_indexable]')
     .anyOf(kulturIds.map((id) => [id, 0]))
     .toArray()
   const eventsSorted = events.sort(eventSort)
@@ -265,14 +265,14 @@ const createMessageFunctions = async ({ artId, store }) => {
       const uniqueGartenIds = [...new Set(gartenIds)]
 
       const gartens = await dexie.gartens
-        .where('[id+aktiv_indexable+_deleted_indexable]')
+        .where('[id+__aktiv_indexable+__deleted_indexable]')
         .anyOf(uniqueGartenIds.map((id) => [id, 1, 0]))
         .toArray()
       const gartensSorted = await gartensSortedFromGartens(gartens)
       const filterPromiseArray = gartensSorted.map(async (g) => {
         const kulturs = await collectionFromTable({
           table: 'kultur',
-          where: { garten_id: g.id, _deleted_indexable: 0 },
+          where: { garten_id: g.id, __deleted_indexable: 0 },
         }).toArray()
 
         return !!kulturs.length && kulturs.every((k) => !k.aktiv)
@@ -379,7 +379,7 @@ const createMessageFunctions = async ({ artId, store }) => {
       ),
     zaehlungsInFutureNotPrognose: async () => {
       const zaehlungs = await dexie.zaehlungs
-        .where('[kultur_id+_deleted_indexable]')
+        .where('[kultur_id+__deleted_indexable]')
         .anyOf(kulturIds.map((id) => [id, 0]))
         .filter(
           (z) =>
@@ -410,7 +410,7 @@ const createMessageFunctions = async ({ artId, store }) => {
     },
     zaehlungsWithoutDatum: async () => {
       const zaehlungs = await dexie.zaehlungs
-        .where('[kultur_id+_deleted_indexable]')
+        .where('[kultur_id+__deleted_indexable]')
         .anyOf(kulturIds.map((id) => [id, 0]))
         .filter((z) => !z.datum)
         .toArray()
@@ -557,12 +557,12 @@ const createMessageFunctions = async ({ artId, store }) => {
           .toArray()
         const idsOfKultursWithTkSet = kulturOptionsWithTkSet.map((o) => o.id)
         const kulturs = await dexie.kulturs
-          .where('[id+art_id+aktiv_indexable+_deleted_indexable]')
+          .where('[id+art_id+__aktiv_indexable+__deleted_indexable]')
           .anyOf(idsOfKultursWithTkSet.map((id) => [id, artId, 1, 0]))
           .toArray()
         const kulturIds = kulturs.map((k) => k.id)
         const zaehlungs = await dexie.zaehlungs
-          .where('[kultur_id+_deleted_indexable]')
+          .where('[kultur_id+__deleted_indexable]')
           .anyOf(kulturIds.map((id) => [id, 0]))
           .toArray()
         const zaehlungsSorted = zaehlungs.sort(zaehlungSort)

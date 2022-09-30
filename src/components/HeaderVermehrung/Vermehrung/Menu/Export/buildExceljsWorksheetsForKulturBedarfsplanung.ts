@@ -21,7 +21,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
   }).toArray()
   const gartenIds = gartens.map((g) => g.id)
   const kulturs = await dexie.kulturs
-    .where('[garten_id+aktiv_indexable+_deleted_indexable]')
+    .where('[garten_id+__aktiv_indexable+__deleted_indexable]')
     .anyOf(gartenIds.map((id) => [id, 1, 0]))
     .toArray()
   const kultursSorted = await kultursSortedFromKulturs(kulturs)
@@ -43,7 +43,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
       }).toArray()
       const idsOfZaehlungsOfKultur = zaehlungsOfKultur.map((z) => z.id)
       const tzsWithAnzahlPflanzen = await dexie.teilzaehlungs
-        .where('[zaehlung_id+_deleted_indexable]')
+        .where('[zaehlung_id+__deleted_indexable]')
         .anyOf(idsOfZaehlungsOfKultur.map((id) => [id, 0]))
         .filter((t) => exists(t.anzahl_pflanzen))
         .toArray()
@@ -51,7 +51,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
         ...new Set(tzsWithAnzahlPflanzen.map((t) => t.zaehlung_id)),
       ]
       const ownZaehlungen = await dexie.zaehlungs
-        .where('[id+kultur_id+_deleted_indexable]')
+        .where('[id+kultur_id+__deleted_indexable]')
         .anyOf(
           idsOfZaehlungsWithTzsWithAnzahlPflanzen.map((id) => [
             id,
@@ -105,7 +105,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
         where: addTotalCriteriaToWhere({
           table: 'lieferung',
           store,
-          where: { von_kultur_id: kultur.id, geplant_indexable: 1 },
+          where: { von_kultur_id: kultur.id, __geplant_indexable: 1 },
         }),
       })
         .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))
@@ -116,7 +116,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
         where: addTotalCriteriaToWhere({
           table: 'lieferung',
           store,
-          where: { von_kultur_id: kultur.id, geplant_indexable: 0 },
+          where: { von_kultur_id: kultur.id, __geplant_indexable: 0 },
         }),
       })
         .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))
@@ -177,7 +177,7 @@ const buildExceljsWorksheetsForKulturBedarfsplanung = async ({
         where: addTotalCriteriaToWhere({
           table: 'lieferung',
           store,
-          where: { nach_kultur_id: kultur.id, geplant_indexable: 0 },
+          where: { nach_kultur_id: kultur.id, __geplant_indexable: 0 },
         }),
       })
         .filter((l) => !!l.datum && exists(l.anzahl_pflanzen))

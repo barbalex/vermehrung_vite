@@ -85,7 +85,7 @@ const PersonArten = ({ person }) => {
     const avsSorted = await avsSortByArt(avs)
     const avArtIds = [...new Set(avs.map((v) => v.art_id))]
     const arts = await dexie.arts
-      .where('[id+_deleted_indexable]')
+      .where('[id+__deleted_indexable]')
       .noneOf(avArtIds.map((id) => [id, 0]))
       .toArray()
     const artsSorted = await artsSortedFromArts(arts)

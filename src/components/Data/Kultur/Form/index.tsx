@@ -179,7 +179,7 @@ const KulturForm = ({
     )
 
     const arts = await dexie.arts
-      .where('[id+_deleted_indexable]')
+      .where('[id+__deleted_indexable]')
       .anyOf(artsToChoose.map((id) => [id, 0]))
       .filter((a) => !!a.ae_id)
       .toArray()
@@ -200,7 +200,7 @@ const KulturForm = ({
     )
 
     const herkunfts = await dexie.herkunfts
-      .where('[id+_deleted_indexable]')
+      .where('[id+__deleted_indexable]')
       .anyOf(herkunftsToChoose.map((id) => [id, 0]))
       .toArray()
     const herkunft = await row?.herkunft?.()

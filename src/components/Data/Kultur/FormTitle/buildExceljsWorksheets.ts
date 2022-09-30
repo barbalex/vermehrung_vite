@@ -129,7 +129,7 @@ const buildExceljsWorksheets = async ({
 
     // 3. Get Teil-Zählungen
     const teilzaehlungs = await dexie.teilzaehlungs
-      .where('[zaehlung_id+_deleted_indexable]')
+      .where('[zaehlung_id+__deleted_indexable]')
       .anyOf(idsOfZaehlungs.map((id) => [id, 0]))
       .toArray()
     const teilzaehlungsSorted = await teilzaehlungsSortByTk(teilzaehlungs)

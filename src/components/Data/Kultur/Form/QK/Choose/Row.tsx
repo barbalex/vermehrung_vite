@@ -37,7 +37,7 @@ const ChooseKulturQkRow = ({ qk }) => {
     })
     const personOption = await person?.personOption()
     const kulturQks = await dexie.kultur_qks
-      .where({ _deleted_indexable: 0 })
+      .where({ __deleted_indexable: 0 })
       .toArray()
 
     return { personOption, kulturQkChoosen: kulturQks.map((q) => q.id) }

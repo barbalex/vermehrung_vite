@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import personLabelFromPerson from './personLabelFromPerson'
 
 const sammlungLabelFromSammlung = ({
-  sammlung,
+  sammlung, 
   art,
   ae_art,
   person,

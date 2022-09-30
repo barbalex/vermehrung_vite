@@ -21,13 +21,13 @@ const buildData = async ({ artId }) => {
   }).toArray()
   const kultursIds = kulturs.map((k) => k.id)
   const zaehlungs = await dexie.zaehlungs
-    .where('[kultur_id+_deleted_indexable]')
+    .where('[kultur_id+__deleted_indexable]')
     .anyOf(kultursIds.map((id) => [id, 0]))
     .and((z) => !!z.datum)
     .toArray()
   const zaehlungsIds = zaehlungs.map((z) => z.id)
   const teilzaehlungsWithAnzahlPflanzen = await dexie.teilzaehlungs
-    .where('[zaehlung_id+_deleted_indexable]')
+    .where('[zaehlung_id+__deleted_indexable]')
     .anyOf(zaehlungsIds.map((id) => [id, 0]))
     .and((tz) => tz.anzahl_pflanzen !== null)
     .toArray()
@@ -41,7 +41,7 @@ const buildData = async ({ artId }) => {
    * So need to recreate it for every usage
    */
   const zaehlungsObservableForZaehlungsDone = dexie.zaehlungs
-    .where('[kultur_id+prognose_indexable+_deleted_indexable]')
+    .where('[kultur_id+__prognose_indexable+__deleted_indexable]')
     .anyOf(kultursIds.map((id) => [id, 0, 0]))
     .and((z) => !!z.datum)
   const zaehlungsDone = await zaehlungsObservableForZaehlungsDone
@@ -49,7 +49,7 @@ const buildData = async ({ artId }) => {
     .toArray()
 
   const zaehlungsObservableForZaehlungsPlannedAll = dexie.zaehlungs
-    .where('[kultur_id+_deleted_indexable]')
+    .where('[kultur_id+__deleted_indexable]')
     .anyOf(kultursIds.map((id) => [id, 0]))
     .and((z) => !!z.datum)
   const zaehlungsPlannedAll = await zaehlungsObservableForZaehlungsPlannedAll
@@ -103,8 +103,8 @@ const buildData = async ({ artId }) => {
       store,
       where: {
         art_id: artId,
-        nach_ausgepflanzt_indexable: 1,
-        geplant_indexable: 0,
+        __nach_ausgepflanzt_indexable: 1,
+        __geplant_indexable: 0,
       },
     }),
   })
@@ -123,8 +123,8 @@ const buildData = async ({ artId }) => {
       store,
       where: {
         art_id: artId,
-        nach_ausgepflanzt_indexable: 1,
-        geplant_indexable: 1,
+        __nach_ausgepflanzt_indexable: 1,
+        __geplant_indexable: 1,
       },
     }),
   })

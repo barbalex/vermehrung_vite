@@ -76,7 +76,7 @@ const Herkunft = ({
       where: addTotalCriteriaToWhere({
         table: 'herkunft',
         store,
-        where: { _deleted_indexable: 0, nr: row.nr },
+        where: { __deleted_indexable: 0, nr: row.nr },
       }),
     })
       .filter((h) => h.id !== row.id)

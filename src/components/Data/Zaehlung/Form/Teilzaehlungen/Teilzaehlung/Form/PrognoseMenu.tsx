@@ -94,7 +94,7 @@ const PrognoseMenu = ({
           where: {
             kultur_id: kulturId,
             datum: dateOfZaehlung,
-            prognose_indexable: 1,
+            __prognose_indexable: 1,
           },
         }),
       }).toArray()

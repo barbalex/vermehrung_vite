@@ -68,7 +68,7 @@ const createMessageFunctions = async ({ kulturId, store }) => {
   const idsOfZaehlungs = zaehlungs.map((z) => z.id)
 
   const teilzaehlungs = await dexie.teilzaehlungs
-    .where('[zaehlung_id+_deleted_indexable]')
+    .where('[zaehlung_id+__deleted_indexable]')
     .anyOf(idsOfZaehlungs.map((id) => [id, 0]))
     .toArray()
 

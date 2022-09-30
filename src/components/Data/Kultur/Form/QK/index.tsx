@@ -59,7 +59,7 @@ const KulturQk = ({ kultur }) => {
       dexie.persons.get({
         account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
       }),
-      dexie.kultur_qks.where({ _deleted_indexable: 0 }).sortBy('name'),
+      dexie.kultur_qks.where({ __deleted_indexable: 0 }).sortBy('name'),
     ])
 
     const personOption: PersonOption = await person?.personOption()
