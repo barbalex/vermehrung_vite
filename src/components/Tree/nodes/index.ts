@@ -128,7 +128,7 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
   const openNodes = getSnapshot(openNodesRaw)
   const activeNodeArray = activeNodeArrayRaw.toJSON()
 
-  console.log('buildNodes, activeNodeArray:', activeNodeArray)
+  // console.log('buildNodes, activeNodeArray:', activeNodeArray)
 
   const showArt = getShowArt({ userRole, activeNodeArray })
   const showEvent = getShowEvent({ userPersonOption, activeNodeArray })
