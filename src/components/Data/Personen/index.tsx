@@ -20,6 +20,7 @@ import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTa
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
+import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 
 const Container = styled.div`
   height: 100%;
@@ -60,8 +61,16 @@ const Personen = ({ filter: showFilter, width, height }) => {
   const { person: personFilter } = store.filter
 
   const data = useLiveQuery(async () => {
+    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+      store,
+      table: 'person',
+    })
     const [persons, totalCount, userRole] = await Promise.all([
-      filteredCollectionFromTable({ store, table: 'person' }).toArray(),
+      filteredCollectionFromTable({
+        store,
+        table: 'person',
+        hierarchyWhereAndFilter,
+      }).toArray(),
       collectionFromTable({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'evepersonnt' }),

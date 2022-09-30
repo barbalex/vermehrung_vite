@@ -26,8 +26,11 @@ const LieferungTitleChooser = ({
   } = store
 
   const data = useLiveQuery(async () => {
-    const { filter = () => true, where = {} } =
-      await hierarchyWhereAndFilterForTable({ store, table: 'lieferung' })
+    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+      store,
+      table: 'lieferung',
+    })
+    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
@@ -35,7 +38,11 @@ const LieferungTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'lieferung', where }),
         filter,
       }).count(),
-      filteredCollectionFromTable({ store, table: 'lieferung' }).count(),
+      filteredCollectionFromTable({
+        store,
+        table: 'lieferung',
+        hierarchyWhereAndFilter,
+      }).count(),
     ])
 
     return { totalCount, filteredCount }

@@ -8,6 +8,7 @@ import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
+import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 
 const PersonFormTitleChooser = ({
   showFilter,
@@ -18,12 +19,20 @@ const PersonFormTitleChooser = ({
   const store = useContext(StoreContext)
 
   const data = useLiveQuery(async () => {
+    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+      store,
+      table: 'person',
+    })
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'person' }),
       }).count(),
-      filteredCollectionFromTable({ store, table: 'person' }).count(),
+      filteredCollectionFromTable({
+        store,
+        table: 'person',
+        hierarchyWhereAndFilter,
+      }).count(),
     ])
 
     return { totalCount, filteredCount }

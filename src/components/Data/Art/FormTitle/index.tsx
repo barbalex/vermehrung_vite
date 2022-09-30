@@ -23,7 +23,11 @@ const ArtFormTitleChooser = ({
         table: 'art',
         where: addTotalCriteriaToWhere({ store, table: 'art' }),
       }).count(),
-      filteredCollectionFromTable({ store, table: 'art' }).count(),
+      filteredCollectionFromTable({
+        store,
+        table: 'art',
+        hierarchyWhereAndFilter: undefined,
+      }).count(),
     ])
     return { totalCount, filteredCount }
   }, [store.filter.art, store.art_initially_queried])

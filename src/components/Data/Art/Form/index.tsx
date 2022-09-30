@@ -47,7 +47,7 @@ const ArtForm = ({
 
   const data = useLiveQuery(async () => {
     const [arts, aeArts] = await Promise.all([
-      filteredCollectionFromTable({ store, table: 'art' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'art', hierarchyWhereAndFilter: undefined }).toArray(),
       dexie.ae_arts.orderBy('name').toArray(),
     ])
 

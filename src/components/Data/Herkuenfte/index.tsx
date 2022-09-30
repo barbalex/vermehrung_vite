@@ -69,12 +69,17 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
   const activeNodeArray = anaRaw.toJSON()
 
   const data = useLiveQuery(async () => {
-    const { filter = () => true, where = {} } =
-      await hierarchyWhereAndFilterForTable({ store, table: 'herkunft' })
+    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+      store,
+      table: 'herkunft',
+    })
+    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
+
     const [herkunfts, totalCount] = await Promise.all([
       filteredCollectionFromTable({
         store,
         table: 'herkunft',
+        hierarchyWhereAndFilter,
       }).toArray(),
       collectionFromTable({
         table: 'herkunft',

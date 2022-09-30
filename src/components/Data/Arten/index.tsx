@@ -59,7 +59,11 @@ const Arten = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [arts, totalCount] = await Promise.all([
-      filteredCollectionFromTable({ store, table: 'art' }).toArray(),
+      filteredCollectionFromTable({
+        store,
+        table: 'art',
+        hierarchyWhereAndFilter: undefined,
+      }).toArray(),
       collectionFromTable({
         store,
         table: 'art',

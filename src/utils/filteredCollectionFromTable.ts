@@ -2,18 +2,18 @@ import camelCase from 'lodash/camelCase'
 
 import types from '../store/Filter/simpleTypes'
 import exists from './exists'
-import hierarchyWhereAndFilterForTable from './hierarchyWhereAndFilterForTable'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 import collectionFromTable from './collectionFromTable'
 
-const filteredCollectionFromTable = async ({ store, table }) => {
+const filteredCollectionFromTable = ({
+  store,
+  table,
+  hierarchyWhereAndFilter = {},
+}) => {
   if (!table) throw `no table passed`
 
   const { where: hierarchyWhere = {}, filter: hierarchyFilter } =
-    await hierarchyWhereAndFilterForTable({
-      store,
-      table,
-    })
+    hierarchyWhereAndFilter
 
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`

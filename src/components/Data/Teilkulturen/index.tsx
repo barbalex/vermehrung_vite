@@ -60,10 +60,18 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const { filter = () => true, where = {} } =
-      await hierarchyWhereAndFilterForTable({ store, table: 'teilkultur' })
+    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+      store,
+      table: 'teilkultur',
+    })
+    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
+
     const [teilkulturs, totalCount] = await Promise.all([
-      filteredCollectionFromTable({ store, table: 'teilkultur' }).toArray(),
+      filteredCollectionFromTable({
+        store,
+        table: 'teilkultur',
+        hierarchyWhereAndFilter,
+      }).toArray(),
       collectionFromTable({
         table: 'teilkultur',
         where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),
