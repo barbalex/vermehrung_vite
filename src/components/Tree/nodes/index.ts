@@ -245,7 +245,6 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
       store,
       table: 'art',
     })
-    console.log('Tree, artCollection:', artCollection)
     const artCount = await artCollection.count()
     artFolderNodes = buildArtFolder({ count: artCount })
     const artFolderIsOpen = openNodes.some(

@@ -15,11 +15,10 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const { personIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'garten',
     })
-    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
@@ -30,7 +29,8 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
       filteredCollectionFromTable({
         store,
         table: 'garten',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).count(),
     ])
 

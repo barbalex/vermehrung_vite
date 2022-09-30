@@ -61,7 +61,7 @@ const Personen = ({ filter: showFilter, width, height }) => {
   const { person: personFilter } = store.filter
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'person',
     })
@@ -69,7 +69,8 @@ const Personen = ({ filter: showFilter, width, height }) => {
       filteredCollectionFromTable({
         store,
         table: 'person',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).toArray(),
       collectionFromTable({
         table: 'person',

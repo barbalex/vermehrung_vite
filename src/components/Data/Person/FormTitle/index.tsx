@@ -19,7 +19,7 @@ const PersonFormTitleChooser = ({
   const store = useContext(StoreContext)
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'person',
     })
@@ -31,7 +31,8 @@ const PersonFormTitleChooser = ({
       filteredCollectionFromTable({
         store,
         table: 'person',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).count(),
     ])
 

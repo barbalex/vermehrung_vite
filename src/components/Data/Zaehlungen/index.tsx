@@ -60,17 +60,17 @@ const Zaehlungen = ({ filter: showFilter, width, height }) => {
   const { activeNodeArray, setActiveNodeArray, removeOpenNode } = store.tree
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'zaehlung',
     })
-    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [zaehlungs, totalCount] = await Promise.all([
       filteredCollectionFromTable({
         store,
         table: 'zaehlung',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).toArray(),
       collectionFromTable({
         table: 'zaehlung',

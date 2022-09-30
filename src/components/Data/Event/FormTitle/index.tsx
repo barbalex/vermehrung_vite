@@ -15,11 +15,10 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
   const { kulturIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'event',
     })
-    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
@@ -30,7 +29,8 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
       filteredCollectionFromTable({
         store,
         table: 'event',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).count(),
     ])
 

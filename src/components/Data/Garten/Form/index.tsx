@@ -62,7 +62,7 @@ const GartenForm = ({
     ])
 
     // need to show a choosen person even if inactive but not if deleted
-    const person = await row.person()
+    const person = await row?.person?.()
     const personsIncludingChoosen = uniqBy(
       [...persons, ...(person && !showFilter ? [person] : [])],
       'id',

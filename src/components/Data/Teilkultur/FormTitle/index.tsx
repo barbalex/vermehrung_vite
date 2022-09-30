@@ -20,11 +20,10 @@ const TeilkulturFormTitleChooser = ({
   const { kulturIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'teilkultur',
     })
-    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
@@ -35,7 +34,8 @@ const TeilkulturFormTitleChooser = ({
       filteredCollectionFromTable({
         store,
         table: 'teilkultur',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).count(),
     ])
 

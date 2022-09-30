@@ -58,7 +58,8 @@ const ArtForm = ({
   const store = useContext(StoreContext)
   const { filter, online } = store
 
-  const row: Art = useLiveQuery(async () => await dexie.arts.get(id), [id])
+  let row: Art = useLiveQuery(async () => await dexie.arts.get(id), [id])
+  if (showFilter) row = filter.art
 
   const [activeConflict, setActiveConflict] = useState(null)
   const conflictDisposalCallback = useCallback(

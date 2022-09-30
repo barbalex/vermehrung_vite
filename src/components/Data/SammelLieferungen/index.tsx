@@ -63,7 +63,6 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
       filteredCollectionFromTable({
         store,
         table: 'sammel_lieferung',
-        hierarchyWhereAndFilter: undefined,
       }).toArray(),
       collectionFromTable({
         table: 'sammel_lieferung',

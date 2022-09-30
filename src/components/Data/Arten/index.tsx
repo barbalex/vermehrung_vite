@@ -62,7 +62,6 @@ const Arten = ({ filter: showFilter, width, height }) => {
       filteredCollectionFromTable({
         store,
         table: 'art',
-        hierarchyWhereAndFilter: undefined,
       }).toArray(),
       collectionFromTable({
         store,

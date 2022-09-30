@@ -31,7 +31,6 @@ const SammelLieferungFormTitleChooser = ({
       filteredCollectionFromTable({
         store,
         table: 'sammel_lieferung',
-        hierarchyWhereAndFilter: undefined,
       }).count(),
     ])
 

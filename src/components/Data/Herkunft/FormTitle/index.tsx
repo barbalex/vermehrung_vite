@@ -21,11 +21,10 @@ const HerkunftFormTitleChooser = ({
   const { sammlungIdInActiveNodeArray, artIdInActiveNodeArray } = store
 
   const data = useLiveQuery(async () => {
-    const hierarchyWhereAndFilter = await hierarchyWhereAndFilterForTable({
+    const { where, filter } = await hierarchyWhereAndFilterForTable({
       store,
       table: 'herkunft',
     })
-    const { filter = () => true, where = {} } = hierarchyWhereAndFilter
 
     const [totalCount, filteredCount] = await Promise.all([
       collectionFromTable({
@@ -36,7 +35,8 @@ const HerkunftFormTitleChooser = ({
       filteredCollectionFromTable({
         store,
         table: 'herkunft',
-        hierarchyWhereAndFilter,
+        where,
+        filter,
       }).count(),
     ])
 

@@ -26,7 +26,6 @@ const ArtFormTitleChooser = ({
       filteredCollectionFromTable({
         store,
         table: 'art',
-        hierarchyWhereAndFilter: undefined,
       }).count(),
     ])
     return { totalCount, filteredCount }
