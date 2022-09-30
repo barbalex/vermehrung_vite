@@ -16,7 +16,7 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import lieferungSort from '../../../utils/lieferungSort'
 import constants from '../../../utils/constants'
 import { SammelLieferung } from '../../../dexieClient'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -60,7 +60,10 @@ const SammelLieferungen = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [sammelLieferungs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'sammel_lieferung' }).toArray(),
+      filteredCollectionFromTable({
+        store,
+        table: 'sammel_lieferung',
+      }).toArray(),
       collectionFromTable({
         table: 'sammel_lieferung',
         where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),

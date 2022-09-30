@@ -16,7 +16,7 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import herkunftSort from '../../../utils/herkunftSort'
 import constants from '../../../utils/constants'
 import { Herkunft } from '../../../dexieClient'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
@@ -72,7 +72,7 @@ const Herkuenfte = ({ filter: showFilter, width, height }) => {
     const { filter = () => true, where = {} } =
       await hierarchyWhereAndFilterForTable({ store, table: 'herkunft' })
     const [herkunfts, totalCount] = await Promise.all([
-      filteredObjectsFromTable({
+      filteredCollectionFromTable({
         store,
         table: 'herkunft',
       }).toArray(),

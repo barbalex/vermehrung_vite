@@ -16,7 +16,7 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import personSort from '../../../utils/personSort'
 import constants from '../../../utils/constants'
 import { dexie, Person } from '../../../dexieClient'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -61,7 +61,7 @@ const Personen = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [persons, totalCount, userRole] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'person' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'person' }).toArray(),
       collectionFromTable({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'evepersonnt' }),

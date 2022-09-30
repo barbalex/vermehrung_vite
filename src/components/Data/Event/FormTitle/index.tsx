@@ -8,7 +8,7 @@ import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
@@ -24,7 +24,7 @@ const EventFormTitle = ({ row, showFilter, showHistory, setShowHistory }) => {
         where: addTotalCriteriaToWhere({ store, table: 'event', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'event' }).count(),
+      filteredCollectionFromTable({ store, table: 'event' }).count(),
     ])
 
     return { totalCount, filteredCount }

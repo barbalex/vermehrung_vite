@@ -5,7 +5,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import StoreContext from '../../../../storeContext'
 import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 
@@ -23,7 +23,7 @@ const ArtFormTitleChooser = ({
         table: 'art',
         where: addTotalCriteriaToWhere({ store, table: 'art' }),
       }).count(),
-      filteredObjectsFromTable({ store, table: 'art' }).count(),
+      filteredCollectionFromTable({ store, table: 'art' }).count(),
     ])
     return { totalCount, filteredCount }
   }, [store.filter.art, store.art_initially_queried])

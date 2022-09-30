@@ -112,7 +112,7 @@ import getShowTeilkultur from '../../../utils/showTeilkultur'
 import getShowZaehlung from '../../../utils/showZaehlung'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 
 const compare = (a, b) => {
   // sort a before, if it has no value at this index
@@ -241,7 +241,11 @@ const buildNodes = async ({ store, userPersonOption = {}, userRole }) => {
 
   // 1 art
   if (showArt) {
-    const artCollection = filteredObjectsFromTable({ store, table: 'art' })
+    const artCollection = await filteredCollectionFromTable({
+      store,
+      table: 'art',
+    })
+    console.log('Tree, artCollection:', artCollection)
     const artCount = await artCollection.count()
     artFolderNodes = buildArtFolder({ count: artCount })
     const artFolderIsOpen = openNodes.some(

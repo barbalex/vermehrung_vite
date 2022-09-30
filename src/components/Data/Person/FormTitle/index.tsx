@@ -7,7 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const PersonFormTitleChooser = ({
   showFilter,
@@ -23,7 +23,7 @@ const PersonFormTitleChooser = ({
         table: 'person',
         where: addTotalCriteriaToWhere({ store, table: 'person' }),
       }).count(),
-      filteredObjectsFromTable({ store, table: 'person' }).count(),
+      filteredCollectionFromTable({ store, table: 'person' }).count(),
     ])
 
     return { totalCount, filteredCount }

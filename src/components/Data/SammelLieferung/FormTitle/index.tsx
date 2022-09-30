@@ -7,7 +7,7 @@ import FilterTitle from '../../../shared/FilterTitle'
 import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const SammelLieferungFormTitleChooser = ({
   lieferung,
@@ -28,7 +28,7 @@ const SammelLieferungFormTitleChooser = ({
         table: 'sammel_lieferung',
         where: addTotalCriteriaToWhere({ store, table: 'sammel_lieferung' }),
       }).count(),
-      filteredObjectsFromTable({
+      filteredCollectionFromTable({
         store,
         table: 'sammel_lieferung',
       }).count(),

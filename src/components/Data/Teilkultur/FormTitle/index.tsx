@@ -8,7 +8,7 @@ import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const TeilkulturFormTitleChooser = ({
   row,
@@ -29,7 +29,7 @@ const TeilkulturFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'teilkultur' }).count(),
+      filteredCollectionFromTable({ store, table: 'teilkultur' }).count(),
     ])
 
     return { totalCount, filteredCount }

@@ -2,7 +2,7 @@ import { dexie } from '../dexieClient'
 import collectionFromTable from './collectionFromTable'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 
-const hierarchyWhereAndFilterForTable = async ({ store, table }) => {
+const hierarchyWhereAndFilterForTable = async ({ store, table }) => { 
   const {
     artIdInActiveNodeArray,
     gartenIdInActiveNodeArray,

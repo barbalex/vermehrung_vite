@@ -6,13 +6,14 @@ import hierarchyWhereAndFilterForTable from './hierarchyWhereAndFilterForTable'
 import addTotalCriteriaToWhere from './addTotalCriteriaToWhere'
 import collectionFromTable from './collectionFromTable'
 
-const filteredObjectsFromTable = async ({ store, table, count = false }) => {
+const filteredCollectionFromTable = async ({ store, table }) => {
   if (!table) throw `no table passed`
 
-  const { where: hierarchyWhere = {}, filter: hierarchyFilter } = await hierarchyWhereAndFilterForTable({
-    store,
-    table,
-  })
+  const { where: hierarchyWhere = {}, filter: hierarchyFilter } =
+    await hierarchyWhereAndFilterForTable({
+      store,
+      table,
+    })
 
   const storeFilter = store.filter[table]
   if (!storeFilter) throw `no filter found for table ${table}`
@@ -32,27 +33,27 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
       const [key, value] = entry
       const type = types[table][key] ?? 'string'
       const objectValue = object[key]
-      // console.log('filteredObjectsFromTable, objectValue:', objectValue)
+      // console.log('filteredCollectionFromTable, objectValue:', objectValue)
       if (objectValue === undefined /*&& value !== undefined*/) {
-        console.log('filteredObjectsFromTable, false due to undefined')
+        console.log('filteredCollectionFromTable, false due to undefined')
         returnValue = false
         break
       }
       if (objectValue === null /*&& value !== null*/) {
-        // console.log('filteredObjectsFromTable, false due to null')
+        // console.log('filteredCollectionFromTable, false due to null')
         returnValue = false
         break
       }
       // console.log(
-      //   'filteredObjectsFromTable, type === string',
+      //   'filteredCollectionFromTable, type === string',
       //   type === 'string',
       // )
       // console.log(
-      //   'filteredObjectsFromTable, value?.toString()?.toLowerCase()',
+      //   'filteredCollectionFromTable, value?.toString()?.toLowerCase()',
       //   value?.toString()?.toLowerCase(),
       // )
       // console.log(
-      //   'filteredObjectsFromTable, !objectValue.includes(value?.toString()?.toLowerCase())',
+      //   'filteredCollectionFromTable, !objectValue.includes(value?.toString()?.toLowerCase())',
       //   !objectValue.includes(value?.toString()?.toLowerCase()),
       // )
       if (
@@ -62,16 +63,16 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
         !objectValue?.includes?.(value?.toString()?.toLowerCase())
       ) {
         // console.log(
-        //   'filteredObjectsFromTable, false due to not including in lowercase',
+        //   'filteredCollectionFromTable, false due to not including in lowercase',
         // )
         returnValue = false
         break
       } else if (type === 'string' && !objectValue?.includes?.(value)) {
-        // console.log('filteredObjectsFromTable, false due to not including')
+        // console.log('filteredCollectionFromTable, false due to not including')
         returnValue = false
         break
       } else if (type !== 'string' && !(objectValue === value)) {
-        // console.log('filteredObjectsFromTable, false due to not equal')
+        // console.log('filteredCollectionFromTable, false due to not equal')
         // TODO: if is indexed field, add to where
         // watch out for booleans (use _indexable field and convert value)
         returnValue = false
@@ -90,6 +91,7 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
 
   // if a url is opened, a dataset should always show
   // even if it was filtered away
+  // TODO: text
   const tableIdInActiveNodeArray =
     store[`${camelCase(table)}IdInActiveNodeArray`]
   const orIdInUrlAdder = (collection) =>
@@ -101,4 +103,4 @@ const filteredObjectsFromTable = async ({ store, table, count = false }) => {
   return filteredCollection2
 }
 
-export default filteredObjectsFromTable
+export default filteredCollectionFromTable

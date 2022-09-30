@@ -8,7 +8,7 @@ import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
 import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const ZaehlungFormTitleChooser = ({
   row,
@@ -29,7 +29,7 @@ const ZaehlungFormTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'zaehlung', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'zaehlung' }).count(),
+      filteredCollectionFromTable({ store, table: 'zaehlung' }).count(),
     ])
 
     return { totalCount, filteredCount }

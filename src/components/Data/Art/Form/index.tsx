@@ -16,7 +16,7 @@ import Personen from './Personen'
 import ErrorBoundary from '../../../shared/ErrorBoundary'
 import ConflictList from '../../../shared/ConflictList'
 import artsSortedFromArts from '../../../../utils/artsSortedFromArts'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 import { dexie, Art, AeArt } from '../../../../dexieClient'
 
 const FieldsContainer = styled.div`
@@ -47,7 +47,7 @@ const ArtForm = ({
 
   const data = useLiveQuery(async () => {
     const [arts, aeArts] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'art' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'art' }).toArray(),
       dexie.ae_arts.orderBy('name').toArray(),
     ])
 

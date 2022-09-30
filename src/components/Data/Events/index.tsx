@@ -15,7 +15,7 @@ import FilterNumbers from '../../shared/FilterNumbers'
 import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import eventSort from '../../../utils/eventSort'
 import constants from '../../../utils/constants'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
@@ -62,7 +62,7 @@ const Events = ({ filter: showFilter, width, height }) => {
     const { filter = () => true, where = {} } =
       await hierarchyWhereAndFilterForTable({ store, table: 'event' })
     const [events, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'event' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'event' }).toArray(),
       collectionFromTable({
         table: 'event',
         where: addTotalCriteriaToWhere({ store, table: 'event', where }),

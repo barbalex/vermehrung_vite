@@ -8,7 +8,7 @@ import FormTitle from './FormTitle'
 import hierarchyWhereAndFilterForTable from '../../../../utils/hierarchyWhereAndFilterForTable'
 import collectionFromTable from '../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../utils/addTotalCriteriaToWhere'
-import filteredObjectsFromTable from '../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../utils/filteredCollectionFromTable'
 
 const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
   const store = useContext(StoreContext)
@@ -24,7 +24,7 @@ const GartenFormTitle = ({ showFilter, row, showHistory, setShowHistory }) => {
         where: addTotalCriteriaToWhere({ store, table: 'garten', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'garten' }).count(),
+      filteredCollectionFromTable({ store, table: 'garten' }).count(),
     ])
 
     return { totalCount, filteredCount }

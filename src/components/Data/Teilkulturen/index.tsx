@@ -16,7 +16,7 @@ import { ReactComponent as UpSvg } from '../../../svg/to_up.inline.svg'
 import teilkulturSort from '../../../utils/teilkulturSort'
 import constants from '../../../utils/constants'
 import { Teilkultur } from '../../../dexieClient'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import hierarchyWhereAndFilterForTable from '../../../utils/hierarchyWhereAndFilterForTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
@@ -63,7 +63,7 @@ const Teilkulturen = ({ filter: showFilter, width, height }) => {
     const { filter = () => true, where = {} } =
       await hierarchyWhereAndFilterForTable({ store, table: 'teilkultur' })
     const [teilkulturs, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'teilkultur' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'teilkultur' }).toArray(),
       collectionFromTable({
         table: 'teilkultur',
         where: addTotalCriteriaToWhere({ store, table: 'teilkultur', where }),

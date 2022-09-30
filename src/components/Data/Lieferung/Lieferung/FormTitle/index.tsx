@@ -8,7 +8,7 @@ import FormTitle from './FormTitle'
 import collectionFromTable from '../../../../../utils/collectionFromTable'
 import addTotalCriteriaToWhere from '../../../../../utils/addTotalCriteriaToWhere'
 import hierarchyWhereAndFilterForTable from '../../../../../utils/hierarchyWhereAndFilterForTable'
-import filteredObjectsFromTable from '../../../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../../../utils/filteredCollectionFromTable'
 
 const LieferungTitleChooser = ({
   row,
@@ -35,7 +35,7 @@ const LieferungTitleChooser = ({
         where: addTotalCriteriaToWhere({ store, table: 'lieferung', where }),
         filter,
       }).count(),
-      filteredObjectsFromTable({ store, table: 'lieferung' }).count(),
+      filteredCollectionFromTable({ store, table: 'lieferung' }).count(),
     ])
 
     return { totalCount, filteredCount }

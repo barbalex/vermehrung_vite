@@ -16,7 +16,7 @@ import FilterNumbers from '../../shared/FilterNumbers'
 import artsSortedFromArts from '../../../utils/artsSortedFromArts'
 import constants from '../../../utils/constants'
 import { Art } from '../../../dexieClient'
-import filteredObjectsFromTable from '../../../utils/filteredObjectsFromTable'
+import filteredCollectionFromTable from '../../../utils/filteredCollectionFromTable'
 import Spinner from '../../shared/Spinner'
 import addTotalCriteriaToWhere from '../../../utils/addTotalCriteriaToWhere'
 import collectionFromTable from '../../../utils/collectionFromTable'
@@ -59,7 +59,7 @@ const Arten = ({ filter: showFilter, width, height }) => {
 
   const data = useLiveQuery(async () => {
     const [arts, totalCount] = await Promise.all([
-      filteredObjectsFromTable({ store, table: 'art' }).toArray(),
+      filteredCollectionFromTable({ store, table: 'art' }).toArray(),
       collectionFromTable({
         store,
         table: 'art',
