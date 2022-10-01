@@ -40,28 +40,34 @@ const derivedFields = {
           herkunft,
         })
       },
+      dependentTables: [
+        'herkunft',
+        'art',
+        'person',
+      ],
+    },
+    __labelUnderHerkunft: {
+      derive: async (row) => {
+        if (!row) return
+        const [art, person] = await Promise.all([
+          dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
+          dexie.persons.get(
+            row.person_id ?? '99999999-9999-9999-9999-999999999999',
+          ),
+        ])
+        const ae_art = await art?.aeArt()
+
+        return sammlungLabelFromSammlungUnderHerkunft({
+          sammlung: row,
+          art,
+          ae_art,
+          person,
+        })
+      },
       dependentTables: (row) => ({
-        herkunft: row.herkunft_id,
         art: row.art_id,
         person: row.person_id,
       }),
-    },
-    __labelUnderHerkunft: async (row) => {
-      if (!row) return
-      const [art, person] = await Promise.all([
-        dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
-        dexie.persons.get(
-          row.person_id ?? '99999999-9999-9999-9999-999999999999',
-        ),
-      ])
-      const ae_art = await art?.aeArt()
-
-      return sammlungLabelFromSammlungUnderHerkunft({
-        sammlung: row,
-        art,
-        ae_art,
-        person,
-      })
     },
   },
   teilkultur: {},
