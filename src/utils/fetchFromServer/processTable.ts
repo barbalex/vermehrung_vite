@@ -2,13 +2,6 @@ import { dexie } from '../../dexieClient'
 import addIndexableBooleans from '../addIndexableBooleans'
 import addDerivedFields from '../addDerivedFields'
 
-const stripTypename = (object) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { __typename, ...rest } = object
-  delete object.__typename
-  return rest
-}
-
 // TODO: do this in worker?
 const processSubscriptionResult = async ({ data, table, store }) => {
   const { setInitiallyQueried, setLastUpdated, setInitiallyQuerying } = store
