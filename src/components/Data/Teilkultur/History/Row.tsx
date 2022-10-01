@@ -11,6 +11,7 @@ import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
 import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
+import addDerivedFieldsInDexie from '../../../../utils/addDerivedFieldsInDexie'
 
 const TeilkulturHistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
@@ -72,6 +73,10 @@ const TeilkulturHistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     addIndexableBooleans({ table: 'teilkultur', object: newObjectForStore })
     // optimistically update store
     await dexie.teilkulturs.update(row.id, newObjectForStore)
+    return await addDerivedFieldsInDexie({
+      table: 'teilkultur',
+      id: row.id,
+    })
   }, [
     row,
     revRow.teilkultur_id,

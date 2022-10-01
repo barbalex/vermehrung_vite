@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useState, useEffect } from 'react'
+import React, { useContext, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import styled from 'styled-components'
 
@@ -33,13 +33,6 @@ const ArtenRow = ({ row, style, last }) => {
   const { herkunftIdInActiveNodeArray } = store
   const { activeNodeArray, setActiveNodeArray } = store.tree
 
-  const [label, setLabel] = useState('')
-  useEffect(() => {
-    herkunftIdInActiveNodeArray
-      ? row.labelUnderHerkunft().then(setLabel)
-      : row.label().then(setLabel)
-  }, [herkunftIdInActiveNodeArray, row])
-
   const onClickRow = useCallback(
     () => setActiveNodeArray([...activeNodeArray, row.id]),
     [activeNodeArray, row.id, setActiveNodeArray],
@@ -47,7 +40,9 @@ const ArtenRow = ({ row, style, last }) => {
 
   return (
     <Row key={row.id} onClick={onClickRow} style={style} data-last={last}>
-      <div>{label}</div>
+      <div>
+        {herkunftIdInActiveNodeArray ? row.__labelUnterHerkunft : row.__label}
+      </div>
     </Row>
   )
 }

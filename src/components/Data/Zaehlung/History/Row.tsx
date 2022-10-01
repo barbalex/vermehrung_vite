@@ -11,6 +11,7 @@ import toPgArray from '../../../../utils/toPgArray'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
 import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
+import addDerivedFieldsInDexie from '../../../../utils/addDerivedFieldsInDexie'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
@@ -70,6 +71,10 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     addIndexableBooleans({ table: 'zaehlung', object: newObjectForStore })
     // optimistically update store
     await dexie.zaehlungs.update(row.id, newObjectForStore)
+    return await addDerivedFieldsInDexie({
+      table: 'zaehlung',
+      id: row.id,
+    })
   }, [
     row,
     revRow.zaehlung_id,

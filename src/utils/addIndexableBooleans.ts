@@ -9,7 +9,7 @@ const addIndexableBooleans = ({ table, object }) => {
         booleanToInteger(value)
     }
   })
-  return object
+  return object 
 }
 
 export default addIndexableBooleans

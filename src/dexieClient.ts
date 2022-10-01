@@ -32,6 +32,7 @@ import {
   sammlungFile as sammlungFileFragment,
 } from './utils/fragments'
 import addIndexableBooleans from './utils/addIndexableBooleans'
+import addDerivedFieldsInDexie from './utils/addDerivedFieldsInDexie'
 import collectionFromTable from './utils/collectionFromTable'
 import addTotalCriteriaToWhere from './utils/addTotalCriteriaToWhere'
 
@@ -206,7 +207,11 @@ export class Herkunft implements IHerkunft {
     }
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'herkunft', object: storeUpdate })
-    dexie.herkunfts.update(this.id, storeUpdate)
+    await dexie.herkunfts.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'herkunft',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -462,7 +467,11 @@ export class Sammlung implements ISammlung {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'sammlung', object: storeUpdate })
 
-    dexie.sammlungs.update(this.id, storeUpdate)
+    await dexie.sammlungs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'sammlung',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -710,7 +719,11 @@ export class Lieferung {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'lieferung', object: storeUpdate })
 
-    dexie.lieferungs.update(this.id, storeUpdate)
+    await dexie.lieferungs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'lieferung',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -871,7 +884,11 @@ export class Art implements IArt {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'art', object: storeUpdate })
 
-    dexie.arts.update(this.id, storeUpdate)
+    await dexie.arts.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'art',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -1085,7 +1102,11 @@ export class Garten implements IGarten {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'garten', object: storeUpdate })
 
-    dexie.gartens.update(this.id, storeUpdate)
+    await dexie.gartens.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'garten',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -1374,7 +1395,11 @@ export class Kultur implements IKultur {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'kultur', object: storeUpdate })
 
-    dexie.kulturs.update(this.id, storeUpdate)
+    await dexie.kulturs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'kultur',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -1552,7 +1577,11 @@ export class Teilkultur implements ITeilkultur {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'teilkultur', object: storeUpdate })
 
-    dexie.teilkulturs.update(this.id, storeUpdate)
+    await dexie.teilkulturs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'teilkultur',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -1732,7 +1761,11 @@ export class Zaehlung implements IZaehlung {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'zaehlung', object: storeUpdate })
 
-    dexie.zaehlungs.update(this.id, storeUpdate)
+    await dexie.zaehlungs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'zaehlung',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -1914,9 +1947,11 @@ export class Teilzaehlung implements ITeilzaehlung {
     }
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'teilzaehlung', object: storeUpdate })
-
     await dexie.teilzaehlungs.update(this.id, storeUpdate)
-    return
+    return await addDerivedFieldsInDexie({
+      table: 'teilzaehlung',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -2221,7 +2256,11 @@ export class Person implements IPerson {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'person', object: storeUpdate })
 
-    dexie.persons.update(this.id, storeUpdate)
+    await dexie.persons.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'teilzaehpersonlung',
+      id: this.id,
+    })
   }
   delete({ store }) {
     this.edit({ field: '_deleted', value: true, store })
@@ -2479,7 +2518,11 @@ export class SammelLieferung implements ISammelLieferung {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'sammel_lieferung', object: storeUpdate })
 
-    dexie.sammel_lieferungs.update(this.id, storeUpdate)
+    await dexie.sammel_lieferungs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'sammel_lieferung',
+      id: this.id,
+    })
     const sl_auto_copy_edits = userPersonOption?.sl_auto_copy_edits
     setTimeout(() => {
       // copy to all lieferungen
@@ -2676,7 +2719,11 @@ export class Event implements IEvent {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'event', object: storeUpdate })
 
-    dexie.events.update(this.id, storeUpdate)
+    await dexie.events.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'event',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -2827,7 +2874,11 @@ export class Av implements IAv {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'av', object: storeUpdate })
 
-    dexie.avs.update(this.id, storeUpdate)
+    await dexie.avs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'av',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -2976,7 +3027,11 @@ export class Gv implements IGv {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'gv', object: storeUpdate })
 
-    dexie.gvs.update(this.id, storeUpdate)
+    await dexie.gvs.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'gv',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -3987,7 +4042,11 @@ export class ArtQk implements IArtQk {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'art_qk', object: storeUpdate })
 
-    dexie.art_qks.update(this.id, storeUpdate)
+    await dexie.art_qks.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'art_qk',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -4162,7 +4221,11 @@ export class KulturOption implements IKulturOption {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'kultur_option', object: storeUpdate })
 
-    dexie.kultur_options.update(this.id, storeUpdate)
+    await dexie.kultur_options.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'kultur_option',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -4298,7 +4361,11 @@ export class KulturQk implements IKulturQk {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'kultur_qk', object: storeUpdate })
 
-    dexie.kultur_qks.update(this.id, storeUpdate)
+    await dexie.kultur_qks.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'kultur_qk',
+      id: this.id,
+    })
   }
 
   delete({ store }) {
@@ -4555,7 +4622,11 @@ export class PersonOption implements IPersonOption {
     // set all indexable boolean fields
     addIndexableBooleans({ table: 'person_option', object: storeUpdate })
 
-    dexie.person_options.update(this.id, storeUpdate)
+    await dexie.person_options.update(this.id, storeUpdate)
+    return await addDerivedFieldsInDexie({
+      table: 'person_option',
+      id: this.id,
+    })
   }
 
   delete({ store }) {

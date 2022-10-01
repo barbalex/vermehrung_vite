@@ -1,20 +1,22 @@
 import { dexie } from '../../dexieClient'
 import addIndexableBooleans from '../addIndexableBooleans'
+import addDerivedFields from '../addDerivedFields'
 
 const stripTypename = (object) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { __typename, ...rest } = object
+  delete object.__typename
   return rest
 }
 
 // TODO: do this in worker?
-const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
+const processSubscriptionResult = async ({ data, table, store }) => {
   const { setInitiallyQueried, setLastUpdated, setInitiallyQuerying } = store
-  if (!dataIn.length) {
+  if (!data.length) {
     setInitiallyQueried({ table })
     return
   }
-  console.log('processTable, dataIn:', dataIn)
+  // console.log('processTable, dataIn:', dataIn)
   setInitiallyQuerying(table)
 
   // use a timeout to stagger the imports
@@ -24,8 +26,19 @@ const processSubscriptionResult = async ({ data: dataIn, table, store }) => {
     // console.log('processTable', {
     //   table,
     // })
-    const data = dataIn.map((d) => stripTypename(d))
-    data?.forEach((object) => addIndexableBooleans({ table, object }))
+    for (const object of data) {
+      delete object.__typename
+      addIndexableBooleans({ table, object })
+      await addDerivedFields({
+        table,
+        object,
+      })
+      table === 'sammlung' &&
+        console.log(
+          'processTable, object after stripping typename, adding indexable booleans and derived fields:',
+          object,
+        )
+    }
 
     // console.log('processTable', { data, table })
 

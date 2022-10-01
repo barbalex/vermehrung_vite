@@ -11,6 +11,7 @@ import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
 import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
+import addDerivedFieldsInDexie from '../../../../utils/addDerivedFieldsInDexie'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
   const store = useContext(StoreContext)
@@ -74,6 +75,10 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     addIndexableBooleans({ table: 'kultur', object: newObjectForStore })
     // optimistically update store
     await dexie.kulturs.update(row.id, newObjectForStore)
+    return await addDerivedFieldsInDexie({
+      table: 'kultur',
+      id: row.id,
+    })
   }, [
     row,
     revRow.kultur_id,

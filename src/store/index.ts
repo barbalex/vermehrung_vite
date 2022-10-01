@@ -33,6 +33,7 @@ import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import { dexie } from '../dexieClient'
 import addIndexableBooleans from '../utils/addIndexableBooleans'
+import addDerivedFieldsInDexie from '../utils/addDerivedFieldsInDexie'
 
 const myTypes = types
   .model({
@@ -319,7 +320,8 @@ const myTypes = types
       async updateModelValues({ table, id, values }) {
         // add/update indexable booleans
         addIndexableBooleans({ table, values })
-        dexie[`${table}s`]?.update?.(id, values)
+        await dexie[`${table}s`]?.update?.(id, values)
+        return await addDerivedFieldsInDexie({ table, id })
       },
       removeQueuedQueryById(id) {
         self.queuedQueries.delete(id)
@@ -401,6 +403,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'art', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'art',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.arts.put(newObjectForStore)
         setTimeout(() => {
@@ -454,6 +461,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'av', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'av',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         dexie.avs.put(newObjectForStore)
       },
@@ -512,6 +524,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'event', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'event',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.events.put(newObjectForStore)
         setTimeout(() => {
@@ -574,6 +591,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'garten', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'garten',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.gartens.put(newObjectForStore)
         setTimeout(() => {
@@ -627,6 +649,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'gv', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'gv',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.gvs.put(newObjectForStore)
       },
@@ -680,6 +707,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'herkunft', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'herkunft',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.herkunfts.put(newObjectForStore)
         setTimeout(() => {
@@ -751,6 +783,11 @@ const myTypes = types
         })
         // optimistically update store
         addIndexableBooleans({ table: 'kultur', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'kultur',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         await dexie.kulturs.put(newObjectForStore)
         await dexie.kultur_options.put({ id })
         setTimeout(() => {
@@ -836,6 +873,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'lieferung', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'lieferung',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.lieferungs.put(newObjectForStore)
         setTimeout(() => {
@@ -906,6 +948,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'person', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'person',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.persons.put(newObjectForStore)
         await dexie.person_options.put({ id })
@@ -985,6 +1032,11 @@ const myTypes = types
           table: 'sammel_lieferung',
           object: newObjectForStore,
         })
+        await addDerivedFieldsInDexie({
+          table: 'sammel_lieferung',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.sammel_lieferungs.put(newObjectForStore)
         setTimeout(() => {
@@ -1056,6 +1108,11 @@ const myTypes = types
           revertValue: true,
         })
         addIndexableBooleans({ table: 'sammlung', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'sammlung',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.sammlungs.put(newObjectForStore)
         setTimeout(() => {
@@ -1118,6 +1175,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'teilkultur', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'teilkultur',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.teilkulturs.put(newObjectForStore)
         if (!noNavigateInTree) {
@@ -1189,6 +1251,11 @@ const myTypes = types
           table: 'teilzaehlung',
           object: newObjectForStore,
         })
+        await addDerivedFieldsInDexie({
+          table: 'teilzaehlung',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.teilzaehlungs.put(newObjectForStore)
       },
@@ -1239,6 +1306,11 @@ const myTypes = types
           isInsert: true,
         })
         addIndexableBooleans({ table: 'zaehlung', object: newObjectForStore })
+        await addDerivedFieldsInDexie({
+          table: 'zaehlung',
+          row: newObjectForStore,
+          object: newObjectForStore,
+        })
         // optimistically update store
         await dexie.zaehlungs.put(newObjectForStore)
         setTimeout(() => {
