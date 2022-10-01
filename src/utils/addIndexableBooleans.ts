@@ -1,5 +1,5 @@
 import indexableBooleans from './indexableBooleans.json'
-import booleanToInteger from './booleanToInteger'
+import booleanToInteger from './booleanToInteger' 
 
 const addIndexableBooleans = ({ table, object }) => {
   Object.entries(object).forEach(([key, value]) => {

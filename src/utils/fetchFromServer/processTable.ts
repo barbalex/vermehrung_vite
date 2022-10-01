@@ -1,5 +1,4 @@
 import { dexie } from '../../dexieClient'
-import addIndexableBooleans from '../addIndexableBooleans'
 import addDerivedFields from '../addDerivedFields'
 
 // TODO: do this in worker?
@@ -16,24 +15,12 @@ const processSubscriptionResult = async ({ data, table, store }) => {
   // reason: indexedDB creates indexes right after a table was imported
   // need to stagger imports to keep ui responsive between them
   setTimeout(async () => {
-    // console.log('processTable', {
-    //   table,
-    // })
     for (const object of data) {
-      delete object.__typename
-      addIndexableBooleans({ table, object })
       await addDerivedFields({
         table,
         object,
       })
-      table === 'sammlung' &&
-        console.log(
-          'processTable, object after stripping typename, adding indexable booleans and derived fields:',
-          object,
-        )
     }
-
-    // console.log('processTable', { data, table })
 
     try {
       await dexie[`${table}s`].bulkPut(data)

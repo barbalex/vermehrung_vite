@@ -10,7 +10,6 @@ import toPgArray from '../../../../../utils/toPgArray'
 import mutations from '../../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../../dexieClient'
-import addIndexableBooleans from '../../../../../utils/addIndexableBooleans'
 import addDerivedFieldsInDexie from '../../../../../utils/addDerivedFieldsInDexie'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
@@ -79,7 +78,6 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     // for store: convert rev to winner
     newObjectForStore.id = row.id
     delete newObjectForStore.lieferung_id
-    addIndexableBooleans({ table: 'lieferung', object: newObjectForStore })
     await dexie.lieferungs.update(row.id, newObjectForStore)
     return await addDerivedFieldsInDexie({
       table: 'lieferung',

@@ -10,7 +10,6 @@ import toPgArray from '../../../../utils/toPgArray'
 import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
-import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
 import addDerivedFieldsInDexie from '../../../../utils/addDerivedFieldsInDexie'
 
 const TeilkulturHistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
@@ -70,7 +69,6 @@ const TeilkulturHistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     // for store: convert rev to winner
     newObjectForStore.id = row.id
     delete newObjectForStore.teilkultur_id
-    addIndexableBooleans({ table: 'teilkultur', object: newObjectForStore })
     // optimistically update store
     await dexie.teilkulturs.update(row.id, newObjectForStore)
     return await addDerivedFieldsInDexie({

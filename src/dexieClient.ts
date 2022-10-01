@@ -35,6 +35,8 @@ import addIndexableBooleans from './utils/addIndexableBooleans'
 import addDerivedFieldsInDexie from './utils/addDerivedFieldsInDexie'
 import collectionFromTable from './utils/collectionFromTable'
 import addTotalCriteriaToWhere from './utils/addTotalCriteriaToWhere'
+import addDerivedFields from './utils/addDerivedFields'
+import addDerivedFieldsInDexie from './utils/addDerivedFieldsInDexie'
 
 window.Dexie = Dexie
 
@@ -205,8 +207,6 @@ export class Herkunft implements IHerkunft {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'herkunft', object: storeUpdate })
     await dexie.herkunfts.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'herkunft',
@@ -464,9 +464,6 @@ export class Sammlung implements ISammlung {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'sammlung', object: storeUpdate })
-
     await dexie.sammlungs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'sammlung',
@@ -716,9 +713,6 @@ export class Lieferung {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'lieferung', object: storeUpdate })
-
     await dexie.lieferungs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'lieferung',
@@ -881,9 +875,6 @@ export class Art implements IArt {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'art', object: storeUpdate })
-
     await dexie.arts.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'art',
@@ -1099,9 +1090,6 @@ export class Garten implements IGarten {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'garten', object: storeUpdate })
-
     await dexie.gartens.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'garten',
@@ -1392,9 +1380,6 @@ export class Kultur implements IKultur {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'kultur', object: storeUpdate })
-
     await dexie.kulturs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'kultur',
@@ -1574,9 +1559,6 @@ export class Teilkultur implements ITeilkultur {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'teilkultur', object: storeUpdate })
-
     await dexie.teilkulturs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'teilkultur',
@@ -1759,8 +1741,6 @@ export class Zaehlung implements IZaehlung {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableBooleans({ table: 'zaehlung', object: storeUpdate })
-
     await dexie.zaehlungs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'zaehlung',
@@ -1945,8 +1925,6 @@ export class Teilzaehlung implements ITeilzaehlung {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'teilzaehlung', object: storeUpdate })
     await dexie.teilzaehlungs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'teilzaehlung',
@@ -2253,9 +2231,6 @@ export class Person implements IPerson {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'person', object: storeUpdate })
-
     await dexie.persons.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'teilzaehpersonlung',
@@ -2515,9 +2490,6 @@ export class SammelLieferung implements ISammelLieferung {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'sammel_lieferung', object: storeUpdate })
-
     await dexie.sammel_lieferungs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'sammel_lieferung',
@@ -2716,9 +2688,6 @@ export class Event implements IEvent {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'event', object: storeUpdate })
-
     await dexie.events.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'event',
@@ -2872,8 +2841,6 @@ export class Av implements IAv {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableBooleans({ table: 'av', object: storeUpdate })
-
     await dexie.avs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'av',
@@ -3024,9 +2991,6 @@ export class Gv implements IGv {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'gv', object: storeUpdate })
-
     await dexie.gvs.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'gv',
@@ -4040,8 +4004,6 @@ export class ArtQk implements IArtQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableBooleans({ table: 'art_qk', object: storeUpdate })
-
     await dexie.art_qks.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'art_qk',
@@ -4218,9 +4180,6 @@ export class KulturOption implements IKulturOption {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'kultur_option', object: storeUpdate })
-
     await dexie.kultur_options.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'kultur_option',
@@ -4359,8 +4318,6 @@ export class KulturQk implements IKulturQk {
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
     // set all indexable boolean fields
-    addIndexableBooleans({ table: 'kultur_qk', object: storeUpdate })
-
     await dexie.kultur_qks.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'kultur_qk',
@@ -4619,9 +4576,6 @@ export class PersonOption implements IPersonOption {
       changed_by: newObject.changed_by,
       _revisions: this._revisions ? [rev, ...this._revisions] : [rev],
     }
-    // set all indexable boolean fields
-    addIndexableBooleans({ table: 'person_option', object: storeUpdate })
-
     await dexie.person_options.update(this.id, storeUpdate)
     return await addDerivedFieldsInDexie({
       table: 'person_option',
@@ -4818,3 +4772,58 @@ export class MySubClassedDexie extends Dexie {
 }
 
 export const dexie = new MySubClassedDexie()
+
+// method to add derived fields to all objects at once
+const addDerivedFieldsToAll = async ({ table, objects }) => {
+  for (const object of objects) {
+    await addDerivedFields({ table, object })
+  }
+}
+
+dexie.use({
+  stack: 'dbcore',
+  name: 'derivedFields',
+  create(downlevelDatabase) {
+    // Return your own implementation of DBCore:
+    return {
+      // Copy default implementation.
+      ...downlevelDatabase,
+      // Override table method
+      // BEWARE: table is with s, i.e. sammlungs!!!
+      table(tableName) {
+        const table = tableName.slice(0, -1)
+        const downlevelTable = downlevelDatabase.table(tableName)
+        // Derive your own table from it:
+        return {
+          // Copy default table implementation:
+          ...downlevelTable,
+          // Override the mutate method:
+          mutate: (req) => {
+            // Copy the request object
+            // Do things before mutate, then
+            // table === 'sammlung' &&
+            //   console.log(`table ${table} being mutated, req:`, req)
+            const myRequest = { ...req }
+            for (const object of myRequest.values) {
+              addIndexableBooleans({
+                table,
+                object,
+              })
+              delete object.__typename
+              // TODO: how to run async function here
+              // await addDerivedFields({ table: 'sammlung', object })
+            }
+            // call downlevel mutate:
+            return downlevelTable.mutate(myRequest).then((res) => {
+              // console.log(`table ${table} being mutated, res:`, res)
+              // Do things after mutate
+              const myResponse = { ...res }
+              // Then return your response:
+              return myResponse
+            })
+          },
+        }
+      },
+    }
+  },
+})

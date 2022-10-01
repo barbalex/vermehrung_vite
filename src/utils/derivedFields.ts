@@ -18,26 +18,33 @@ const derivedFields = {
   person_option: {},
   sammel_lieferung: {},
   sammlung: {
-    __label: async (row) => {
-      if (!row) return
-      const [herkunft, art, person] = await Promise.all([
-        dexie.herkunfts.get(
-          row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
-        ),
-        dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
-        dexie.persons.get(
-          row.person_id ?? '99999999-9999-9999-9999-999999999999',
-        ),
-      ])
-      const ae_art = await art?.aeArt()
+    __label: {
+      derive: async (row) => {
+        if (!row) return
+        const [herkunft, art, person] = await Promise.all([
+          dexie.herkunfts.get(
+            row.herkunft_id ?? '99999999-9999-9999-9999-999999999999',
+          ),
+          dexie.arts.get(row.art_id ?? '99999999-9999-9999-9999-999999999999'),
+          dexie.persons.get(
+            row.person_id ?? '99999999-9999-9999-9999-999999999999',
+          ),
+        ])
+        const ae_art = await art?.aeArt()
 
-      return sammlungLabelFromSammlung({
-        sammlung: row,
-        art,
-        ae_art,
-        person,
-        herkunft,
-      })
+        return sammlungLabelFromSammlung({
+          sammlung: row,
+          art,
+          ae_art,
+          person,
+          herkunft,
+        })
+      },
+      dependentTables: (row) => ({
+        herkunft: row.herkunft_id,
+        art: row.art_id,
+        person: row.person_id,
+      }),
     },
     __labelUnderHerkunft: async (row) => {
       if (!row) return

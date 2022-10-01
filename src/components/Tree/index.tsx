@@ -45,7 +45,7 @@ const Tree = () => {
     })
     const personOption: PersonOption = await person?.personOption()
 
-    return { personOption, userRole: person.user_role }
+    return { personOption, userRole: person?.user_role }
   }, [user.uid])
 
   const userPersonOption = data?.personOption

@@ -10,7 +10,6 @@ import toPgArray from '../../../../utils/toPgArray'
 import mutations from '../../../../utils/mutations'
 import createDataArrayForRevComparison from '../createDataArrayForRevComparison'
 import { dexie } from '../../../../dexieClient'
-import addIndexableBooleans from '../../../../utils/addIndexableBooleans'
 import addDerivedFieldsInDexie from '../../../../utils/addDerivedFieldsInDexie'
 
 const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
@@ -73,7 +72,6 @@ const HistoryRow = ({ row, revRow, historyTakeoverCallback }) => {
     newObjectForStore.id = row.id
     delete newObjectForStore.herkunft_id
     // optimistically update store
-    addIndexableBooleans({ table: 'herkunft', object: newObjectForStore })
     await dexie.herkunfts.update(row.id, newObjectForStore)
     return await addDerivedFieldsInDexie({
       table: 'herkunft',
