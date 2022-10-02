@@ -78,12 +78,12 @@ const SelectLoadingOptions = ({
   saveToDb,
   error: saveToDbError,
   modelFilter = () => true,
-  labelTable,
+  labelTable = 'arts',
   labelField,
 }) => {
   const [data, setData] = useState({})
   useLiveQuery(async () => {
-    const data = await dexie[labelTable ? `${labelTable}s` : 'arts'].get(
+    const data = await dexie[`${labelTable}s`].get(
       row[field] ?? '99999999-9999-9999-9999-999999999999',
     )
     setData(data)
