@@ -34,9 +34,6 @@ import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import { dexie } from '../dexieClient'
 import addDerivedFieldsInDexie from '../utils/addDerivedFieldsInDexie'
-import collectionFromTable from '../utils/collectionFromTable'
-import addTotalCriteriaToWhere from '../utils/addTotalCriteriaToWhere'
-import artsSortedFromArts from '../utils/artsSortedFromArts'
 
 const myTypes = types
   .model({
