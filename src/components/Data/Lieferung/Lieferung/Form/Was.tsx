@@ -64,7 +64,7 @@ const LieferungWas = ({ showFilter, row, saveToDb, ifNeeded }) => {
     ])
 
     const artsIncludingChoosen = uniqBy(
-      [...arts, ...(art && !showFilter ? [art] : [])],
+      [...arts, ...(art && !showFilter && [art])],
       'id',
     )
     const artsSorted = await artsSortedFromArts(artsIncludingChoosen)
