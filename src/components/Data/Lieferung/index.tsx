@@ -72,7 +72,7 @@ const LieferungContainer = ({ filter: showFilter, id: idPassed }) => {
     // show that too
     return (
       <StyledSplitPane split="vertical" size="50%" maxSize={-10}>
-        <Lieferung showFilter={showFilter} row={row} id={id} />
+        <Lieferung showFilter={showFilter} personOption={personOption} row={row} id={id} />
         <SammelLieferung
           showFilter={showFilter}
           id={row?.sammel_lieferung_id}

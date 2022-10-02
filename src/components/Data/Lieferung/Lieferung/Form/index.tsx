@@ -14,7 +14,6 @@ import Von from './Von'
 import Nach from './Nach'
 import Wann from './Wann'
 import Wer from './Wer'
-import { dexie } from '../../../../../dexieClient'
 
 const FieldsContainer = styled.div`
   padding: 10px;
@@ -35,6 +34,7 @@ const LierferungForm = ({
   showFilter,
   id,
   row,
+  personOption = {},
   activeConflict,
   setActiveConflict,
   showHistory,
@@ -45,15 +45,11 @@ const LierferungForm = ({
   const { errors, filter, unsetError, user } = store
 
   const data = useLiveQuery(async () => {
-    const [person, sammelLieferung, vonSammlung] = await Promise.all([
-      dexie.persons.get({
-        account_id: user.uid ?? '99999999-9999-9999-9999-999999999999',
-      }),
+    const [sammelLieferung, vonSammlung] = await Promise.all([
       row.sammelLieferung?.(),
       row.sammlung?.(),
     ])
 
-    const personOption: PersonOption = await person?.personOption()
     const vonSammlungHerkunft = await vonSammlung?.herkunft?.()
 
     if (vonSammlungHerkunft) {
@@ -87,9 +83,8 @@ const LierferungForm = ({
       personOption,
       sammelLieferung,
     }
-  }, [user.uid, row])
+  }, [user.uid, row, personOption])
 
-  const personOption = data?.personOption ?? {}
   const sammelLieferung = data?.sammelLieferung
   const herkunft = data?.herkunft
   const herkunftQuelle = data?.herkunftQuelle

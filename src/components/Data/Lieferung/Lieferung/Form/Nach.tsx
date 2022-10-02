@@ -45,20 +45,19 @@ const LieferungNach = ({ showFilter, row, saveToDb, ifNeeded, herkunft }) => {
   const nachKulturWerte = useLiveQuery(async () => {
     const kulturs = await collectionFromTable({
       table: 'kultur',
-      where: addTotalCriteriaToWhere({ table: 'kultur', store }),
+      where: addTotalCriteriaToWhere({
+        table: 'kultur',
+        store,
+        where: {
+          // show only kulturen of art_id
+          ...(row?.art_id && { art_id: row.art_id }),
+          // show only kulturen with same herkunft
+          ...(herkunft?.id && { herkunft_id: herkunft.id }),
+        },
+      }),
     }).toArray()
 
     const kultursFiltered = kulturs
-      // show only kulturen of art_id
-      .filter((k) => {
-        if (row?.art_id) return k.art_id === row.art_id
-        return true
-      })
-      // show only kulturen with same herkunft
-      .filter((k) => {
-        if (herkunft?.id) return k.herkunft_id === herkunft.id
-        return true
-      })
       // shall not be delivered to same kultur it came from
       .filter((k) => {
         if (row?.von_kultur_id && row?.von_kultur_id !== row?.nach_kultur_id) {
