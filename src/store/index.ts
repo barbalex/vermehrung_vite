@@ -10,6 +10,7 @@ import Tree, { defaultValue as defaultTree } from './Tree'
 import Filter from './Filter/types'
 import initialFilterValues from './Filter/initialValues'
 import QueuedQueryType from './QueuedQuery'
+// import WertType from './Wert'
 import NotificationType from './Notification'
 import Errors, { defaultValue as defaultErrors } from './Errors'
 
@@ -33,6 +34,9 @@ import getAuthToken from '../utils/getAuthToken'
 import mutations from '../utils/mutations'
 import { dexie } from '../dexieClient'
 import addDerivedFieldsInDexie from '../utils/addDerivedFieldsInDexie'
+import collectionFromTable from '../utils/collectionFromTable'
+import addTotalCriteriaToWhere from '../utils/addTotalCriteriaToWhere'
+import artsSortedFromArts from '../utils/artsSortedFromArts'
 
 const myTypes = types
   .model({
@@ -122,6 +126,7 @@ const myTypes = types
     // wsReconnectCount is made so a subscription can provoke re-subscription on error
     // see initializeSubscriptions, unsubscribe.ae_art
     wsReconnectCount: types.maybeNull(types.number, 0),
+    // artWerte: types.map(WertType),
   })
   .volatile(() => ({
     user: {},
@@ -131,13 +136,6 @@ const myTypes = types
     navigate: undefined,
   }))
   .actions((self) => {
-    /*
-     * Setting counts on every change of relevant values
-     * Reason: reduce computation
-     * TODO: only re-calculate when data is shown according to person_options?
-     * For instance: person_options.tree_lieferung
-     * TODO: conditionAdder?
-     */
     reaction(
       () => `${self.queuedQueries.size}/${self.shortTermOnline}`,
       flow(function* () {

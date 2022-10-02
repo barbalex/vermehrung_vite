@@ -4793,6 +4793,7 @@ dexie.use({
       table(tableName) {
         const table = tableName.slice(0, -1)
         const downlevelTable = downlevelDatabase.table(tableName)
+        // if (table === 'art') store.setArtWerte()
         // Derive your own table from it:
         return {
           // Copy default table implementation:
